@@ -1,0 +1,6 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/ictcore/bin
+MAILTO=""
+HOME=/usr/ictcore
+* * * * * ictcore /usr/bin/php '/usr/ictcore/bin/cron.php' 2>/dev/null
+10 0 * * * root /usr/bin/sbin /usr/sbin/ntpdate pool.ntp.org >/dev/null

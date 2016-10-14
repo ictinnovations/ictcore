@@ -1,0 +1,38 @@
+{
+	"name": "aza/libevent",
+	"description": "AzaLibEvent - Simple, powerful and easy to use OOP wrapper for the LibEvent PHP bindings. Component from Anizoptera CMF.",
+	"keywords": [
+		"libevent", "async", "timers", "event", "stream", "sockets"
+	],
+	"homepage": "https://github.com/Anizoptera/AzaLibEvent",
+	"license": "MIT",
+	"support": {
+		"issues": "https://github.com/Anizoptera/AzaLibEvent/issues"
+	},
+	"authors": [
+		{"name": "Amal Samally", "email": "amal.samally@gmail.com", "homepage": "https://github.com/amal"},
+		{"name": "AzaGroup Members"}
+	],
+	"require": {
+		"php": ">=5.2",
+		"aza/clibase": "~1.0"
+	},
+	"require-dev": {
+		"aza/socket": "~1.0"
+	},
+	"suggest": {
+		"ext-libevent": "Really it's a requirement for normal work."
+	},
+	"autoload": {
+		"psr-0": {
+			"Aza\\Components\\LibEvent": ""
+		}
+	},
+	"target-dir": "Aza/Components/LibEvent",
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.x-dev"
+		}
+	},
+	"minimum-stability": "dev"
+}

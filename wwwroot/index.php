@@ -1,0 +1,57 @@
+<?php
+// default include is /usr/ictcore/core
+chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
+
+// Include the framework
+include_once "core.php";
+include_once "Api.php";
+
+// **************************************************** PREPARE SYSTEM
+$oApi = new Api();
+$oApi->create_interface('rest'); // create rest server interface
+// ****************************************** AUTHENTICATE AND EXECUTE
+try {
+  if (http_authenticate() === true) {
+    $oApi->process_request();  // serve rest request
+  } else {
+    throw new CoreException('401', 'Unknown authentication error');
+  }
+} catch (CoreException $e) {
+  // send error
+  $oApi->send_error($e->getCode(), $e->getMessage());
+}
+
+exit();
+
+function http_authenticate()
+{
+  $realm = conf_get('company:name', 'ICTCore') . ' :: REST API Server';
+  // select authentication method
+  if (!empty($_SERVER['PHP_AUTH_USER'])) {
+    $username = $_SERVER['PHP_AUTH_USER'];
+    $password = $_SERVER['PHP_AUTH_PW'];
+  } else {
+    header("WWW-Authenticate: Basic realm=\"$realm\"");
+    throw new CoreException('401', "You are not authorized to access this resource");
+  }
+  // authenticate using username and password method
+  try {
+    $oUser = new User($username);
+  } catch (CoreException $e) {
+    // hide actuall error, i.e User not found
+    header("WWW-Authenticate: Basic realm=\"$realm\"");
+    throw new CoreException('401', "Invalid username or password", $e);
+  }
+  if (empty($oUser->user_id) || $oUser->authenticate($password) == false) {
+    header("WWW-Authenticate: Basic realm=\"$realm\"");
+    throw new CoreException('401', "Invalid username or password");
+  }
+
+  try {
+    do_login($oUser);
+  } catch (CoreException $ex) {
+    header("WWW-Authenticate: Basic realm=\"$realm\"");
+    throw new CoreException('401', "User account disabled / banned, please contact admin", $ex);
+  }
+  return true;
+}

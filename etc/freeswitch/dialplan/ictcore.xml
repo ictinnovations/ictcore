@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ictcore dialplan -->
+<include>
+  <context name="ictcore">
+    <extension name="application_inbound">
+      <condition field="destination_number" expression="^\+?(\d+)$">
+        <action application="lua" data="/usr/ictcore/bin/freeswitch/application.lua 0 inbound success" />
+        <action application="hangup"/>
+      </condition>
+    </extension>
+  </context>
+  <context name="ictcore_fail">
+    <extension name="app_originate_fail">
+      <condition field="${originate_disposition}" expression="^(.*)$">
+        <action application="lua" data="/usr/ictcore/bin/freeswitch/spool_failed.lua ${spool_id} ${application_id} $1" />
+        <action application="hangup"/>
+      </condition>
+    </extension>
+  </context>
+</include>

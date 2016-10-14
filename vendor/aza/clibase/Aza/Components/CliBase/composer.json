@@ -1,0 +1,40 @@
+{
+	"name": "aza/clibase",
+	"description": "AzaCliBase - Anizoptera CMF component with basic functionality and helper methods for CLI and Daemon applications (forks, libevent, etc..).",
+	"keywords": [
+		"cli", "daemon", "helper", "utility",
+		"fork", "posix", "pcntl", "libevent",
+		"exit code", "signal"
+	],
+	"homepage": "https://github.com/Anizoptera/AzaCliBase",
+	"license": "MIT",
+	"support": {
+		"issues": "https://github.com/Anizoptera/AzaCliBase/issues"
+	},
+	"authors": [
+		{"name": "Amal Samally", "email": "amal.samally@gmail.com", "homepage": "https://github.com/amal"},
+		{"name": "AzaGroup Members"}
+	],
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"suggest": {
+		"ext-posix": "Used everywhere in component. Really it's a requirement for normal work.",
+		"ext-pcntl": "Used everywhere in component. Really it's a requirement for normal work.",
+		"ext-proctitle": "Used to change process title",
+		"ext-libevent": "Used for storing one main event base for application and save availability flag",
+		"aza/libevent": "Used for storing one main event base for application"
+	},
+	"autoload": {
+		"psr-0": {
+			"Aza\\Components\\CliBase": ""
+		}
+	},
+	"target-dir": "Aza/Components/CliBase",
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.x-dev"
+		}
+	},
+	"minimum-stability": "dev"
+}

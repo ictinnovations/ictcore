@@ -1,0 +1,16 @@
+Order allow,deny
+Allow from all
+
+DirectoryIndex index.php
+<IfModule mod_rewrite.c>
+    # Turn Rewrite Engine on
+    RewriteEngine On
+
+    # Send empty /directory index request to index.php
+    RewriteRule ^$ index.php [QSA,L]
+
+    # Send all non matching requests to index.php (index.php will parse the request url and routes accordingly)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
