@@ -7,8 +7,8 @@ ICTCore having primary focus on integrated and automated communication. ICTCore 
 
 ICTCore is a PHP and Linux based service application which support multiple gateway interfaces like Freeswitch, Kannel and Sendmail further it offers inbound and outbound transmissions for voice, fax, sms and email. However main feature of ICTCore is its unified way of integration which allow different kind of services to interact with each other, for example a message can trigger a call or an inbound fax can be forwarded over email.
 
-Feature
--------
+Features
+--------
 
 ### Truly unified communication framework
 ICTCore allow developers to use multiple communication methods / services like Call, FAX, Messaging or Email, plus it also allow them to integrate these services with each other, like SMS notification after each call or email to fax.
@@ -93,7 +93,7 @@ $faxTransmission->send();
 
 Get involved!
 -------------
-We believe in leveraging open source in telecommunication, providing a free platform for simple and advanced CTI applications. ICTCore was built by people like you, and we need your help to make ICTCore better! Why not participate in a useful project today? Please check doc folder to learn how to begin.
+We believe in leveraging open source in telecommunication, providing a free platform for simple and advanced CTI applications. ICTCore was built by people like you, and we need your help to make ICTCore better! Why not participate in a useful project today? Please check docs folder to learn how to begin.
 
 License
 -------

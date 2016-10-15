@@ -14,7 +14,7 @@ Directory Structure
 * wwwroot : to communicate with external world, with gateways and to server REST APIs
 * log     : Activity Logs / log files
 * db      : SQL scripts for new database initialization
-* doc     : All type of documentation / guide
+* docs    : All type of documentation / guide
 * .spec   : RPM spec files
 * vendor  : Third party dependencies and libraries mannaged by Composer
 * composer.json

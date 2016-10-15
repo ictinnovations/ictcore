@@ -162,9 +162,9 @@ touch %{buildroot}/var/spool/mail/ictcore
 %config(noreplace) %{core_home}/etc/odbc.ini
 
 # save documents
-%doc %{core_home}/doc
+%doc %{core_home}/docs
 %doc %{core_home}/CHANGLOG.md
-%doc %{core_home}/INSTALL.md
+%doc %{core_home}/README.md
 %doc %{core_home}/LICENSE.md
 %doc %{core_home}/TODO.md
 
@@ -424,7 +424,7 @@ echo "apache" >> /etc/mail/trusted-users
 * Tue Sep 20 2016 Nasir Iqbal <nasir@ictinnovations.com> - 0.7.0
 - Refactoring, logic and flow and api refactoring (third release)
 
-* Tue Jun 29 2016 Nasir Iqbal <nasir@ictinnovations.com> - 0.6.0
+* Wed Jun 29 2016 Nasir Iqbal <nasir@ictinnovations.com> - 0.6.0
 - Rest interface and APIs development
 - User guide for REST APIs
 - User authentication and authorization support added
