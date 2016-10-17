@@ -61,7 +61,7 @@ class Emailtofax extends Program
       $emailRecieve->data = array(
           'context' => 'internal',
           'source' => $this->aCache['account']->email,
-          'filter_flag' => Dialplan::FILTER_COMMON
+          'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE)
       );
     } else {
       $emailRecieve->data = array(

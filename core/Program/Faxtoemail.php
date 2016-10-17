@@ -70,13 +70,13 @@ class Faxtoemail extends Program
     if (isset($this->aCache['account'])) {
       $inboundCall->data = array(
           'context' => 'external',
-          'source' => $this->aCache['account']->phone,
-          'filter_flag' => Dialplan::FILTER_COMMON
+          'destination' => $this->aCache['account']->phone,
+          'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_DESTINATION)
       );
     } else {
       $inboundCall->data = array(
           'context' => 'external',
-          'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE)
+          'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_DESTINATION)
       );
     }
 

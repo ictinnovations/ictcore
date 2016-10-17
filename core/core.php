@@ -135,8 +135,9 @@ class Core
 
       // Finally update contact_id and status for newly created transmission
       // Note: we can't locate or create contact before activating transmission owner
-      self::locate_contact($oSequence);
+      self::locate_contact($oTransmission, $oSequence);
       $oTransmission->status = Transmission::STATUS_INITIALIZING;
+      $oTransmission->save(); // we must save transmission to generate transmission_id for new spool
     }
 
     // At this point we are excepting to have a valid program and transmission

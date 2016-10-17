@@ -609,24 +609,29 @@ class Program
     /**
      * ***************************************** Process application results **
      */
-    // if it is an existing transmission
-    if (!$oTransmission->is_pending()) {
-      $oApplication = Application::load($oSequence->oRequest->application_id);
-      // For new transmission
-    } else {
-      // check if dialplan provide any reference to first application
-      if ($oSequence->oDialplan->application_id) {
+    // load request application
+    if ($oTransmission->status == Transmission::STATUS_INITIALIZING) { // For new transmission
+      // first of all change transmission status
+      $oTransmission->status = Transmission::STATUS_PROCESSING;
+      $listApplication = Application::search($this->program_id, ORDER_INIT);
+      foreach ($listApplication as $application_id) {
+        $oApplication = Application::load($application_id);
+        break; // only one application is needed
+      }
+    } else { // in case of existing in-process transmission
+      // use application id from request if not present then
+      // check if dialplan provide any reference to application
+      if (!empty($oSequence->oRequest->application_id)) {
+        $oApplication = Application::load($oSequence->oRequest->application_id);
+      } else if (!empty($oSequence->oDialplan) && ctype_digit(($oSequence->oDialplan->application_id))) {
         $oApplication = Application::load($oSequence->oDialplan->application_id);
-      } else {
-        $listApplication = Application::search($this->program_id, ORDER_INIT);
-        foreach ($listApplication as $application_id) {
-          $oApplication = Application::load($application_id);
-          break; // only one application is needed
-        }
       }
     }
+
+    // process application
     $oApplication->_process($oTransmission, $oSequence);
     $this->application_completed($oApplication);
+
     /**
      * ********************************************* Process program Results **
      */
