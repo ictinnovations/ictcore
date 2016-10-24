@@ -33,3 +33,16 @@ class CoreProcess extends Thread
   }
 
 }
+
+class ScheduleProcess extends Thread
+{
+
+  function process()
+  {
+    // First parameter will be schedule_id
+    $schedule_id = $this->getParam(0);
+    $oSchedule = new Schedule($schedule_id);
+    $oSchedule->process();
+  }
+
+}

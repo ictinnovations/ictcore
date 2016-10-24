@@ -265,6 +265,20 @@ CREATE TABLE schedule
 ) ENGINE = InnoDB;
 CREATE INDEX schedule_data ON schedule (data);
 
+CREATE TABLE schedule_expression
+   year                          varchar(50)            NOT NULL default '*',
+   weekday                       varchar(50)            NOT NULL default '*',
+   month                         varchar(50)            NOT NULL default '*',
+   day                           varchar(50)            NOT NULL default '*',
+   hour                          varchar(50)            NOT NULL default '*',
+   minute                        varchar(50)            NOT NULL default '*',
+   second                        varchar(50)            NOT NULL default '*',
+   schedule_id                   int(11) unsigned       NOT NULL
+) ENGINE = InnoDB;
+
+CREATE TABLE schedule_queue
+) ENGINE = InnoDB;
+
 /*==============================================================*/
 /* Table: configuration (System and User configurations)        */
 /*==============================================================*/

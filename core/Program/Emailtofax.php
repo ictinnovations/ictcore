@@ -230,7 +230,7 @@ class Emailtofax extends Program
 
     // Now we are ready to create new transmission for email
     $emailTransmission = Sendemail::transmission_instant($programData, $transmissionData);
-    $emailTransmission->schedule(array('delay' => '60'));
+    $emailTransmission->schedule(array('delay' => 5));
     //$emailTransmission->send();
   }
 
@@ -242,11 +242,15 @@ class Emailtofax extends Program
   public function send_fax($fax_filepath)
   {
     // prepare data for new program
+    $oDocument = Document();
+    $oDocument->file_name = $fax_filepath;
+    $oDocument->save();
+
     $programData = array(
         'name' => 'emailtofax_sendfax',
         'parent_id' => $this->program_id,
         'data' => array(
-            'document_file' => $fax_filepath
+            'document_id' => $oDocument->document_id
         )
     );
 
@@ -259,7 +263,7 @@ class Emailtofax extends Program
 
     // Now we are ready to launch new transmission for fax
     $faxTransmission = Sendfax::transmission_instant($programData, $transmissionData);
-    $faxTransmission->schedule(array('delay' => '60'));
+    $faxTransmission->schedule(array('delay' => 5));
     //$faxTransmission->send();
   }
 

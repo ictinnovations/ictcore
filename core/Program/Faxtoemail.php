@@ -236,7 +236,7 @@ class Faxtoemail extends Program
 
     // Now we are ready to create new transmission for email
     $emailTransmission = Sendemail::transmission_instant($programData, $transmissionData);
-    $emailTransmission->schedule(array('delay' => '60'));
+    $emailTransmission->schedule(array('delay' => 5));
     //$emailTransmission->send();
   }
 

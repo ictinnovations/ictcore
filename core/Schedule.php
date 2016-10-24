@@ -300,9 +300,11 @@ class Schedule
   public static function process_all()
   {
     $aSchedule = self::search_pending();
+    // now process each aSchedule in a separate thread
+    include 'lib/CoreThread.php';
     foreach ($aSchedule as $schedule_id) {
-      $oSchedule = new Schedule($schedule_id);
-      $oSchedule->process();
+      $scheduleThread = new ScheduleProcess();
+      $scheduleThread->wait()->run($schedule_id);
     }
   }
 
@@ -311,28 +313,11 @@ class Schedule
     Corelog::log("proccessing schedule:" . $this->schedule_id, Corelog::CRUD);
 
     $result = false;
-
-    switch ($this->type) {
-      case 'transmission':
-        try {
-          $oTransmission = new Transmission($this->data);
-          // before sending transmission remember to login its owner
-          $oTransmission->activate_owner();
-          $oTransmission->send();
-        } catch (Exception $ex) {
-          Corelog::log($ex->getMessage(), Corelog::ERROR);
-          Corelog::log("Unable to send scheduled transmission", Corelog::ERROR);
-        }
-        break;
-      default:
-        $type = ucfirst(strtolower(trim($this->type)));
-        if (class_exists($type)) {
-          $oType = new $type($this->data);
-          if (method_exists($oType, $this->action)) {
-            $result = call_user_func_array(array($oType, $this->action));
-          }
-        }
-        break;
+    $classType = ucfirst(strtolower(trim($this->type)));
+    if (class_exists($classType)) {
+      if (method_exists($classType, 'schedule_process')) {
+        $result = call_user_func_array(array($classType, 'schedule_process'), array($this));
+      }
     }
 
     if ($this->is_recurring) {

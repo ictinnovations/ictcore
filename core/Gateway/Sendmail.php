@@ -164,10 +164,11 @@ class Sendmail extends Gateway
         'error' => ''
     );
 
-    // now process results in a separate thread
-    include 'lib/CoreThread.php';
-    $threadProcess = new CoreProcess();
-    $threadProcess->wait()->run($oRequest);
+    /* NOTE: 
+     * under apache multithreading does not work
+     * so we have to use scheduling
+     */
+    $oRequest->schedule(array('delay' => 1));
     /*     * **************************************************** UPDATE END */
   }
 

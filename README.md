@@ -1,16 +1,16 @@
-ICTCore - A Unified Communication Platform for CTI
-==================================================
+ICTCore - A Unified Communications Framework for CTI
+====================================================
 
-ICTCore core is open source unified communication framework for developers and integrators to rapidly develop ICT based applications using their existing development skills. By using ICTCore, developer can create communication based applications such as Auto attendant, Fax to Email, Click to Call etc.. they can program custom business logic that can control incoming and outgoing communication instances.
+ICTCore core is open source unified communications framework for developers and integrators to rapidly develop ICT based applications using their existing development skills. By using ICTCore, developer can create communication based applications such as Auto attendant, Fax to Email, Click to Call etc.. they can program custom business logic that can control incoming and outgoing communication instances.
 
-ICTCore having primary focus on integrated and automated communication. ICTCore goal is to be a common server-side software / back-end for CTI (computer telephony integration) related projects. Further as a framework it can be extended to develop new communication solution and services using user's existing development skills and infrastructure.
+ICTCore having primary focus on integrated and automated communications. ICTCore goal is to be a common server-side software / back-end for CTI (computer telephony integration) related projects. Further as a framework it can be extended to develop new communication solution and services using user's existing development skills and infrastructure.
 
 ICTCore is a PHP and Linux based service application which support multiple gateway interfaces like Freeswitch, Kannel and Sendmail further it offers inbound and outbound transmissions for voice, fax, sms and email. However main feature of ICTCore is its unified way of integration which allow different kind of services to interact with each other, for example a message can trigger a call or an inbound fax can be forwarded over email.
 
 Features
 --------
 
-### Truly unified communication framework
+### Truly unified communications framework
 ICTCore allow developers to use multiple communication methods / services like Call, FAX, Messaging or Email, plus it also allow them to integrate these services with each other, like SMS notification after each call or email to fax.
 
 * ICTCore cover all major communication methods
@@ -41,63 +41,60 @@ ICTCore is build for developers, ICTCore allows developers to
 
 Install
 -------
-Currently ICTCore binaries are available for CentOs 6 and 7, To install ICTCore you need a freshly installed server and then you can instruction mentioned in following.
+Currently ICTCore binaries are available for CentOs 6 and 7, To install ICTCore you need a freshly installed server and then you can follow the instructions mentioned in following. If you are looking for source code you can find it at github [ICTCore: Open Source Unified Communications Framework](https://github.com/ictinnovations/ictcore)
 
-1. Install ict and epel repositories
+First of all we need to install ict and epel repositories
 #### for centos 7
-```
-rpm -Uvh 'https://service.ictinnovations.com/repo/7/ict-release-7-4.el7.centos.noarch.rpm'
-yum install epel-release
-```
+
+    rpm -Uvh 'https://service.ictinnovations.com/repo/7/ict-release-7-4.el7.centos.noarch.rpm'  
+    yum install epel-release  
+
 #### for CentOs 6 also install Freeswitch repository
-```
-rpm -Uvh 'http://service.ictinnovations.com/repo/6/ict-release-6-2.noarch.rpm'
-rpm -Uvh 'http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'
-rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'
-```
 
-2. Install ICTCore
-```
-yum install ictcore ictcore-voice ictcore-fax ictcore-email
-```
+    rpm -Uvh 'http://service.ictinnovations.com/repo/6/ict-release-6-2.noarch.rpm'  
+    rpm -Uvh 'http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'  
+    rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'  
 
-3. Create a new database and database user for ictcore
+1. Install ICTCore  
+    `
+    yum update  
+    yum install ictcore ictcore-voice ictcore-fax ictcore-email  
+    `
 
-4. Initiate / populate newly created database using scripts from /usr/ictcore/db/*
+2. Create a new database and database user for ictcore
 
-5. Update /etc/ictcore.conf and /etc/odbc.ini for database access
+3. Initiate / populate newly created database using scripts from /usr/ictcore/db/*
 
-6. Restart HTTP / Apache server
+4. Update /etc/ictcore.conf and /etc/odbc.ini for database access
+
+5. Restart HTTP / Apache server
 
 Getting started
 ---------------
 Following is an example about sending fax by using ICTCore
 
-```
-// prepare a program with fax document
-$programData = array('file_name' => '/some/pdf/file.pdf');
-$faxProgram = new Sendfax(null, array('data' => $programData));
+    // prepare a program with fax document
+    $programData = array('file_name' => '/some/pdf/file.pdf');
+    $faxProgram = new Sendfax(null, array('data' => $programData));
 
-// create a transmission
-$contact_id = 12;
-$account_id = 1;
-$faxTransmission = faxProgram->transmission_create($contact_id, $account_id);
+    // create a transmission
+    $contact_id = 12;
+    $account_id = 1;
+    $faxTransmission = faxProgram->transmission_create($contact_id, $account_id);
 
-// schedule transmission 
-$faxTransmission->schedule(array('delay' => 3600)); // in seconds
+    // schedule transmission 
+    $faxTransmission->schedule(array('delay' => 3600)); // in seconds
 
-// or dispatch immediately
-$faxTransmission->send();
-
-```
+    // or dispatch immediately
+    $faxTransmission->send();
 
 Get involved!
 -------------
-We believe in leveraging open source in telecommunication, providing a free platform for simple and advanced CTI applications. ICTCore was built by people like you, and we need your help to make ICTCore better! Why not participate in a useful project today? Please check docs folder to learn how to begin.
+We believe in leveraging open source in telecommunications, providing a free platform for simple and advanced CTI applications. ICTCore was built by people like you, and we need your help to make ICTCore better! Why not participate in a useful project today? Please check docs folder to learn how to begin.
 
 License
 -------
-The ICTCore is open-sourced software licensed under the [MPLv2 license](LICENSE.md).
+The ICTCore is open-sourced software licensed under the [MPLv2 license](https://www.mozilla.org/en-US/MPL/2.0/).
 
 Contact us
 ----------

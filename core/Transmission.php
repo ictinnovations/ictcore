@@ -457,6 +457,27 @@ class Transmission
     }
   }
 
+  public static function schedule_process($oSchedule)
+  {  
+    try {
+      $oTransmission = new Self($oSchedule->data); // data is transmission_id
+      switch ($oSchedule->action) {
+        case 'send':
+          // before sending transmission from schedule 
+          // remember to login its owner
+          $oTransmission->activate_owner();
+          $oTransmission->send();
+          break;
+        default:
+          throw new CoreException("500", "Unknown schedule action, Unable to continue!");
+      }
+      
+    } catch (Exception $ex) {
+      Corelog::log($ex->getMessage(), Corelog::ERROR);
+      Corelog::log("Unable to send scheduled transmission", Corelog::ERROR);
+    }
+  }
+
   public function send()
   {
     if (Transmission::STATUS_INVALID == $this->status) {
@@ -518,6 +539,7 @@ class Transmission
 
   public function &result_create($data, $name, $type = Result::TYPE_APPLICATION, $application_id = '')
   {
+    Corelog::log("New result, type: " . $type . ", name: " . $name . ", data: " . print_r($data, ture), Corelog::LOGIC);
     $this->aResult[$name] = new Result();
     $this->aResult[$name]->spool_id = $this->oSpool->spool_id;
     $this->aResult[$name]->name = $name;

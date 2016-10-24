@@ -23,8 +23,9 @@ BuildRequires: php subversion
 Provides: ictcore
 
 # ICTCore developed in php
-Requires: php php-cli php-curl php-mcrypt php-mbstring php-xmlrpc php-posix php-mysql
-Requires: php-pear php-pear-Pager php-pear-SOAP php-pear-HTTP-Request php-pecl-imagick php-pecl-json php-xml
+Requires: php php-cli php-curl php-mcrypt php-mbstring php-xmlrpc php-posix php-mysql php-xml
+Requires: php-pear php-pear-Pager php-pear-SOAP php-pear-HTTP-Request
+Requires: php-pecl-imagick php-pecl-json php-pecl-libevent
 # ICTCore use mysql as database in centos 6 or mariadb in centos 7
 %if %{rhel} > 6
 Requires: mariadb mariadb-server mysql-connector-odbc

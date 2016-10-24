@@ -43,4 +43,47 @@ class Request
     }
   }
 
+  public function __sleep()
+  {
+    return array('gateway_flag', 'spool_id', 'application_id', 'application_data', 'source', 'destination');
+  }
+
+  public function schedule($schedule_data = array())
+  {
+    if (empty($schedule_data)) {
+      $schedule_data = array('delay' => 60);
+    }
+    $oSchedule = new Schedule();
+    $oSchedule->type = 'request';
+    $oSchedule->action = 'process';
+    $oSchedule->data = serialize($this);
+    foreach ($schedule_data as $schedule_field => $schedule_value) {
+      $oSchedule->$schedule_field = $schedule_value;
+    }
+    $oSchedule->save();
+    return $oSchedule->schedule_id;
+  }
+
+  public function schedule_cancel()
+  {
+    // TODO: schedule_cancel in not supported
+  }
+
+  public function schedule_process($oSchedule)
+  {
+    try {
+      $oRequest = unserialize($oSchedule->data); // data is serilized request
+      switch ($oSchedule->action) {
+        case 'process':
+          Core::process($oRequest);
+          break;
+        default:
+          throw new CoreException("500", "Unknown schedule action, Unable to continue!");
+      }
+    } catch (Exception $ex) {
+      Corelog::log($ex->getMessage(), Corelog::ERROR);
+      Corelog::log("Unable to process request", Corelog::ERROR);
+    }
+  }
+
 }
