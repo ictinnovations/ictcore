@@ -28,15 +28,32 @@ class Corelog
   const TRACE = 1024; // again not valid log mode, but for extended information
   const AUTH = 2048;
 
+  public static $process_id = NULL;
+
+  public static function error_handler($error_no, $error_string, $error_file, $error_line, $error_context) {
+    $message = "$error_string in $error_file on line $error_line";
+    $class   = Corelog::NOTICE;
+    switch ($error_no) {
+      case E_ERROR:
+        $class = Corelog::ERROR;
+        break;
+      case E_WARNING:
+        $class = Corelog::WARNING;
+        break;
+      default:
+        $class = Corelog::NOTICE;
+    }
+    Corelog::log($message, $class, $error_context);
+  }
+
   public static function log($message, $class = Corelog::INFO, $extra = null)
   {
     global $path_log, $website_log;
-    static $process_id = NULL;
 
     if (($website_log & $class) == $class) {
 
-      if (empty($process_id)) {
-        $process_id = getmypid();
+      if (empty(Corelog::$process_id)) {
+        Corelog::$process_id = getmypid();
       }
       $log_type = self::code_to_name($class);
       $dateTime = gmdate('Y-m-d H:i:s');

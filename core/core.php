@@ -12,6 +12,7 @@ require_once dirname(__FILE__) . "/lib/init.php";
 /* Include all ict classes */
 // basic
 require_once "Token.php";
+require_once "Task.php";
 require_once "Schedule.php";
 require_once "User.php";
 include_once_directory('User');

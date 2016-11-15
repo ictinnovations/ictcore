@@ -162,7 +162,7 @@ class Kannel extends Gateway
      * under apache multithreading does not work
      * so we have to use scheduling
      */
-    $oRequest->schedule(array('delay' => 1));
+    $oRequest->task_create();
     /*     * **************************************************** UPDATE END */
   }
 

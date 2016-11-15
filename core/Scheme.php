@@ -35,6 +35,7 @@ class Scheme
 
   public function compile(Program &$oProgram, Sequence &$oSequence)
   {
+    Corelog::log("Compiling porgram", Corelog::LOGIC);
     foreach ($this->applicationCache as $appName => $oApplication) {
       $data = array_merge($oApplication::$requiredParameter, $oApplication->data);
       // First application must have ORDER_INIT weight

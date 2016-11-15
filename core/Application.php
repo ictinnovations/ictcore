@@ -151,7 +151,7 @@ class Application
 
   public function deploy(Program &$oProgram)
   {
-    Corelog::log("Deploying application : " . $this->type . " for program : " . $oProgram->type, Corelog::LOGIC);
+    Corelog::log("Deploying application : $this->type($this->application_id) for program : $oProgram->program_id", Corelog::LOGIC);
     // further code will go here
   }
 
@@ -300,7 +300,7 @@ class Application
 
   public function _execute(Transmission &$oTransmission, Sequence &$oSequence)
   {
-    Corelog::log('Executing application : ' . $this->type . ' having id : ' . $this->application_id, Corelog::FLOW);
+    Corelog::log("Executing application : $this->type($this->application_id)", Corelog::FLOW);
 
     $this->oTransmission = &$oTransmission;
     $this->oSequence = &$oSequence;
@@ -332,7 +332,7 @@ class Application
    */
   public function _process(Transmission &$oTransmission, Sequence &$oSequence)
   {
-    Corelog::log('Processing application : ' . $this->type . ' having id : ' . $this->application_id, Corelog::FLOW);
+    Corelog::log("Processing application : $this->type($this->application_id)", Corelog::FLOW);
 
     $this->oTransmission = &$oTransmission;
     $this->oSequence = &$oSequence;
@@ -343,7 +343,7 @@ class Application
     $this->result = &$oSequence->oRequest->application_data;
     $spool_status = $this->process();
 
-    Corelog::log('Application processing completed with result' . $this->result['result'], Corelog::FLOW);
+    Corelog::log('Application processing completed with result: ' . $this->result['result'], Corelog::FLOW);
     Corelog::log('Application complete results', Corelog::DEBUG, $this->result);
 
     // First of all save application result which is common to all applications

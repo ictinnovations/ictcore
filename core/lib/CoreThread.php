@@ -8,7 +8,19 @@
 
 use Aza\Components\Thread\Thread;
 
-class CoreSend extends Thread
+class CoreThread extends Thread
+{
+  function __construct($pName = null, $pool = null, $debug = false, array $options = null)
+  {
+    global $ict_db_link;
+    parent::__construct($pName, $pool, $debug, $options);
+    $ict_db_link = DB::connect(TRUE);
+    Corelog::$process_id = getmypid();
+    Corelog::log("New thread started for: " . get_class($this), Corelog::FLOW);
+  }
+}
+
+class SendThread extends CoreThread
 {
 
   function process()
@@ -21,7 +33,7 @@ class CoreSend extends Thread
 
 }
 
-class CoreProcess extends Thread
+class ProcessThread extends CoreThread
 {
 
   function process()
@@ -34,15 +46,17 @@ class CoreProcess extends Thread
 
 }
 
-class ScheduleProcess extends Thread
+class TaskThread extends CoreThread
 {
 
   function process()
   {
-    // First parameter will be schedule_id
-    $schedule_id = $this->getParam(0);
-    $oSchedule = new Schedule($schedule_id);
-    $oSchedule->process();
+    // First parameter will be task_id
+    $task_id = $this->getParam(0);
+    // Second parameter will be server_time
+    $server_time = $this->getParam(1);
+    $oTask = new Task($task_id);
+    $oTask->process($server_time);
   }
 
 }

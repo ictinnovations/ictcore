@@ -189,6 +189,8 @@ class Program
 
   public function scheme()
   {
+    Corelog::log("Creating program scheme", Corelog::LOGIC);
+
     $app1st = new Log();
     $app1st->data = array('message' => 'test application one');
 
@@ -208,7 +210,7 @@ class Program
 
   public function deploy()
   {
-    Corelog::log("Compiling porgram", Corelog::CRUD);
+    Corelog::log("Constructing porgram", Corelog::LOGIC);
 
     $this->load_cache();
 
@@ -497,7 +499,7 @@ class Program
 
   public function _execute(Transmission &$oTransmission, Sequence &$oSequence)
   {
-    Corelog::log('Executing program : ' . $this->type . ' having id : ' . $this->program_id, Corelog::FLOW);
+    Corelog::log("Executing program : $this->type($this->program_id)", Corelog::FLOW);
 
     $this->oTransmission = &$oTransmission;
     $this->oSequence = &$oSequence;
@@ -533,7 +535,7 @@ class Program
    */
   public function program_completed($program_type, Program &$oProgram)
   {
-    Corelog::log(ucfirst($oProgram->type) . " program complated with id: " . $oProgram->program_id, Corelog::LOGIC);
+    Corelog::log("Program complated : $oProgram->type($oProgram->program_id)", Corelog::LOGIC);
     // final action
     if ($program_type == 'primary') {
       // further code will goes here
@@ -593,7 +595,7 @@ class Program
    */
   public function _process(Transmission &$oTransmission, Sequence &$oSequence)
   {
-    Corelog::log('Processing with program : ' . $this->type . ' having id : ' . $this->program_id, Corelog::FLOW);
+    Corelog::log("Processing with program : $this->type($this->program_id)", Corelog::FLOW);
 
     // make input variable available at class level
     $this->oTransmission = &$oTransmission;

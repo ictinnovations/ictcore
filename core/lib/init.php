@@ -36,12 +36,7 @@ include_once "session.php";   // library for session management
 include_once "CoreException.php"; // library for error
 // include_once "CoreThread.php"; // Multi Threading support for selected functions
 
-/* Connecting, selecting database */
-$db_port = conf_get('db:port', '3306');
-$db_host = conf_get('db:host', 'localhost') . ':' . $db_port;
-$db_user = conf_get('db:user', 'myuser');
-$db_pass = conf_get('db:pass', '');
-$db_name = conf_get('db:name', 'ictcore');
+set_error_handler(array('Corelog', 'error_handler'), E_ALL);
 
 $website_host = conf_get('website:host', '127.0.0.1');
 $website_port = conf_get('website:port', '80');
@@ -52,15 +47,8 @@ $website_log = Corelog::parse_config($log_string);
 // first of all set php default timezone to UTC
 date_default_timezone_set('UTC');       // required to bypass server timezone settings
 
-$ict_db_link = mysql_connect($db_host, $db_user, $db_pass);
-if (!$ict_db_link) {
-  throw new CoreException('500', 'Unable to connect database server error:' . mysql_error());
-}
-$ict_db_conn = mysql_select_db($db_name);
-if (!$ict_db_conn) {
-  throw new CoreException('500', 'Unable to select database');
-}
-mysql_query("SET time_zone = '+00:00'"); // required to bypass server timezone settings
+/* Connecting, selecting database */
+$ict_db_link = DB::connect();
 
 /* load default system configuration from database */
 conf_system_load();

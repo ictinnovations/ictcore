@@ -48,32 +48,32 @@ class Request
     return array('gateway_flag', 'spool_id', 'application_id', 'application_data', 'source', 'destination');
   }
 
-  public function schedule($schedule_data = array())
+  public function task_create($task_data = array())
   {
-    if (empty($schedule_data)) {
-      $schedule_data = array('delay' => 60);
+    if (empty($task_data)) {
+      $task_data = array('status' => Task::PENDING); // start now
     }
-    $oSchedule = new Schedule();
-    $oSchedule->type = 'request';
-    $oSchedule->action = 'process';
-    $oSchedule->data = serialize($this);
-    foreach ($schedule_data as $schedule_field => $schedule_value) {
-      $oSchedule->$schedule_field = $schedule_value;
+    $oTask = new Task();
+    $oTask->type = 'request';
+    $oTask->action = 'process';
+    $oTask->data = serialize($this);
+    foreach ($task_data as $task_field => $task_value) {
+      $oTask->$task_field = $task_value;
     }
-    $oSchedule->save();
-    return $oSchedule->schedule_id;
+    $oTask->save();
+    return $oTask->task_id;
   }
 
-  public function schedule_cancel()
+  public function task_cancel()
   {
-    // TODO: schedule_cancel in not supported
+    // TODO: task_cancel in not supported
   }
 
-  public function schedule_process($oSchedule)
+  public function task_process($oTask)
   {
     try {
-      $oRequest = unserialize($oSchedule->data); // data is serilized request
-      switch ($oSchedule->action) {
+      $oRequest = unserialize($oTask->data); // data is serilized request
+      switch ($oTask->action) {
         case 'process':
           Core::process($oRequest);
           break;

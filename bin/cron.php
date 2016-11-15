@@ -14,7 +14,7 @@ include_once "core.php";
 function cron_process()
 {
   // process all pending retries
-  Schedule::process_all();
+  Task::process_all();
 
   // execute email fetch script
   // nothing special we just need to include it for execution

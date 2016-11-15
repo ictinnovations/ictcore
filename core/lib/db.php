@@ -10,6 +10,29 @@
 class DB
 {
 
+  static $link = NULL;
+
+  static function connect($link_new = FALSE)
+  {
+    $db_port = conf_get('db:port', '3306');
+    $db_host = conf_get('db:host', 'localhost') . ':' . $db_port;
+    $db_user = conf_get('db:user', 'myuser');
+    $db_pass = conf_get('db:pass', '');
+    $db_name = conf_get('db:name', 'ictcore');
+
+    $link = mysql_connect($db_host, $db_user, $db_pass, $link_new);
+    if (!$link) {
+      throw new CoreException('500', 'Unable to connect database server error:' . mysql_error($link));
+    }
+    $result = mysql_select_db($db_name, $link);
+    if (!$result) {
+      throw new CoreException('500', 'Unable to select database');
+    }
+    mysql_query("SET time_zone = '+00:00'", $link); // required to bypass server timezone settings
+
+    return $link;
+  }
+
   static function next_record_id($table, $field = '')
   {
     $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'");

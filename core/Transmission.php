@@ -282,7 +282,7 @@ class Transmission
   {
     Corelog::log("Transmission delete", Corelog::CRUD);
     // first delete all associated schedules
-    $this->schedule_cancel();
+    $this->task_cancel();
     // TODO: Don't delete instead mark it as deleted or also delete related spool and result records
     return DB::delete(self::$table, 'transmission_id', $this->transmission_id, true);
   }
@@ -362,7 +362,7 @@ class Transmission
       case Transmission::STATUS_FAILED:
         if ($this->try_allowed > $this->try_done) {
           $this->status = Transmission::STATUS_PENDING_RETRY;
-          $this->schedule(array('delay' => 60)); // retry after 60 seconds
+          $this->schedule_create(array('delay' => 60)); // retry after 60 seconds
         }
         break;
     }
@@ -431,24 +431,35 @@ class Transmission
     $this->is_deleted = 0;   // not deleteds
   }
 
-  public function schedule($schedule_data = array())
+  public function schedule_create($schedule_data = array())
   {
     if (empty($schedule_data)) {
-      $schedule_data = array('delay' => 60);
+      $schedule_data = array(
+          'status' => Task::ONHOLD,
+          'delay' => 60
+      );
+    }
+    return $this->task_create($schedule_data);
+  }
+
+  public function task_create($task_data = array())
+  {
+    if (empty($task_data)) {
+      $task_data = array('status' => Task::PENDING);
     }
     $oSchedule = new Schedule();
     $oSchedule->type = 'transmission';
     $oSchedule->action = 'send';
     $oSchedule->data = $this->transmission_id;
     $oSchedule->account_id = $this->account_id;
-    foreach ($schedule_data as $schedule_field => $schedule_value) {
+    foreach ($task_data as $schedule_field => $schedule_value) {
       $oSchedule->$schedule_field = $schedule_value;
     }
     $oSchedule->save();
     return $oSchedule->schedule_id;
   }
 
-  public function schedule_cancel()
+  public function task_cancel()
   {
     $aSchedule = Schedule::search(array('type' => 'transmission', 'data' => $this->transmission_id));
     foreach ($aSchedule as $schedule) {
@@ -457,11 +468,11 @@ class Transmission
     }
   }
 
-  public static function schedule_process($oSchedule)
-  {  
+  public static function task_process($oTask)
+  {
     try {
-      $oTransmission = new Self($oSchedule->data); // data is transmission_id
-      switch ($oSchedule->action) {
+      $oTransmission = new self($oTask->data); // data is transmission_id
+      switch ($oTask->action) {
         case 'send':
           // before sending transmission from schedule 
           // remember to login its owner
@@ -469,12 +480,11 @@ class Transmission
           $oTransmission->send();
           break;
         default:
-          throw new CoreException("500", "Unknown schedule action, Unable to continue!");
+          throw new CoreException("500", "Unknown task action, Unable to continue!");
       }
-      
     } catch (Exception $ex) {
       Corelog::log($ex->getMessage(), Corelog::ERROR);
-      Corelog::log("Unable to send scheduled transmission", Corelog::ERROR);
+      Corelog::log("Unable to process transmission task", Corelog::ERROR);
     }
   }
 
@@ -539,7 +549,7 @@ class Transmission
 
   public function &result_create($data, $name, $type = Result::TYPE_APPLICATION, $application_id = '')
   {
-    Corelog::log("New result, type: " . $type . ", name: " . $name . ", data: " . print_r($data, ture), Corelog::LOGIC);
+    Corelog::log("New result, type: " . $type . ", name: " . $name . ", data: " . print_r($data, true), Corelog::LOGIC);
     $this->aResult[$name] = new Result();
     $this->aResult[$name]->spool_id = $this->oSpool->spool_id;
     $this->aResult[$name]->name = $name;

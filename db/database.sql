@@ -145,6 +145,12 @@ INSERT INTO permission VALUES (NULL, 'transmission_read', '');
 INSERT INTO permission VALUES (NULL, 'transmission_update', '');
 INSERT INTO permission VALUES (NULL, 'transmission_delete', '');
 INSERT INTO permission VALUES (NULL, 'transmission_send', '');
+-- Task permissions
+INSERT INTO permission VALUES (NULL, 'task', '');
+INSERT INTO permission VALUES (NULL, 'task_create', '');
+INSERT INTO permission VALUES (NULL, 'task_read', '');
+INSERT INTO permission VALUES (NULL, 'task_list', '');
+INSERT INTO permission VALUES (NULL, 'task_delete', '');
 -- Schedule permissions
 INSERT INTO permission VALUES (NULL, 'schedule', '');
 INSERT INTO permission VALUES (NULL, 'schedule_create', '');
@@ -242,42 +248,62 @@ CREATE TABLE role_resource
 ) ENGINE = InnoDB;
 
 /*==============================================================*/
-/* Table: schedule                                              */
+/* Table: tasks                                                 */
 /* Desc: list of todo tasks / schedules                         */
 /*==============================================================*/
-CREATE TABLE schedule
+CREATE TABLE task
 (
-   schedule_id                   int(11) unsigned       NOT NULL auto_increment,
+   task_id                       int(11) unsigned       NOT NULL auto_increment,
    type                          varchar(64)            NOT NULL default '',
    action                        varchar(64)            NOT NULL default 0,
    data                          varchar(64)            NOT NULL default '',
-   month                         varchar(50)            NOT NULL default '*',
-   day                           varchar(50)            NOT NULL default '*',
-   weekday                       varchar(50)            NOT NULL default '*',
-   hour                          varchar(50)            NOT NULL default '*',
-   minute                        varchar(50)            NOT NULL default '*',
    weight                        int(4)                 NOT NULL default 0,
+   status                        int(4)                 NOT NULL default 0,
    is_recurring                  int(4)                 NOT NULL default 0,
-   last_run                      int(11)                default NULL,
+   due_at                        int(11)                default NULL,
    expiry                        int(11)                default NULL,
+   last_run                      int(11)                default NULL,
    account_id                    int(11)                default NULL,
-   PRIMARY KEY (schedule_id)
+   PRIMARY KEY (task_id)
 ) ENGINE = InnoDB;
-CREATE INDEX schedule_data ON schedule (data);
 
-CREATE TABLE schedule_expression
+CREATE TABLE schedule
+(
    year                          varchar(50)            NOT NULL default '*',
    weekday                       varchar(50)            NOT NULL default '*',
    month                         varchar(50)            NOT NULL default '*',
    day                           varchar(50)            NOT NULL default '*',
    hour                          varchar(50)            NOT NULL default '*',
    minute                        varchar(50)            NOT NULL default '*',
-   second                        varchar(50)            NOT NULL default '*',
-   schedule_id                   int(11) unsigned       NOT NULL
+   task_id                       int(11) unsigned       NOT NULL
 ) ENGINE = InnoDB;
+CREATE INDEX schedule_task_id ON schedule (task_id);
+CREATE INDEX schedule_time ON schedule (hour, minute);
+ALTER TABLE schedule 
+  ADD FOREIGN KEY schedule_task_delete (task_id) 
+  REFERENCES task (task_id) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE;
 
-CREATE TABLE schedule_queue
-) ENGINE = InnoDB;
+DELIMITER |
+CREATE EVENT event_check_schedule
+  ON SCHEDULE EVERY 1 SECOND
+  DO BEGIN
+    UPDATE task t JOIN schedule s ON t.task_id = s.task_id
+    SET t.status = 1, 
+        t.due_at = UNIX_TIMESTAMP(),
+        t.expiry = (UNIX_TIMESTAMP() + 300)
+    WHERE t.status IN (0, 2, 3)
+      AND (t.last_run IS NULL OR (t.last_run + 59) < UNIX_TIMESTAMP())
+      AND (s.year = '*'     OR s.year = YEAR(CURDATE())) 
+      AND (s.month = '*'    OR s.month = MONTH(CURDATE())) 
+      AND (s.day = '*'      OR s.day = DAYOFMONTH(CURDATE())) 
+      AND (s.weekday = '*'  OR s.weekday = DAYOFWEEK(CURDATE())) 
+      AND (s.hour = '*'     OR s.hour = HOUR(CURTIME())) 
+      AND (s.minute = '*'   OR s.minute = MINUTE(CURTIME()));
+  END;
+|
+DELIMITER ;
 
 /*==============================================================*/
 /* Table: configuration (System and User configurations)        */

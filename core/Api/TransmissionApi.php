@@ -189,10 +189,10 @@ class TransmissionApi extends Api
    * @url POST /sms/$transmission_id/schedule
    * @url POST /email/$transmission_id/schedule
    */
-  public function schedule($transmission_id, $data = array())
+  public function schedule_create($transmission_id, $data = array())
   {
     $this->_authorize('transmission_send');
-    $this->_authorize('schedule_create');
+    $this->_authorize('task_create');
 
     $oSchedule = new Schedule();
     $this->set($oSchedule, $data);
@@ -204,7 +204,7 @@ class TransmissionApi extends Api
     $oSchedule->account_id = $oTransmission->account_id;
     $oSchedule->save();
 
-    return $oSchedule->schedule_id;
+    return $oSchedule->task_id;
   }
 
   /**
@@ -219,10 +219,10 @@ class TransmissionApi extends Api
   public function schedule_cancel($transmission_id)
   {
     $this->_authorize('transmission_update');
-    $this->_authorize('schedule_delete');
+    $this->_authorize('task_delete');
 
     $oTransmission = new Transmission($transmission_id);
-    return $oTransmission->schedule_cancel();
+    return $oTransmission->task_cancel();
   }
 
   /**
