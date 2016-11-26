@@ -184,7 +184,7 @@ class Text extends Message
 
   public function token_apply(Token $oToken, $default_value = Token::KEEP_ORIGNAL)
   {
-    $this->data = $oToken->token_replace($this->data, $default_value);
+    $this->data = $oToken->render_variable($this->data, $default_value);
   }
 
 }

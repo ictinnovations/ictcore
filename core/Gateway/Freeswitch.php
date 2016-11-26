@@ -38,18 +38,25 @@ class Freeswitch extends Gateway
 
   public static function capabilities()
   {
-    return (
-            Voice::SERVICE_FLAG | Fax::SERVICE_FLAG
-            );
-  }
-
-  public function is_supported($service)
-  {
-    if (($this->capabilities() & $service) == $service) {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
+    $capabilities = array();
+    $capabilities['service_flag'] = (Voice::SERVICE_FLAG | Fax::SERVICE_FLAG);
+    $capabilities['application'] = array(
+        'inbound',
+        'originate',
+        'connect',
+        'disconnect',
+        'voice_play',
+        'fax_receive',
+        'fax_send',
+        'log'
+    );
+    $capabilities['account'] = array(
+        'extension'
+    );
+    $capabilities['provider'] = array(
+        'sip'
+    );
+    return $capabilities;
   }
 
   protected function connect()
@@ -140,7 +147,7 @@ class Freeswitch extends Gateway
     $this->dissconnect();
   }
 
-  public static function template_application($application_name, $service_flag = Voice::SERVICE_FLAG)
+  public static function template_application($application_name, $service_type = 'voice')
   {
     switch ($application_name) {
       case 'inbound':
@@ -162,7 +169,7 @@ class Freeswitch extends Gateway
             'origination_caller_id_number' => '[source:phone]',
             'origination_caller_id_name' => '[source:phone]'
         );
-        if (($service_flag & Fax::SERVICE_FLAG) == Fax::SERVICE_FLAG) {
+        if ($service_type == 'fax') {
           $template['input'] += array(
               'fax_enable_t38_request' => 'true',
               'fax_enable_t38' => 'true',
@@ -278,46 +285,54 @@ class Freeswitch extends Gateway
     return $template;
   }
 
-  public function save_provider($name, $aSetting = array())
+  public function config_template($type, $name = '')
   {
-    global $path_etc;
-    Corelog::log("Freeswitch saving provide name: $name", Corelog::CRUD);
-
-    if ($aSetting['register'] == true) {
-      $aSetting['register'] = 'true';
-    } else {
-      $aSetting['register'] = 'false';
+    switch ($type) {
+      case 'did':
+        return 'account/did/freeswitch/default.twig';
+      case 'extension':
+        return 'account/extension/freeswitch/default.twig';
+      case 'sip':
+        return 'provider/sip/freeswitch/default.twig';
+      default:
+        return 'invalid.twig';
     }
-    unset($aSetting['active']);
-    $doc = new DOMDocument();
-    $doc->formatOutput = true;
-    $include_obj = $doc->createElement('include');
-    $include_node = $doc->appendChild($include_obj);
-
-    $gateway_obj = $doc->createElement('gateway');
-    $gateway_node = $include_node->appendChild($gateway_obj);
-    $gateway_node->setAttribute('name', $name);
-
-    foreach ($aSetting as $param_name => $param_value) {
-      $param_obj = $doc->createElement('param');
-      $param_node = $gateway_node->appendChild($param_obj);
-      $param_node->setAttribute('name', $param_name);
-      $param_node->setAttribute('value', $param_value);
-    }
-
-    return $doc->save($path_etc . DIRECTORY_SEPARATOR . "freeswitch/sip_profiles/provider/$name.xml");
   }
 
-  public function template_provider()
+  private function config_filename($type, $name)
   {
-    return array(
-        'name' => '[provider:name]',
-        'username' => '[provider:username]',
-        'password' => '[provider:password]',
-        'register' => '[provider:register]',
-        'realm' => '[provider:host]',
-        'proxy' => '[provider:host]:[provider:port]'
-    );
+    global $path_etc;
+    switch ($type) {
+      case 'extension':
+        return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/directory/$name.xml";
+      case 'sip':
+        return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/sip_profiles/provider/$name.xml";
+    }
+    return false;
+  }
+
+  public function config_save($type, $name, $data = '')
+  {
+    $doc = new DOMDocument();
+    $doc->formatOutput = true;
+    $doc->loadXML($data);
+
+    Corelog::log("Freeswitch saving config for type: $type, name: $name", Corelog::CRUD);
+    $config_file = $this->config_filename($type, $name);
+    return $doc->save($config_file);
+  }
+
+  public function config_delete($type, $name)
+  {
+    Corelog::log("Freeswitch deleting config for type: $type, name: $name", Corelog::CRUD);
+    $config_file = $this->config_filename($type, $name);
+    return unlink($config_file);
+  }
+
+  public function config_reload()
+  {
+    // TODO: develop reload method for freeswitch
+    parent::config_reload();
   }
 
 }

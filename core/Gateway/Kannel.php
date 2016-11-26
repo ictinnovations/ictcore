@@ -42,16 +42,25 @@ class Kannel extends Gateway
 
   public static function capabilities()
   {
-    return Sms::SERVICE_FLAG;
-  }
-
-  public function is_supported($service)
-  {
-    if (($this->capabilities() & $service) == $service) {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
+    $capabilities = array();
+    $capabilities['service_flag'] = SMS::SERVICE_FLAG;
+    $capabilities['application'] = array(
+        'inbound',
+        'originate',
+        'connect',
+        'disconnect',
+        'voice_play',
+        'fax_receive',
+        'fax_send',
+        'log'
+    );
+    $capabilities['account'] = array(
+        'did'
+    );
+    $capabilities['provider'] = array(
+        'smpp'
+    );
+    return $capabilities;
   }
 
   protected function connect()
@@ -166,8 +175,11 @@ class Kannel extends Gateway
     /*     * **************************************************** UPDATE END */
   }
 
-  public static function template_application($application_name, $service_flag = Sms::SERVICE_FLAG)
+  public static function template_application($application_name, $service_type = 'sms')
   {
+    if ($service_type != 'sms') {
+      return '';
+    }
     $template = '';
     switch ($application_name) {
       case 'sms_send':
@@ -194,39 +206,49 @@ class Kannel extends Gateway
     return $template;
   }
 
-  public function save_provider($name, $aSetting = array())
+  
+  public function config_template($type, $name = '')
   {
-    global $path_etc;
-    Corelog::log("Kannel saving provide name: $name", Corelog::CRUD);
-
-    $config = "group=smsc\n";
-    $config .= "smsc=smpp\n";
-    $config .= "transceiver-mode=yes\n";
-    $config .= "max-pending-submits=10\n";
-    $config .= "system-type=VMA\n";
-    foreach ($aSetting as $param_name => $param_value) {
-      switch ($param_name) {
-        case 'name':
-          // skip this one
-          break;
-        default:
-          $config .= "$param_name=$param_value\n";
-          break;
-      }
+    switch ($type) {
+      case 'did':
+        return 'account/did/kannel/default.twig';
+      case 'smpp':
+        return 'provider/smpp/kannel/default.twig';
+      default:
+        return 'invalid.twig';
     }
-
-    file_put_contents($path_etc . DIRECTORY_SEPARATOR . "kannel/provider/$name.conf", $config);
   }
 
-  public function template_provider()
+  private function config_filename($type, $name)
   {
-    return array(
-        'name' => '[provider:name]',
-        'smsc-username' => '[provider:username]',
-        'smsc-password' => '[provider:password]',
-        'host' => '[provider:host]',
-        'port' => '[provider:port]'
-    );
+    global $path_etc;
+    switch ($type) {
+      case 'did':
+        return $path_etc . DIRECTORY_SEPARATOR . "kannel/provider/$name.xml";
+      case 'smpp':
+        return $path_etc . DIRECTORY_SEPARATOR . "kannel/provider/$name.xml";
+    }
+    return false;
+  }
+
+  public function config_save($type, $name, $data = '')
+  {
+    Corelog::log("Kannel saving config for type: $type, name: $name", Corelog::CRUD);
+    $config_file = $this->config_filename($type, $name);
+    return file_put_contents($config_file, $data);
+  }
+
+  public function config_delete($type, $name)
+  {
+    Corelog::log("Kannel deleting config for type: $type, name: $name", Corelog::CRUD);
+    $config_file = $this->config_filename($type, $name);
+    return unlink($config_file);
+  }
+
+  public function config_reload()
+  {
+    // TODO: develop reload method for kannel
+    parent::config_reload();
   }
 
 }

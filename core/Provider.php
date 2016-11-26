@@ -273,7 +273,7 @@ class Provider
       $gateway_class = gateway_flag_to_class($this->gateway_flag);
       // Create new instance of gateway class to save provider info
       $oGateway = new $gateway_class();
-      $aSetting = $oToken->token_replace($oGateway->template_provider());
+      $aSetting = $oToken->render_variable($oGateway->template_provider());
       $oGateway->save_provider($this->name, $aSetting);
 
       return TRUE;

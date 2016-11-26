@@ -158,7 +158,7 @@ class Emailtofax extends Program
         $this->send_email_notification('emailtofax_mailreceived', "Program/Emailtofax/data/email_accepted.tpl.php", 'request');
         // then send fax to destination address
         // use attachment from inbound email, (see: token_create in transmission_done for oTemplate)
-        $attachment = $this->oSequence->oToken->token_replace('[template:attachment]');
+        $attachment = $this->oSequence->oToken->render_string('[template:attachment]');
         $this->send_fax($attachment);
       } else {
         // send notification to user, about email error

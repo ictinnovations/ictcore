@@ -11,6 +11,7 @@ class Service
 
   /** @const */
   const SERVICE_FLAG = 0;
+  const SERVICE_TYPE = 'service';
   const CONTACT_FIELD = 'phone';
   const MESSAGE_CLASS = 'Message';
   const GATEWAY_CLASS = 'Gateway';
@@ -22,18 +23,35 @@ class Service
 
   public function capabilities()
   {
-    return array(
-        'originate'
-    );
+    $cGateway = static::GATEWAY_CLASS;
+    $capabilities = $cGateway::capabilities();
+    // drop service_flag from original gateway capabilities
+    unset($capabilities['service_flag']);
+    return $capabilities;
   }
 
-  public function is_supported($application_name)
+  public function is_supported($feature, $type = 'application')
   {
-    if (in_array($application_name, $this->capabilities())) {
-      return TRUE;
-    } else {
-      return FALSE;
+    $capabilities = $this->capabilities();
+    switch ($type) {
+      case 'application':
+      case 'account':
+      case 'provider':
+      default:
+        if ($capabilities[$type] && in_array($feature, $capabilities)) {
+          return TRUE;
+        } else {
+          return FALSE;
+        }
+        break;
     }
+  }
+
+  public function template_application($application_name)
+  {
+    $cGateway = static::GATEWAY_CLASS;
+    $template = $cGateway::template_application($application_name, static::SERVICE_TYPE);
+    return $template;
   }
 
   public function execute_application($command, $load_provider = true)
@@ -47,7 +65,7 @@ class Service
         Corelog::log($e->getMessage(), Corelog::NOTICE);
         Corelog::log("No gateway provider found", Corelog::NOTICE);
       }
-      $command = $oToken->token_replace($command); // TODO: add REPLACE_EMPTY
+      $command = $oToken->render_variable($command); // TODO: add REPLACE_EMPTY
     }
     // this function require gateway access to execute given command
     $cGateway = static::GATEWAY_CLASS;
@@ -55,18 +73,25 @@ class Service
     return $oGateway->send($command);
   }
 
-  public function template_application($application_name)
+  public function config_template($config_type, $config_name = 'default')
   {
     $cGateway = static::GATEWAY_CLASS;
-    switch ($application_name) {
-      case 'originate':
-        $template = $cGateway::template_application($application_name, Voice::SERVICE_FLAG);
-        break;
-      default:
-        $template = $cGateway::template_application($application_name);
-        break;
-    }
+    $template = $cGateway::config_template($config_type, $config_name);
     return $template;
+  }
+
+  public function config_save($config_type, $config_name = 'default', $aSetting = array())
+  {
+    $cGateway = static::GATEWAY_CLASS;
+    $oGateway = new $cGateway;
+    return $oGateway->config_save($config_type, $config_name, $aSetting);
+  }
+
+  public function config_delete($config_type, $config_name = 'default')
+  {
+    $cGateway = static::GATEWAY_CLASS;
+    $oGateway = new $cGateway;
+    return $oGateway->config_delete($config_type, $config_name);
   }
 
 }

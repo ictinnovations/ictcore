@@ -48,16 +48,26 @@ class Sendmail extends Gateway
 
   public static function capabilities()
   {
-    return Email::SERVICE_FLAG;
-  }
-
-  public function is_supported($service)
-  {
-    if (($this->capabilities() & $service) == $service) {
-      return TRUE;
-    } else {
-      return FALSE;
-    }
+    $capabilities = array();
+    $capabilities['service_flag'] = Email::SERVICE_FLAG;
+    $capabilities['application'] = array(
+        'inbound',
+        'originate',
+        'connect',
+        'disconnect',
+        'voice_play',
+        'fax_receive',
+        'fax_send',
+        'log'
+    );
+    $capabilities['account'] = array(
+        'mailbox'
+    );
+    $capabilities['provider'] = array(
+        'smtp',
+        'sendmail'
+    );
+    return $capabilities;
   }
 
   protected function validate_email($email)
@@ -172,8 +182,11 @@ class Sendmail extends Gateway
     /*     * **************************************************** UPDATE END */
   }
 
-  public static function template_application($application_name, $service_flag = Email::SERVICE_FLAG)
+  public static function template_application($application_name, $service_type = 'email')
   {
+    if ($service_type != 'email') {
+      return '';
+    }
     $template = '';
     switch ($application_name) {
       case 'email_send':

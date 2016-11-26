@@ -108,7 +108,7 @@ class Message
   public function token_apply(Token $oToken, $default_value = Token::KEEP_ORIGNAL)
   {
     // replace tokens with given values, if current message type support this
-    $oToken->token_replace($this->data, $default_value);
+    $oToken->render_variable($this->data, $default_value);
   }
 
 }

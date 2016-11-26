@@ -18,6 +18,7 @@ $path_etc = $path_root . DIRECTORY_SEPARATOR . 'etc';
 $path_log = $path_root . DIRECTORY_SEPARATOR . 'log';
 $path_data = $path_root . DIRECTORY_SEPARATOR . 'data';
 $path_cache = $path_root . DIRECTORY_SEPARATOR . 'cache';
+$path_template = $path_core . DIRECTORY_SEPARATOR . 'templates';
 
 // Default include path and Autoload
 // For Classes

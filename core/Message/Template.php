@@ -200,10 +200,10 @@ class Template extends Message
 
   public function token_apply(Token $oToken, $default_value = Token::KEEP_ORIGNAL)
   {
-    $this->subject = $oToken->token_replace($this->subject, $default_value);
-    $this->body = $oToken->token_replace($this->body, $default_value);
-    $this->body_alt = $oToken->token_replace($this->body_alt, $default_value);
-    $this->attachment = $oToken->token_replace($this->attachment, $default_value);
+    $this->subject = $oToken->render_variable($this->subject, $default_value);
+    $this->body = $oToken->render_variable($this->body, $default_value);
+    $this->body_alt = $oToken->render_variable($this->body_alt, $default_value);
+    $this->attachment = $oToken->render_variable($this->attachment, $default_value);
   }
 
 }

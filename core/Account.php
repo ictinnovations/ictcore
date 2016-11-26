@@ -14,10 +14,11 @@ class Account
   const COMPANY = -2;
   const ANONYMOUS = -3;
 
-  private static $table = 'account';
-  private static $primary_key = 'account_id';
-  private static $fields = array(
+  protected static $table = 'account';
+  protected static $primary_key = 'account_id';
+  protected static $fields = array(
       'account_id',
+      'type',
       'username',
       'passwd',
       'passwd_pin',
@@ -29,8 +30,9 @@ class Account
       'active',
       'user_id'
   );
-  private static $read_only = array(
+  protected static $read_only = array(
       'account_id',
+      'type',
       'user_id'
   );
 
@@ -38,14 +40,20 @@ class Account
    * @property-read integer $account_id
    * @var integer
    */
-  private $account_id = NULL;
+  protected $account_id = NULL;
+
+  /**
+   * @property-read string $type
+   * @var string 
+   */
+  protected $type = 'account';
 
   /**
    * @property string $username
    * @see function Account::set_username()
    * @var string 
    */
-  private $username = NULL;
+  protected $username = NULL;
 
   /** @var string */
   public $passwd = NULL;
@@ -76,7 +84,12 @@ class Account
    * @see function Account::associate()
    * @var integer
    */
-  private $user_id = NULL;
+  protected $user_id = NULL;
+
+  public function capabilities()
+  {
+    return (Transmission::INBOUND | Transmission::OUTBOUND);
+  }
 
   public function __construct($account_id = NULL)
   {
@@ -133,6 +146,7 @@ class Account
         case 'account_id':
           $aWhere[] = "$search_field = $search_value";
           break;
+        case 'type':
         case 'username':
         case 'phone':
         case 'email':
@@ -181,7 +195,38 @@ class Account
     return $aToken;
   }
 
-  private function load()
+  public static function getClass($account_id)
+  {
+    if (ctype_digit(trim($account_id))) {
+      $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
+      $result = DB::query(self::$table, $query, array('account_id' => $account_id));
+      if (is_resource($result)) {
+        $account_type = mysql_result($result, 0);
+      }
+    } else {
+      $account_type = $account_id;
+    }
+    $class_name = ucfirst(strtolower(trim($account_type)));
+    if (class_exists($class_name)) {
+      return $class_name;
+    } else {
+      return false;
+    }
+  }
+  
+  public static function load($account_id)
+  {
+    $class_name = self::getClass($account_id);
+    if ($class_name) {
+      Corelog::log("Creating instance of : $class_name for account: $account_id", Corelog::CRUD);
+      return new $class_name($account_id);
+    } else {
+      Corelog::log("$class_name class not found, Creating instance of : Account", Corelog::CRUD);
+      return new self($account_id);
+    }
+  }
+
+  protected function _load()
   {
     Corelog::log("Loading account: $this->account_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE account_id='%account_id%' ";
@@ -246,7 +291,7 @@ class Account
     }
   }
 
-  private function set_username($username)
+  protected function set_username($username)
   {
     if (empty($this->username)) {
       $this->username = $username;

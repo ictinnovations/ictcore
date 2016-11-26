@@ -11,34 +11,9 @@ class Fax extends Service
 
   /** @const */
   const SERVICE_FLAG = 2;
+  const SERVICE_TYPE = 'fax';
   const CONTACT_FIELD = 'phone';
   const MESSAGE_CLASS = 'Document';
   const GATEWAY_CLASS = 'Freeswitch';
-
-  public function capabilities()
-  {
-    return array(
-        'log',
-        'originate',
-        'connect',
-        'fax_send',
-        'fax_receive',
-        'disconnect'
-    );
-  }
-
-  public function template_application($application_name)
-  {
-    $cGateway = static::GATEWAY_CLASS;
-    switch ($application_name) {
-      case 'originate':
-        $template = $cGateway::template_application($application_name, Fax::SERVICE_FLAG);
-        break;
-      default:
-        $template = $cGateway::template_application($application_name);
-        break;
-    }
-    return $template;
-  }
 
 }

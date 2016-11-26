@@ -43,7 +43,7 @@ class Scheme
         $oApplication->weight = Application::ORDER_INIT;
       }
       // make sure no default value left, so REPLACE_EMPTY in token replacement
-      $oApplication->data = $oSequence->oToken->token_replace($data, Token::REPLACE_EMPTY);
+      $oApplication->data = $oSequence->oToken->render_variable($data, Token::REPLACE_EMPTY);
       $oApplication->program_id = $oProgram->program_id;
       $oApplication->save();
       $oApplication->deploy($oProgram);

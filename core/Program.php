@@ -387,7 +387,7 @@ class Program
      */
     $this->load_cache();
     $oToken = $this->load_token();
-    $finalData = $oToken->token_replace($this::$requiredParameter);
+    $finalData = $oToken->render_variable($this::$requiredParameter);
 
     $data = array(
         'program_id' => $this->program_id,
@@ -506,7 +506,7 @@ class Program
 
     // before processing update data with available tokens
     $data = array_merge($this::$requiredParameter, $this->data);
-    $this->set_data($oSequence->oToken->token_replace($data));
+    $this->set_data($oSequence->oToken->render_variable($data));
     $this->load_cache();
     // update token cache
     $oSequence->token_create($this);
@@ -603,7 +603,7 @@ class Program
 
     // before processing update data with available tokens
     $data = array_merge($this::$requiredParameter, $this->data);
-    $this->set_data($oSequence->oToken->token_replace($data));
+    $this->set_data($oSequence->oToken->render_variable($data));
     $this->load_cache();
     // update token cache
     $oSequence->token_create($this);

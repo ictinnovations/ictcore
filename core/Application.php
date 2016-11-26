@@ -307,7 +307,7 @@ class Application
 
     // before processing update data with available tokens
     $data = array_merge($this::$requiredParameter, $this->data);
-    $this->set_data($oSequence->oToken->token_replace($data));
+    $this->set_data($oSequence->oToken->render_variable($data));
     // update token cache
     $oSequence->token_create($this);
 

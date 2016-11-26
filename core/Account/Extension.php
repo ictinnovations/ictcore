@@ -1,38 +1,38 @@
 <?php
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/* * ***************************************************************
+ * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
+ * Developed By: Nasir Iqbal                                       *
+ * Website : http://www.ictinnovations.com/                        *
+ * Mail : nasir@ictinnovations.com                                 *
+ * *************************************************************** */
 
-/**
- * Description of Extension
- *
- * @author nasir
- */
 class Extension extends Account
 {
 
-  public $type = 'extension';
-
-  public function capabilities()
-  {
-    return (Transmission::INBOUND | Transmission::OUTBOUND);
-  }
+  /**
+   * @property-read string $type
+   * @var string 
+   */
+  protected $type = 'extension';
 
   public function save()
   {
     parent::save();
-    Voice::create_extension($this);
-  }
 
-  public function remove_program($program_name = 'all')
-  {
-    parent::remove_program($program_name);
+    $oToken = new Token();
+    $oToken->add('account', $this->token_get());
+    $oToken->add('extension', $this->token_get());
+
+    $oVoice = new Voice();
+    $template = $oVoice->config_template($this->type, $this->username);
+    $extension = $oToken->render_template($template);
+    $oVoice->config_save('extension', $this->username, $extension);
   }
 
   public function delete()
   {
+    $oVoice = new Voice();
+    $oVoice->config_delete('extension', $this->username);
     parent::delete();
   }
 
