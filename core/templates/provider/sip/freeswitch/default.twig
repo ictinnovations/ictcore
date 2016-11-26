@@ -1,0 +1,16 @@
+<include>
+  <gateway name="{{ provider.name }}">
+    <param name="username" value="{{ provider.username }}"/>
+    <param name="password" value="{{ provider.password }}"/>
+    <param name="caller-id-in-from" value="false"/>
+    <param name="extension" value="{{ provider.username }}"/>
+    <param name="extension-in-contact" value="true"/>
+    <param name="realm" value="{{ provider.host }}"/>
+    <param name="proxy" value="{{ provider.host }}"/>
+    <param name="register-proxy" value="{{ provider.host }}"/>
+    <param name="expire-seconds" value="3600"/>
+    <param name="register" value="{% if provider.register == 1 %}true{% else %}false{% endif %}"/>
+    <param name="from-user" value="{{ provider.username }}"/>
+    <param name="from-domain" value="{{ provider.host }}"/>
+  </gateway>
+</include>

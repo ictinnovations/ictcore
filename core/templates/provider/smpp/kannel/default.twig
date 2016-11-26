@@ -1,0 +1,18 @@
+
+group=smsc
+smsc=smpp
+transceiver-mode=yes
+max-pending-submits=10
+system-type=VMA
+name={% provider.name %}
+smsc-username={% provider.username %}
+smsc-password={% provider.password %}
+host={% provider.host %}
+port={% provider.port %}
+{% if provider.settings is iterable %}
+  {% for key, value in provider.settings %}
+    {% if key != 'name' %}
+{{ key }}={{ value }}
+    {% endif %}
+  {% endfor %}
+{% endif %}

@@ -1,0 +1,14 @@
+<include>
+  <user id="{{ account.username }}">
+    <params>
+      <param name="password" value="{{ account.passwd }}"/> <!--SIP password-->
+      <param name="vm-password" value="{{ account.passwd_pin }}"/>
+    </params>
+    <variables>
+      <variable name="accountcode" value="{{ account.account_id }}"/>
+      <variable name="user_context" value="user_{{ account.user_id }}"/>
+      <variable name="effective_caller_id_name" value="{{ account.first_name }} {{ account.last_name }}"/>
+      <variable name="effective_caller_id_number" value="{{ account.username }}"/>
+    </variables>
+  </user>
+</include>
