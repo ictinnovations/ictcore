@@ -39,7 +39,7 @@ class Sequence
 
     $this->oResponse->spool_id = $spool_id;
     $this->oResponse->application_id = $application_id;
-    $this->oResponse->application_data[$application_id] = $this->oToken->render_variable($application_data);
+    $this->oResponse->application_data[$application_id] = $this->oToken->render_template($application_data);
 
     return $this->oResponse;
   }

@@ -43,7 +43,7 @@ class Log extends Application
     // All services should support log appliction
     $cService = service_flag_to_class($this->oTransmission->service_flag);
     $oService = new $cService();
-    return $oService->template_application('log');
+    return $oService->application_template('log');
   }
 
 }

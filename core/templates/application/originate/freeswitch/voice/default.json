@@ -1,0 +1,26 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "failure_causes": "NORMAL_CLEARING",
+    "transfer_on_fail": "'UNALLOCATED_NUMBER auto_cause xml ictcore_fail'",
+    "api_hangup_hook": "lua /usr/ictcore/bin/freeswitch/spool_failed.lua {{ spool.spool_id }} {{ application.application_id }} error",
+    "session_in_hangup_hook": "true",
+    "ignore_early_media": "true",
+    "codec_string": "'PCMU,PCMA'",
+    "spool_status": "connected",
+    "spool_id": "{{ spool.spool_id }}",
+    "origination_caller_id_number": "{{ source.phone }}",
+    "origination_caller_id_name": "{{ source.phone }}",
+    "application_result": "success"
+  },
+  "output": {
+    "status": "spool_status",
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "bgapi originate",
+      "data": "sofia/gateway/{{ provider.name }}/{{ provider.prefix }}{{ destination.phone }} 'lua(/usr/ictcore/bin/freeswitch/application.lua {{ spool.spool_id }} {{ application.application_id }} success)'"
+    }
+  ]
+}

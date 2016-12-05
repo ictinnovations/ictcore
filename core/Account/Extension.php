@@ -15,6 +15,12 @@ class Extension extends Account
    */
   protected $type = 'extension';
 
+  public function search($aFilter = array())
+  {
+    $aFilter['type'] = 'extension';
+    return parent::search($aFilter);
+  }
+
   public function save()
   {
     parent::save();

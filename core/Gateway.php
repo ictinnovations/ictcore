@@ -10,54 +10,12 @@ abstract class Gateway
 {
 
   /** @const */
-  const CONTACT_FIELD = 'phone';
   const GATEWAY_FLAG = 0;
+  const GATEWAY_TYPE = 'gateway';
+  const CONTACT_FIELD = 'phone';
 
   /** @var boolean $conn */
   protected $conn = FALSE;
-
-  public static function capabilities()
-  {
-    $capabilities = array();
-    $capabilities['service_flag'] = (
-            Voice::SERVICE_FLAG |
-            Fax::SERVICE_FLAG |
-            Sms::SERVICE_FLAG |
-            Email::SERVICE_FLAG
-            //| Video::SERVICE_FLAG
-            );
-    $capabilities['application'] = array(
-        'dial',
-        'message'
-    );
-    $capabilities['account'] = array();
-    $capabilities['provider'] = array();
-    return $capabilities;
-  }
-
-  public function is_supported($feature, $type = 'service_flag')
-  {
-    $capabilities = $this->capabilities();
-    switch ($type) {
-      case 'service_flag':
-        if (($capabilities['service_flag'] & $feature) == $feature) {
-          return TRUE;
-        } else {
-          return FALSE;
-        }
-        break;
-      case 'application':
-      case 'account':
-      case 'provider':
-      default:
-        if ($capabilities[$type] && in_array($feature, $capabilities)) {
-          return TRUE;
-        } else {
-          return FALSE;
-        }
-        break;
-    }
-  }
 
   protected function connect()
   {
@@ -69,11 +27,11 @@ abstract class Gateway
     return fclose($this->conn);
   }
 
-  public function send($command)
+  public function send($command, Provider $oProvider = NULL)
   {
     if ($this->connect()) {
       // process
-      Corelog::log('Gateway->Send demo: ' . $command, Corelog::WARNING);
+      Corelog::log('Gateway->Send demo: ' . $command . ' via: ' . $oProvider->name, Corelog::WARNING);
       $this->dissconnect();
       return TRUE;
     } else {
@@ -90,12 +48,6 @@ abstract class Gateway
     } else {
       return FALSE;
     }
-  }
-
-  public static function template_application($application_name, $service_type = 'voice')
-  {
-    Corelog::log("Gateway->application_template demo. name: $application_name type: $service_type", Corelog::WARNING);
-    return '';
   }
 
   public static function config_template($config_type)

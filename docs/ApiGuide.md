@@ -1000,7 +1000,6 @@ A json encoded associative array containing key and value pairs based on followi
     "name": "__String__",
     "gateway_flag": "__Numeric_ID__, Type of gateway i.e Freeswitch::GATEWAY_FLAG or Kannel::GATEWAY_FLAG",
     "service_flag": "__Numeric_ID__, Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG",
-    "technology_id": "__Optional_Numeric_ID__, see technology table",
     "node_id": "__Optional_Numeric_ID__, see node table",
     "host": "__IPAddress__, ip address to termination server",
     "port": "__Optional_Digits__",

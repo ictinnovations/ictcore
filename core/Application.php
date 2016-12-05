@@ -295,7 +295,7 @@ class Application
   public function execute()
   {
     $oService = new Service();
-    return $oService->template_application($this->name);
+    return $oService->application_template($this->name);
   }
 
   public function _execute(Transmission &$oTransmission, Sequence &$oSequence)

@@ -6,8 +6,6 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-define('PROVIDER_DEFAULT', -1);
-
 class Provider
 {
 
@@ -19,7 +17,6 @@ class Provider
       'name',
       'gateway_flag',
       'service_flag',
-      'technology_id',
       'node_id',
       'host',
       'port',
@@ -61,9 +58,6 @@ class Provider
   private $service_flag = NULL;
 
   /** @var integer */
-  public $technology_id = NULL;
-
-  /** @var integer */
   public $node_id = NULL;
 
   /** @var string */
@@ -99,19 +93,11 @@ class Provider
   /** @var integer */
   public $active = NULL;
 
-  public function __construct($provider_id = NULL, $service_flag = NULL)
+  public function __construct($provider_id = NULL)
   {
-    if (!empty($provider_id) && $provider_id != PROVIDER_DEFAULT) {
+    if (!empty($provider_id)) {
       $this->provider_id = $provider_id;
-      $this->load();
-    } else if (!empty($service_flag)) {
-      $query = "SELECT provider_id FROM " . self::$table . " 
-                 WHERE active=1 AND (service_flag & $service_flag = $service_flag)
-                 ORDER BY provider_id DESC LIMIT 1";
-      $result = DB::query(self::$table, $query, array('provider_id' => $this->provider_id));
-      $data = mysql_fetch_assoc($result);
-      $this->provider_id = $data['provider_id'];
-      $this->load();
+      $this->_load();
     }
   }
 
@@ -135,6 +121,7 @@ class Provider
         case 'name':
         case 'node_id':
         case 'host':
+        case 'type':
           $aWhere[] = "$search_field = '$search_value'";
           break;
         case 'gateway_flag':
@@ -146,7 +133,7 @@ class Provider
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
-    $query = "SELECT provider_id, name, host, gateway_flag, service_flag, node_id FROM " . $from_str;
+    $query = "SELECT provider_id, name, host, gateway_flag, service_flag, node_id, type FROM " . $from_str;
     Corelog::log("provider search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query(self::$table, $query);
     while ($data = mysql_fetch_assoc($result)) {
@@ -156,8 +143,40 @@ class Provider
     return $aProvider;
   }
 
-  private function load()
+  public static function getClass($provider_id)
   {
+    if (ctype_digit(trim($provider_id))) {
+      $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
+      $result = DB::query(self::$table, $query, array('provider_id' => $provider_id));
+      if (is_resource($result)) {
+        $provider_type = mysql_result($result, 0);
+      }
+    } else {
+      $provider_type = $provider_id;
+    }
+    $class_name = ucfirst(strtolower(trim($provider_type)));
+    if (class_exists($class_name)) {
+      return $class_name;
+    } else {
+      return false;
+    }
+  }
+
+  public static function load($provider_id)
+  {
+    $class_name = self::getClass($provider_id);
+    if ($class_name) {
+      Corelog::log("Creating instance of : $class_name for provider: $provider_id", Corelog::CRUD);
+      return new $class_name($provider_id);
+    } else {
+      Corelog::log("$class_name class not found, Creating instance of : Provider", Corelog::CRUD);
+      return new self($provider_id);
+    }
+  }
+
+  private function _load()
+  {
+    Corelog::log("Loading provider: $this->provider_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
     $result = DB::query(self::$table, $query, array('provider_id' => $this->provider_id));
     $data = mysql_fetch_assoc($result);
@@ -166,7 +185,6 @@ class Provider
       $this->name = $data['name'];
       $this->gateway_flag = $data['gateway_flag'];
       $this->service_flag = $data['service_flag'];
-      $this->technology_id = $data['technology_id'];
       $this->node_id = $data['node_id'];
       $this->host = $data['host'];
       $this->port = $data['port'];
@@ -239,7 +257,6 @@ class Provider
         'name' => $this->name,
         'gateway_flag' => $this->gateway_flag,
         'service_flag' => $this->service_flag,
-        'technology_id' => $this->technology_id,
         'node_id' => $this->node_id,
         'host' => $this->host,
         'port' => $this->port,

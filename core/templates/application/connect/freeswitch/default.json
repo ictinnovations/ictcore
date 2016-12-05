@@ -1,0 +1,19 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "spool_id": "{{ spool.spool_id }}",
+    "spool_status": "connected",
+    "start_app_id": "{{ application.application_id }}",
+    "application_result": "success"
+  },
+  "output": {
+    "result": "application_result",
+    "status": "spool_status"
+  },
+  "batch": [
+    {
+      "name": "answer",
+      "data": ""
+    }
+  ]
+}

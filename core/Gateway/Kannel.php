@@ -10,8 +10,9 @@ class Kannel extends Gateway
 {
 
   /** @const */
-  const CONTACT_FIELD = 'phone';
   const GATEWAY_FLAG = 2;
+  const GATEWAY_TYPE = 'kannel';
+  const CONTACT_FIELD = 'phone';
 
   /** @var boolean $conn */
   protected $conn = false;
@@ -40,29 +41,6 @@ class Kannel extends Gateway
     $this->path = conf_get('kannel:path', '/cgi-bin/sendsms');
   }
 
-  public static function capabilities()
-  {
-    $capabilities = array();
-    $capabilities['service_flag'] = SMS::SERVICE_FLAG;
-    $capabilities['application'] = array(
-        'inbound',
-        'originate',
-        'connect',
-        'disconnect',
-        'voice_play',
-        'fax_receive',
-        'fax_send',
-        'log'
-    );
-    $capabilities['account'] = array(
-        'did'
-    );
-    $capabilities['provider'] = array(
-        'smpp'
-    );
-    return $capabilities;
-  }
-
   protected function connect()
   {
 
@@ -83,9 +61,13 @@ class Kannel extends Gateway
     return fclose($this->conn);
   }
 
-  public function send($command)
+  public function send($command, Provider $oProvider = NULL)
   {
-    Corelog::log("Kannel sending commands", Corelog::CRUD, $command);
+    if (empty($oProvider)) {
+      Corelog::log("Kannel sending commands", Corelog::CRUD, $command);
+    } else {
+      Corelog::log("Kannel sending commands via:".$oProvider->name, Corelog::CRUD, $command);
+    }
 
     $queryString = array(
         'username' => $this->username,
@@ -175,50 +157,6 @@ class Kannel extends Gateway
     /*     * **************************************************** UPDATE END */
   }
 
-  public static function template_application($application_name, $service_type = 'sms')
-  {
-    if ($service_type != 'sms') {
-      return '';
-    }
-    $template = '';
-    switch ($application_name) {
-      case 'sms_send':
-        $template = array(
-            // provider
-            'smsc' => '[provider:name]',
-            // transmission
-            'to' => '[destination:phone]',
-            'from' => '[source:phone]',
-            // message
-            'data' => '[message:data]',
-            'mclass' => '[message:class]',
-            'coding' => '[message:encoding]',
-            'charset' => '[message:type]',
-            // delivery / status update
-            'spool_id' => '[spool:spool_id]',
-            'application_id' => '[application:application_id]'
-        );
-        break;
-      case 'log':
-        // TODO: create a kannel.log file, and put log messages there
-        break;
-    }
-    return $template;
-  }
-
-  
-  public function config_template($type, $name = '')
-  {
-    switch ($type) {
-      case 'did':
-        return 'account/did/kannel/default.twig';
-      case 'smpp':
-        return 'provider/smpp/kannel/default.twig';
-      default:
-        return 'invalid.twig';
-    }
-  }
-
   private function config_filename($type, $name)
   {
     global $path_etc;
@@ -235,14 +173,14 @@ class Kannel extends Gateway
   {
     Corelog::log("Kannel saving config for type: $type, name: $name", Corelog::CRUD);
     $config_file = $this->config_filename($type, $name);
-    return file_put_contents($config_file, $data);
+    file_put_contents($config_file, $data);
   }
 
   public function config_delete($type, $name)
   {
     Corelog::log("Kannel deleting config for type: $type, name: $name", Corelog::CRUD);
     $config_file = $this->config_filename($type, $name);
-    return unlink($config_file);
+    unlink($config_file);
   }
 
   public function config_reload()

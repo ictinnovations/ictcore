@@ -10,8 +10,9 @@ class Freeswitch extends Gateway
 {
 
   /** @const */
-  const CONTACT_FIELD = 'phone';
   const GATEWAY_FLAG = 8;
+  const GATEWAY_TYPE = 'freeswitch';
+  const CONTACT_FIELD = 'phone';
 
   /** @var boolean $conn */
   protected $conn = false;
@@ -34,29 +35,6 @@ class Freeswitch extends Gateway
     $this->port = conf_get('freeswitch:port', '8021');
     $this->username = conf_get('freeswitch:user', 'user');
     $this->password = conf_get('freeswitch:pass', 'ClueCon');
-  }
-
-  public static function capabilities()
-  {
-    $capabilities = array();
-    $capabilities['service_flag'] = (Voice::SERVICE_FLAG | Fax::SERVICE_FLAG);
-    $capabilities['application'] = array(
-        'inbound',
-        'originate',
-        'connect',
-        'disconnect',
-        'voice_play',
-        'fax_receive',
-        'fax_send',
-        'log'
-    );
-    $capabilities['account'] = array(
-        'extension'
-    );
-    $capabilities['provider'] = array(
-        'sip'
-    );
-    return $capabilities;
   }
 
   protected function connect()
@@ -87,9 +65,13 @@ class Freeswitch extends Gateway
     return fclose($this->conn);
   }
 
-  public function send($command)
+  public function send($command, Provider $oProvider = NULL)
   {
-    Corelog::log("Freeswitch sending commands", Corelog::CRUD, $command);
+    if (empty($oProvider)) {
+      Corelog::log("Freeswitch sending commands", Corelog::CRUD, $command);
+    } else {
+      Corelog::log("Freeswitch sending commands via:".$oProvider->name, Corelog::CRUD, $command);
+    }
     $this->connect();
 
     if ($this->conn) {
@@ -147,158 +129,6 @@ class Freeswitch extends Gateway
     $this->dissconnect();
   }
 
-  public static function template_application($application_name, $service_type = 'voice')
-  {
-    switch ($application_name) {
-      case 'inbound':
-        // yet no template needed by inbound application
-        break;
-      case 'originate':
-        $app_script = "/usr/ictcore/bin/freeswitch/application.lua";
-        $end_script = "/usr/ictcore/bin/freeswitch/spool_failed.lua";
-        $app_failed = "lua $end_script [spool:spool_id] [application:application_id] error";
-        $template['input'] = array(
-            'failure_causes' => 'NORMAL_CLEARING', // transfer on each failure except normal clearing
-            'transfer_on_fail' => "'UNALLOCATED_NUMBER auto_cause xml ictcore_fail'",
-            'api_hangup_hook' => "'$app_failed'", // queue are required for additional lua variables
-            'session_in_hangup_hook' => 'true',
-            'ignore_early_media' => 'true',
-            'codec_string' => "'PCMU,PCMA'",
-            'spool_status' => 'connected',
-            'spool_id' => '[spool:spool_id]',
-            'origination_caller_id_number' => '[source:phone]',
-            'origination_caller_id_name' => '[source:phone]'
-        );
-        if ($service_type == 'fax') {
-          $template['input'] += array(
-              'fax_enable_t38_request' => 'true',
-              'fax_enable_t38' => 'true',
-              'fax_verbose' => 'true',
-              'fax_use_ecm' => 'true'
-          );
-        }
-        $app_success = "lua($app_script [spool:spool_id] [application:application_id] success)";
-        $template['batch'][1] = array(
-            'name' => "bgapi originate",
-            'data' => "sofia/gateway/[provider:name]/[provider:prefix][destination:phone] '&$app_success'"
-        );
-        $template['output'] = array(
-            'status' => 'spool_status'
-        );
-        break;
-      case 'connect':
-        $template['input'] = array(
-            'spool_id' => '[spool:spool_id]',
-            'spool_status' => 'connected',
-            'start_app_id' => '[application:application_id]'
-        );
-        $template['batch'][1] = array(
-            'name' => "answer",
-            'data' => '' // no data
-        );
-        $template['output'] = array(
-            'status' => 'spool_status'
-        );
-        break;
-      case 'log':
-        $template['batch'][1] = array(
-            'name' => "log",
-            'data' => 'INFO [parameter:message]'
-        );
-        break;
-      case 'disconnect':
-        $template['batch'][1] = array(
-            'name' => "hangup",
-            'data' => '' // TODO, update it for cause codes
-        );
-        break;
-      case 'voice_play':
-        $template['batch'][1] = array(
-            'name' => "playback",
-            'data' => "[parameter:message]"
-        );
-        break;
-      case 'fax_receive':
-        $fax_file_tmp = tempnam('/tmp', 'fax_') . '.tif';
-        $template['input'] = array(
-            'fax_enable_t38_request' => 'true',
-            'fax_enable_t38' => 'true',
-            'fax_local_station_id' => 'ICTCore',
-            'fax_file' => $fax_file_tmp,
-            'application_result' => 'failed',
-            'execute_on_fax_success' => 'set application_result=success'
-        );
-        $template['batch'][1] = array(
-            'name' => "playback",
-            'data' => "silence_stream://1000"
-        );
-        $template['batch'][4] = array(
-            'name' => "rxfax",
-            'data' => $fax_file_tmp
-        );
-        $template['output'] = array(
-            'error' => 'fax_result_text',
-            'pages' => 'fax_document_total_pages',
-            'fax_file' => 'fax_file'
-        );
-        break;
-      case 'fax_send':
-        $template['input'] = array(
-            'fax_enable_t38_request' => 'true',
-            'fax_enable_t38' => 'true',
-            'fax_local_station_id' => 'ICTCore',
-            'fax_header' => '[parameter:header]',
-            'fax_ident' => '[source:phone]',
-            'application_result' => 'failed',
-            'execute_on_fax_success' => 'set application_result=success'
-        );
-        $template['batch'][1] = array(
-            'name' => "playback",
-            'data' => "silence_stream://2000"
-        );
-        $template['batch'][4] = array(
-            'name' => "txfax",
-            'data' => "[parameter:message]"
-        );
-        $template['output'] = array(
-            'error' => 'fax_result_text',
-            'pages' => 'fax_document_transferred_pages'
-        );
-        break;
-    }
-
-    // insert missing parameters with their defaults
-    $template += array(
-        'application_id' => '[application:application_id]',
-        'input' => array(),
-        'output' => array(),
-        'batch' => array()
-    );
-    $template['input'] += array(
-        'application_result' => 'success'  // set the default result, will be read by output
-    );
-    $template['output'] += array(
-        'result' => 'application_result', // mapping between application and gateway variables
-        'call_id' => 'uuid'
-    );
-
-    return $template;
-  }
-
-  public function config_template($type, $name = '')
-  {
-    switch ($type) {
-      case 'did':
-        return 'account/did/freeswitch/default.twig';
-      case 'extension':
-        return 'account/extension/freeswitch/default.twig';
-      case 'sip':
-        return 'provider/sip/freeswitch/default.twig';
-      default:
-        return 'invalid.twig';
-    }
-  }
-
   private function config_filename($type, $name)
   {
     global $path_etc;
@@ -319,14 +149,14 @@ class Freeswitch extends Gateway
 
     Corelog::log("Freeswitch saving config for type: $type, name: $name", Corelog::CRUD);
     $config_file = $this->config_filename($type, $name);
-    return $doc->save($config_file);
+    $doc->save($config_file);
   }
 
   public function config_delete($type, $name)
   {
     Corelog::log("Freeswitch deleting config for type: $type, name: $name", Corelog::CRUD);
     $config_file = $this->config_filename($type, $name);
-    return unlink($config_file);
+    unlink($config_file);
   }
 
   public function config_reload()

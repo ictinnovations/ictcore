@@ -16,4 +16,34 @@ class Email extends Service
   const MESSAGE_CLASS = 'Template';
   const GATEWAY_CLASS = 'Sendmail';
 
+  public static function capabilities()
+  {
+    $capabilities = array();
+    $capabilities['application'] = array(
+        'email_receive',
+        'email_send',
+        'log'
+    );
+    $capabilities['account'] = array(
+        'mailbox'
+    );
+    $capabilities['provider'] = array(
+        'smtp',
+        'sendmail'
+    );
+    return $capabilities;
+  }
+
+  public function application_template($application_name)
+  {
+    $gateway_class = static::GATEWAY_CLASS;
+    $gateway_type = $gateway_class::GATEWAY_TYPE;
+    switch ($application_name) {
+      case 'email_send':
+      case 'email_receive':
+      case 'log':
+        return "application/$application_name/$gateway_type/default.json";
+    }
+  }
+
 }

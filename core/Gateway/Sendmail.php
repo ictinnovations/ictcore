@@ -12,8 +12,9 @@ class Sendmail extends Gateway
 {
 
   /** @const */
-  const CONTACT_FIELD = 'email';
   const GATEWAY_FLAG = 4;
+  const GATEWAY_TYPE = 'sendmail';
+  const CONTACT_FIELD = 'email';
 
   /** @var boolean $conn */
   protected $conn = false;
@@ -44,30 +45,6 @@ class Sendmail extends Gateway
     $this->password = conf_get('sendmail:pass', '');
     $this->type = conf_get('sendmail:type', 'sendmail');
     $this->cli = conf_get('sendmail:cli', '/usr/sbin/sendmail');
-  }
-
-  public static function capabilities()
-  {
-    $capabilities = array();
-    $capabilities['service_flag'] = Email::SERVICE_FLAG;
-    $capabilities['application'] = array(
-        'inbound',
-        'originate',
-        'connect',
-        'disconnect',
-        'voice_play',
-        'fax_receive',
-        'fax_send',
-        'log'
-    );
-    $capabilities['account'] = array(
-        'mailbox'
-    );
-    $capabilities['provider'] = array(
-        'smtp',
-        'sendmail'
-    );
-    return $capabilities;
   }
 
   protected function validate_email($email)
@@ -116,9 +93,13 @@ class Sendmail extends Gateway
     }
   }
 
-  public function send($command)
+  public function send($command, Provider $oProvider = NULL)
   {
-    Corelog::log("Sendmail sending commands", Corelog::CRUD, $command);
+    if (empty($oProvider)) {
+      Corelog::log("Sendmail sending commands", Corelog::CRUD, $command);
+    } else {
+      Corelog::log("Sendmail sending commands via:".$oProvider->name, Corelog::CRUD, $command);
+    }
 
     $mailMsg = Swift_Message::newInstance();
 
@@ -180,33 +161,6 @@ class Sendmail extends Gateway
      */
     $oRequest->task_create();
     /*     * **************************************************** UPDATE END */
-  }
-
-  public static function template_application($application_name, $service_type = 'email')
-  {
-    if ($service_type != 'email') {
-      return '';
-    }
-    $template = '';
-    switch ($application_name) {
-      case 'email_send':
-        $template = array(
-            'to' => '[destination:email]',
-            'from' => '[source:email]',
-            'subject' => '[parameter:subject]',
-            'body' => '[parameter:body]',
-            'body_alt' => '[parameter:body_alt]',
-            'attachment' => '[parameter:attachment]',
-            'application_id' => '[application:application_id]',
-            'spool_id' => '[spool:spool_id]',
-                //'file_title' => '[message:name].[message:type]'
-        );
-        break;
-      case 'log':
-        // TODO: create a kannel.log file, and put log messages there
-        break;
-    }
-    return $template;
   }
 
 }

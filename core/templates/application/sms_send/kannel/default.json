@@ -1,0 +1,11 @@
+{
+  "smsc": "{{ provider.name }}",
+  "to": "{{ destination.phone }}",
+  "from": "{{ source.phone }}",
+  "data": "{{ message.data }}",
+  "mclass": "{{ message.class }}",
+  "coding": "{{ message.encoding }}",
+  "charset": "{{ message.type }}",
+  "spool_id": "{{ spool.spool_id }}",
+  "application_id": "{{ application.application_id }}"
+}

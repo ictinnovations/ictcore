@@ -42,7 +42,7 @@ class Fax_receive extends Application
   public function execute()
   {
     $oService = new Fax();
-    return $oService->template_application('fax_receive');
+    return $oService->application_template('fax_receive');
   }
 
   public function process()

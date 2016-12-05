@@ -44,7 +44,7 @@ class Fax_send extends Application
   public function execute()
   {
     $oService = new Fax();
-    return $oService->template_application('fax_send');
+    return $oService->application_template('fax_send');
   }
 
   public function process()

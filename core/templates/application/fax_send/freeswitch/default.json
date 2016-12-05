@@ -1,0 +1,27 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "fax_enable_t38_request": "true",
+    "fax_enable_t38": "true",
+    "fax_local_station_id": "ICTCore",
+    "fax_header": "{{ parameter.header }}",
+    "fax_ident": "{{ source.phone }}",
+    "application_result": "failed",
+    "execute_on_fax_success": "set application_result=success"
+  },
+  "output": {
+    "error": "fax_result_text",
+    "pages": "fax_document_transferred_pages",
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "playback",
+      "data": "silence_stream://2000"
+    },
+    {
+      "name": "txfax",
+      "data": "{{ parameter.message }}"
+    }
+  ]
+}

@@ -36,10 +36,13 @@ class Email_send extends Application
   public function execute()
   {
     $oService = new Email();
-    $output = $oService->template_application('email_send');
-    $command = $this->oSequence->oToken->render_variable($output, Token::KEEP_ORIGNAL); // keep provider related token intact
+    $oProvider = $oService->route_get();
+    $this->oSequence->oToken->add('provider', $oProvider);
+    $output = $oService->application_template('email_send');
+    $command = $this->oSequence->oToken->render_template($output, Token::KEEP_ORIGNAL); // keep provider related token intact
     // this application require gateway access to send an email
-    return $oService->execute_application($command, FALSE);
+    $oService->application_execute('email_send', $command, $oProvider);
+    return ''; // nothing to return
   }
 
   public function process()

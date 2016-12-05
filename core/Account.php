@@ -123,7 +123,7 @@ class Account
         $data = mysql_fetch_assoc($result);
         $this->account_id = $data['account_id'];
       }
-      $this->load();
+      $this->_load();
     }
   }
 
@@ -162,7 +162,7 @@ class Account
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT account_id, username, first_name, last_name, phone, email FROM " . $from_str;
+    $query = "SELECT account_id, type, username, first_name, last_name, phone, email FROM " . $from_str;
     Corelog::log("account search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('account', $query);
     while ($data = mysql_fetch_assoc($result)) {
@@ -213,7 +213,7 @@ class Account
       return false;
     }
   }
-  
+
   public static function load($account_id)
   {
     $class_name = self::getClass($account_id);
@@ -234,6 +234,7 @@ class Account
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->account_id = $data['account_id'];
+      $this->type = $data['type'];
       $this->username = $data['username'];
       $this->passwd = $data['passwd'];
       $this->passwd_pin = $data['passwd_pin'];
@@ -302,6 +303,7 @@ class Account
   {
     $data = array(
         'account_id' => $this->account_id,
+        'type' => $this->type,
         'username' => $this->username,
         'passwd' => $this->passwd,
         'passwd_pin' => $this->passwd_pin,

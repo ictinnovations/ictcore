@@ -649,7 +649,6 @@ CREATE TABLE provider
    name                          varchar(128)           NOT NULL default '',
    gateway_flag                  int(11) unsigned       default NULL,
    service_flag                  int(11) unsigned       default NULL,
-   technology_id                 int(11) unsigned       NOT NULL,
    node_id                       int(11) unsigned       NOT NULL,
    host                          varchar(128)           NOT NULL default '',
    port                          int(6)                 NOT NULL default 5060,
@@ -693,31 +692,6 @@ CREATE FUNCTION get_dialstring(Contact VARCHAR(32), Provider_ID INT(11))
   END;
 |
 DELIMITER ;
-
-/*==============================================================*/
-/* Table: technology                                            */
-/* Desc: All voip technologies stored here like SIP, H323       */
-/*==============================================================*/
-CREATE TABLE technology
-(
-   technology_id                 int(11) unsigned       NOT NULL auto_increment,
-   technology_name               varchar(128)           NOT NULL default '',
-   technology_value              varchar(128)           NOT NULL default '',
-   technology_dialstring         varchar(255)           NOT NULL default '',
-   technology_register           varchar(255)           NOT NULL default '',
-   file_name                     varchar(50)            NOT NULL default '',
-   gateway_id                    int(11)                default NULL,
-   PRIMARY KEY (technology_id)
-) ENGINE = InnoDB;
-
-/*==============================================================*/
-/* Desc: Dumping sample data into technology table              */
-/*==============================================================*/
--- (technology_id, technology_name, technology_value, technology_dialstring, technology_register, file_name, gateway_id)
-INSERT INTO technology VALUES (1, 'SIP', 'SIP', 'SIP/%provider/%phone', '%user:%pass@%host', 'sip.conf', 1);
-INSERT INTO technology VALUES (2, 'DAHDI', 'DAHDI', 'DAHDI/%provider/%phone', '', 'dahdi.conf', 1);
-INSERT INTO technology VALUES (4, 'IAX', 'IAX2', 'IAX2/%user:%pass@%provider/%phone', '%user:%pass@%host', 'iax.conf', 1);
--- before adding technology for gateway other then asterisk, remember to filter technology related select queries 
 
 /*==============================================================*/
 /* Table: codec                                                 */

@@ -21,12 +21,15 @@ class Service
     // nothing to do
   }
 
-  public function capabilities()
+  public static function capabilities()
   {
-    $cGateway = static::GATEWAY_CLASS;
-    $capabilities = $cGateway::capabilities();
-    // drop service_flag from original gateway capabilities
-    unset($capabilities['service_flag']);
+    $capabilities = array();
+    $capabilities['application'] = array(
+        'dial',
+        'message'
+    );
+    $capabilities['account'] = array();
+    $capabilities['provider'] = array();
     return $capabilities;
   }
 
@@ -47,51 +50,62 @@ class Service
     }
   }
 
-  public function template_application($application_name)
-  {
-    $cGateway = static::GATEWAY_CLASS;
-    $template = $cGateway::template_application($application_name, static::SERVICE_TYPE);
-    return $template;
+  public static function route_get() {
+    $aFilter = array(
+        'active' => 1,
+        'service_flag' => static::SERVICE_FLAG
+    );
+    $listRoute = Provider::search($aFilter);
+    if (count($listRoute)) {
+      $aProvider = array_shift($listRoute);
+      $oProvider = new Provider($aProvider['provider_id']);
+      return $oProvider;
+    }
+    throw new CoreException('No provider available');
   }
 
-  public function execute_application($command, $load_provider = true)
+  public static function application_template($application_name)
   {
-    if ($load_provider) {
-      $oToken = new Token();
-      try {
-        $oProvider = new Provider(PROVIDER_DEFAULT, static::SERVICE_FLAG);
-        $oToken->add('provider', $oProvider->token_get());
-      } catch (CoreException $e) {
-        Corelog::log($e->getMessage(), Corelog::NOTICE);
-        Corelog::log("No gateway provider found", Corelog::NOTICE);
-      }
-      $command = $oToken->render_variable($command); // TODO: add REPLACE_EMPTY
+    Corelog::log("Service->application_template demo. name: $application_name", Corelog::WARNING);
+    return 'invalid.twig';
+  }
+
+  public function application_execute($application_name, $command, Provider $oProvider = NULL)
+  {
+    switch ($application_name) {
+      default:
+        // nothing to do
     }
-    // this function require gateway access to execute given command
     $cGateway = static::GATEWAY_CLASS;
     $oGateway = new $cGateway;
-    return $oGateway->send($command);
+    $oGateway->send($command, $oProvider);
   }
 
-  public function config_template($config_type, $config_name = 'default')
+  public static function config_template($config_type)
   {
-    $cGateway = static::GATEWAY_CLASS;
-    $template = $cGateway::config_template($config_type, $config_name);
-    return $template;
+    Corelog::log('Service->config_template demo. type: ' . $config_type, Corelog::WARNING);
+    return 'invalid.twig';
   }
 
   public function config_save($config_type, $config_name = 'default', $aSetting = array())
   {
     $cGateway = static::GATEWAY_CLASS;
     $oGateway = new $cGateway;
-    return $oGateway->config_save($config_type, $config_name, $aSetting);
+    $oGateway->config_save($config_type, $config_name, $aSetting);
   }
 
   public function config_delete($config_type, $config_name = 'default')
   {
     $cGateway = static::GATEWAY_CLASS;
     $oGateway = new $cGateway;
-    return $oGateway->config_delete($config_type, $config_name);
+    $oGateway->config_delete($config_type, $config_name);
+  }
+
+  public function config_reload()
+  {
+    $cGateway = static::GATEWAY_CLASS;
+    $oGateway = new $cGateway;
+    $oGateway->config_reload();
   }
 
 }

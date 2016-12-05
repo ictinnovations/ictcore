@@ -25,10 +25,13 @@ class Originate extends Application
     } else if ($this->oTransmission->service_flag == Fax::SERVICE_FLAG) {
       $oService = new Fax();
     }
-    $output = $oService->template_application('originate');
-    $command = $this->oSequence->oToken->render_variable($output, Token::KEEP_ORIGNAL); // keep provider related token intact
-    // this application require gateway access to send an email
-    return $oService->execute_application($command, true);
+    $oProvider = $oService->route_get();
+    $this->oSequence->oToken->add('provider', $oProvider);
+    $output = $oService->application_template('originate');
+    $command = $this->oSequence->oToken->render_template($output, Token::KEEP_ORIGNAL); // keep provider related token intact
+    // this application require gateway access to dial
+    $oService->application_execute('originate', $command, $oProvider);
+    return ''; // nothing to return
   }
 
 }

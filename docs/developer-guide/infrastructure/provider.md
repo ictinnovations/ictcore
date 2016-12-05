@@ -14,7 +14,6 @@ Properties
     'name',
     'gateway_flag',
     'service_flag',
-    'technology_id',
     'node_id',
     'host',
     'port',

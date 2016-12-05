@@ -26,7 +26,7 @@ class Connect extends Application
       $oService = new Fax();
     }
 
-    return $oService->template_application('connect');
+    return $oService->application_template('connect');
   }
 
   public function process()

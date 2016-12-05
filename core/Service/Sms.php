@@ -16,4 +16,45 @@ class Sms extends Service
   const MESSAGE_CLASS = 'Text';
   const GATEWAY_CLASS = 'Kannel';
 
+  public static function capabilities()
+  {
+    $capabilities = array();
+    $capabilities['application'] = array(
+        'sms_receive',
+        'sms_send',
+        'log'
+    );
+    $capabilities['account'] = array(
+        'longcode'
+    );
+    $capabilities['provider'] = array(
+        'smpp'
+    );
+    return $capabilities;
+  }
+
+  public function config_template($type, $name = '')
+  {
+    switch ($type) {
+      case 'did':
+        return 'account/did/kannel/default.twig';
+      case 'smpp':
+        return 'provider/smpp/kannel/default.twig';
+      default:
+        return 'invalid.twig';
+    }
+  }
+
+  public function application_template($application_name)
+  {
+    $gateway_class = static::GATEWAY_CLASS;
+    $gateway_type = $gateway_class::GATEWAY_TYPE;
+    switch ($application_name) {
+      case 'sms_send':
+      case 'sms_receive':
+      case 'log':
+        return "application/$application_name/$gateway_type/default.json";
+    }
+  }
+
 }
