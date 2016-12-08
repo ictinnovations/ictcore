@@ -7,6 +7,6 @@
         "twig/twig": "^1.28"
     },
     "autoload": {
-        "psr-4": {"ICT\\Core\\": "core/"}
+        "psr-4": {"ICT\\Core\\": ["core/", "core/lib/"]}
     }
 }

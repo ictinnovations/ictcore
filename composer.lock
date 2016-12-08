@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "459b556d0a0e62658a70d56f9b08bfa1",
+    "hash": "078938ce7a1e96c44cef95de9a967134",
     "content-hash": "cecdb0ac94faf3c3f8e678e6df137b26",
     "packages": [
         {
@@ -265,12 +265,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jacwright/RestServer.git",
-                "reference": "d95356301bc4254694893f84c2f94ce54a463d64"
+                "reference": "adfa1460e61178d53d63e72b2e65ab68d53b8ad7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jacwright/RestServer/zipball/d95356301bc4254694893f84c2f94ce54a463d64",
-                "reference": "d95356301bc4254694893f84c2f94ce54a463d64",
+                "url": "https://api.github.com/repos/jacwright/RestServer/zipball/adfa1460e61178d53d63e72b2e65ab68d53b8ad7",
+                "reference": "adfa1460e61178d53d63e72b2e65ab68d53b8ad7",
                 "shasum": ""
             },
             "require": {
@@ -305,7 +305,7 @@
                 "rest",
                 "rest-server"
             ],
-            "time": "2016-02-15 20:41:57"
+            "time": "2016-06-21 14:05:17"
         },
         {
             "name": "nategood/httpful",
@@ -359,23 +359,23 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.2",
+            "version": "v5.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "d8db871a54619458a805229a057ea2af33c753e8"
+                "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/d8db871a54619458a805229a057ea2af33c753e8",
-                "reference": "d8db871a54619458a805229a057ea2af33c753e8",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/545ce9136690cea74f98f86fbb9c92dd9ab1a756",
+                "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9.1,<0.9.4"
+                "mockery/mockery": "~0.9.1"
             },
             "type": "library",
             "extra": {
@@ -408,20 +408,20 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2016-05-01 08:45:47"
+            "time": "2016-11-24 01:01:23"
         },
         {
             "name": "twig/twig",
-            "version": "v1.28.1",
+            "version": "v1.28.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "fff80c4a7ae1d47a81dfec10c76cbcb939170b45"
+                "reference": "b22ce0eb070e41f7cba65d78fe216de29726459c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/fff80c4a7ae1d47a81dfec10c76cbcb939170b45",
-                "reference": "fff80c4a7ae1d47a81dfec10c76cbcb939170b45",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/b22ce0eb070e41f7cba65d78fe216de29726459c",
+                "reference": "b22ce0eb070e41f7cba65d78fe216de29726459c",
                 "shasum": ""
             },
             "require": {
@@ -429,7 +429,7 @@
             },
             "require-dev": {
                 "symfony/debug": "~2.7",
-                "symfony/phpunit-bridge": "~2.7"
+                "symfony/phpunit-bridge": "~3.2@dev"
             },
             "type": "library",
             "extra": {
@@ -469,7 +469,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-11-19 05:52:49"
+            "time": "2016-11-23 18:41:40"
         }
     ],
     "packages-dev": [],

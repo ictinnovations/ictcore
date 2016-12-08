@@ -21,6 +21,7 @@ class ComposerStaticInit310410ba0498529560857ea7544dea3a
         'ICT\\Core\\' => 
         array (
             0 => __DIR__ . '/../..' . '/core',
+            1 => __DIR__ . '/../..' . '/core/lib',
         ),
     );
 
