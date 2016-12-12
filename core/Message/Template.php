@@ -1,10 +1,20 @@
 <?php
+
+namespace ICT\Core\Message;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\DB;
+use ICT\Core\Message;
+use ICT\Core\Token;
+use ICT\Core\User;
 
 class Template extends Message
 {
@@ -152,9 +162,10 @@ class Template extends Message
   {
     global $path_data;
     if (file_exists($file_path)) {
+      $user_id = empty(User::$activeUser) ? 0 : User::$activeUser->user_id;
       $raw_type = strtolower(end(explode('.', $file_path)));
       $file_type = empty($file_type) ? 'pdf' : $raw_type;
-      $file_name = 'attachment_' . user_get('user_id', 0) . '_';
+      $file_name = 'attachment_' . $user_id . '_';
       $file_name .= DB::next_record_id($file_name);
       $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;
       rename($file_path, $dst_file);

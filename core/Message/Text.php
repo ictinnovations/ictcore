@@ -1,10 +1,19 @@
 <?php
+
+namespace ICT\Core\Message;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\DB;
+use ICT\Core\Message;
+use ICT\Core\Token;
 
 define('SMS_ENCODING_GSM', 0);
 define('SMS_ENCODING_BINARY', 1);

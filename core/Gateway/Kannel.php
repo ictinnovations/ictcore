@@ -1,10 +1,20 @@
 <?php
+
+namespace ICT\Core\Gateway;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use Exception;
+use ICT\Core\Conf;
+use ICT\Core\Corelog;
+use ICT\Core\Gateway;
+use ICT\Core\Provider;
+use ICT\Core\Request;
 
 class Kannel extends Gateway
 {
@@ -34,11 +44,11 @@ class Kannel extends Gateway
 
   public function __construct()
   {
-    $this->username = conf_get('kannel:user', 'myuser');
-    $this->password = conf_get('kannel:pass', 'mypass');
-    $this->host = conf_get('kannel:host', '127.0.0.1');
-    $this->port = conf_get('kannel:port', '13013');
-    $this->path = conf_get('kannel:path', '/cgi-bin/sendsms');
+    $this->username = Conf::get('kannel:user', 'myuser');
+    $this->password = Conf::get('kannel:pass', 'mypass');
+    $this->host = Conf::get('kannel:host', '127.0.0.1');
+    $this->port = Conf::get('kannel:port', '13013');
+    $this->path = Conf::get('kannel:path', '/cgi-bin/sendsms');
   }
 
   protected function connect()
@@ -86,7 +96,7 @@ class Kannel extends Gateway
        */
       $spool_id = $command['spool_id'];
       $dlrMask = 1 | 2 | 4 | 8 | 16;
-      $rsp_url = conf_get('site:base_url', 'http://localhost/ictcore') . '/gateway.php';
+      $rsp_url = Conf::get('site:base_url', 'http://localhost/ictcore') . '/gateway.php';
       $dlrUrl = "$rsp_url?spool_id=$spool_id&gateway_flag=" . Kannel::GATEWAY_FLAG;
       $dlrUrl .= "&application_data[result]=%d&application_data[error]=%A";
 

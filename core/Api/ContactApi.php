@@ -1,10 +1,17 @@
 <?php
+
+namespace ICT\Core\Api;
+
 /* * ***************************************************************
  * Copyright © 2016 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Api;
+use ICT\Core\Contact;
+use ICT\Core\CoreException;
 
 class ContactApi extends Api
 {

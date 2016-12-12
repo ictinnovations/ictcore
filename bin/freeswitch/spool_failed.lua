@@ -3,10 +3,13 @@ application.lua
 Disclaimer: Use at your own risk.  No implied warranties or help if/when stuff blows up.
 ]]
 
-ictcore_url    = 'http://localhost/ictcore/gateway.php'
+CONF = (loadfile "/usr/ictcore/bin/freeswitch/lib/LIP.lua")() -- one-time load of INI files related routines
+
+local aConf = CONF.load('/etc/ictcore.conf');
+ictcore_url    = tostring(aConf.gatewayhub.url)
 ictcore_access = {
-  username      = "foo",
-  password      = "bar",
+  username      = tostring(aConf.gatewayhub.username),
+  password      = tostring(aConf.gatewayhub.password),
   gateway_flag  = 8
 }
 

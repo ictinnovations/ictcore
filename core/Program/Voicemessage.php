@@ -1,10 +1,22 @@
 <?php
+
+namespace ICT\Core\Program;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Application\Disconnect;
+use ICT\Core\Application\Originate;
+use ICT\Core\Application\Voice_play;
+use ICT\Core\Message\Recording;
+use ICT\Core\Program;
+use ICT\Core\Scheme;
+use ICT\Core\Service\Voice;
+use ICT\Core\Transmission;
 
 class Voicemessage extends Program
 {

@@ -1,10 +1,27 @@
 <?php
+
+namespace ICT\Core\Program;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Account;
+use ICT\Core\Application\Email_receive;
+use ICT\Core\Conf;
+use ICT\Core\Contact;
+use ICT\Core\Exchange\Dialplan;
+use ICT\Core\Message\Document;
+use ICT\Core\Message\Template;
+use ICT\Core\Program;
+use ICT\Core\Result;
+use ICT\Core\Scheme;
+use ICT\Core\Service\Email;
+use ICT\Core\Token;
+use ICT\Core\Transmission;
 
 class Emailtofax extends Program
 {
@@ -220,7 +237,7 @@ class Emailtofax extends Program
     );
 
     // prepare data for new transmission
-    $reply_from = conf_get('emailtofax:reply_account', 'default');
+    $reply_from = Conf::get('emailtofax:reply_account', 'default');
     $transmissionData = array(
         'contact_id' => $this->oTransmission->contact_id,
         // replace contact with company contact as per system configurations

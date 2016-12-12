@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -15,7 +18,6 @@ class Provider
   private static $fields = array(
       'provider_id',
       'name',
-      'gateway_flag',
       'service_flag',
       'node_id',
       'host',
@@ -42,13 +44,6 @@ class Provider
 
   /** @var string */
   public $name = NULL;
-
-  /**
-   * @property-read integer $gateway_flag 
-   * @see Provider::set_service_flag()
-   * @var integer 
-   */
-  private $gateway_flag = NULL;
 
   /**
    * @property integer $service_flag 
@@ -124,7 +119,6 @@ class Provider
         case 'type':
           $aWhere[] = "$search_field = '$search_value'";
           break;
-        case 'gateway_flag':
         case 'service_flag':
           $aWhere[] = "($search_field | $search_value) = $search_value";
           break;
@@ -133,7 +127,7 @@ class Provider
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
-    $query = "SELECT provider_id, name, host, gateway_flag, service_flag, node_id, type FROM " . $from_str;
+    $query = "SELECT provider_id, name, host, service_flag, node_id, type FROM " . $from_str;
     Corelog::log("provider search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query(self::$table, $query);
     while ($data = mysql_fetch_assoc($result)) {
@@ -143,7 +137,7 @@ class Provider
     return $aProvider;
   }
 
-  public static function getClass($provider_id)
+  public static function getClass($provider_id, $namespace = 'ICT\\Core\\Provider')
   {
     if (ctype_digit(trim($provider_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
@@ -155,6 +149,9 @@ class Provider
       $provider_type = $provider_id;
     }
     $class_name = ucfirst(strtolower(trim($provider_type)));
+    if (!empty($namespace)) {
+      $class_name = $namespace . '\\' . $class_name;
+    }
     if (class_exists($class_name)) {
       return $class_name;
     } else {
@@ -183,7 +180,6 @@ class Provider
     if ($data) {
       $this->provider_id = $data['provider_id'];
       $this->name = $data['name'];
-      $this->gateway_flag = $data['gateway_flag'];
       $this->service_flag = $data['service_flag'];
       $this->node_id = $data['node_id'];
       $this->host = $data['host'];
@@ -242,20 +238,11 @@ class Provider
     }
   }
 
-  private function set_service_flag($service_flag)
-  {
-    $this->service_flag = $service_flag;
-    $service_class = service_flag_to_class($this->service_flag);
-    $gateway_class = $service_class::GATEWAY_CLASS;
-    $this->gateway_flag = $gateway_class::GATEWAY_FLAG;
-  }
-
   public function save()
   {
     $data = array(
         'provider_id' => $this->provider_id,
         'name' => $this->name,
-        'gateway_flag' => $this->gateway_flag,
         'service_flag' => $this->service_flag,
         'node_id' => $this->node_id,
         'host' => $this->host,
@@ -281,31 +268,6 @@ class Provider
       $this->provider_id = $data['provider_id'];
       Corelog::log("New Provider created: $this->provider_id", Corelog::CRUD);
     }
-
-    if ($result) {
-      $oToken = new Token();
-      $oToken->add('provider', $this);
-
-      // get gateway class name
-      $gateway_class = gateway_flag_to_class($this->gateway_flag);
-      // Create new instance of gateway class to save provider info
-      $oGateway = new $gateway_class();
-      $aSetting = $oToken->render_variable($oGateway->template_provider());
-      $oGateway->save_provider($this->name, $aSetting);
-
-      return TRUE;
-    }
-  }
-
-  function update_config()
-  {
-    $query = DB::query('provider', "SELECT provider_id FROM provider WHERE active=1");
-
-    while ($aProvider = mysql_fetch_array($query)) {
-      
-    }
-
-    return true;
   }
 
 }

@@ -1,10 +1,17 @@
 <?php
+
+namespace ICT\Core\User;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\DB;
 
 class Permission
 {

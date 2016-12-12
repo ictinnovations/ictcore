@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -33,7 +36,7 @@ class Schedule extends Task
 
   /** @var integer */
   public $year = '*';
-  
+
   /** @var integer */
   public $month = '*';
 
@@ -100,12 +103,14 @@ class Schedule extends Task
     return parent::delete();
   }
 
-  private function schedule_delete() {
+  private function schedule_delete()
+  {
     Corelog::log("Schedule delete", Corelog::CRUD);
     DB::delete(self::$sub_table, 'task_id', $this->task_id);
   }
-  
-  private function split($cron_field, $min = 0, $max = 59) {
+
+  private function split($cron_field, $min = 0, $max = 59)
+  {
     $cron_list = array();
     if ($cron_field == '*') {
       $cron_list = array('*');
@@ -125,7 +130,7 @@ class Schedule extends Task
       $dividend = $this->_split_field_validate($temp_dividend, $min, $max, FALSE);
       $divider = $this->_split_field_validate($temp_divider, $min, $max, FALSE);
       for ($i = $divider; $i <= $dividend; $i = $i + $divider) {
-        $cron_list[] =  $this->_split_field_validate($i, $min, $max);
+        $cron_list[] = $this->_split_field_validate($i, $min, $max);
       }
     } else {
       $cron_list = array($this->_split_field_validate($cron_field, $min, $max));
@@ -133,7 +138,8 @@ class Schedule extends Task
     return array_unique($cron_list);
   }
 
-  private function _split_field_validate($input, $min = 0, $max = 59, $check_range = TRUE) {
+  private function _split_field_validate($input, $min = 0, $max = 59, $check_range = TRUE)
+  {
     $max_full = ($min == 0) ? ($max + 1) : $max;
     $input2 = str_replace('*', $max_full, $input);
     $output = preg_replace('[\D]', '', $input2);
@@ -146,7 +152,8 @@ class Schedule extends Task
     return $output;
   }
 
-  private function merge($cron_list) {
+  private function merge($cron_list)
+  {
     return implode(',', array_unique($cron_list));
   }
 
@@ -230,7 +237,8 @@ class Schedule extends Task
     return $schedule_count;
   }
 
-  private function schedule_save($year, $month, $day) {
+  private function schedule_save($year, $month, $day)
+  {
     $listWeekday = $this->split($this->weekday, 1, 7);
     $listHour = $this->split($this->hour, 0, 23);
     $listMinute = $this->split($this->minute, 0, 59);
@@ -255,4 +263,5 @@ class Schedule extends Task
     }
     return $schedule_count;
   }
+
 }

@@ -6,6 +6,8 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Corelog;
+
 $filename = $_GET["name"];
 $path = "file/document/";
 $pathThumbs = $path . "thumbs/";

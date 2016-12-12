@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -70,13 +73,13 @@ class Contact
       $this->load();
     } else if (Contact::COMPANY == $contact_id) {
       $this->contact_id = $contact_id;
-      $title = conf_get('company:title', 'ICTCore');
+      $title = Conf::get('company:title', 'ICTCore');
       $aTitle = explode(' ', $title, 2);
       $this->first_name = $aTitle[0];
       $this->last_name = isset($aTitle[1]) ? $aTitle[1] : '';
-      $this->email = conf_get('company:email', 'no-reply@example.com');
-      $this->phone = conf_get('company:phone', '1111111111');
-      $this->address = conf_get('company:address', 'PK');
+      $this->email = Conf::get('company:email', 'no-reply@example.com');
+      $this->phone = Conf::get('company:phone', '1111111111');
+      $this->address = Conf::get('company:address', 'PK');
     }
   }
 
@@ -205,7 +208,7 @@ class Contact
 
   public function email_to_phone()
   {
-    $aEmail = imap_rfc822_parse_adrlist($this->email, conf_get('sendmail:domain', 'localhost'));
+    $aEmail = imap_rfc822_parse_adrlist($this->email, Conf::get('sendmail:domain', 'localhost'));
     $strPhone = $aEmail[0]->mailbox; // we are only interested in 1st (0) part of aEmail list
     $this->phone = preg_replace("/[^0-9]/", "", $strPhone); // keep only digits
     return $this->phone;
@@ -213,7 +216,7 @@ class Contact
 
   public function phone_to_email()
   {
-    $strEmail = $this->phone . '@' . conf_get('sendmail:domain', 'localhost');
+    $strEmail = $this->phone . '@' . Conf::get('sendmail:domain', 'localhost');
     $this->email = $strEmail;
     return $this->email;
   }

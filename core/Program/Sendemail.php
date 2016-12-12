@@ -1,10 +1,20 @@
 <?php
+
+namespace ICT\Core\Program;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Application\Email_send;
+use ICT\Core\Message\Template;
+use ICT\Core\Program;
+use ICT\Core\Scheme;
+use ICT\Core\Service\Email;
+use ICT\Core\Transmission;
 
 class Sendemail extends Program
 {

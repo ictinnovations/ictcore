@@ -1,10 +1,19 @@
 <?php
+
+namespace ICT\Core\Message;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\DB;
+use ICT\Core\Message;
+use ICT\Core\User;
 
 class Recording extends Message
 {
@@ -167,8 +176,9 @@ class Recording extends Message
   protected function set_file_name($file_path)
   {
     global $path_data;
+    $user_id = empty(User::$activeUser) ? 0 : User::$activeUser->user_id;
     $file_type = empty($this->type) ? 'wav' : $this->type;
-    $file_name = 'recording_' . user_get('user_id', 0) . '_';
+    $file_name = 'recording_' . $user_id . '_';
     $file_name .= DB::next_record_id($file_name);
     $wav_file = $path_data . DIRECTORY_SEPARATOR . 'recording' . DIRECTORY_SEPARATOR . $file_name . '.wav';
     $this->create_wav($file_path, $file_type, $wav_file);
@@ -210,7 +220,7 @@ class Recording extends Message
     //$allowed_type = $this->recording_type_allowed();
     // get installed sox version
     $raw_output = NULL;
-    exec(sys_which('sox', '/usr/bin') . ' --version', $raw_output);
+    exec(\ICT\Core\sys_which('sox', '/usr/bin') . ' --version', $raw_output);
     $sox_output = isset($raw_output[0]) ? $raw_output[0] : 'v0.0.0'; // to avoid undefined index error
     $raw_version = NULL;
     preg_match('/v(\d+\.\d+\.\d+)/', $sox_output, $raw_version);
@@ -218,24 +228,24 @@ class Recording extends Message
 
     if (in_array(strtolower($type), $sox_type)) {
       if (version_compare($sox_version, '13.0.0', '<')) {
-        $sox_cmd = sys_which('sox', '/usr/bin') . " '$sourceFile' -w -r 8000 -c 1 -s '$targetFile'";
+        $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -w -r 8000 -c 1 -s '$targetFile'";
       } else {
-        $sox_cmd = sys_which('sox', '/usr/bin') . " '$sourceFile' -2 -r 8000 -c 1 -s '$targetFile'";
+        $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -2 -r 8000 -c 1 -s '$targetFile'";
       }
       Corelog::log("Converting source audio into pbx supported wav file", Corelog::CRUD, $sox_cmd);
       exec($sox_cmd);
     } else { // unsupported format, it is excepted that this will be never used
       //$fixedType = 'wav'; // assume wav
-      $sox_cmd = sys_which('cp', '/bin') . " '$sourceFile' '$targetFile'";
+      $sox_cmd = \ICT\Core\sys_which('cp', '/bin') . " '$sourceFile' '$targetFile'";
       Corelog::log("Converting unknown source audio into pbx supported wav file", Corelog::CRUD, $sox_cmd);
     }
 
     exec("chmod 644 '$targetFile'");
 
     if (version_compare($sox_version, '14.0.0', '<')) {
-      $sox_cmd = sys_which('sox', '/usr/bin') . " '$targetFile' -e stat 2>&1 | sed -n 's#^Length (seconds):[^0-9]*\\([0-9.]*\)$#\\1#p'";
+      $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$targetFile' -e stat 2>&1 | sed -n 's#^Length (seconds):[^0-9]*\\([0-9.]*\)$#\\1#p'";
     } else {
-      $sox_cmd = sys_which('sox', '/usr/bin') . " '$targetFile' -n stat 2>&1 | sed -n 's#^Length (seconds):[^0-9]*\\([0-9.]*\)$#\\1#p'";
+      $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$targetFile' -n stat 2>&1 | sed -n 's#^Length (seconds):[^0-9]*\\([0-9.]*\)$#\\1#p'";
     }
     $duration = NULL;
     exec($sox_cmd, $duration);

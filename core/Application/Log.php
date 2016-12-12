@@ -1,10 +1,16 @@
 <?php
+
+namespace ICT\Core\Application;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Application;
+use ICT\Core\Service;
 
 class Log extends Application
 {
@@ -41,8 +47,7 @@ class Log extends Application
   public function execute()
   {
     // All services should support log appliction
-    $cService = service_flag_to_class($this->oTransmission->service_flag);
-    $oService = new $cService();
+    $oService = Service::load($this->oTransmission->service_flag);
     return $oService->application_template('log');
   }
 

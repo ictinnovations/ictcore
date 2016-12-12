@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -50,7 +53,45 @@ class Service
     }
   }
 
-  public static function route_get() {
+  public static function load($service_flag) {
+    static $serviceMap = null;
+
+    if (empty($serviceMap)) {
+      // manually load all available service classes
+      include_once_directory('Service');
+      $listService = list_available_classes('ICT\\Core\\Service');
+      foreach ($listService as $serviceClass) {
+        $flag = $serviceClass::SERVICE_FLAG;
+        $serviceMap[$flag] = $serviceClass;
+      }
+    }
+
+    if (!empty($service_flag) && isset($serviceMap[$service_flag])) {
+      $className = $serviceMap[$service_flag];
+      $oService = new $className;
+      return $oService;
+    } else {
+      return false;
+    }
+  }
+
+  public static function get_gateway() {
+    static $oGateway = NULL;
+    if (empty($oGateway)) {
+      $oGateway = new Gateway();
+    }
+    return $oGateway;
+  }
+
+  public static function get_message() {
+    static $oMessage = NULL;
+    if (empty($oMessage)) {
+      $oMessage = new Message();
+    }
+    return $oMessage;
+  }
+
+  public static function get_route() {
     $aFilter = array(
         'active' => 1,
         'service_flag' => static::SERVICE_FLAG
@@ -58,7 +99,7 @@ class Service
     $listRoute = Provider::search($aFilter);
     if (count($listRoute)) {
       $aProvider = array_shift($listRoute);
-      $oProvider = new Provider($aProvider['provider_id']);
+      $oProvider = Provider::load($aProvider['provider_id']);
       return $oProvider;
     }
     throw new CoreException('No provider available');
@@ -76,8 +117,7 @@ class Service
       default:
         // nothing to do
     }
-    $cGateway = static::GATEWAY_CLASS;
-    $oGateway = new $cGateway;
+    $oGateway = $this->get_gateway();
     $oGateway->send($command, $oProvider);
   }
 
@@ -89,22 +129,19 @@ class Service
 
   public function config_save($config_type, $config_name = 'default', $aSetting = array())
   {
-    $cGateway = static::GATEWAY_CLASS;
-    $oGateway = new $cGateway;
+    $oGateway = $this->get_gateway();
     $oGateway->config_save($config_type, $config_name, $aSetting);
   }
 
   public function config_delete($config_type, $config_name = 'default')
   {
-    $cGateway = static::GATEWAY_CLASS;
-    $oGateway = new $cGateway;
+    $oGateway = $this->get_gateway();
     $oGateway->config_delete($config_type, $config_name);
   }
 
   public function config_reload()
   {
-    $cGateway = static::GATEWAY_CLASS;
-    $oGateway = new $cGateway;
+    $oGateway = $this->get_gateway();
     $oGateway->config_reload();
   }
 

@@ -1,50 +1,13 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
-
-function service_flag_to_class($service_flag)
-{
-  static $serviceMap = null;
-
-  if (empty($serviceMap)) {
-    $listService = list_available_classes('Service');
-    foreach ($listService as $serviceClass) {
-      $flag = $serviceClass::SERVICE_FLAG;
-      $serviceMap[$flag] = $serviceClass;
-    }
-  }
-
-  if (!empty($service_flag) && isset($serviceMap[$service_flag])) {
-    $className = $serviceMap[$service_flag];
-    return $className;
-  } else {
-    return false;
-  }
-}
-
-function gateway_flag_to_class($gateway_flag)
-{
-  static $gatewayMap = null;
-
-  if (empty($gatewayMap)) {
-    $listGateway = list_available_classes('Gateway');
-    foreach ($listGateway as $gatewayClass) {
-      $flag = $gatewayClass::GATEWAY_FLAG;
-      $gatewayMap[$flag] = $gatewayClass;
-    }
-  }
-
-  if (!empty($gateway_flag) && isset($gatewayMap[$gateway_flag])) {
-    $className = $gatewayMap[$gateway_flag];
-    return $className;
-  } else {
-    return false;
-  }
-}
 
 function list_available_classes($type = null)
 {
@@ -72,15 +35,24 @@ function list_available_classes($type = null)
  */
 function include_once_directory($folder, $suffix = '.php')
 {
-  $aFile = array();
-  $current_dir = getcwd();
-  chdir(dirname(dirname(__FILE__))); // default include directory is parent (core) directory
-  foreach (glob($folder . DIRECTORY_SEPARATOR . "*" . $suffix) as $filename) {
+  global $path_core;
+  $filter = $path_core . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . '*' . $suffix;
+  foreach (glob($filter) as $filename) {
     $aFile[] = $filename;
     include_once $filename;
   }
-  chdir($current_dir);
   return $aFile;
+}
+
+function path_to_namespace($path)
+{
+  global $path_core;
+  if (substr($path, 0, strlen($path_core)) == $path_core) {
+    $path = substr($path, strlen($path_core));
+  }
+  $clean_path = trim($path, DIRECTORY_SEPARATOR);
+  $namespace = 'ICT\\Core\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $clean_path);
+  return $namespace;
 }
 
 /**
@@ -108,7 +80,6 @@ function bitmask2array($mask = 0)
 
 function do_login($user)
 {
-  global $ict_user;
   $oUser = null;
 
   if (!is_object($user)) {
@@ -116,7 +87,8 @@ function do_login($user)
     if (empty($user) || $user == USER_GUEST) {
       // load dummy user same as dummy account
       $oUser = new User(USER_GUEST);
-      return $ict_user;
+      User::$activeUser = $oUser;
+      return $oUser;
     }
     $oUser = new User($user);
   } else {
@@ -132,28 +104,10 @@ function do_login($user)
     throw new CoreException(401, "User account disabled, can't loging");
   }
 
-  $ict_user = $oUser;
-  Corelog::log("do_login, results", Corelog::DEBUG, $ict_user);
+  User::$activeUser = $oUser;
+  Corelog::log("do_login, results", Corelog::DEBUG, User::$activeUser);
 
-  return $ict_user;
-}
-
-function user_get($field, $default = null)
-{
-  global $ict_user;
-  $value = $default;
-  if (is_object($ict_user)) {
-    $value = $ict_user->$field;
-  }
-  return $value;
-}
-
-function user_set($field, $value)
-{
-  global $ict_user;
-  if (is_object($ict_user)) {
-    $ict_user->$field = $value;
-  }
+  return User::$activeUser;
 }
 
 function json_check($string)
@@ -164,13 +118,11 @@ function json_check($string)
 
 function can_access($access_name, $user_id = null)
 {
-  global $ict_user;
-
   // load user if user_id exist otherwise use crrently logged-in user
   if (!empty($user_id)) {
     $oUser = new User($user_id);
-  } else if (!empty($ict_user)) {
-    $oUser = $ict_user;
+  } else if (!empty(User::$activeUser)) {
+    $oUser = User::$activeUser;
   } else {
     return false;
   }

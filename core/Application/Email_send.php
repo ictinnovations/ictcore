@@ -1,10 +1,18 @@
 <?php
+
+namespace ICT\Core\Application;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Application;
+use ICT\Core\Service\Email;
+use ICT\Core\Spool;
+use ICT\Core\Token;
 
 class Email_send extends Application
 {
@@ -36,7 +44,7 @@ class Email_send extends Application
   public function execute()
   {
     $oService = new Email();
-    $oProvider = $oService->route_get();
+    $oProvider = $oService->get_route();
     $this->oSequence->oToken->add('provider', $oProvider);
     $output = $oService->application_template('email_send');
     $command = $this->oSequence->oToken->render_template($output, Token::KEEP_ORIGNAL); // keep provider related token intact

@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -191,13 +194,13 @@ class Program
   {
     Corelog::log("Creating program scheme", Corelog::LOGIC);
 
-    $app1st = new Log();
+    $app1st = new Application();
     $app1st->data = array('message' => 'test application one');
 
-    $app2nd = new Log();
+    $app2nd = new Application();
     $app2nd->data = array('message' => 'test application two');
 
-    $app3rd = new Log();
+    $app3rd = new Application();
     $app3rd->data = array('message' => 'test application three');
 
     $oScheme = new Scheme();
@@ -227,7 +230,7 @@ class Program
     // nothing to remove
   }
 
-  public static function getClass($program_id)
+  public static function getClass($program_id, $namespace = 'ICT\\Core\\Program')
   {
     if (ctype_digit(trim($program_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE program_id='%program_id%' ";
@@ -239,6 +242,9 @@ class Program
       $program_type = $program_id;
     }
     $class_name = ucfirst(strtolower(trim($program_type)));
+    if (!empty($namespace)) {
+      $class_name = $namespace . '\\' . $class_name;
+    }
     if (class_exists($class_name)) {
       return $class_name;
     } else {
@@ -476,7 +482,7 @@ class Program
     $oTransmission->title = $this->name;
     $oTransmission->program_id = $this->program_id;
     $oTransmission->origin = $this->type;
-    $oTransmission->service_flag = Voice::SERVICE_FLAG;
+    $oTransmission->service_flag = Service::SERVICE_FLAG;
     $oTransmission->status = Transmission::STATUS_PENDING;
     $oTransmission->direction = $direction;
     $oTransmission->contact_id = $contact_id;
@@ -488,7 +494,7 @@ class Program
   {
     $result = false;
     // fetch program's initial applications (identified by ORDER_INIT as weight)
-    $listApplication = Application::search($this->program_id, ORDER_INIT);
+    $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
     foreach ($listApplication as $application_id) {
       $oApplication = Application::load($application_id);
       $oApplication->_execute($this->oTransmission, $this->oSequence);
@@ -615,7 +621,7 @@ class Program
     if ($oTransmission->status == Transmission::STATUS_INITIALIZING) { // For new transmission
       // first of all change transmission status
       $oTransmission->status = Transmission::STATUS_PROCESSING;
-      $listApplication = Application::search($this->program_id, ORDER_INIT);
+      $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
       foreach ($listApplication as $application_id) {
         $oApplication = Application::load($application_id);
         break; // only one application is needed

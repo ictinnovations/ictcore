@@ -1,10 +1,17 @@
 <?php
+
+namespace ICT\Core\Service;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Gateway\Kannel;
+use ICT\Core\Message\Text;
+use ICT\Core\Service;
 
 class Sms extends Service
 {
@@ -33,7 +40,25 @@ class Sms extends Service
     return $capabilities;
   }
 
-  public function config_template($type, $name = '')
+  public static function get_gateway()
+  {
+    static $oGateway = NULL;
+    if (empty($oGateway)) {
+      $oGateway = new Kannel();
+    }
+    return $oGateway;
+  }
+
+  public static function get_message()
+  {
+    static $oMessage = NULL;
+    if (empty($oMessage)) {
+      $oMessage = new Text();
+    }
+    return $oMessage;
+  }
+
+  public static function config_template($type, $name = '')
   {
     switch ($type) {
       case 'did':
@@ -45,10 +70,9 @@ class Sms extends Service
     }
   }
 
-  public function application_template($application_name)
+  public static function application_template($application_name)
   {
-    $gateway_class = static::GATEWAY_CLASS;
-    $gateway_type = $gateway_class::GATEWAY_TYPE;
+    $gateway_type = Kannel::GATEWAY_TYPE;
     switch ($application_name) {
       case 'sms_send':
       case 'sms_receive':

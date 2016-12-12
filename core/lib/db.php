@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -14,11 +17,11 @@ class DB
 
   static function connect($link_new = FALSE)
   {
-    $db_port = conf_get('db:port', '3306');
-    $db_host = conf_get('db:host', 'localhost') . ':' . $db_port;
-    $db_user = conf_get('db:user', 'myuser');
-    $db_pass = conf_get('db:pass', '');
-    $db_name = conf_get('db:name', 'ictcore');
+    $db_port = Conf::get('db:port', '3306');
+    $db_host = Conf::get('db:host', 'localhost') . ':' . $db_port;
+    $db_user = Conf::get('db:user', 'myuser');
+    $db_pass = Conf::get('db:pass', '');
+    $db_name = Conf::get('db:name', 'ictcore');
 
     $link = mysql_connect($db_host, $db_user, $db_pass, $link_new);
     if (!$link) {
@@ -175,7 +178,7 @@ class DB
     );
 
     $row_id = FALSE;
-    $user_id = user_get('user_id', NULL);
+    $user_id = User::$activeUser->user_id;
     $columns = array();
     $data = array();
     $query_start = '';
@@ -350,12 +353,12 @@ class DB
       return TRUE;
     } else {
       if ($auth_key == 'created_by') { // main table
-        $auth_value = user_get('user_id', NULL);
+        $auth_value = User::$activeUser->user_id;
         if (empty($auth_value)) {
           return FALSE; // null user id is not allowed
         }
       } else { // sub table
-        $user_value = user_get('user_id', NULL);
+        $user_value = User::$activeUser->user_id;
         if (empty($user_value)) {
           return FALSE; // null user id is not allowed
         }

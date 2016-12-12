@@ -1,10 +1,21 @@
 <?php
+
+namespace ICT\Core\Application;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Application;
+use ICT\Core\Exchange\Dialplan;
+use ICT\Core\Gateway\Kannel;
+use ICT\Core\Message\Text;
+use ICT\Core\Program;
+use ICT\Core\Result;
+use ICT\Core\Spool;
 
 class Sms_receive extends Application
 {

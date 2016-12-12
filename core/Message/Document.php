@@ -1,10 +1,19 @@
 <?php
+
+namespace ICT\Core\Message;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\DB;
+use ICT\Core\Message;
+use ICT\Core\User;
 
 class Document extends Message
 {
@@ -175,7 +184,8 @@ class Document extends Message
       $file_type = end($aType);
       $this->type = strtolower($file_type);
     }
-    $file_name = 'document_' . user_get('user_id', 0) . '_';
+    $user_id = empty(User::$activeUser) ? 0 : User::$activeUser->user_id;
+    $file_name = 'document_' . $user_id . '_';
     $file_name .= DB::next_record_id($file_name);
     $tiff_file = $path_data . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . $file_name . '.tif';
     $this->create_tiff($file_path, $file_type, $tiff_file);
@@ -218,7 +228,7 @@ class Document extends Message
 
     $infos = '';
     $pdfFile = $this->create_pdf($sourceFile, $type);
-    exec(sys_which('pdfinfo', '/usr/bin') . " '$pdfFile'", $infos);
+    exec(\ICT\Core\sys_which('pdfinfo', '/usr/bin') . " '$pdfFile'", $infos);
     foreach ($infos as $info_row) {
       $matches = array();
       if (preg_match('/^Pages:\s*([0-9.]*)$/', $info_row, $matches)) {
@@ -246,13 +256,13 @@ class Document extends Message
 
     // some time simple pdf to tiff conversion can create problem in fax sending, I don't why? 
     // but ps to tiff conversion can solve this problem
-    $cmd = sys_which('pdf2ps', '/usr/bin') . " '$pdfFile' '$pdfFile.ps'";
+    $cmd = \ICT\Core\sys_which('pdf2ps', '/usr/bin') . " '$pdfFile' '$pdfFile.ps'";
     exec($cmd);
 
     $resolution_string = $this->resolution_x . "x" . $this->resolution_y;
     //$cmd = "convert -quiet -density 150 $sourceFile -shave 65x65 -colorspace rgb -quality 100 -resample 320 $targetFile";
     //$cmd = "cat $sourceFile | gs -q -sDEVICE=tiffg3 -sPAPERSIZE=a4 -r204x196 -dNOPAUSE -sOutputFile=$targetFile"; // 
-    $cmd = sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -r$resolution_string -sOutputFile='$targetFile' -dFIXEDMEDIA -dDEVICEWIDTHPOINTS=$this->size_y -dDEVICEHEIGHTPOINTS=$this->size_x -f '$pdfFile.ps'";
+    $cmd = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -r$resolution_string -sOutputFile='$targetFile' -dFIXEDMEDIA -dDEVICEWIDTHPOINTS=$this->size_y -dDEVICEHEIGHTPOINTS=$this->size_x -f '$pdfFile.ps'";
     Corelog::log("Converting source image into fax support tiff", Corelog::CRUD, $cmd);
     exec($cmd);
     //exec("rm -rf '$sourceFile'");
@@ -267,7 +277,7 @@ class Document extends Message
       case 'tiff':
         Corelog::log("Converting tif/tiff into pdf", Corelog::CRUD);
         $pdfFile = "$sourceFile.pdf";
-        $cmd = sys_which('tiff2pdf', '/usr/bin') . " -o $pdfFile -z $sourceFile";
+        $cmd = \ICT\Core\sys_which('tiff2pdf', '/usr/bin') . " -o $pdfFile -z $sourceFile";
         exec($cmd);
         //exec("rm -rf '$sourceFile'");
         break;
@@ -281,11 +291,11 @@ class Document extends Message
       case 'text':
         Corelog::log("Converting txt/text into pdf", Corelog::CRUD);
         $pdfFile = "$sourceFile.pdf";
-        $cmd = sys_which('textfmt', 'usr/sbin') . " $sourceFile > $sourceFile.ps";
+        $cmd = \ICT\Core\sys_which('textfmt', 'usr/sbin') . " $sourceFile > $sourceFile.ps";
         //$cmd = "/usr/local/bin/uniprint -hsize 0 -size 9 -in $sourceFile.pdf -out $sourceFile.ps";
         exec($cmd);
         //exec("rm -rf '$sourceFile'");
-        $cmd = sys_which('ps2pdf', '/usr/bin') . " $sourceFile.ps $pdfFile";
+        $cmd = \ICT\Core\sys_which('ps2pdf', '/usr/bin') . " $sourceFile.ps $pdfFile";
         exec($cmd);
         //exec("rm -rf '$sourceFile.ps'");
         break;
@@ -294,7 +304,7 @@ class Document extends Message
       case 'jpeg':
         Corelog::log("Converting png/jpg into pdf", Corelog::CRUD);
         $pdfFile = "$sourceFile.pdf";
-        $cmd = sys_which('convert', '/usr/bin') . " $sourceFile -type Bilevel -monochrome $pdfFile";
+        $cmd = \ICT\Core\sys_which('convert', '/usr/bin') . " $sourceFile -type Bilevel -monochrome $pdfFile";
         exec($cmd);
         //exec("rm -rf '$sourceFile'");
         break;

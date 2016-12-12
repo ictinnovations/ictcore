@@ -647,7 +647,6 @@ CREATE TABLE provider
 (
    provider_id                   int(11) unsigned       NOT NULL auto_increment,
    name                          varchar(128)           NOT NULL default '',
-   gateway_flag                  int(11) unsigned       default NULL,
    service_flag                  int(11) unsigned       default NULL,
    node_id                       int(11) unsigned       NOT NULL,
    host                          varchar(128)           NOT NULL default '',

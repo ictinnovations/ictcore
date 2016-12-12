@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -6,10 +9,15 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\User\Role;
+use ICT\Core\User\Permission;
+
 define('USER_GUEST', -1);
 
 class User
 {
+
+  public static $activeUser;
 
   private static $table = 'usr';
   private static $link_role = 'user_role';
@@ -137,7 +145,7 @@ class User
           $this->last_name = 'Guest';
           $this->email = 'no-reply@example.com';
           $this->phone = '1111111111';
-          $this->address = conf_get('company:address', 'PK');
+          $this->address = Conf::get('company:address', 'PK');
           return $this->user_id; // don't proceed further
         }
       }

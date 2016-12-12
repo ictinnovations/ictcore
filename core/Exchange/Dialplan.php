@@ -1,10 +1,21 @@
 <?php
+
+namespace ICT\Core\Exchange;
+
 /* * ***************************************************************
  * Copyright © 2016 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Account;
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\DB;
+use ICT\Core\Gateway;
+use ICT\Core\Gateway\Freeswitch;
+use ICT\Core\Request;
 
 class Dialplan
 {
@@ -131,8 +142,8 @@ class Dialplan
     foreach ($listDialplan as $aDialplan) {
       if (($aDialplan['filter_flag'] & self::FILTER_ACCOUNT) == self::FILTER_ACCOUNT) {
         // first of all know the contact field
-        $gatewayClass = gateway_flag_to_class($aDialplan['gateway_flag']);
-        $contactFiled = $gatewayClass::CONTACT_FIELD;
+        $oGateway = Gateway::load($aDialplan['gateway_flag']);
+        $contactFiled = $oGateway::CONTACT_FIELD;
         // check for additional filters
         if (($aDialplan['filter_flag'] & self::FILTER_ACCOUNT_SOURCE) == self::FILTER_ACCOUNT_SOURCE) {
           $accountFilter = array($contactFiled => $oRequest->source);

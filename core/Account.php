@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -107,19 +110,19 @@ class Account
       } else if (Account::COMPANY == $account_id) {
         Corelog::log("Company account: creating instance", Corelog::CRUD);
         $this->account_id = $account_id;
-        $title = conf_get('company:name', 'ICTCore');
+        $title = Conf::get('company:name', 'ICTCore');
         $aTitle = explode(' ', $title, 2);
         $this->first_name = $aTitle[0];
         $this->last_name = isset($aTitle[1]) ? $aTitle[1] : '';
-        $this->email = conf_get('company:email', 'no-reply@example.com');
-        $this->phone = conf_get('company:phone', '1111111111');
-        $this->address = conf_get('company:address', 'PK');
+        $this->email = Conf::get('company:email', 'no-reply@example.com');
+        $this->phone = Conf::get('company:phone', '1111111111');
+        $this->address = Conf::get('company:address', 'PK');
         return $account_id; // don't proceed further
       } else if (Account::USER_DEFAULT == $account_id) {
         Corelog::log("Default account: creating instance", Corelog::CRUD);
         $query = "SELECT account_id FROM " . self::$table . " WHERE active=1 AND created_by=%user_id%
                    ORDER BY account_id DESC LIMIT 1";
-        $result = DB::query(self::$table, $query, array('user_id' => user_get('user_id')));
+        $result = DB::query(self::$table, $query, array('user_id' => User::$activeUser->user_id));
         $data = mysql_fetch_assoc($result);
         $this->account_id = $data['account_id'];
       }
@@ -195,7 +198,7 @@ class Account
     return $aToken;
   }
 
-  public static function getClass($account_id)
+  public static function getClass($account_id, $namespace = 'ICT\\Core\\Account')
   {
     if (ctype_digit(trim($account_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
@@ -207,6 +210,9 @@ class Account
       $account_type = $account_id;
     }
     $class_name = ucfirst(strtolower(trim($account_type)));
+    if (!empty($namespace)) {
+      $class_name = $namespace . '\\' . $class_name;
+    }
     if (class_exists($class_name)) {
       return $class_name;
     } else {

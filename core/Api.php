@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2016 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -42,7 +45,7 @@ class Api
     if (!empty($interface_type) && $interface_type = 'rest') {
       // Initialize the server
       $this->interface_type = 'rest';
-      $realm = conf_get('company:name', 'ICTCore') . ' :: REST API Server';
+      $realm = Conf::get('company:name', 'ICTCore') . ' :: REST API Server';
       $this->oInterface = new RestServer('production', $realm); // debug / production
       $this->oInterface->cacheDir = $path_cache; // set folder for rest server url mapping
       self::rest_load($this->oInterface, 'Api');
@@ -63,15 +66,15 @@ class Api
       return false;
     }
 
-    $apiFiles = include_once_directory($dir);
-    foreach ($apiFiles as $api_file) {
-      $class_name = basename($api_file, '.php');
-      if (class_exists($class_name)) {
-        $restInterface->addClass($class_name);
-        if (method_exists($class_name, 'rest_load')) {
-          $child_dir = "$dir/" . str_replace('Api', '', $class_name);
-          $class_name::rest_load($restInterface, $child_dir);
-        }
+    include_once_directory($dir);
+    $namespace = path_to_namespace($dir);
+    $listApi = list_available_classes($namespace);
+    foreach ($listApi as $apiClass) {
+      $restInterface->addClass($apiClass);
+      if (method_exists($apiClass, 'rest_load')) {
+        $className = str_replace($namespace, '', $apiClass);
+        $child_dir = $dir . DIRECTORY_SEPARATOR . str_replace('Api', '', $className);
+        $apiClass::rest_load($restInterface, $child_dir);
       }
     }
   }

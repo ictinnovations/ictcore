@@ -1,10 +1,17 @@
 <?php
+
+namespace ICT\Core\Account;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Account;
+use ICT\Core\Service\Voice;
+use ICT\Core\Token;
 
 class Extension extends Account
 {
@@ -15,7 +22,7 @@ class Extension extends Account
    */
   protected $type = 'extension';
 
-  public function search($aFilter = array())
+  public static function search($aFilter = array())
   {
     $aFilter['type'] = 'extension';
     return parent::search($aFilter);

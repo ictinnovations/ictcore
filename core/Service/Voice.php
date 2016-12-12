@@ -1,10 +1,17 @@
 <?php
+
+namespace ICT\Core\Service;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Gateway\Freeswitch;
+use ICT\Core\Message\Recording;
+use ICT\Core\Service;
 
 class Voice extends Service
 {
@@ -36,8 +43,24 @@ class Voice extends Service
     );
     return $capabilities;
   }
-  
-  public function config_template($type, $name = '')
+
+  public static function get_gateway() {
+    static $oGateway = NULL;
+    if (empty($oGateway)) {
+      $oGateway = new Freeswitch();
+    }
+    return $oGateway;
+  }
+
+  public static function get_message() {
+    static $oMessage = NULL;
+    if (empty($oMessage)) {
+      $oMessage = new Recording();
+    }
+    return $oMessage;
+  }
+
+  public static function config_template($type, $name = '')
   {
     switch ($type) {
       case 'did':
@@ -51,10 +74,9 @@ class Voice extends Service
     }
   }
 
-  public function application_template($application_name)
+  public static function application_template($application_name)
   {
-    $gateway_class = static::GATEWAY_CLASS;
-    $gateway_type = $gateway_class::GATEWAY_TYPE;
+    $gateway_type = Freeswitch::GATEWAY_TYPE;
     switch ($application_name) {
       case 'originate':
         return "application/originate/$gateway_type/voice/default.json";

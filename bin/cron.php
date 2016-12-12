@@ -6,6 +6,8 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Task;
+
 // default include is /usr/ictcore/core
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 

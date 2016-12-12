@@ -1,10 +1,19 @@
 <?php
+
+namespace ICT\Core\Gateway;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use DOMDocument;
+use ICT\Core\Conf;
+use ICT\Core\Corelog;
+use ICT\Core\Gateway;
+use ICT\Core\Provider;
 
 class Freeswitch extends Gateway
 {
@@ -31,10 +40,10 @@ class Freeswitch extends Gateway
 
   public function __construct()
   {
-    $this->host = conf_get('freeswitch:host', '127.0.0.1');
-    $this->port = conf_get('freeswitch:port', '8021');
-    $this->username = conf_get('freeswitch:user', 'user');
-    $this->password = conf_get('freeswitch:pass', 'ClueCon');
+    $this->host = Conf::get('freeswitch:host', '127.0.0.1');
+    $this->port = Conf::get('freeswitch:port', '8021');
+    $this->username = Conf::get('freeswitch:user', 'user');
+    $this->password = Conf::get('freeswitch:pass', 'ClueCon');
   }
 
   protected function connect()

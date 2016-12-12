@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -160,7 +163,7 @@ class Application
     // nothing to remove
   }
 
-  public static function load($application_id)
+  public static function getClass($application_id, $namespace = 'ICT\\Core\\Application')
   {
     if (ctype_digit(trim($application_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE application_id='%application_id%' ";
@@ -170,13 +173,26 @@ class Application
       }
     } else {
       $application_type = $application_id;
-      $application_id = NULL;
     }
     $class_name = ucfirst(strtolower(trim($application_type)));
-    Corelog::log("Creating instance of : $class_name for application: $application_id", Corelog::CRUD);
+    if (!empty($namespace)) {
+      $class_name = $namespace . '\\' . $class_name;
+    }
     if (class_exists($class_name)) {
+      return $class_name;
+    } else {
+      return false;
+    }
+  }
+
+  public static function load($application_id)
+  {
+    $class_name = self::getClass($application_id);
+    if ($class_name) {
+      Corelog::log("Creating instance of : $class_name for application: $application_id", Corelog::CRUD);
       return new $class_name($application_id);
     } else {
+      Corelog::log("$class_name class not found, Creating instance of : Application", Corelog::CRUD);
       return new self($application_id);
     }
   }

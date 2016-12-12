@@ -1,10 +1,27 @@
 <?php
+
+namespace ICT\Core\Gateway;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use Exception;
+use ICT\Core\Conf;
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\Gateway;
+use ICT\Core\Provider;
+use ICT\Core\Request;
+use Swift_Attachment;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_SendmailTransport;
+use Swift_SmtpTransport;
+
 global $path_root;
 require_once $path_root . '/vendor/swiftmailer/swiftmailer/lib/swift_required.php';
 
@@ -39,12 +56,12 @@ class Sendmail extends Gateway
 
   public function __construct()
   {
-    $this->host = conf_get('sendmail:host', '127.0.0.1');
-    $this->port = conf_get('sendmail:port', '25');
-    $this->username = conf_get('sendmail:user', '');
-    $this->password = conf_get('sendmail:pass', '');
-    $this->type = conf_get('sendmail:type', 'sendmail');
-    $this->cli = conf_get('sendmail:cli', '/usr/sbin/sendmail');
+    $this->host = Conf::get('sendmail:host', '127.0.0.1');
+    $this->port = Conf::get('sendmail:port', '25');
+    $this->username = Conf::get('sendmail:user', '');
+    $this->password = Conf::get('sendmail:pass', '');
+    $this->type = Conf::get('sendmail:type', 'sendmail');
+    $this->cli = Conf::get('sendmail:cli', '/usr/sbin/sendmail');
   }
 
   protected function validate_email($email)

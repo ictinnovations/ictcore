@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -6,45 +9,11 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use Exception;
+use ICT\Core\Exchange\Dialplan;
+
 /* Bootstrap, load all required libraries and configurations */
 require_once dirname(__FILE__) . "/lib/init.php";
-
-/* Include all ict classes */
-// basic
-require_once "Token.php";
-require_once "Task.php";
-require_once "Schedule.php";
-require_once "User.php";
-include_once_directory('User');
-// Contact
-require_once "Contact.php";
-require_once "Account.php";
-// Message storage
-require_once "Message.php";
-include_once_directory('Message');
-// Programs / Applications / Action
-require_once "Program.php";
-require_once "Application.php";
-require_once "Action.php";
-require_once "Scheme.php";
-include_once_directory('Program');
-include_once_directory('Application');
-// Services
-require_once "Service.php";
-include_once_directory('Service');
-// Gateways / routes
-require_once "Provider.php";
-require_once "Gateway.php";
-include_once_directory('Gateway');
-// PBX
-require_once "Exchange.php";
-include_once_directory('Exchange');
-require_once "Transmission.php";
-require_once "Spool.php";
-require_once "Result.php";
-require_once "Request.php";
-require_once "Response.php";
-require_once "Sequence.php";
 
 class Core
 {
@@ -110,7 +79,6 @@ class Core
       } catch (CoreException $ex) {
         throw new CoreException("500", "Unable to load program", $ex);
       }
-
     } else {
       $new_request = true; // this is new inbound call
       Corelog::log('No transmission found, searching for dialplan', Corelog::FLOW);
@@ -133,7 +101,6 @@ class Core
       // for time being create transmissing by using company contact
       $oTransmission = $oProgram->transmission_create(Contact::COMPANY, $account_id, $direction);
       $oTransmission->activate_owner(); // Load permission
-
       // Finally update contact_id and status for newly created transmission
       // Note: we can't locate or create contact before activating transmission owner
       self::locate_contact($oTransmission, $oSequence);
@@ -196,8 +163,8 @@ class Core
         $contact = $oSequence->oRequest->source;
       }
       // search fo existing contact
-      $gatewayClass = gateway_flag_to_class($oSequence->oDialplan->gateway_flag);
-      $contactField = $gatewayClass::CONTACT_FIELD;
+      $oGateway = Gateway::load($oSequence->oDialplan->gateway_flag);
+      $contactField = $oGateway::CONTACT_FIELD;
       $contactFilter = array($contactField => $contact);
       $listContact = Contact::search($contactFilter);
       if ($listContact) {
@@ -218,6 +185,7 @@ class Core
   /* Closing
     save all status in transmission and spool etc ..
    */
+
   private static function wrapup(Transmission &$oTransmission)
   {
     foreach ($oTransmission->aResult as $oResult) {

@@ -1,4 +1,7 @@
 <?php
+
+namespace ICT\Core;
+
 /* * ****************************************************************
  * Copyright © 2016 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -6,11 +9,13 @@
  * Mail : nasir@ictinnovations.com                                 *
  * **************************************************************** */
 
+use Exception;
+
 class Request
 {
 
   /** @var integer $gateway_flag */
-  public $gateway_flag = Freeswitch::GATEWAY_FLAG;
+  public $gateway_flag = Gateway::GATEWAY_FLAG;
 
   /** @var integer $spool_id */
   public $spool_id = null;

@@ -1,10 +1,16 @@
 <?php
+
+namespace ICT\Core\Application;
+
 /* * ***************************************************************
  * Copyright © 2015 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
+
+use ICT\Core\Application;
+use ICT\Core\Service\Voice;
 
 class Voice_play extends Application
 {

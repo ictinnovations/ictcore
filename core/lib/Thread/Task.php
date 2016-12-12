@@ -1,6 +1,6 @@
 <?php
 
-namespace ICT\Core;
+namespace ICT\Core\Thread;
 
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
@@ -9,16 +9,20 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-use Aza\Components\Thread\Thread;
+use ICT\Core\CoreThread;
+use ICT\Core\Task as UserTask;
 
-class CoreThread extends Thread
+class Task extends CoreThread
 {
-  function __construct($pName = null, $pool = null, $debug = false, array $options = null)
+
+  function process()
   {
-    global $ict_db_link;
-    parent::__construct($pName, $pool, $debug, $options);
-    $ict_db_link = DB::connect(TRUE);
-    Corelog::$process_id = getmypid();
-    Corelog::log("New thread started for: " . get_class($this), Corelog::FLOW);
+    // First parameter will be task_id
+    $task_id = $this->getParam(0);
+    // Second parameter will be server_time
+    $server_time = $this->getParam(1);
+    $oTask = new UserTask($task_id);
+    $oTask->process($server_time);
   }
+
 }

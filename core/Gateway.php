@@ -1,4 +1,7 @@
-n<?php
+<?php
+
+namespace ICT\Core;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -6,7 +9,7 @@ n<?php
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-abstract class Gateway
+class Gateway
 {
 
   /** @const */
@@ -16,6 +19,28 @@ abstract class Gateway
 
   /** @var boolean $conn */
   protected $conn = FALSE;
+
+  public static function load($gateway_flag) {
+    static $gatewayMap = null;
+
+    if (empty($gatewayMap)) {
+      // manually load all available service classes
+      include_once_directory('Gateway');
+      $listGateway = list_available_classes('ICT\\Core\\Gateway');
+      foreach ($listGateway as $gatewayClass) {
+        $flag = $gatewayClass::GATEWAY_FLAG;
+        $gatewayMap[$flag] = $gatewayClass;
+      }
+    }
+
+    if (!empty($gateway_flag) && isset($gatewayMap[$gateway_flag])) {
+      $className = $gatewayMap[$gateway_flag];
+      $oGateway = new $className;
+      return $oGateway;
+    } else {
+      return false;
+    }
+  }
 
   protected function connect()
   {

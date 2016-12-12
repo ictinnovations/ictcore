@@ -1,4 +1,16 @@
 <?php
+/* * ***************************************************************
+ * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
+ * Developed By: Nasir Iqbal                                       *
+ * Website : http://www.ictinnovations.com/                        *
+ * Mail : nasir@ictinnovations.com                                 *
+ * *************************************************************** */
+
+use ICT\Core\Api;
+use ICT\Core\Conf;
+use ICT\Core\CoreException;
+use ICT\Core\User;
+
 // default include is /usr/ictcore/core
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 
@@ -25,7 +37,7 @@ exit();
 
 function http_authenticate()
 {
-  $realm = conf_get('company:name', 'ICTCore') . ' :: REST API Server';
+  $realm = Conf::get('company:name', 'ICTCore') . ' :: REST API Server';
   // select authentication method
   if (!empty($_SERVER['PHP_AUTH_USER'])) {
     $username = $_SERVER['PHP_AUTH_USER'];

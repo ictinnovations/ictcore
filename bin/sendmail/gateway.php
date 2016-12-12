@@ -1,20 +1,33 @@
 <?php
+/* * ***************************************************************
+ * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
+ * Developed By: Nasir Iqbal                                       *
+ * Website : http://www.ictinnovations.com/                        *
+ * Mail : nasir@ictinnovations.com                                 *
+ * *************************************************************** */
+
+use ICT\Core\Conf;
+use ICT\Core\Core;
+use ICT\Core\Corelog;
+use ICT\Core\Gateway\Sendmail;
+use ICT\Core\Request;
+
 // remove sendmail and bin parent by .. / ..
 chdir(dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'core');
 include_once "core.php";
 
-$host = conf_get('sample_provider:user', 'localhost');
-$port = conf_get('sample_provider:port', '933');
-$username = conf_get('sample_provider:user', 'freeswitch');
-$password = conf_get('sample_provider:pass', '');
-$imap_type = conf_get('sample_provider:type', 'local');
-$box_inbox = conf_get('sample_provider:folder', 'INBOX');
-$box_dump = conf_get('sample_provider:folder_processed', 'processed');
+$host = Conf::get('sample_provider:user', 'localhost');
+$port = Conf::get('sample_provider:port', '933');
+$username = Conf::get('sample_provider:user', 'freeswitch');
+$password = Conf::get('sample_provider:pass', '');
+$imap_type = Conf::get('sample_provider:type', 'local');
+$box_inbox = Conf::get('sample_provider:folder', 'INBOX');
+$box_dump = Conf::get('sample_provider:folder_processed', 'processed');
 
 $msg_status = "UNSEEN"; // new emails
 
 if ($imap_type == 'local') {
-  $conn = imap_open(conf_get('sendmail:folder', '/var/spool/mail/ictcore'), "", "", NULL, 1)
+  $conn = imap_open(Conf::get('sendmail:folder', '/var/spool/mail/ictcore'), "", "", NULL, 1)
           or die('Unable to read Mails: ' . imap_last_error());
 } else if ($imap_type == 'imap') {
   $conn = imap_open("{" . "$host" . ":" . "$port" . "/imap}" . $box_inbox, $username, $password, 0, 0, NULL)

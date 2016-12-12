@@ -1,4 +1,18 @@
 <?php
+/* * ***************************************************************
+ * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
+ * Developed By: Nasir Iqbal                                       *
+ * Website : http://www.ictinnovations.com/                        *
+ * Mail : nasir@ictinnovations.com                                 *
+ * *************************************************************** */
+
+use ICT\Core\Conf;
+use ICT\Core\Core;
+use ICT\Core\CoreException;
+use ICT\Core\Gateway\Freeswitch;
+use ICT\Core\Http;
+use ICT\Core\Request;
+
 // default include is /usr/ictcore/core
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 
@@ -18,11 +32,11 @@ try {
   exit(); // terminate program execution
 }
 
-$spool_id = http_input_get('spool_id', 0);
-$gateway_flag = http_input_get('gateway_flag', Freeswitch::GATEWAY_FLAG);
-$application_id = http_input_get('application_id', null);
-$application_data = http_input_get('application_data', array());
-if (json_check($application_data)) {
+$spool_id = Http::input_get('spool_id', 0);
+$gateway_flag = Http::input_get('gateway_flag', Freeswitch::GATEWAY_FLAG);
+$application_id = Http::input_get('application_id', null);
+$application_data = Http::input_get('application_data', array());
+if (\ICT\Core\json_check($application_data)) {
   $application_data = json_decode($application_data, TRUE); // we need associated array
 }
 
@@ -50,7 +64,7 @@ function process_response($spool_id, $application_id, $application_data = array(
   $oRequest->application_id = $application_id;
   $oRequest->application_data = $application_data;
   $oRequest->gateway_flag = $gateway_flag;
-  
+
   if (!empty($application_data['source'])) {
     if ($gateway_flag == Freeswitch::GATEWAY_FLAG) {
       $oRequest->source = preg_replace("/[^0-9]/", "", $application_data['source']);
@@ -65,18 +79,18 @@ function process_response($spool_id, $application_id, $application_data = array(
       $oRequest->destination = $application_data['destination'];
     }
   }
-  
+
   return Core::process($oRequest);
 }
 
 function http_authenticate()
 {
-  $realm = conf_get('company:name', 'ICTCore') . ' :: Gateway Hub';
+  $realm = Conf::get('company:name', 'ICTCore') . ' :: Gateway Hub';
 
   // select authentication method
-  if (http_input_get('username', null)) {
-    $username = http_input_get('username', null);
-    $password = http_input_get('password', null);
+  if (Http::input_get('username', null)) {
+    $username = Http::input_get('username', null);
+    $password = Http::input_get('password', null);
   } else {
     header("WWW-Authenticate: Basic realm=\"$realm\"");
     throw new CoreException('401', "You are not authorized to access this resource");
@@ -85,10 +99,10 @@ function http_authenticate()
   // authenticate using username and password method
   $user_ok = false;
   $pass_ok = false;
-  if (conf_get('gatewayhub:username', 'myuser') == $username) {
+  if (Conf::get('gatewayhub:username', 'myuser') == $username) {
     $user_ok = true;
   }
-  if (conf_get('gatewayhub:password', 'plsChangeMe') == $password) {
+  if (Conf::get('gatewayhub:password', 'plsChangeMe') == $password) {
     $pass_ok = true;
   }
 
