@@ -15,8 +15,7 @@ use ICT\Core\User;
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 
 // Include the framework
-include_once "core.php";
-include_once "Api.php";
+include_once "Core.php";
 
 // **************************************************** PREPARE SYSTEM
 $oApi = new Api();

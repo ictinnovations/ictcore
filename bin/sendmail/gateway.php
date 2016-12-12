@@ -14,7 +14,7 @@ use ICT\Core\Request;
 
 // remove sendmail and bin parent by .. / ..
 chdir(dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'core');
-include_once "core.php";
+include_once "Core.php";
 
 $host = Conf::get('sample_provider:user', 'localhost');
 $port = Conf::get('sample_provider:port', '933');

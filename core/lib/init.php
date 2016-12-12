@@ -9,6 +9,9 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Conf\File as ConfFile;
+use ICT\Core\Conf\System as SystemConfiguration;
+
 global $path_lib, $path_core, $path_root, $path_www, $path_etc, $path_log, $path_data, $website_log;
 
 // following lines will allow to include files from both core and lib directories
@@ -26,18 +29,15 @@ $path_template = $path_core . DIRECTORY_SEPARATOR . 'templates';
 // For Classes
 $loader = require dirname($path_core) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-/* Include all required libraries 
-  These library will responsible to provide commonly requrired functions
+/* Include required libraries 
+  These library will be responsible to provide commonly requrired functions
  */
 include_once "common.php";    // common functions
-include_once "Corelog.php";   // library for logging (order is important)
-include_once "conf.php";      // library for gui / framework configuration
-include_once "config.php";    // library for gateway / backend configuration
-include_once "db.php";        // library for database management
-include_once "session.php";   // library for session management
-include_once "CoreException.php"; // library for error
-// include_once "CoreThread.php"; // Multi Threading support for selected functions
 
+// Read database and other basic configuration from configuration file
+ConfFile::load('/etc/ictcore.conf');
+
+// Corelog will be our default error handler
 set_error_handler(array('ICT\\Core\\Corelog', 'error_handler'), E_ALL);
 
 $website_host = Conf::get('website:host', '127.0.0.1');
@@ -50,7 +50,7 @@ $website_log = Corelog::parse_config($log_string);
 date_default_timezone_set('UTC');       // required to bypass server timezone settings
 
 /* Connecting, selecting database */
-$ict_db_link = DB::connect();
+DB::connect();
 
 /* load default system configuration from database */
-conf_system_load();
+SystemConfiguration::load();

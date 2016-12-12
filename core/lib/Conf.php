@@ -53,7 +53,12 @@ class Conf extends Data
     }
   }
 
-  protected static function load($configuration = array())
+  public static function load ($config_id)
+  {
+    Corelog::log("Demo, loading configuration for $config_id");
+  }
+
+  protected static function merge($configuration = array())
   {
     foreach ($configuration as $class => $config) {
       foreach ($config as $name => $data) {

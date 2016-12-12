@@ -6,8 +6,6 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-use ICT\Core\Corelog;
-
 $filename = $_GET["name"];
 $path = "file/document/";
 $pathThumbs = $path . "thumbs/";
@@ -29,5 +27,5 @@ try {
   $images->clear();
   $images->destroy();
 } catch (Exception $e) {
-  Corelog::log($e->getMessage(), Corelog::ERROR);
+  echo $e->getMessage();
 }

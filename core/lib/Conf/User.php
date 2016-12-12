@@ -16,13 +16,15 @@ use ICT\Core\Session;
 class User extends Conf
 {
 
-  public static function load($user_id = null, $type = null)
+  public static $user_id = NULL;
+
+  public static function load($user_id = NULL)
   {
     $filter = array();
     if (empty($user_id)) {
       $user_id = Session::get('user:user_id', null);
     }
-    Corelog::log("configuration requested for user: $user_id, type: $type", Corelog::DEBUG);
+    Corelog::log("configuration requested for user: $user_id", Corelog::DEBUG);
 
     $filter[] = '(c.permission_flag & ' . Conf::PERMISSION_USER_WRITE . ')=' . Conf::PERMISSION_USER_WRITE;
     $filter[] = 'cd.class=' . Conf::USER;
@@ -32,8 +34,9 @@ class User extends Conf
       return false; // can do nothing
     }
 
-    $configuration = self::database_conf_get($filter, $type);
-    parent::load($configuration);
+    $configuration = self::database_conf_get($filter);
+    self::$user_id = $user_id;
+    parent::merge($configuration);
   }
 
 }

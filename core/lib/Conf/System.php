@@ -15,13 +15,15 @@ use ICT\Core\Corelog;
 class System extends Conf
 {
 
-  public static function load($node_id = null, $type = null)
+  public static $node_id = NULL;
+
+  public static function load($node_id = null)
   {
     $filter = array();
     if (empty($node_id)) {
       $node_id = self::get('node:node_id', null);
     }
-    Corelog::log("configuration requested for node: $node_id, type: $type", Corelog::DEBUG);
+    Corelog::log("configuration requested for node: $node_id", Corelog::DEBUG);
 
     $filter[] = '(c.permission_flag & ' . Conf::PERMISSION_GLOBAL_READ . ')=' . Conf::PERMISSION_GLOBAL_READ;
     $filter[] = 'cd.class=' . Conf::SYSTEM;
@@ -31,8 +33,9 @@ class System extends Conf
       $filter[] = "cd.node_id=" . Conf::NODE_ALL;
     }
 
-    $configuration = self::database_conf_get($filter, $type);
-    parent::load($configuration);
+    $configuration = self::database_conf_get($filter);
+    self::$node_id = $node_id;
+    parent::merge($configuration);
   }
 
 }

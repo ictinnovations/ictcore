@@ -16,8 +16,7 @@ use ICT\Core\Request;
 // default include is /usr/ictcore/core
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 
-include_once "core.php";
-include_once "lib/http.php";
+include_once "Core.php";
 
 try {
   if (http_authenticate() != true) {

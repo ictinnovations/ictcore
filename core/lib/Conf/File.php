@@ -9,32 +9,34 @@ namespace ICT\Core\Conf;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use Exception;
 use ICT\Core\Conf;
-use ICT\Core\CoreException;
-use ICT\Core\Corelog;
 
-class Conffile extends Conf
+/*
+ * NOTE: no log in following file, cos this file will be executed before log setup
+ */
+
+class File extends Conf
 {
 
-  public static function load($file_path)
+  public static $config_file = '/etc/ictcore.conf';
+
+  public static function load($file_path = NULL)
   {
-    global $path_etc;
+    $configSource = is_file($file_path) ? $file_path : self::$config_file;
 
     //reading configuration file.
-    //in success result is $ict_conf array.
-    $configSource = is_file($file_path) ? $file_path : $path_etc . '/ictcore.conf';
-
     if (is_file($configSource)) {
       $configuration = parse_ini_file($configSource, TRUE);
-      Corelog::log("configuration file loaded", Corelog::DEBUG, $configuration);
       if (!is_array($configuration)) {
-        throw new CoreException('500', "Bad configuration file: $configSource");
+        throw new Exception("Bad configuration file: $configSource", '500');
       }
     } else {
-      throw new CoreException('500', "No configuration file found: $configSource");
+      throw new Exception("No configuration file found: $configSource", '500');
     }
 
-    parent::load($configuration);
+    self::$config_file = $configSource;
+    parent::merge($configuration);
   }
 
 }

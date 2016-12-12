@@ -11,7 +11,7 @@ use ICT\Core\Task;
 // default include is /usr/ictcore/core
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 
-include_once "core.php";
+include_once "Core.php";
 
 function cron_process()
 {

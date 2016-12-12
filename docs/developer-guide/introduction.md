@@ -64,7 +64,7 @@ common
 Common code / functions ( not related to telecommunication ) which are required to perform basic system and OS related activities.
 
 * Token    : to change communication parameters dynamically with variable support
-* core.php : main include file, with common ict related functions
+* Core.php : main include file, with common ict related functions
 * lib      : Common programming functions like database, configuration etc ..
 
 
