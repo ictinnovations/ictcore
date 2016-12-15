@@ -62,6 +62,7 @@ class Corelog
       }
       $log_type = self::code_to_name($class);
       $dateTime = gmdate('Y-m-d H:i:s');
+      $process_id = self::$process_id;
       $message = "[$dateTime] [$process_id] [$log_type] $message\n";
       if (!empty($extra) && ($website_log & Corelog::EXTRA) == Corelog::EXTRA) { // print extra log only if log level is set to EXTRA
         $message .= "--- extra data start ---\n" . print_r($extra, true) . "\n--- extra data end ---\n";

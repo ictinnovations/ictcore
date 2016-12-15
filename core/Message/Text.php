@@ -15,18 +15,18 @@ use ICT\Core\DB;
 use ICT\Core\Message;
 use ICT\Core\Token;
 
-define('SMS_ENCODING_GSM', 0);
-define('SMS_ENCODING_BINARY', 1);
-define('SMS_ENCODING_UNICODE', 2);
-
-define('SMS_CLASS_DISABLE', 0);
-define('SMS_CLASS_NORMAL', 1);
-define('SMS_CLASS_SIM', 2);
-define('SMS_CLASS_TOOLKIT', 4); // SIM TOOLKIT mclass actual value is 3, which can't be used in flag
-define('SMS_CLASS_FLASH', 8); // FLASH mclass actual value is 0, which is being used to disable mclass
-
 class Text extends Message
 {
+
+  const ENCODING_GSM = 0;
+  const ENCODING_BINARY = 1;
+  const ENCODING_UNICODE = 2;
+  
+  const CLASS_DISABLE = 0;
+  const CLASS_NORMAL = 1;
+  const CLASS_SIM = 2;
+  const CLASS_TOOLKIT = 4; // SIM TOOLKIT mclass actual value is 3, which can't be used in flag
+  const CLASS_FLASH = 8; // FLASH mclass actual value is 0, which is being used to disable mclass
 
   protected static $table = 'text';
   protected static $primary_key = 'text_id';
@@ -78,13 +78,13 @@ class Text extends Message
    * @property-read integer $length
    * @var integer
    */
-  protected $class = SMS_CLASS_NORMAL;
+  protected $class = Text::CLASS_NORMAL;
 
   /**
    * @property-read integer $length
    * @var integer
    */
-  protected $encoding = SMS_ENCODING_GSM;
+  protected $encoding = Text::ENCODING_GSM;
 
   public function __construct($text_id = NULL)
   {

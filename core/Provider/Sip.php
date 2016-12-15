@@ -22,7 +22,7 @@ class Sip extends Provider
    */
   protected $type = 'sip';
 
-  public function search($aFilter = array())
+  public static function search($aFilter = array())
   {
     $aFilter['type'] = 'sip';
     return parent::search($aFilter);

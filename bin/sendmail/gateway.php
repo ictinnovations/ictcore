@@ -122,9 +122,9 @@ if (!empty($emails)) {
     $subject = $header->subject;
     $body = $message;
     $body_alt = $message_alt;
-    $from = $header->from[0];
+    $from = isset($header->from) ? $header->from[0] : $header->sender[0];
     $date = $header->date;
-    $to = $header->to[0];
+    $to = isset($header->to) ? $header->to[0] : $header->reply_to[0];
     $attachment = $filename;
 
     $status = imap_setflag_full($conn, $email_number, "\\Seen");

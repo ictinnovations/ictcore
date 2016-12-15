@@ -41,7 +41,7 @@ class Conf extends Data
       return self::$conf[$name];
     }
     // check for : colon separated name
-    return static::_get(self::$conf, $name, $default);
+    return self::_get(self::$conf, $name, $default);
   }
 
   function set($name, $value)
@@ -49,7 +49,7 @@ class Conf extends Data
     if (strpos($name, ':') === false) {
       self::$conf[$name] = $value;
     } else {
-      static::_set(self::$conf, $name, $value);
+      self::_set(self::$conf, $name, $value);
     }
   }
 

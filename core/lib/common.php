@@ -84,9 +84,9 @@ function do_login($user)
 
   if (!is_object($user)) {
     Corelog::log("do_login requested, with user_id $user", Corelog::COMMON);
-    if (empty($user) || $user == USER_GUEST) {
+    if (empty($user) || $user == User::GUEST) {
       // load dummy user same as dummy account
-      $oUser = new User(USER_GUEST);
+      $oUser = new User(User::GUEST);
       User::$activeUser = $oUser;
       return $oUser;
     }

@@ -23,7 +23,7 @@ class Http extends Data
       return self::$input[$name];
     }
     // check for : colon separated name
-    return static::_get(self::$input, $name, $default);
+    return self::_get(self::$input, $name, $default);
   }
 
   public static function input_set($name, $value)
@@ -31,7 +31,7 @@ class Http extends Data
     if (strpos($name, ':') === false) {
       self::$input[$name] = $value;
     } else {
-      static::_set(self::$input, $name, $value);
+      self::_set(self::$input, $name, $value);
     }
   }
 
@@ -41,7 +41,7 @@ class Http extends Data
       return self::$output[$name];
     }
     // check for : colon separated name
-    return static::_get(self::$output, $name, $default);
+    return self::_get(self::$output, $name, $default);
   }
 
   public static function output_set($name, $value)
@@ -49,7 +49,7 @@ class Http extends Data
     if (strpos($name, ':') === false) {
       self::$output[$name] = $value;
     } else {
-      static::_set(self::$output, $name, $value);
+      self::_set(self::$output, $name, $value);
     }
   }
 

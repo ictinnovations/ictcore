@@ -178,6 +178,7 @@ class Account
       $oAccount = new Account($aFilter['account_id']);
       $aAccount[$oAccount->account_id] = array(
           'account_id' => $oAccount->account_id,
+          'type' => 'account',
           'username' => $oAccount->username,
           'first_name' => $oAccount->first_name,
           'last_name' => $oAccount->last_name,

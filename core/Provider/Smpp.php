@@ -22,7 +22,7 @@ class Smpp extends Provider
    */
   protected $type = 'smpp';
 
-  public function search($aFilter = array())
+  public static function search($aFilter = array())
   {
     $aFilter['type'] = 'smpp';
     return parent::search($aFilter);

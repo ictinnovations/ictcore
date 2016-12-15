@@ -12,10 +12,10 @@ namespace ICT\Core;
 use ICT\Core\User\Role;
 use ICT\Core\User\Permission;
 
-define('USER_GUEST', -1);
-
 class User
 {
+
+  const GUEST = -1;
 
   public static $activeUser;
 
@@ -137,9 +137,9 @@ class User
         $this->username = $user_id;
       } else {
         $this->user_id = $user_id;
-        if (USER_GUEST == $user_id) {
+        if (User::GUEST == $user_id) {
           Corelog::log("Guest user: creating instance", Corelog::CRUD);
-          $this->user_id = USER_GUEST;
+          $this->user_id = User::GUEST;
           $this->username = 'guest';
           $this->first_name = 'Anonymous';
           $this->last_name = 'Guest';
@@ -187,7 +187,7 @@ class User
     }
 
     // if no user found, check for guest user
-    if (empty($aUser) && isset($aFilter['user_id']) && $aFilter['user_id'] == USER_GUEST) {
+    if (empty($aUser) && isset($aFilter['user_id']) && $aFilter['user_id'] == User::GUEST) {
       $oUser = new User($aFilter['user_id']);
       $aUser[$oUser->user_id] = array(
           'user_id' => $oUser->user_id,
@@ -413,7 +413,7 @@ class User
   public function authenticate($access_key, $key_type = 'password')
   {
     // treat guest user as authenticated
-    if ($this->user_id == USER_GUEST) {
+    if ($this->user_id == User::GUEST) {
       return true;
     }
     switch ($key_type) {

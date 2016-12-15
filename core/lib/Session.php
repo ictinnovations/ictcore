@@ -30,7 +30,7 @@ class Session extends Data
       return $_SESSION[$name];
     }
     // check for : colon separated name
-    return static::_get($_SESSION, $name, $default);
+    return self::_get($_SESSION, $name, $default);
   }
 
   public static function set($name, $value)
@@ -39,7 +39,7 @@ class Session extends Data
     if (strpos($name, ':') === false) {
       $_SESSION[$name] = $value;
     } else {
-      static::_set($_SESSION, $name, $value);
+      self::_set($_SESSION, $name, $value);
     }
   }
 

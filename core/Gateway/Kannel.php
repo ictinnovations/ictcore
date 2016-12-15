@@ -84,8 +84,11 @@ class Kannel extends Gateway
         'password' => $this->password
     );
 
+    // Convert json into data array
+    $data = json_decode($command, TRUE);
+
     // check if we can update application status via delivery report, if so use it
-    if (!empty($command['application_id']) && !empty($command['spool_id'])) {
+    if (!empty($data['application_id']) && !empty($data['spool_id'])) {
       /* delivery report settings
         DLR-Mask
         1: Delivered to phone,
@@ -94,7 +97,7 @@ class Kannel extends Gateway
         8: Delivered to SMSC,
         16: Non-Delivered to SMSC.
        */
-      $spool_id = $command['spool_id'];
+      $spool_id = $data['spool_id'];
       $dlrMask = 1 | 2 | 4 | 8 | 16;
       $rsp_url = Conf::get('site:base_url', 'http://localhost/ictcore') . '/gateway.php';
       $dlrUrl = "$rsp_url?spool_id=$spool_id&gateway_flag=" . Kannel::GATEWAY_FLAG;
@@ -104,7 +107,7 @@ class Kannel extends Gateway
       $queryString['dlr-url'] = $dlrUrl;
     }
 
-    foreach ($command as $variable => $value) {
+    foreach ($data as $variable => $value) {
       switch ($variable) {
         case 'dlr-url':
           $queryString[] = "dlr-url=" . rawurlencode($value);

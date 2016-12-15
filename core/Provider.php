@@ -33,24 +33,30 @@ class Provider
       'active'
   );
   private static $read_only = array(
-      'provider_id'
+      'provider_id',
+      'type'
   );
 
   /**
    * @property-read integer $provider_id
    * @var integer
    */
-  private $provider_id = NULL;
+  protected $provider_id = NULL;
 
   /** @var string */
   public $name = NULL;
 
   /**
+   * @property-read string $type
+   * @var string
+   */
+  protected $type = NULL;
+
+  /**
    * @property integer $service_flag 
-   * @see Provider::set_service_flag()
    * @var integer 
    */
-  private $service_flag = NULL;
+  public $service_flag = NULL;
 
   /** @var integer */
   public $node_id = NULL;
@@ -81,9 +87,6 @@ class Provider
 
   /** @var integer */
   public $weight = NULL;
-
-  /** @var string */
-  public $type = NULL;
 
   /** @var integer */
   public $active = NULL;

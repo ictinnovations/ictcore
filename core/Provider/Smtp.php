@@ -20,7 +20,7 @@ class Smtp extends Provider
    */
   protected $type = 'smtp';
 
-  public function search($aFilter = array())
+  public static function search($aFilter = array())
   {
     $aFilter['type'] = 'smtp';
     return parent::search($aFilter);

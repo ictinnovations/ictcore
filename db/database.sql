@@ -11,6 +11,7 @@
 CREATE TABLE account
 (
    account_id                     int(11) unsigned       NOT NULL auto_increment,
+   type                           varchar(32)            default NULL,
    username                       varchar(64)            default NULL,
    passwd                         varchar(128)           default NULL,
    passwd_pin                     varchar(32)            default NULL,
@@ -659,7 +660,7 @@ CREATE TABLE provider
    description                   varchar(255)           NOT NULL default '',
    register                      varchar(255)           default NULL,
    weight                        int(11)                default 0,
-   type                          int(1)                 NOT NULL default 1,
+   type                          varchar(32)            default NULL,
    active                        int(1)                 NOT NULL default 1,
    date_created                  int(11)                default NULL,
    created_by                    int(11)                default NULL,

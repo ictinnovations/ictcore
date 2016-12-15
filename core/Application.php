@@ -331,6 +331,9 @@ class Application
     $app_id = 'app_' . $this->application_id;
     $app_data = $this->execute($oTransmission, $oSequence);
 
+    if (empty($app_data)) {
+      return NULL; // no output
+    }
     return $oSequence->response_create($spool_id, $app_id, $app_data);
   }
 

@@ -118,22 +118,25 @@ class Sendmail extends Gateway
       Corelog::log("Sendmail sending commands via:".$oProvider->name, Corelog::CRUD, $command);
     }
 
+    // Convert json into data array
+    $data = json_decode($command, TRUE);
+
     $mailMsg = Swift_Message::newInstance();
 
     // TODO, make it functional $headers = $mailMsg->getHeaders();
     // $headers->addIdHeader('spool_id', $command['spool_id']);
 
     try {
-      $mailMsg->setTo($this->validate_email($command['to']));
-      $mailMsg->setFrom($this->validate_email($command['from']));
-      $mailMsg->setSubject($command['subject']);
-      $mailMsg->setBody($command['body'], 'text/html');
-      if (!empty($command['body_alt'])) {
-        $mailMsg->addPart($command['body_alt'], 'text/plain');
+      $mailMsg->setTo($this->validate_email($data['to']));
+      $mailMsg->setFrom($this->validate_email($data['from']));
+      $mailMsg->setSubject($data['subject']);
+      $mailMsg->setBody($data['body'], 'text/html');
+      if (!empty($data['body_alt'])) {
+        $mailMsg->addPart($data['body_alt'], 'text/plain');
       }
-      if (!empty($command['attachment']) && is_file($command['attachment'])) {
+      if (!empty($data['attachment']) && is_file($data['attachment'])) {
         // Optionally add any attachments
-        $attachment = Swift_Attachment::fromPath($command['attachment']);
+        $attachment = Swift_Attachment::fromPath($data['attachment']);
         // $attachment->setFilename($command['file_title']);
         $mailMsg->attach($attachment);
       }
@@ -160,9 +163,9 @@ class Sendmail extends Gateway
      * ********************************************************************* */
     $oRequest = new Request();
     $oRequest->gateway_flag = Sendmail::GATEWAY_FLAG;
-    $oRequest->spool_id = $command['spool_id'];
+    $oRequest->spool_id = $data['spool_id'];
 
-    $oRequest->application_id = $command['application_id'];
+    $oRequest->application_id = $data['application_id'];
     $oRequest->application_data = array(
         'amount' => 1,
         'amount_net' => 1,

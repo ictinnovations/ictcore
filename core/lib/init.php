@@ -12,7 +12,7 @@ namespace ICT\Core;
 use ICT\Core\Conf\File as ConfFile;
 use ICT\Core\Conf\System as SystemConfiguration;
 
-global $path_lib, $path_core, $path_root, $path_www, $path_etc, $path_log, $path_data, $website_log;
+global $path_lib, $path_core, $path_root, $path_www, $path_etc, $path_log, $path_data, $path_cache, $path_template, $website_log;
 
 // following lines will allow to include files from both core and lib directories
 $path_lib = realpath(dirname(__FILE__));   // /usr/ictcore/core
@@ -39,10 +39,6 @@ ConfFile::load('/etc/ictcore.conf');
 
 // Corelog will be our default error handler
 set_error_handler(array('ICT\\Core\\Corelog', 'error_handler'), E_ALL);
-
-$website_host = Conf::get('website:host', '127.0.0.1');
-$website_port = Conf::get('website:port', '80');
-$website_url = Conf::get('website:url', 'http://127.0.0.1/');
 $log_string = Conf::get('website:log', 'error warning notice info');
 $website_log = Corelog::parse_config($log_string);
 
