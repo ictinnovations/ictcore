@@ -60,7 +60,7 @@ class Session extends Data
     session_write_close();
     $query = "SELECT data FROM transmission_session WHERE transmission_id='$id'";
     if (!$result = DB::query('transmission_session', $query)) {
-      //session_log("MySQL error: " . mysql_error());
+      //session_log("MySQL error: " . mysql_error(DB::$link));
       return FALSE;
     }
     if (mysql_num_rows($result)) {
@@ -89,8 +89,8 @@ class Session extends Data
                   VALUES ('$id', UNIX_TIMESTAMP(), '%data%')";
     }
     DB::query('transmission_session', $query, array('data' => $data));
-    if (mysql_affected_rows()) {
-      //session_log("session_write update affected " . mysql_affected_rows() . " rows with id: $id");
+    if (mysql_affected_rows(DB::$link)) {
+      //session_log("session_write update affected " . mysql_affected_rows(DB::$link) . " rows with id: $id");
       return TRUE;
     }
   }
@@ -102,10 +102,10 @@ class Session extends Data
     $result = DB::query('transmission_session', $query);
     if ($result) {
       $_SESSION = array();
-      //session_log("MySQL query delete worked. " . mysql_affected_rows(). " row(s) deleted.");
+      //session_log("MySQL query delete worked. " . mysql_affected_rows(DB::$link). " row(s) deleted.");
       return TRUE;
     } else {
-      //session_log("MySQL update error: " . mysql_error() . " with id: $id");
+      //session_log("MySQL update error: " . mysql_error(DB::$link) . " with id: $id");
       return FALSE;
     }
   }
@@ -116,10 +116,10 @@ class Session extends Data
     $query = "DELETE FROM transmission_session WHERE time_start < " . (time() - $life);
     $result = DB::query('transmission_session', $query);
     if ($result) {
-      //session_log("session_gc deleted " . mysql_affected_rows() . " rows.");
+      //session_log("session_gc deleted " . mysql_affected_rows(DB::$link) . " rows.");
       return TRUE;
     } else {
-      //session_log("session_gc error: " . mysql_error() . " with id: $id");
+      //session_log("session_gc error: " . mysql_error(DB::$link) . " with id: $id");
       return FALSE;
     }
   }

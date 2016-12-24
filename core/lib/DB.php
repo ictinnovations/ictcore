@@ -38,14 +38,14 @@ class DB
 
   static function next_record_id($table, $field = '')
   {
-    $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'");
+    $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'", DB::$link);
     if (mysql_num_rows($result)) {
       $newid = mysql_result($result, 0) + 1;
-      mysql_query("UPDATE sequence SET sequence = $newid WHERE table_name = '$table'");
+      mysql_query("UPDATE sequence SET sequence = $newid WHERE table_name = '$table'", DB::$link);
       return $newid;
     } else {
       $field = $field ? $field : $table . '_id';
-      $result = mysql_query("SELECT MAX($field) as newid FROM $table");
+      $result = mysql_query("SELECT MAX($field) as newid FROM $table", DB::$link);
       if ($result) {
         $col_newid = mysql_result($result, 0);
         $newid = $col_newid ? $col_newid + 1 : 1;
@@ -53,18 +53,18 @@ class DB
         $newid = 0;
       }
       $newid = $newid ? $newid + 1 : 1;
-      mysql_query("INSERT INTO sequence (table_name, sequence) VALUES ('$table', $newid)");
+      mysql_query("INSERT INTO sequence (table_name, sequence) VALUES ('$table', $newid)", DB::$link);
       return $newid;
     }
   }
 
   static function save_record_id($table, $index)
   {
-    $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'");
+    $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'", DB::$link);
     if (mysql_num_rows($result)) {
-      mysql_query("UPDATE sequence SET sequence=$index WHERE table_name='$table'");
+      mysql_query("UPDATE sequence SET sequence=$index WHERE table_name='$table'", DB::$link);
     } else {
-      mysql_query("INSERT INTO sequence (table_name, sequence) VALUES ('$table', $index)");
+      mysql_query("INSERT INTO sequence (table_name, sequence) VALUES ('$table', $index)", DB::$link);
     }
   }
 
@@ -106,9 +106,9 @@ class DB
   static function column_list($table)
   {
     $aColumn = array();
-    $result = mysql_query("SHOW COLUMNS FROM $table");
+    $result = mysql_query("SHOW COLUMNS FROM $table", DB::$link);
     if ($result === FALSE) {
-      Corelog::log("DB:unknown table: $table: " . mysql_error(), Corelog::ERROR);
+      Corelog::log("DB:unknown table: $table: " . mysql_error(DB::$link), Corelog::ERROR);
       return FALSE;
     }
     while ($column = mysql_fetch_assoc($result)) {
@@ -132,7 +132,7 @@ class DB
         $type = strtolower(substr($column['Type'], 0, strpos($column['Type'], '(')));
         $aMap[$column_name] = array(
             'name' => $column['Field'],
-            'value' => mysql_real_escape_string($aData[$column_name]),
+            'value' => mysql_real_escape_string($aData[$column_name], DB::$link),
             'is_string' => !in_array(trim($type), $non_text), // treat as string field not is a number
             'default' => $column['Default']
         );
@@ -185,9 +185,9 @@ class DB
     $query_end = '';
     //$query_data  = '';
 
-    $col_result = mysql_query("SHOW COLUMNS FROM $table");
+    $col_result = mysql_query("SHOW COLUMNS FROM $table", DB::$link);
     if ($col_result === FALSE) {
-      Corelog::log("DB:unknown table: $table: " . mysql_error(), Corelog::ERROR);
+      Corelog::log("DB:unknown table: $table: " . mysql_error(DB::$link), Corelog::ERROR);
       return FALSE;
     }
     // Field      | Type     | Null | Key | Default | Extra  ==> Value
@@ -216,7 +216,7 @@ class DB
             //  update <=              or if INSERT then don't include empty values
             if ($primary_key !== FALSE || ($primary_key === FALSE && $values[$column_name] != '')) {
               $columns[$column_name] = $column;
-              $columns[$column_name]['Value'] = mysql_real_escape_string($values[$column_name]);
+              $columns[$column_name]['Value'] = mysql_real_escape_string($values[$column_name], DB::$link);
             }
           }
           break;
@@ -240,7 +240,7 @@ class DB
       $row_id = $columns[$primary_key]['Value'];
 
       /* // remove unchanged columns from query
-        $current_rs   = mysql_query("SELECT * FROM $table_name WHERE $primary_key = $row_id");
+        $current_rs   = mysql_query("SELECT * FROM $table_name WHERE $primary_key = $row_id", DB::$link);
         $current_data = mysql_fetch_assoc($current_rs);
         foreach ($columns as $col_name => $col_value) {
         if ($col_value == $current_data[$col_name]) {
@@ -291,13 +291,13 @@ class DB
     }
     $query_data = implode($data, ', ');
     $query_full = "$query_start $query_data $query_end";
-    $qry_result = mysql_query($query_full);
+    $qry_result = mysql_query($query_full, DB::$link);
     Corelog::log("DB:update query executed on table: $table", Corelog::DEBUG);
     if ($qry_result === FALSE) {
-      Corelog::log("DB:update error table: $table error: " . mysql_error(), Corelog::WARNING);
+      Corelog::log("DB:update error table: $table error: " . mysql_error(DB::$link), Corelog::WARNING);
       return FALSE;
     }
-    $values['primary_key'] = mysql_insert_id();
+    $values['primary_key'] = mysql_insert_id(DB::$link);
     if ($primary_key === FALSE) {
       $values[$table . '_id'] = $values['primary_key'];
     }
@@ -308,7 +308,7 @@ class DB
   {
     $values = array();
     foreach ($aValues as $key => $value) {
-      $values["%$key%"] = mysql_real_escape_string($value);
+      $values["%$key%"] = mysql_real_escape_string($value, DB::$link);
     }
 
     if ($check_auth) {
@@ -329,7 +329,7 @@ class DB
 
     $final_query = str_replace(array_keys($values), array_values($values), $req_query);
     Corelog::log("DB:query executed on table: $table", Corelog::DEBUG, $final_query);
-    return mysql_query($final_query);
+    return mysql_query($final_query, DB::$link);
   }
 
   static function delete($table, $primary_key, $row_id, $check_auth = FALSE, $foreign_table = '', $foreign_key = '', $foreign_value = '')
@@ -363,9 +363,9 @@ class DB
           return FALSE; // null user id is not allowed
         }
         $user_key = 'created_by';
-        $auth_value = mysql_real_escape_string($auth_value);
+        $auth_value = mysql_real_escape_string($auth_value, DB::$link);
         $parent_query = "SELECT $auth_key FROM $table WHERE $auth_key=$auth_value AND $user_key=$user_value";
-        $parent_result = mysql_query($parent_query);
+        $parent_result = mysql_query($parent_query, DB::$link);
         if (mysql_num_rows($parent_result) == NULL) {
           return FALSE;
         }

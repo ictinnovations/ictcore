@@ -41,7 +41,7 @@ class Token
 
   public function merge($oToken)
   {
-    $this->token = array_merge_recursive($this->token, $oToken->token);
+    $this->token = array_replace_recursive($this->token, $oToken->token);
   }
 
   public function render_template($template, $default_value = Token::KEEP_ORIGNAL)

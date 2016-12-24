@@ -233,6 +233,16 @@ class Application
     return DB::delete(self::$table, 'application_id', $this->application_id);
   }
 
+  public function __isset($field)
+  {
+    $method_name = 'isset_' . $field;
+    if (method_exists($this, $method_name)) {
+      return $this->$method_name();
+    } else {
+      return isset($this->$field);
+    }
+  }
+
   public function __get($field)
   {
     $method_name = 'get_' . $field;

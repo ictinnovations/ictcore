@@ -244,7 +244,6 @@ class Task
   {
     $listTask = self::search_pending();
     // now process each aTask in a separate thread
-    include 'lib/CoreThread.php';
     foreach ($listTask as $task_id => $aTask) {
       $taskThread = new TaskThread();
       $taskThread->wait()->run($task_id, $aTask['server_time']);
@@ -275,7 +274,8 @@ class Task
       DB::query(self::$table, $sql, array('cur_time' => time(), 'status' => Task::PROCESSED, 'task_id' => $this->task_id));
 
       $result = false;
-      $classType = ucfirst(strtolower(trim($this->type)));
+      $namespace = '\\ICT\Core\\';
+      $classType = $namespace . ucfirst(strtolower(trim($this->type)));
       if (class_exists($classType)) {
         if (method_exists($classType, 'task_process')) {
           $result = call_user_func_array(array($classType, 'task_process'), array($this));

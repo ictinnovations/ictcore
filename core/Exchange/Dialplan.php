@@ -218,7 +218,7 @@ class Dialplan
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE dialplan_id='%dialplan_id%' ";
-    $result = DB::query(self::$table, $query, array('dialplan_id' => $this->dialplan_id), true);
+    $result = DB::query(self::$table, $query, array('dialplan_id' => $this->dialplan_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->dialplan_id = $data['dialplan_id'];

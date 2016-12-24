@@ -344,6 +344,8 @@ setfacl -d -m g::rw %{core_home}/log
 # system cache directory must be writable
 chmod g+rws %{core_home}/cache
 setfacl -d -m g::rw %{core_home}/cache
+# enable event support in mysql
+grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-scheduler=ON/" /etc/my.cnf
 # enable and start cron service
 /sbin/chkconfig crond on
 /sbin/service crond start

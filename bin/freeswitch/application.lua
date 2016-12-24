@@ -222,20 +222,12 @@ while oCall:ready() do
   call_status = 'active'
 
   -- fetch next instructions from ictcore remote Gateway interface
-  local appDataAll = application_fetch()
-  if (appDataAll == false or appDataAll == '') then
-    oCall:hangup()
+  local newAppData = application_fetch()
+  if (newAppData == false or newAppData == '') then
+    oCall:hangup() -- no new application to executed, it mean we are at the end, so hangup
     break
-  else -- we are ready to execute new applications
-    app_count = 0
-    for appId, appData in pairs(appDataAll) do
-      application_execute(appData)
-      app_count = app_count + 1
-    end
-    if app_count == 0 then
-      oCall:hangup()  -- no new application executed, it mean we are at the end, so hangup
-      break
-    end
+  else -- we are ready to execute new application
+    application_execute(newAppData)
   end
 end
 

@@ -473,7 +473,7 @@ class Transmission
     }
   }
 
-  public static function task_process($oTask)
+  public static function task_process(\ICT\Core\Task $oTask)
   {
     try {
       $oTransmission = new self($oTask->data); // data is transmission_id
@@ -491,6 +491,9 @@ class Transmission
       Corelog::log($ex->getMessage(), Corelog::ERROR);
       Corelog::log("Unable to process transmission task", Corelog::ERROR);
     }
+
+    // in either case remember to remove the task
+    $oTask->delete();
   }
 
   public function send()

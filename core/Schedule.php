@@ -256,7 +256,7 @@ class Schedule extends Task
               'task_id' => $this->task_id
           );
           // add new, no authentication needed
-          DB::update(self::$table, $data, false);
+          DB::update(self::$sub_table, $data, false);
           $schedule_count++;
         }
       }

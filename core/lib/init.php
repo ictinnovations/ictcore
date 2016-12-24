@@ -46,7 +46,10 @@ $website_log = Corelog::parse_config($log_string);
 date_default_timezone_set('UTC');       // required to bypass server timezone settings
 
 /* Connecting, selecting database */
-DB::connect();
+DB::$link = DB::connect();
 
 /* load default system configuration from database */
 SystemConfiguration::load();
+
+/* Start with guest user */
+User::$activeUser = new User(User::GUEST);

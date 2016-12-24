@@ -74,7 +74,7 @@ class Request
     // TODO: task_cancel in not supported
   }
 
-  public function task_process($oTask)
+  public function task_process(\ICT\Core\Task $oTask)
   {
     try {
       $oRequest = unserialize($oTask->data); // data is serilized request
@@ -89,6 +89,9 @@ class Request
       Corelog::log($ex->getMessage(), Corelog::ERROR);
       Corelog::log("Unable to process request", Corelog::ERROR);
     }
+
+    // in either case remember to remove the task
+    $oTask->delete();
   }
 
 }

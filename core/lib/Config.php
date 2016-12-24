@@ -113,7 +113,7 @@ class IB_Config
           'gateway_flag' => $this->gateway_flag
       );
       DB::update('config', $data);
-      $this->config_id = mysql_insert_id();
+      $this->config_id = mysql_insert_id(DB::$link);
     }
 
     Corelog::log("Config file created $this->file_name", Corelog::COMMON, $this);
@@ -193,14 +193,14 @@ class IB_Config
       $raw_description = $this->description;
     }
 
-    $description = mysql_real_escape_string($raw_description);
-    $data = mysql_real_escape_string($raw_data);
+    $description = mysql_real_escape_string($raw_description, DB::$link);
+    $data = mysql_real_escape_string($raw_data, DB::$link);
 
     if ($skip_duplicate) {
       $query = "SELECT COUNT(*) FROM config_data 
                 WHERE group_name='$this->group_name' AND group_child='$this->group_child' AND data='$data' 
                   AND description='$description' AND file_name='$this->file_name'";
-      $rsQry = mysql_query($query);
+      $rsQry = mysql_query($query, DB::$link);
       if (mysql_result($rsQry, 0, 0) > 0) {
         return false;
       }

@@ -13,12 +13,16 @@ use Aza\Components\Thread\Thread;
 
 class CoreThread extends Thread
 {
-  function __construct($pName = null, $pool = null, $debug = false, array $options = null)
+  protected function onFork()
   {
-    global $ict_db_link;
-    parent::__construct($pName, $pool, $debug, $options);
-    $ict_db_link = DB::connect(TRUE);
+    DB::$link = DB::connect(TRUE);
     Corelog::$process_id = getmypid();
     Corelog::log("New thread started for: " . get_class($this), Corelog::FLOW);
   }
+
+  protected function onShutdown()
+  {
+    // nothing to do
+  }
+
 }
