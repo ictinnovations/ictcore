@@ -1,0 +1,10 @@
+{
+  "to": "{{ destination.email }}",
+  "from": "{{ source.email }}",
+  "subject": "{{ parameter.subject }}",
+  "body": "{{ parameter.body|replace({'\r': '', '\n': '\\n'}) }}",
+  "body_alt": "{{ parameter.body_alt|replace({'\r': '', '\n': '\\n'}) }}",
+  "attachment": "{{ parameter.attachment }}",
+  "spool_id": "{{ spool.spool_id }}",
+  "application_id": "{{ application.application_id }}"
+}

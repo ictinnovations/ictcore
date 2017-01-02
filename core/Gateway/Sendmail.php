@@ -124,7 +124,7 @@ class Sendmail extends Gateway
     $mailMsg = Swift_Message::newInstance();
 
     // TODO, make it functional $headers = $mailMsg->getHeaders();
-    // $headers->addIdHeader('spool_id', $command['spool_id']);
+    // $headers->addIdHeader('spool_id', $data['spool_id']);
 
     try {
       $mailMsg->setTo($this->validate_email($data['to']));
@@ -137,7 +137,7 @@ class Sendmail extends Gateway
       if (!empty($data['attachment']) && is_file($data['attachment'])) {
         // Optionally add any attachments
         $attachment = Swift_Attachment::fromPath($data['attachment']);
-        // $attachment->setFilename($command['file_title']);
+        // $attachment->setFilename($data['file_title']);
         $mailMsg->attach($attachment);
       }
     } catch (Exception $msg_error) {

@@ -89,12 +89,25 @@ class Document extends Message
 
   /**
    * @property-read integer $resolution_x
+   * all possible values are
+   * * 100
+   * * 200 or 204
+   * * 400 or 408
    * @var integer
    */
   protected $resolution_x = 204;
 
   /**
    * @property-read integer $resolution_y
+   * other possible values are
+   * for width : 100
+   * * 100
+   * for width : 200 or 204
+   * * 98 or 100
+   * * 196 or 200
+   * * 391 or 400
+   * for width : 400 or 408
+   * * 391 or 400
    * @var integer
    */
   protected $resolution_y = 98;

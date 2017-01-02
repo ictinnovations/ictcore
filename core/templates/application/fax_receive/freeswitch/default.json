@@ -4,7 +4,7 @@
     "fax_enable_t38_request": "true",
     "fax_enable_t38": "true",
     "fax_local_station_id": "ICTCore",
-    "fax_file": "{{ application.tempfile }}",
+    "fax_file": "{{ parameter.fax_file }}",
     "application_result": "failed",
     "execute_on_fax_success": "set application_result=success"
   },
@@ -21,7 +21,7 @@
     },
     {
       "name": "rxfax",
-      "data": "{{ application.tempfile }}"
+      "data": "{{ parameter.fax_file }}"
     }
   ]
 }

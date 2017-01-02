@@ -102,7 +102,7 @@ class Service
       $oProvider = Provider::load($aProvider['provider_id']);
       return $oProvider;
     }
-    throw new CoreException('No provider available');
+    throw new CoreException('404', 'No provider available');
   }
 
   public static function application_template($application_name)

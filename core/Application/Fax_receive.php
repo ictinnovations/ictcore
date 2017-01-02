@@ -43,10 +43,16 @@ class Fax_receive extends Application
    */
   public static $supportedResult = array(
       'result' => array('success', 'error'),
-      'file' => '/path/to/file',
+      'fax_file' => '/path/to/file',
       'pages' => 0,
       'error' => '' // empty message expected on success
   );
+
+  public function __construct($application_id = NULL)
+  {
+    parent::__construct($application_id);
+    $this->data['fax_file'] = tempnam('/tmp', 'fax_') . '.tif';
+  }
 
   public function execute()
   {

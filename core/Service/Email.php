@@ -9,8 +9,11 @@ namespace ICT\Core\Service;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
 use ICT\Core\Gateway\Sendmail;
 use ICT\Core\Message\Template;
+use ICT\Core\Provider\Smtp;
 use ICT\Core\Service;
 
 class Email extends Service
@@ -55,6 +58,19 @@ class Email extends Service
       $oMessage = new Template();
     }
     return $oMessage;
+  }
+
+  public static function get_route()
+  {
+    try{
+      return parent::get_route();
+    } catch (CoreException $ex) {
+      Corelog::log($ex->getMessage(), Corelog::NOTICE);
+      Corelog::log('Using localhost as email gateway', Corelog::NOTICE);
+      $oProvider = new Smtp();
+      $oProvider->name = 'localhost';
+      return $oProvider;
+    }
   }
 
   public static function application_template($application_name)

@@ -9,6 +9,8 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ReflectionClass;
+
 class Sequence
 {
 
@@ -56,10 +58,13 @@ class Sequence
         $this->oToken->merge($oObject->load_token());
       }
     } else if (method_exists($oObject, 'token_get')) {
-      $this->oToken->add(strtolower(get_class($oObject)), $oObject->token_get());
-      $parent_class = get_parent_class($oObject);
-      if (!empty($parent_class)) {
-        $this->oToken->add(strtolower(get_parent_class($oObject)), $oObject->token_get());
+      $reflectionObject = new ReflectionClass($oObject);
+      $class_name = strtolower($reflectionObject->getShortName());
+      $this->oToken->add($class_name, $oObject->token_get());
+      $reflectionParent = $reflectionObject->getParentClass();
+      if ($reflectionParent) {
+        $parent_class_name = strtolower($reflectionParent->getShortName());
+        $this->oToken->add($parent_class_name, $oObject->token_get());
       }
     }
   }
