@@ -9,6 +9,8 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Exchange\Dialplan;
+
 class Program
 {
 
@@ -227,7 +229,12 @@ class Program
 
   public function remove()
   {
-    // nothing to remove
+    $filter = array('program_id' => $this->program_id);
+    $listDialplan = Dialplan::search($filter);
+    foreach ($listDialplan as $aDialplan) {
+      $oDialplan = new Dialplan($aDialplan['dialplan_id']);
+      $oDialplan->delete();
+    }
   }
 
   public static function getClass($program_id, $namespace = 'ICT\\Core\\Program')
@@ -414,6 +421,8 @@ class Program
       Corelog::log("New Program created: $this->program_id", Corelog::CRUD);
     }
     // before leaving update program resources
+    // but first clear all old resource and then save new resource
+    DB::delete(self::$table . '_resource', 'program_id', $this->program_id, true);
     $this->save_resource($this->data);
     return $result;
   }
@@ -426,8 +435,6 @@ class Program
         $this->save_resource($value);
         continue;
       }
-      // first of all clear old resource and then save new resource
-      DB::delete(self::$table . '_resource', 'program_id', $this->program_id, true);
       $fields = array(
           'program_id' => $this->program_id,
           'resource_type' => $name,

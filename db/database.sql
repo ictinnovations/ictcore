@@ -58,9 +58,10 @@ CREATE TABLE usr
 DELIMITER |
 CREATE TRIGGER usr_insert AFTER INSERT
   ON usr FOR EACH ROW BEGIN
-    INSERT INTO account SELECT 
-      NULL, NEW.username, NEW.passwd, LEFT(RAND()*999999, 4), NEW.first_name, NEW.last_name, NEW.phone, 
-      NEW.email, NEW.address, NEW.active, NEW.date_created, NEW.usr_id, NULL, NULL;
+    INSERT INTO account (account_id, type, username, passwd, passwd_pin, first_name, last_name, phone, email, address,
+                         active, date_created, created_by, last_updated, updated_by)
+    SELECT NULL, 'extension', NEW.username, NEW.passwd, LEFT(RAND()*999999, 4), NEW.first_name, NEW.last_name, NEW.phone,
+           NEW.email, NEW.address, NEW.active, NEW.date_created, NEW.usr_id, NULL, NULL;
   END;
 |
 DELIMITER ;
