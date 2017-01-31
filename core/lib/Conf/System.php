@@ -35,7 +35,7 @@ class System extends Conf
 
     $configuration = self::database_conf_get($filter);
     self::$node_id = $node_id;
-    parent::merge($configuration);
+    parent::merge_array($configuration);
   }
 
 }

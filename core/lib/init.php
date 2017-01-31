@@ -53,3 +53,15 @@ SystemConfiguration::load();
 
 /* Start with guest user */
 User::$activeUser = new User(User::GUEST);
+
+/* Setup Session handlers */
+// bond session management with following functions
+$oSession = Session::get_instance();
+session_set_save_handler(
+        array($oSession, 'open'),
+        array($oSession, 'close'),
+        array($oSession, 'read'),
+        array($oSession, 'write'),
+        array($oSession, 'destroy'),
+        array($oSession, 'gc')
+          );

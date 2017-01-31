@@ -10,47 +10,65 @@ namespace ICT\Core;
  * *************************************************************** */
 
 // initializing global variables
-Http::$input = array_merge($_GET, $_FILES, $_POST);
+$oHttp = Http::get_instance();
+$oHttp->input = array_merge($_GET, $_FILES, $_POST);
 
 class Http extends Data
 {
-  public static $input = array();
-  public static $output = array();
+
+  /**
+   * @var Http
+   */
+  protected static $_instance;
+
+  /**
+   * @staticvar boolean $initialized
+   * @return Http
+   */
+  public static function get_instance()
+  {
+    static $initialized = FALSE;
+    if (!$initialized) {
+      self::$_instance = new self;
+      $initialized = TRUE;
+    }
+    return self::$_instance;
+  }
+
+  public static function set($name, $value)
+  {
+    $_instance = self::get_instance();
+    $_instance->__set($name, $value);
+  }
+
+  public static function &get($name, $default = NULL)
+  {
+    $_instance = self::get_instance();
+    $value = &$_instance->__get($name);
+    if (NULL === $value) {
+      return $default;
+    }
+    return $value;
+  }
 
   public static function input_get($name, $default = null)
   {
-    if (isset(self::$input[$name])) {
-      return self::$input[$name];
-    }
-    // check for : colon separated name
-    return self::_get(self::$input, $name, $default);
+    return self::get("input:$name", $default);
   }
 
   public static function input_set($name, $value)
   {
-    if (strpos($name, ':') === false) {
-      self::$input[$name] = $value;
-    } else {
-      self::_set(self::$input, $name, $value);
-    }
+    self::set("input:$name", $value);
   }
 
   public static function output_get($name, $default = null)
   {
-    if (isset(self::$output[$name])) {
-      return self::$output[$name];
-    }
-    // check for : colon separated name
-    return self::_get(self::$output, $name, $default);
+    return self::get("output:$name", $default);
   }
 
   public static function output_set($name, $value)
   {
-    if (strpos($name, ':') === false) {
-      self::$output[$name] = $value;
-    } else {
-      self::_set(self::$output, $name, $value);
-    }
+    self::set("output:$name", $value);
   }
 
 }

@@ -33,38 +33,51 @@ class Conf extends Data
   // admin  = 186 = system | ADMIN_WRITE
   // user   = 250 = admin | USER_WRITE
 
-  public static $conf = array();
+  /**
+   * @var Conf
+   */
+  public static $oConf = array();
 
-  function get($name, $default = null)
+  /**
+   * @staticvar boolean $initialized
+   * @return Conf
+   */
+  public static function get_instance()
   {
-    if (isset(self::$conf[$name])) {
-      return self::$conf[$name];
+    static $initialized = FALSE;
+    if (!$initialized) {
+      self::$oConf = new self;
+      $initialized = TRUE;
     }
-    // check for : colon separated name
-    return self::_get(self::$conf, $name, $default);
+    return self::$oConf;
   }
 
-  function set($name, $value)
+  public static function set($name, $value)
   {
-    if (strpos($name, ':') === false) {
-      self::$conf[$name] = $value;
-    } else {
-      self::_set(self::$conf, $name, $value);
-    }
+    $oConf = self::get_instance();
+    $oConf->__set($name, $value);
   }
 
-  public static function load ($config_id)
+  public static function &get($name, $default = NULL)
+  {
+    $oConf = self::get_instance();
+    $value = &$oConf->__get($name);
+    if (NULL === $value) {
+      return $default;
+    }
+    return $value;
+  }
+
+  public static function load($config_id)
   {
     Corelog::log("Demo, loading configuration for $config_id");
   }
 
-  protected static function merge($configuration = array())
+  protected static function merge_array($configuration = array())
   {
-    foreach ($configuration as $class => $config) {
-      foreach ($config as $name => $data) {
-        self::$conf[$class][$name] = $data;
-      }
-    }
+    $newConf = new Data($configuration);
+    $oConf = self::get_instance();
+    $oConf->merge($newConf);
     return true;
   }
 

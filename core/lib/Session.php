@@ -9,127 +9,118 @@ namespace ICT\Core;
  * Website : http://www.ictinnovations.com/                        *
  * Mail : info@ictinnovations.com                                  *
  * *************************************************************** */
+
 // Database Session Handling Functions
-// bond session management with following functions
-session_set_save_handler(
-        array('ICT\\Core\\Session', 'open'),
-        array('ICT\\Core\\Session', 'close'),
-        array('ICT\\Core\\Session', 'read'),
-        array('ICT\\Core\\Session', 'write'),
-        array('ICT\\Core\\Session', 'delete'),
-        array('ICT\\Core\\Session', 'gc')
-          );
 
 class Session extends Data
 {
 
-  public static function get($name, $default = NULL)
+  /**
+   * @var Session
+   */
+  protected static $_instance;
+
+  /**
+   * @staticvar boolean $initialized
+   * @return Session
+   */
+  public static function get_instance()
   {
-    global $_SESSION;
-    if (isset($_SESSION[$name])) {
-      return $_SESSION[$name];
+    static $initialized = FALSE;
+    if (!$initialized) {
+      self::$_instance = new self;
+      $initialized = TRUE;
     }
-    // check for : colon separated name
-    return self::_get($_SESSION, $name, $default);
+    return self::$_instance;
   }
 
   public static function set($name, $value)
   {
-    global $_SESSION;
-    if (strpos($name, ':') === false) {
-      $_SESSION[$name] = $value;
-    } else {
-      self::_set($_SESSION, $name, $value);
-    }
+    $_instance = self::get_instance();
+    $_instance->__set($name, $value);
   }
 
-  public static function open($path, $name) {
-    exec("echo '$path, $name' > /dev/null");
+  public static function &get($name, $default = NULL)
+  {
+    $_instance = self::get_instance();
+    $value = &$_instance->__get($name);
+    if (NULL === $value) {
+      return $default;
+    }
+    return $value;
+  }
+
+  public static function open($path, $name)
+  {
+    Corelog::log("Session open requested with path: $path, and name: $name", Corelog::DEBUG);
     return TRUE;
   }
 
   public static function close()
   {
-    //session_log("session_close");
+    Corelog::log("Session close requested", Corelog::DEBUG);
     return TRUE;
   }
 
   public static function read($id)
   {
-    //session_log("session_read");
+    Corelog::log("Session read requested with id: $id", Corelog::DEBUG);
     session_write_close();
     $query = "SELECT data FROM transmission_session WHERE transmission_id='$id'";
     if (!$result = DB::query('transmission_session', $query)) {
-      //session_log("MySQL error: " . mysql_error(DB::$link));
+      Corelog::log("Session read failed with error: " . mysql_error(DB::$link), Corelog::WARNING);
       return FALSE;
     }
     if (mysql_num_rows($result)) {
       $row = mysql_fetch_assoc($result);
-      //session_log("session_read returned " . $row["data"]);
-      return $row["data"];
+      return unserialize($row["data"]);
     } else {
-      //session_log("session_read found zero rows with id: $id");
+      Corelog::log("Session read found zero rows", Corelog::WARNING);
       return "";
     }
   }
 
   public static function write($id, $data)
   {
-    global $_SESSION;
-
-    //session_log("session_write");
+    Corelog::log("Session write requested with id: $id", Corelog::DEBUG, $data);
     $sessionRs = DB::query('transmission_session', "SELECT count(*) FROM transmission_session s WHERE s.transmission_id = '$id'");
     $row = mysql_fetch_row($sessionRs);
-    //session_log('Found ' . $row[0] . ' record(s).');
-
     if ($row[0] > 0) {
       $query = "UPDATE transmission_session SET data='%data%', time_start=UNIX_TIMESTAMP() WHERE transmission_id ='$id'";
     } else {
       $query = "INSERT INTO transmission_session (transmission_id, time_start, data) 
                   VALUES ('$id', UNIX_TIMESTAMP(), '%data%')";
     }
-    DB::query('transmission_session', $query, array('data' => $data));
+    DB::query('transmission_session', $query, array('data' => serialize($data)));
     if (mysql_affected_rows(DB::$link)) {
-      //session_log("session_write update affected " . mysql_affected_rows(DB::$link) . " rows with id: $id");
       return TRUE;
     }
+    Corelog::log("Session write failed", Corelog::WARNING);
   }
 
-  public static function delete($id)
+  public static function destroy($id)
   {
-    //session_log("session_delete");
+    Corelog::log("Session delete requested with id: $id", Corelog::DEBUG);
     $query = "DELETE FROM transmission_session where transmission_id='$id'";
     $result = DB::query('transmission_session', $query);
     if ($result) {
-      $_SESSION = array();
-      //session_log("MySQL query delete worked. " . mysql_affected_rows(DB::$link). " row(s) deleted.");
+      $oSession = Session::get_instance();
+      unset($oSession);
       return TRUE;
     } else {
-      //session_log("MySQL update error: " . mysql_error(DB::$link) . " with id: $id");
       return FALSE;
     }
   }
 
   public static function gc($life)
   {
-    //session_log("session_gc");
+    Corelog::log("Session gc requested with lif: $life", Corelog::DEBUG);
     $query = "DELETE FROM transmission_session WHERE time_start < " . (time() - $life);
     $result = DB::query('transmission_session', $query);
     if ($result) {
-      //session_log("session_gc deleted " . mysql_affected_rows(DB::$link) . " rows.");
       return TRUE;
     } else {
-      //session_log("session_gc error: " . mysql_error(DB::$link) . " with id: $id");
       return FALSE;
-    }
-  }
-
-  public static function log($message)
-  {
-    $file = fopen('/tmp/session.txt ', "a");
-    if ($file) {
-      fwrite($file, gmdate("Y-m-d H:i:s ") . $message . "\n");
-      fclose($file);
     }
   }
 

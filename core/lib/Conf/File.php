@@ -36,7 +36,7 @@ class File extends Conf
     }
 
     self::$config_file = $configSource;
-    parent::merge($configuration);
+    parent::merge_array($configuration);
   }
 
 }
