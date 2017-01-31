@@ -42,7 +42,7 @@ if (\ICT\Core\json_check($application_data)) {
 // now process the main request
 $oResponse = process_response($spool_id, $application_id, $application_data, $gateway_flag);
 // and publish output
-echo json_encode($oResponse->application_data);
+echo $oResponse->application_data;
 
 // after all process data from additional app if there is any, we need to proecess it after main application
 // so it can use main application result to calculate next action while processing program
