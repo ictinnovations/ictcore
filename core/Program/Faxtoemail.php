@@ -47,7 +47,7 @@ class Faxtoemail extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'account_id' => '[account:account_id]'
+      'account_id' => '[transmission:account:account_id]'
   );
 
   /**
@@ -61,23 +61,24 @@ class Faxtoemail extends Program
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load account
+   * Use account_id or phone from program data as reference
+   * @return Account null or a valid account object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_account()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'account_id':
-        $dataMap['account'] = new Account($parameter_value);
-        break;
-      case 'phone':
-        $oAccount = Account::construct_from_array(array('phone' => $parameter_value));
-        $oAccount->save();
-        $dataMap['account'] = $oAccount;
-        break;
+    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
+      $oAccount = new Account($this->data['account_id']);
+      return $oAccount;
+    } else if (isset($this->data['phone']) && !empty($this->data['phone'])) {
+      $oAccount = Core::locate_account($this->data['phone'], 'phone');
+      if ($oAccount) {
+        // update account_id with new value, and remove all temporary parameters
+        $this->data['account_id'] = $oAccount->account_id;
+        unset($this->data['phone']);
+        return $oAccount;
+      }
     }
-    return $dataMap;
   }
 
   /**
@@ -87,10 +88,10 @@ class Faxtoemail extends Program
   public function scheme()
   {
     $inboundCall = new Inbound();
-    if (isset($this->aCache['account'])) {
+    if (isset($this->aResource['account'])) {
       $inboundCall->data = array(
           'context' => 'external',
-          'destination' => $this->aCache['account']->phone,
+          'destination' => $this->aResource['account']->phone,
           'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_DESTINATION)
       );
     } else {
@@ -159,7 +160,7 @@ class Faxtoemail extends Program
             $error = 'There is no or invalid fax file';
             break 2; // in case of error, also terminate foreach loop
           }
-          $this->oSequence->token_create($oDocument);
+          $this->aResource['document'] = $oDocument;
           break;
         case Result::TYPE_INFO:
           if ($oResult->name == 'pages') {
@@ -179,7 +180,6 @@ class Faxtoemail extends Program
       $error = 'Invalid source fax number';
     } else {
       $this->oTransmission->oContact->save();
-      $this->oSequence->token_create($this->oTransmission->oContact);
     }
 
     if ($result == 'success' && empty($error) && $pages > 0) {
@@ -224,11 +224,10 @@ class Faxtoemail extends Program
    */
   public function send_email_notification()
   {
-    $this->oSequence->token_create($this->oTransmission->oContact);
-
     // Prepare token object for following transmissions
+    $currentToken = new Token(Token::SOURCE_ALL);
     $oToken = new Token();
-    $oToken->add('fax', $this->oSequence->oToken->token);
+    $oToken->add('fax', $currentToken);
 
     $oTemplate = Template::construct_from_file("Program/Faxtoemail/data/fax_received.tpl.php");
     // Now replace all program related tokens in loaded template, but remember to keep missing tokens

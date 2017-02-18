@@ -16,6 +16,7 @@ class Token
 {
 
   /** @const */
+  const SOURCE_NONE = 0;
   const SOURCE_CONF = 1;
   const SOURCE_SESSION = 2;
   const SOURCE_HTTP = 4;
@@ -36,7 +37,7 @@ class Token
    */
   public $template_dir = '';
 
-  public function __construct($token_flag = Token::SOURCE_ALL, $data = array())
+  public function __construct($token_flag = Token::SOURCE_NONE, $data = array())
   {
     $this->token = new Data();
     if (Token::SOURCE_HTTP == ($token_flag & Token::SOURCE_HTTP)) {
@@ -64,8 +65,30 @@ class Token
     $this->token->merge($oToken->token);
   }
 
+  public function token_resolve()
+  {
+    $parent = ''; // no parent
+    array_walk($this->token, array($this, 'token_resolve_callback'), $parent);
+  }
+
+  private function token_resolve_callback(&$token_data, $token_name, $parent)
+  {
+    // also process sub tokens if current object provide any
+    if (is_object($token_data)) {
+      if (method_exists($token_data, 'token_resolve')) {
+        $token_data->token_resolve();
+      }
+    } else if (is_array($token_data)) {
+      $parent = "$parent:$token_name";
+      array_walk($token_data, array($this, 'token_resolve_callback', $parent));
+    }
+  }
+
   public function render_template($template, $default_value = Token::KEEP_ORIGNAL)
   {
+    // prepare
+    $this->token_resolve();
+
     $template_dir = $this->template_dir;
     if (empty($this->template_dir)) {
       global $path_template;
@@ -90,6 +113,8 @@ class Token
 
   public function render_variable($variable, $default_value = Token::KEEP_ORIGNAL)
   {
+    // prepare
+    $this->token_resolve();
     $this->default_value = $default_value;
 
     if (!empty($variable) && (is_array($variable) || is_object($variable))) {
@@ -98,16 +123,23 @@ class Token
         if (is_array($value) || is_object($variable)) {
           $result[$key] = $this->render_variable($value);
         } else {
-          $result[$key] = $this->render_string($value);
+          $result[$key] = $this->_render_string($value);
         }
       }
       return $result;
     } else {
-      return $this->render_string($variable);
+      return $this->_render_string($variable);
     }
   }
 
   public function render_string($in_str)
+  {
+    // prepare
+    $this->token_resolve();
+    return $this->_render_string($in_str);
+  }
+
+  private function _render_string($in_str)
   {
     // the most outer () is being used to get whole matched string in $macths[1] note matchs[0] have '[]'
     $regex = "/\[(([\w]+)(:[\w]+)*)\]/";

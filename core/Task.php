@@ -192,7 +192,7 @@ class Task
     $method_name = 'get_' . $field;
     if (method_exists($this, $method_name)) {
       return $this->$method_name();
-    } else if (!empty($field) && in_array($field, self::$fields)) {
+    } else if (!empty($field) && isset($this->$field)) {
       return $this->$field;
     }
     return NULL;
@@ -203,11 +203,16 @@ class Task
     $method_name = 'set_' . $field;
     if (method_exists($this, $method_name)) {
       $this->$method_name($value);
-    } else if (empty($field) || !in_array($field, self::$fields) || in_array($field, self::$read_only)) {
+    } else if (empty($field) || in_array($field, self::$read_only)) {
       return;
     } else {
       $this->$field = $value;
     }
+  }
+
+  public function get_id()
+  {
+    return $this->task_id;
   }
 
   public function save()

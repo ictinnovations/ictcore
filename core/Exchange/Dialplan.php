@@ -106,73 +106,58 @@ class Dialplan
     }
   }
 
-  public static function lookup(Request $oRequest, &$account_id, $filter_flag = self::FILTER_COMMON)
+  public static function lookup(Request $oRequest)
   {
-    Corelog::log("looking for available dialplan", Corelog::INFO, array('data' => $oRequest));
-
     // general request for incoming call, here we need to search target application in available dialplans
     $aFilter = array();
-    $aDialplan = array();
-    if (($filter_flag & self::FILTER_SOURCE) == self::FILTER_SOURCE && !empty($oRequest->source)) {
-      $aFilter['source'] = $oRequest->source;
+    Corelog::log("looking for available dialplan", Corelog::INFO, array('data' => $oRequest));
+
+    $aFilter['source'] = $oRequest->source;
+    $aFilter['destination'] = $oRequest->destination;
+    $aFilter['context'] = $oRequest->context;
+    if (!empty($oRequest->application_id)) {
+      $aFilter['application_id'] = $oRequest->application_id;
     }
-    if (($filter_flag & self::FILTER_DESTINATION) == self::FILTER_DESTINATION && !empty($oRequest->destination)) {
-      $aFilter['destination'] = $oRequest->destination;
-    }
-    if (($filter_flag & self::FILTER_CONTEXT) == self::FILTER_CONTEXT && !empty($oRequest->context)) {
-      $aFilter['context'] = $oRequest->context;
-    }
-    if (($filter_flag & self::FILTER_APPLICATION_ID) == self::FILTER_APPLICATION_ID) {
-      if (!empty($oRequest->application_id)) {
-        $aFilter['application_id'] = $oRequest->application_id;
-      }
-    }
-    if (($filter_flag & self::FILTER_GATEWAY_FLAG) == self::FILTER_GATEWAY_FLAG) {
-      if (!empty($oRequest->gateway_flag)) {
-        $aFilter['gateway_flag'] = $oRequest->gateway_flag;
-      } else {
-        // gateway flag is required in search to filter out none related entries
-        $aFilter['gateway_flag'] = Freeswitch::GATEWAY_FLAG;
-      }
+    if (!empty($oRequest->gateway_flag)) {
+      $aFilter['gateway_flag'] = $oRequest->gateway_flag;
+    } else {
+      // gateway flag is required in search to filter out none related entries
+      $aFilter['gateway_flag'] = Freeswitch::GATEWAY_FLAG;
     }
 
-    // fetch all available dialplans
+    // fetch and return all available dialplans
     $listDialplan = self::search($aFilter);
 
-    foreach ($listDialplan as $aDialplan) {
+    foreach ($listDialplan as $dialplan_id => $aDialplan) {
       if (($aDialplan['filter_flag'] & self::FILTER_ACCOUNT) == self::FILTER_ACCOUNT) {
+        $aDialplan['account'] = array();
         // first of all know the contact field
         $oGateway = Gateway::load($aDialplan['gateway_flag']);
         $contactFiled = $oGateway::CONTACT_FIELD;
-        // check for additional filters
-        if (($aDialplan['filter_flag'] & self::FILTER_ACCOUNT_SOURCE) == self::FILTER_ACCOUNT_SOURCE) {
+        // check for account filters
+        if (($listDialplan['filter_flag'] & self::FILTER_ACCOUNT_SOURCE) == self::FILTER_ACCOUNT_SOURCE) {
           $accountFilter = array($contactFiled => $oRequest->source);
           $listAccount = Account::search($accountFilter);
           if ($listAccount) {
-            $aAccount = array_shift($listAccount);
-            $account_id = $aAccount['account_id'];
+            $aDialplan['account']['source'] = $listAccount;
           } else {
-            continue;
+            continue; // unable to statisfy source filter drop current dialplan
           }
         }
-        if (($aDialplan['filter_flag'] & self::FILTER_ACCOUNT_DESTINATION) == self::FILTER_ACCOUNT_DESTINATION) {
+        if (($listDialplan['filter_flag'] & self::FILTER_ACCOUNT_DESTINATION) == self::FILTER_ACCOUNT_DESTINATION) {
           $accountFilter = array($contactFiled => $oRequest->destination);
           $listAccount = Account::search($accountFilter);
           if ($listAccount) {
-            $aAccount = array_shift($listAccount);
-            $account_id = $aAccount['account_id'];
+            $aDialplan['account']['destination'] = $listAccount;
           } else {
-            continue;
+            continue; // unable to statisfy destination filter drop current dialplan
           }
         }
       }
-
-      // Starting new transmission based on current program      
-      $oDialplan = new Dialplan($aDialplan['dialplan_id']);
-      return $oDialplan;
+      $listDialplan[$dialplan_id] = $aDialplan;
     }
 
-    throw new CoreException('204', 'no dialplan found');
+    return $listDialplan;
   }
 
   public static function search($aFilter = array())

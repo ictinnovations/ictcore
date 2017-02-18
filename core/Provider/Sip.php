@@ -33,8 +33,7 @@ class Sip extends Provider
     parent::save();
 
     $oToken = new Token();
-    $oToken->add('provider', $this->token_get());
-    $oToken->add('sip', $this->token_get());
+    $oToken->add('provider', $this);
 
     $oVoice = new Voice();
     $template = $oVoice->config_template('sip', $this->username);

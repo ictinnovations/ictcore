@@ -1,7 +1,7 @@
 {
   "application_id": "{{ application.application_id }}",
   "input": {
-    "spool_id": "{{ spool.spool_id }}",
+    "spool_id": "{{ transmission.spool.spool_id }}",
     "spool_status": "connected",
     "start_app_id": "{{ application.application_id }}",
     "application_result": "success"

@@ -23,6 +23,7 @@ class Transmission
   const STATUS_COMPLETED = 'completed';
   const STATUS_FAILED = 'failed';
   const STATUS_INVALID = 'invalid';
+  const INTERNAL = 'internal'; // currently not in use
   const INBOUND = 'inbound';
   const OUTBOUND = 'outbound';
 
@@ -166,6 +167,23 @@ class Transmission
     }
   }
 
+  public function token_resolve()
+  {
+    $oCompany = new Account(Account::COMPANY);
+    $this->company = $oCompany;
+    $this->account = $this->oAccount;
+    $this->contact = $this->oContact;
+    if ($this->direction == Transmission::INBOUND) {
+      $this->destination = $this->oAccount;
+      $this->source = $this->oContact;
+    } else if ($this->direction == Transmission::OUTBOUND) {
+      $this->destination = $this->oContact;
+      $this->source = $this->oAccount;
+    }
+    $this->spool = $this->oSpool;
+    $this->result = $this->aResult;
+  }
+
   public static function search($aFilter = array())
   {
     $aTransmission = array();
@@ -203,44 +221,6 @@ class Transmission
     }
 
     return $aTransmission;
-  }
-
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
-  public function load_token()
-  {
-    // prepare token cache for transmission related things
-    $oToken = new Token();
-
-    $oCompany = new Account(Account::COMPANY);
-    $aCompany = $oCompany->token_get();
-    $aAccount = is_object($this->oAccount) ? $this->oAccount->token_get() : array();
-    $aContact = is_object($this->oContact) ? $this->oContact->token_get() : array();
-    $aSpool = is_object($this->oSpool) ? $this->oSpool->token_get() : array();
-
-    // Now load transmission related tokens
-    $oToken->add('transmission', $this->token_get());
-    $oToken->add('company', $aCompany);
-    $oToken->add('account', $aAccount);
-    $oToken->add('contact', $aContact);
-    if ($this->direction == Transmission::INBOUND) {
-      $oToken->add('destination', $aAccount);
-      $oToken->add('source', $aContact);
-    } else if ($this->direction == Transmission::OUTBOUND) {
-      $oToken->add('destination', $aContact);
-      $oToken->add('source', $aAccount);
-    }
-    // also add spool, needed for tracking purpose
-    $oToken->add('spool', $aSpool);
-
-    return $oToken;
   }
 
   private function load()
@@ -323,7 +303,7 @@ class Transmission
     $method_name = 'get_' . $field;
     if (method_exists($this, $method_name)) {
       return $this->$method_name();
-    } else if (!empty($field) && in_array($field, self::$fields)) {
+    } else if (!empty($field) && isset($this->$field)) {
       return $this->$field;
     }
     return NULL;
@@ -334,11 +314,16 @@ class Transmission
     $method_name = 'set_' . $field;
     if (method_exists($this, $method_name)) {
       $this->$method_name($value);
-    } else if (empty($field) || !in_array($field, self::$fields) || in_array($field, self::$read_only)) {
+    } else if (empty($field) || in_array($field, self::$read_only)) {
       return;
     } else {
       $this->$field = $value;
     }
+  }
+
+  public function get_id()
+  {
+    return $this->transmission_id;
   }
 
   private function set_account_id($account_id)
@@ -473,7 +458,7 @@ class Transmission
     }
   }
 
-  public static function task_process(\ICT\Core\Task $oTask)
+  public static function task_process(Task $oTask)
   {
     try {
       $oTransmission = new self($oTask->data); // data is transmission_id

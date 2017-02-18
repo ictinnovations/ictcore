@@ -124,15 +124,6 @@ class Text extends Message
     return $aText;
   }
 
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE text_id='%text_id%' ";

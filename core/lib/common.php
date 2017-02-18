@@ -81,13 +81,14 @@ function bitmask2array($mask = 0)
 function do_login($user)
 {
   $oUser = null;
+  $oSession = Session::get_instance();
 
   if (!is_object($user)) {
     Corelog::log("do_login requested, with user_id $user", Corelog::COMMON);
     if (empty($user) || $user == User::GUEST) {
       // load dummy user same as dummy account
       $oUser = new User(User::GUEST);
-      User::$activeUser = $oUser;
+      $oSession->user = $oUser;
       return $oUser;
     }
     $oUser = new User($user);
@@ -104,10 +105,10 @@ function do_login($user)
     throw new CoreException(401, "User account disabled, can't loging");
   }
 
-  User::$activeUser = $oUser;
-  Corelog::log("do_login, results", Corelog::DEBUG, User::$activeUser);
+  $oSession->user = $oUser;
+  Corelog::log("do_login, results", Corelog::DEBUG, User::$user);
 
-  return User::$activeUser;
+  return $oSession->user;
 }
 
 function json_check($string)
@@ -119,10 +120,11 @@ function json_check($string)
 function can_access($access_name, $user_id = null)
 {
   // load user if user_id exist otherwise use crrently logged-in user
+  $oSession = Session::get_instance();
   if (!empty($user_id)) {
     $oUser = new User($user_id);
-  } else if (!empty(User::$activeUser)) {
-    $oUser = User::$activeUser;
+  } else if (!empty($oSession->user)) {
+    $oUser = $oSession->user;
   } else {
     return false;
   }

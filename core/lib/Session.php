@@ -21,6 +21,30 @@ class Session extends Data
   protected static $_instance;
 
   /**
+   * currently active user
+   * @var User $user
+   */
+  private $user = null;
+
+  /**
+   * Current request
+   * @var Request $request
+   */
+  private $request = null;
+
+  /**
+   * current response
+   * @var Response $response
+   */
+  private $response = null;
+
+  /**
+   * current transmission
+   * @var Transmission $transmission
+   */
+  private $transmission;
+
+  /**
    * @staticvar boolean $initialized
    * @return Session
    */

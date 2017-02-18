@@ -1,10 +1,10 @@
 {
-  "to": "{{ destination.email }}",
-  "from": "{{ source.email }}",
-  "subject": "{{ parameter.subject }}",
-  "body": "{{ parameter.body|replace({'\r': '', '\n': '\\n'}) }}",
-  "body_alt": "{{ parameter.body_alt|replace({'\r': '', '\n': '\\n'}) }}",
-  "attachment": "{{ parameter.attachment }}",
-  "spool_id": "{{ spool.spool_id }}",
+  "to": "{{ transmission.destination.email }}",
+  "from": "{{ transmission.source.email }}",
+  "subject": "{{ application.subject }}",
+  "body": "{{ application.body|replace({'\r': '', '\n': '\\n'}) }}",
+  "body_alt": "{{ application.body_alt|replace({'\r': '', '\n': '\\n'}) }}",
+  "attachment": "{{ application.attachment }}",
+  "spool_id": "{{ transmission.spool.spool_id }}",
   "application_id": "{{ application.application_id }}"
 }

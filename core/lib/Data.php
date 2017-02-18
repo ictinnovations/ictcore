@@ -82,8 +82,12 @@ class Data implements ArrayAccess, Iterator, Countable
       $index = array_shift($offset);
       if (is_array($data) && isset($data[$index])) {
         $output = &$data[$index];
-      } else if (is_object($data) && isset($data->{$index})) {
-        $output = &$data->{$index};
+      } else if (is_object($data)) {
+        if (in_array($index, get_object_vars($data))) {
+          $output = &$data->{$index}; // only public variable can be used as reference
+        } else if (isset($data->{$index})) {
+          $output = $data->{$index};
+        }
       }
     }
     return $output;

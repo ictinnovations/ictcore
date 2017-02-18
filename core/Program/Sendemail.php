@@ -37,32 +37,32 @@ class Sendemail extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'template_id' => '[template:template_id]'
+      'template_id' => '[template_id]'
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load template
+   * Use template_id or template_file or template_array from program data as reference
+   * @return Template null or a valid template object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_template()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'template_id':
-        $dataMap['template'] = new Template($parameter_value);
-        break;
-      case 'template_file':
-        $oTemplate = Template::construct_from_file($parameter_value);
-        $oTemplate->save();
-        $dataMap['template'] = $oTemplate;
-        break;
-      case 'template_array':
-        $oTemplate = Template::construct_from_array($parameter_value);
-        $oTemplate->save();
-        $dataMap['template'] = $oTemplate;
-        break;
+    if (isset($this->data['template_id']) && !empty($this->data['template_id'])) {
+      $oTemplate = new Template($this->data['template_id']);
+    } else if (isset($this->data['template_file']) && !empty($this->data['template_file'])) {
+      $oTemplate = Template::construct_from_file($this->data['template_file']);
+      $oTemplate->save();
+    } else if (isset($this->data['template_array']) && !empty($this->data['template_array'])) {
+      $oTemplate = Template::construct_from_array($this->data['template_array']);
+      $oTemplate->save();
     }
-    return $dataMap;
+    if (isset($oTemplate)) {
+      // update template_id with new value, and remove all temporary parameters
+      $this->data['template_id'] = $oTemplate->template_id;
+      unset($this->data['template_file']);
+      unset($this->data['template_array']);
+      return $oTemplate;
+    }
   }
 
   /**
@@ -73,10 +73,10 @@ class Sendemail extends Program
   {
     $emailSend = new Email_send();
     $emailSend->data = array(
-        'subject' => $this->aCache['template']->subject,
-        'body' => $this->aCache['template']->body,
-        'body_alt' => $this->aCache['template']->body_alt,
-        'attachment' => $this->aCache['template']->attachment
+        'subject' => $this->aResource['template']->subject,
+        'body' => $this->aResource['template']->body,
+        'body_alt' => $this->aResource['template']->body_alt,
+        'attachment' => $this->aResource['template']->attachment
     );
 
     $oScheme = new Scheme();

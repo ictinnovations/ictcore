@@ -39,28 +39,31 @@ class Voicemessage extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'recording_id' => '[recording:recording_id]'
+      'recording_id' => '[recording_id]'
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load recording
+   * Use recording_id or content or data from program data as reference
+   * @return Recording null or a valid recording object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_recording()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'recording_id':
-        $dataMap['recording'] = new Recording($parameter_value);
-        break;
-      case 'recording_file':
-      case 'file_name':
-        $oRecording = Recording::construct_from_array(array('file_name' => $parameter_value));
+    if (isset($this->data['recording_id']) && !empty($this->data['recording_id'])) {
+      $oRecording = new Recording($this->data['recording_id']);
+      return $oRecording;
+    } else if (isset($this->data['file_name']) || isset($this->data['recording_file'])) {
+      $file_name = !empty($this->data['file_name']) ? $this->data['file_name'] : $this->data['recording_file'];
+      if (!empty($file_name)) {
+        $oRecording = Recording::construct_from_array(array('file_name' => $file_name));
         $oRecording->save();
-        $dataMap['recording'] = $oRecording;
-        break;
+         // update recording_id with new value, and remove all temporary parameters
+        $this->data['recording_id'] = $oRecording->recording_id;
+        unset($this->data['file_name']);
+        unset($this->data['recording_file']);
+        return $oRecording;
+      }
     }
-    return $dataMap;
   }
 
   /**
@@ -73,7 +76,7 @@ class Voicemessage extends Program
 
     $voicePlay = new Voice_play();
     $voicePlay->data = array(
-        'message' => $this->aCache['recording']->file_name
+        'message' => $this->aResource['recording']->file_name
     );
 
     $hangupCall = new Disconnect();

@@ -120,9 +120,10 @@ class Account
         return $account_id; // don't proceed further
       } else if (Account::USER_DEFAULT == $account_id) {
         Corelog::log("Default account: creating instance", Corelog::CRUD);
+        $oSession = Session::get_instance();
         $query = "SELECT account_id FROM " . self::$table . " WHERE active=1 AND created_by=%user_id%
                    ORDER BY account_id DESC LIMIT 1";
-        $result = DB::query(self::$table, $query, array('user_id' => User::$activeUser->user_id));
+        $result = DB::query(self::$table, $query, array('user_id' => $oSession->user->user_id));
         $data = mysql_fetch_assoc($result);
         $this->account_id = $data['account_id'];
       }
@@ -188,15 +189,6 @@ class Account
     }
 
     return $aAccount;
-  }
-
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
   }
 
   public static function getClass($account_id, $namespace = 'ICT\\Core\\Account')
@@ -281,7 +273,7 @@ class Account
     $method_name = 'get_' . $field;
     if (method_exists($this, $method_name)) {
       return $this->$method_name();
-    } else if (!empty($field) && in_array($field, self::$fields)) {
+    } else if (!empty($field) && isset($this->$field)) {
       return $this->$field;
     }
     return NULL;
@@ -292,11 +284,16 @@ class Account
     $method_name = 'set_' . $field;
     if (method_exists($this, $method_name)) {
       $this->$method_name($value);
-    } else if (empty($field) || !in_array($field, self::$fields) || in_array($field, self::$read_only)) {
+    } else if (empty($field) || in_array($field, self::$read_only)) {
       return;
     } else {
       $this->$field = $value;
     }
+  }
+
+  public function get_id()
+  {
+    return $this->account_id;
   }
 
   protected function set_username($username)
@@ -368,14 +365,9 @@ class Account
   public function install_program($oProgram)
   {
     Corelog::log("Program installation for: $this->account_id Program: $oProgram->name", Corelog::CRUD);
-    $oToken = $oProgram->load_token();
-    if (array_key_exists('account', $oToken->token['cache'])) {
-      $program_data = $oProgram->data;
-      $program_data['account'] = $this->account_id;
-      $oProgram->data = $program_data;
-    } else {
-      return false;
-    }
+    $oToken = new Token();
+    $oToken->add('account', $this);
+    $oProgram->data = $oToken->render_variable($oProgram->data, Token::KEEP_ORIGNAL);
     $oProgram->save();
     $oProgram->compile();
     return $oProgram->program_id;
@@ -384,7 +376,7 @@ class Account
   public function remove_program($program_name = 'all')
   {
     Corelog::log("Removing program from: $this->account_id Program: $program_name", Corelog::CRUD);
-    $aProgram = Program::search_resource('account', $this->account_id);
+    $aProgram = Program::resource_search('account', $this->account_id);
     if ($aProgram) { // no error / false
       foreach (array_keys($aProgram) as $program_id) {
         if (ctype_digit($program_name) && $program_name == $program_id) {

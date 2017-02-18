@@ -39,8 +39,8 @@ class Email_receive extends Application
    */
   public static $requiredParameter = array(
       'context' => 'external',
-      'source' => '[source:email]',
-      'destination' => '[destination:email]',
+      'source' => '[contact:email]',
+      'destination' => '[account:email]',
       'filter_flag' => Dialplan::FILTER_COMMON
   );
 

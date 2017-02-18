@@ -92,15 +92,6 @@ class Contact
     return $oContact;
   }
 
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
   public static function search($aFilter = array())
   {
     $aContact = array();
@@ -188,7 +179,7 @@ class Contact
     $method_name = 'get_' . $field;
     if (method_exists($this, $method_name)) {
       return $this->$method_name();
-    } else if (!empty($field) && in_array($field, self::$fields)) {
+    } else if (!empty($field) && isset($this->$field)) {
       return $this->$field;
     }
     return NULL;
@@ -199,11 +190,16 @@ class Contact
     $method_name = 'set_' . $field;
     if (method_exists($this, $method_name)) {
       $this->$method_name($value);
-    } else if (empty($field) || !in_array($field, self::$fields) || in_array($field, self::$read_only)) {
+    } else if (empty($field) || in_array($field, self::$read_only)) {
       return;
     } else {
       $this->$field = $value;
     }
+  }
+
+  public function get_id()
+  {
+    return $this->contact_id;
   }
 
   public function email_to_phone()

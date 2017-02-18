@@ -40,8 +40,8 @@ class Sms_receive extends Application
   public static $supportedResult = array(
       'result' => array('success', 'error'),
       'context' => array('internal', 'external'),
-      'source' => '[source:phone]',
-      'destination' => '[destination:phone]'
+      'source' => '[contact:phone]',
+      'destination' => '[account:phone]'
   );
 
   /**

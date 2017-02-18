@@ -12,7 +12,6 @@ namespace ICT\Core\Application;
 use ICT\Core\Application;
 use ICT\Core\Service\Fax;
 use ICT\Core\Service\Voice;
-use ICT\Core\Token;
 
 class Originate extends Application
 {
@@ -33,13 +32,10 @@ class Originate extends Application
     } else if ($this->oTransmission->service_flag == Fax::SERVICE_FLAG) {
       $oService = new Fax();
     }
-    $oProvider = $oService->get_route();
-    $this->oSequence->oToken->add('provider', $oProvider);
-    $output = $oService->application_template('originate');
-    $command = $this->oSequence->oToken->render_template($output, Token::KEEP_ORIGNAL); // keep provider related token intact
+    $command = $oService->application_template('originate');
     // this application require gateway access to dial
-    $oService->application_execute('originate', $command, $oProvider);
-    return ''; // nothing to return
+    $oService->application_execute($command, true);
+    return ''; // no response, nothing to return
   }
 
 }

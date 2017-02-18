@@ -84,14 +84,11 @@ class Program
    * ***************************************************** Runtime Variables **
    */
 
-  /** @var array */
-  protected $aCache = array();
+  /** @var Data */
+  protected $aResource = array();
 
   /** @var array */
   protected $result = null;
-
-  /** @var Sequence */
-  protected $oSequence = null;
 
   /** @var Transmission */
   protected $oTransmission = null;
@@ -101,10 +98,25 @@ class Program
 
     if (!empty($aParameter) && is_array($aParameter)) {
       $this->set_data($aParameter);
+    } else {
+      $this->data = $this::$requiredParameter;
     }
     if (!empty($program_id)) {
       $this->program_id = $program_id;
       $this->_load();
+    }
+  }
+
+  public function token_resolve()
+  {
+    // first load all available resources
+    $this->resource_load();
+
+    foreach ($this->aResource as $name => $value) {
+      if (is_object($value) && method_exists($value, 'token_resolve')) {
+        $value->token_resolve();
+      }
+      $this->{$name} = $value;
     }
   }
 
@@ -148,50 +160,11 @@ class Program
     return $aProgram;
   }
 
-  public static function search_resource($resource_type, $resource_id)
-  {
-    $aProgram = array();
-
-    $query = "SELECT program_id FROM " . self::$table . "_resource WHERE resource_type='%resource_type%' AND resource_id=%resource_id%";
-    $result = DB::query(self::$table . "_resource", $query, array('resource_type' => $resource_type, 'resource_id' => $resource_id));
-    while ($resource = mysql_fetch_assoc($result)) {
-      $aProgram[$resource['program_id']] = $resource;
-    }
-
-    if (empty($aProgram)) {
-      return false;
-    } else {
-      return $aProgram;
-    }
-  }
-
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
-  public function load_token()
-  {
-    // prepare token cache for program related things
-    $oToken = new Token();
-    $oToken->add('program', $this->token_get());
-    foreach ($this->aCache as $name => $object) {
-      if (is_object($object) && method_exists($object, 'token_get')) {
-        $oToken->add($name, $object->token_get());
-      }
-    }
-    return $oToken;
-  }
-
-  /* Function: scheme
-    Program scheme for primary transmission, application execution order
-    and conditions
+  /**
+   * Function: scheme
+   * Program scheme for primary transmission, application execution order
+   * and conditions
    */
-
   public function scheme()
   {
     Corelog::log("Creating program scheme", Corelog::LOGIC);
@@ -217,14 +190,10 @@ class Program
   {
     Corelog::log("Constructing porgram", Corelog::LOGIC);
 
-    $this->load_cache();
+    $this->resource_load();
 
     $oScheme = $this->scheme();
-
-    $oSequence = new Sequence();
-    $oSequence->token_create($this);
-
-    return $oScheme->compile($this, $oSequence);
+    return $oScheme->compile($this);
   }
 
   public function remove()
@@ -285,32 +254,86 @@ class Program
     Corelog::log("Program loaded: $this->name", Corelog::CRUD);
   }
 
-  /* Wrapper function for data_map */
-
-  protected function load_cache()
+  /**
+   * Locate and load account
+   * Use account_id from program data as reference
+   * @return Account null or a valid account object
+   */
+  protected function resource_load_account()
   {
-    foreach ($this->data as $parameter_name => $parameter_value) {
-      $this->aCache[$parameter_name] = $parameter_value;
-      $dataMap = $this->data_map($parameter_name, $parameter_value);
-      foreach ($dataMap as $new_key => $new_value) {
-        $this->aCache[$new_key] = $new_value;
+    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
+      $oAccount = new Account($this->data['account_id']);
+      return $oAccount;
+    }
+  }
+
+  /**
+   * Locate and load objects / resources required by program
+   * Note: Wrapper function for all resource hook starting with resource_load_
+   * Note: target function can use program data to locate ids and references
+   */
+  protected function resource_load()
+  {
+    $methodList = get_class_methods($this);
+    foreach ($methodList as $resourceLoader) {
+      if (0 === strpos($resourceLoader, 'resource_load_')) {
+        $aResource = $this->{$resourceLoader}();
+        if (is_object($aResource)) {
+          $resource_name = str_replace('resource_load_', '', $resourceLoader);
+          $this->aResource[$resource_name] = $aResource;
+        } else if (is_array($aResource)) {
+          foreach ($aResource as $resource_name => $resource) {
+            $this->aResource[$resource_name] = $resource;
+          }
+        }
       }
     }
   }
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Save references to all required objects and resources
+   * to maintain their available and audit
    */
-  protected function data_map($parameter_name, $parameter_value)
+  public function resource_save()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      default:
-        $dataMap[$parameter_name] = $parameter_value;
-        break;
+    // first make them available
+    $this->resource_load();
+
+    foreach ($this->aResource as $name => $value) {
+      // in case of $value is not object we don't need to save its id
+      if (!is_object($value) || empty($value->id)) {
+        continue;
+      }
+      $fields = array(
+          'program_id' => $this->program_id,
+          'resource_type' => $name,
+          'resource_id' => $value->id
+      );
+      DB::update(self::$table . '_resource', $fields);
     }
-    return $dataMap;
+  }
+
+  /**
+   * Search for programs which are dependents on given resource / object
+   * @param type $resource_type
+   * @param type $resource_id
+   * @return array return program list which depends on provided resource / object
+   */
+  public static function resource_search($resource_type, $resource_id)
+  {
+    $aProgram = array();
+
+    $query = "SELECT program_id FROM " . self::$table . "_resource WHERE resource_type='%resource_type%' AND resource_id=%resource_id%";
+    $result = DB::query(self::$table . "_resource", $query, array('resource_type' => $resource_type, 'resource_id' => $resource_id));
+    while ($resource = mysql_fetch_assoc($result)) {
+      $aProgram[$resource['program_id']] = $resource;
+    }
+
+    if (empty($aProgram)) {
+      return false;
+    } else {
+      return $aProgram;
+    }
   }
 
   public function delete()
@@ -356,7 +379,7 @@ class Program
     $method_name = 'get_' . $field;
     if (method_exists($this, $method_name)) {
       return $this->$method_name();
-    } else if (!empty($field) && in_array($field, self::$fields)) {
+    } else if (!empty($field) && isset($this->$field)) {
       return $this->$field;
     }
     return NULL;
@@ -367,11 +390,16 @@ class Program
     $method_name = 'set_' . $field;
     if (method_exists($this, $method_name)) {
       $this->$method_name($value);
-    } else if (empty($field) || !in_array($field, self::$fields) || in_array($field, self::$read_only)) {
+    } else if (empty($field) || in_array($field, self::$read_only)) {
       return;
     } else {
       $this->$field = $value;
     }
+  }
+
+  public function get_id()
+  {
+    return $this->program_id;
   }
 
   public function get_data($field = '_all_')
@@ -387,7 +415,8 @@ class Program
   public function set_data($field, $value = '_reset_')
   {
     if ('_reset_' == $value) {
-      $this->data = (array) $field; // use field as data array
+      $newData = (array)$field; // use field as data array
+      $this->data = array_merge($this::$requiredParameter, $newData);
     } else {
       $this->data = array_merge($this->data, array($field => $value));
     }
@@ -395,18 +424,11 @@ class Program
 
   public function save()
   {
-    /* Filter out all unnecessary parameters
-      this is required to avoid repetitive data mapping
-     */
-    $this->load_cache();
-    $oToken = $this->load_token();
-    $finalData = $oToken->render_variable($this::$requiredParameter);
-
     $data = array(
         'program_id' => $this->program_id,
         'name' => $this->name,
         'type' => $this->type,
-        'data' => json_encode($finalData, JSON_NUMERIC_CHECK),
+        'data' => json_encode($this->data, JSON_NUMERIC_CHECK),
         'parent_id' => $this->parent_id
     );
 
@@ -423,25 +445,9 @@ class Program
     // before leaving update program resources
     // but first clear all old resource and then save new resource
     DB::delete(self::$table . '_resource', 'program_id', $this->program_id, true);
-    $this->save_resource($this->data);
-    return $result;
-  }
+    $this->resource_save();
 
-  public function save_resource($data)
-  {
-    foreach ($data as $name => $value) {
-      // in case of $value is array call same function recursively
-      if (is_array($value)) {
-        $this->save_resource($value);
-        continue;
-      }
-      $fields = array(
-          'program_id' => $this->program_id,
-          'resource_type' => $name,
-          'resource_id' => $value
-      );
-      DB::update(self::$table . '_resource', $fields);
-    }
+    return $result;
   }
 
   /**
@@ -504,25 +510,22 @@ class Program
     $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
     foreach ($listApplication as $application_id) {
       $oApplication = Application::load($application_id);
-      $oApplication->_execute($this->oTransmission, $this->oSequence);
+      $oApplication->_execute($this->oTransmission);
       $result = true;
     }
     return $result;
   }
 
-  public function _execute(Transmission &$oTransmission, Sequence &$oSequence)
+  public function _execute(Transmission &$oTransmission)
   {
     Corelog::log("Executing program : $this->type($this->program_id)", Corelog::FLOW);
 
     $this->oTransmission = &$oTransmission;
-    $this->oSequence = &$oSequence;
 
     // before processing update data with available tokens
-    $data = array_merge($this::$requiredParameter, $this->data);
-    $this->set_data($oSequence->oToken->render_variable($data));
-    $this->load_cache();
-    // update token cache
-    $oSequence->token_create($this);
+    $oToken = new Token(Token::SOURCE_ALL);
+    $this->data = $oToken->render_variable($this->data);
+    $this->resource_load();
 
     return $this->execute();
   }
@@ -566,6 +569,39 @@ class Program
   }
 
   /**
+   * Locate account_id and contact_id for given request
+   * @param Request $oRequest
+   * @param Dialplan $oDialplan
+   * @return int account_id and false in case of failure
+   */
+  public function authorize(Request $oRequest, Dialplan $oDialplan)
+  {
+    // confirm if it is a new request
+    if (!empty($oRequest->application_id)) {
+      return false;
+    }
+
+    if ($oDialplan->context == 'internal') {
+      $account = $oRequest->source;
+      $contact = $oRequest->destination;
+    } else {
+      $account = $oRequest->destination;
+      $contact = $oRequest->source;
+    }
+
+    // search fo existing account and contact
+    $oGateway = Gateway::load($oDialplan->gateway_flag);
+    $contactField = $oGateway::CONTACT_FIELD;
+    $oAccount = Core::locate_account($account, $contactField);
+    if ($oAccount) {
+      $oContact = Core::locate_contact($contact, $contactField);
+      return array($oAccount, $oContact);
+    } else {
+      return false; // no account found
+    }
+  }
+
+  /**
    * background function: process
    * Process results after completion of each associated application
    * To determine current status of program
@@ -584,8 +620,6 @@ class Program
       // further confirm result by triggerring transmission done event
       $transmission_status = $this->transmission_done();
       $this->oTransmission->status = $transmission_status;
-      // update result cache, maybe result are changed
-      $this->oSequence->oToken->add('result', $this->result);
 
       // check for transmission status, and trigger program completed if required
       if (Transmission::STATUS_COMPLETED == $this->oTransmission->status) {
@@ -597,7 +631,6 @@ class Program
       if ($this->oTransmission->is_done() && !empty($this->parent_id)) {
         $parentProgram = Program::load($this->parent_id);
         $parentProgram->oTransmission = &$this->oTransmission;
-        $parentProgram->oSequence = &$this->oSequence;
         $parentProgram->program_completed('associated', $this);
       }
     }
@@ -606,20 +639,17 @@ class Program
   /**
    * Wrapper function for above process function 
    */
-  public function _process(Transmission &$oTransmission, Sequence &$oSequence)
+  public function _process(Transmission &$oTransmission)
   {
     Corelog::log("Processing with program : $this->type($this->program_id)", Corelog::FLOW);
 
     // make input variable available at class level
     $this->oTransmission = &$oTransmission;
-    $this->oSequence = &$oSequence;
 
     // before processing update data with available tokens
-    $data = array_merge($this::$requiredParameter, $this->data);
-    $this->set_data($oSequence->oToken->render_variable($data));
-    $this->load_cache();
-    // update token cache
-    $oSequence->token_create($this);
+    $oToken = new Token(Token::SOURCE_ALL);
+    $this->data = $oToken->render_variable($this->data);
+    $this->resource_load();
 
     /**
      * ***************************************** Process application results **
@@ -636,15 +666,16 @@ class Program
     } else { // in case of existing in-process transmission
       // use application id from request if not present then
       // check if dialplan provide any reference to application
-      if (!empty($oSequence->oRequest->application_id)) {
-        $oApplication = Application::load($oSequence->oRequest->application_id);
-      } else if (!empty($oSequence->oDialplan) && ctype_digit(($oSequence->oDialplan->application_id))) {
-        $oApplication = Application::load($oSequence->oDialplan->application_id);
+      $oSession = Session::get_instance();
+      if (!empty($oSession->request->application_id)) {
+        $oApplication = Application::load($oSession->request->application_id);
+      } else if (!empty($oSession->dialplan) && ctype_digit(($oSession->dialplan->application_id))) {
+        $oApplication = Application::load($oSession->dialplan->application_id);
       }
     }
 
     // process application
-    $oApplication->_process($oTransmission, $oSequence);
+    $oApplication->_process($oTransmission);
     $this->application_completed($oApplication);
 
     /**

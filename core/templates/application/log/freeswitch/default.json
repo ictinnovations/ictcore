@@ -9,7 +9,7 @@
   "batch": [
     {
       "name": "log",
-      "data": "INFO {{ parameter.message }}"
+      "data": "INFO {{ application.message }}"
     }
   ]
 }

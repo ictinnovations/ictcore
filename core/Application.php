@@ -106,14 +106,23 @@ class Application
   /** @var Transmission */
   protected $oTransmission;
 
-  /** @var Sequence */
-  protected $oSequence;
-
-  public function __construct($application_id = NULL)
+  public function __construct($application_id = null, $aParameter = null)
   {
+    if (!empty($aParameter) && is_array($aParameter)) {
+      $this->set_data($aParameter);
+    } else {
+      $this->data = $this::$requiredParameter;
+    }
     if (!empty($application_id)) {
       $this->application_id = $application_id;
       $this->_load();
+    }
+  }
+
+  public function token_resolve()
+  {
+    foreach ($this->data as $name => $value) {
+      $this->{$name} = $value;
     }
   }
 
@@ -131,25 +140,6 @@ class Application
     }
     Corelog::log("Application search for program: $program_id", Corelog::CRUD, $aApplication);
     return $aApplication;
-  }
-
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
-  public function load_token()
-  {
-    // prepare token cache for application related things
-    $oToken = new Token();
-    $oToken->add('application', $this->token_get());
-    $oToken->add('parameter', $this->data);
-
-    return $oToken;
   }
 
   public function deploy(Program &$oProgram)
@@ -248,7 +238,7 @@ class Application
     $method_name = 'get_' . $field;
     if (method_exists($this, $method_name)) {
       return $this->$method_name();
-    } else if (!empty($field) && in_array($field, self::$fields)) {
+    } else if (!empty($field) && isset($this->$field)) {
       return $this->$field;
     }
     return NULL;
@@ -259,11 +249,16 @@ class Application
     $method_name = 'set_' . $field;
     if (method_exists($this, $method_name)) {
       $this->$method_name($value);
-    } else if (empty($field) || !in_array($field, self::$fields) || in_array($field, self::$read_only)) {
+    } else if (empty($field) || in_array($field, self::$read_only)) {
       return;
     } else {
       $this->$field = $value;
     }
+  }
+
+  public function get_id()
+  {
+    return $this->application_id;
   }
 
   public function get_data($field = '_all_')
@@ -279,7 +274,8 @@ class Application
   public function set_data($field, $value = '_reset_')
   {
     if ('_reset_' == $value) {
-      $this->data = (array) $field; // use field as data array
+      $newData = (array) $field; // use field as data array
+      $this->data = array_merge($this::$requiredParameter, $newData);
     } else {
       $this->data = array_merge($this->data, array($field => $value));
     }
@@ -324,27 +320,30 @@ class Application
     return $oService->application_template($this->name);
   }
 
-  public function _execute(Transmission &$oTransmission, Sequence &$oSequence)
+  public function _execute(Transmission &$oTransmission)
   {
     Corelog::log("Executing application : $this->type($this->application_id)", Corelog::FLOW);
 
     $this->oTransmission = &$oTransmission;
-    $this->oSequence = &$oSequence;
 
     // before processing update data with available tokens
-    $data = array_merge($this::$requiredParameter, $this->data);
-    $this->set_data($oSequence->oToken->render_variable($data));
-    // update token cache
-    $oSequence->token_create($this);
+    $oToken = new Token();
+    $oToken->add('application', $this);
+    $this->data = $oToken->render_variable($this->data);
 
     $spool_id = $oTransmission->oSpool->spool_id;
     $app_id = 'app_' . $this->application_id;
-    $app_data = $this->execute($oTransmission, $oSequence);
+    $app_data = $this->execute($oTransmission);
 
     if (empty($app_data)) {
       return NULL; // no output
+    } else {
+      $oResponse = new Response();
+      $oResponse->spool_id = $spool_id;
+      $oResponse->application_id = $app_id;
+      $oResponse->application_data = $oToken->render_template($app_data);
+      return $oResponse;
     }
-    return $oSequence->response_create($spool_id, $app_id, $app_data);
   }
 
   /**
@@ -359,17 +358,17 @@ class Application
   /**
    * Wrapper function for process 
    */
-  public function _process(Transmission &$oTransmission, Sequence &$oSequence)
+  public function _process(Transmission &$oTransmission)
   {
     Corelog::log("Processing application : $this->type($this->application_id)", Corelog::FLOW);
 
     $this->oTransmission = &$oTransmission;
-    $this->oSequence = &$oSequence;
 
     // adopt any orphan result, matching application type
     $oTransmission->result_associate($this->type, $this->application_id);
     // processing application results
-    $this->result = &$oSequence->oRequest->application_data;
+    $oSession = Session::get_instance();
+    $this->result = &$oSession->request->application_data;
     $spool_status = $this->process();
 
     Corelog::log('Application processing completed with result: ' . $this->result['result'], Corelog::FLOW);
@@ -381,9 +380,6 @@ class Application
     }
     // then update spool status
     $oTransmission->oSpool->status = $spool_status;
-
-    // after processing remember to add all collected results as token
-    $oSequence->oToken->add('result', $oTransmission->aResult);
 
     // quite further processing if spool is no longer active
     if ($oTransmission->oSpool->is_done()) {
@@ -398,7 +394,7 @@ class Application
       if ($oAction->test($this->result)) {
         Corelog::log("Action matched: $oAction->action_id", Corelog::CRUD);
         $nextApplication = Application::load($oAction->action);
-        $nextApplication->_execute($oTransmission, $oSequence);
+        $nextApplication->_execute($oTransmission);
         $action_executed = $action_id;
       }
     }
@@ -409,7 +405,7 @@ class Application
         if ($oAction->is_default) {
           Corelog::log("Selecting default action: $oAction->action_id", Corelog::CRUD);
           $nextApplication = Application::load($oAction->action);
-          $nextApplication->_execute($oTransmission, $oSequence);
+          $nextApplication->_execute($oTransmission);
           $action_executed = true; // default
           break; // only one action can be default so we should break here
         }

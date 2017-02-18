@@ -9,7 +9,7 @@
   "batch": [
     {
       "name": "playback",
-      "data": "{{ parameter.message }}"
+      "data": "{{ application.message }}"
     }
   ]
 }

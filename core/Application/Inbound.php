@@ -48,8 +48,8 @@ class Inbound extends Application
    */
   public static $requiredParameter = array(
       'context' => 'external',
-      'source' => '[source:phone]',
-      'destination' => '[destination:phone]',
+      'source' => '[contact:phone]',
+      'destination' => '[account:phone]',
       'filter_flag' => Dialplan::FILTER_COMMON
   );
 

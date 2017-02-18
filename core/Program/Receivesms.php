@@ -39,27 +39,28 @@ class Receivesms extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'account_id' => '[account:account_id]'
+      'account_id' => '[transmission:account:account_id]'
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load account
+   * Use account_id or phone from program data as reference
+   * @return Account null or a valid account object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_account()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'account_id':
-        $dataMap['account'] = new Account($parameter_value);
-        break;
-      case 'phone':
-        $oAccount = Account::construct_from_array(array('phone' => $parameter_value));
-        $oAccount->save();
-        $dataMap['account'] = $oAccount;
-        break;
+    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
+      $oAccount = new Account($this->data['account_id']);
+      return $oAccount;
+    } else if (isset($this->data['phone']) && !empty($this->data['phone'])) {
+      $oAccount = Core::locate_account($this->data['phone'], 'phone');
+      if ($oAccount) {
+        // update account_id with new value, and remove all temporary parameters
+        $this->data['account_id'] = $oAccount->account_id;
+        unset($this->data['phone']);
+        return $oAccount;
+      }
     }
-    return $dataMap;
   }
 
   /**
@@ -70,7 +71,7 @@ class Receivesms extends Program
   {
     $smsRecieve = new Sms_receive();
     $smsRecieve->data = array(
-        'source' => $this->aCache['account']->phone,
+        'source' => $this->aResource['account']->phone,
         'filter_flag' => Dialplan::FILTER_COMMON
     );
 

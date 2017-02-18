@@ -33,8 +33,7 @@ class Smpp extends Provider
     parent::save();
 
     $oToken = new Token();
-    $oToken->add('provider', $this->token_get());
-    $oToken->add('smpp', $this->token_get());
+    $oToken->add('provider', $this);
 
     $oVoice = new Sms();
     $template = $oVoice->config_template('smpp', $this->username);

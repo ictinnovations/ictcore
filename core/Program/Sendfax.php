@@ -40,28 +40,31 @@ class Sendfax extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'document_id' => '[document:document_id]'
+      'document_id' => '[document_id]'
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load document
+   * Use document_id or content or data from program data as reference
+   * @return Document null or a valid document object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_document()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'document_id':
-        $dataMap['document'] = new Document($parameter_value);
-        break;
-      case 'document_file':
-      case 'file_name':
-        $oDocument = Document::construct_from_array(array('file_name' => $parameter_value));
+    if (isset($this->data['document_id']) && !empty($this->data['document_id'])) {
+      $oDocument = new Document($this->data['document_id']);
+      return $oDocument;
+    } else if (isset($this->data['file_name']) || isset($this->data['document_file'])) {
+      $file_name = !empty($this->data['file_name']) ? $this->data['file_name'] : $this->data['document_file'];
+      if (!empty($file_name)) {
+        $oDocument = Document::construct_from_array(array('file_name' => $file_name));
         $oDocument->save();
-        $dataMap['document'] = $oDocument;
-        break;
+         // update document_id with new value, and remove all temporary parameters
+        $this->data['document_id'] = $oDocument->document_id;
+        unset($this->data['file_name']);
+        unset($this->data['document_file']);
+        return $oDocument;
+      }
     }
-    return $dataMap;
   }
 
   /**
@@ -74,8 +77,8 @@ class Sendfax extends Program
 
     $faxSend = new Fax_send();
     $faxSend->data = array(
-        'message' => $this->aCache['document']->file_name,
-        'header' => $this->aCache['document']->name
+        'message' => $this->aResource['document']->file_name,
+        'header' => $this->aResource['document']->name
     );
 
     $hangupCall = new Disconnect();

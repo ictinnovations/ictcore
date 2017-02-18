@@ -13,6 +13,7 @@ use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\DB;
 use ICT\Core\Message;
+use ICT\Core\Session;
 use ICT\Core\Token;
 use ICT\Core\User;
 
@@ -122,15 +123,6 @@ class Template extends Message
     return $aTemplate;
   }
 
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE template_id='%template_id%' ";
@@ -162,7 +154,8 @@ class Template extends Message
   {
     global $path_data;
     if (file_exists($file_path)) {
-      $user_id = empty(User::$activeUser) ? 0 : User::$activeUser->user_id;
+      $oSession = Session::get_instance();
+      $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
       $raw_type = strtolower(end(explode('.', $file_path)));
       $file_type = empty($file_type) ? 'pdf' : $raw_type;
       $file_name = 'attachment_' . $user_id . '_';

@@ -4,8 +4,8 @@
     "fax_enable_t38_request": "true",
     "fax_enable_t38": "true",
     "fax_local_station_id": "ICTCore",
-    "fax_header": "{{ parameter.header }}",
-    "fax_ident": "{{ source.phone }}",
+    "fax_header": "{{ application.header }}",
+    "fax_ident": "{{ transmission.source.phone }}",
     "application_result": "failed",
     "execute_on_fax_success": "set application_result=success"
   },
@@ -21,7 +21,7 @@
     },
     {
       "name": "txfax",
-      "data": "{{ parameter.message }}"
+      "data": "{{ application.message }}"
     }
   ]
 }

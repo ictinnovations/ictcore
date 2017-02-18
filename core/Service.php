@@ -111,14 +111,19 @@ class Service
     return 'invalid.twig';
   }
 
-  public function application_execute($application_name, $command, Provider $oProvider = NULL)
+  public function application_execute($command, $require_provider = true)
   {
-    switch ($application_name) {
-      default:
-        // nothing to do
-    }
     $oGateway = $this->get_gateway();
-    $oGateway->send($command, $oProvider);
+
+    if ($require_provider) {
+      $oProvider = static::get_route();
+      $tokenData = array('provider' => $oProvider);
+      $oToken = new Token(Token::SOURCE_ALL, $tokenData);
+      $command = $oToken->render_template($command, Token::KEEP_ORIGNAL); // keep provider related token intact
+      $oGateway->send($command, $oProvider);
+    } else {
+      $oGateway->send($command);
+    }
   }
 
   public static function config_template($config_type)

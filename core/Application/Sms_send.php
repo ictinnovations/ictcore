@@ -12,7 +12,6 @@ namespace ICT\Core\Application;
 use ICT\Core\Application;
 use ICT\Core\Service\Sms;
 use ICT\Core\Spool;
-use ICT\Core\Token;
 
 class Sms_send extends Application
 {
@@ -44,22 +43,20 @@ class Sms_send extends Application
    * @var array 
    */
   public static $requiredParameter = array(
-      'subject' => '[template:subject]',
-      'body' => '[template:body]',
-      'body_alt' => '[template:body_alt]',
-      'attachment' => '[template:attachment]'
+      'data' => '[text:data]',
+      'encoding' => '[text:encoding]',
+      'class' => '[text:class]',
+      'type' => '[text:type]',
+      'length' => '[text:length]'
   );
 
   public function execute()
   {
     $oService = new Sms();
-    $oProvider = $oService->get_route();
-    $this->oSequence->oToken->add('provider', $oProvider);
-    $output = $oService->application_template('sms_send');
-    $command = $this->oSequence->oToken->render_template($output, Token::KEEP_ORIGNAL); // keep provider related token intact
+    $command = $oService->application_template('sms_send');
     // this application require gateway access to send a sms
-    $oService->application_execute('sms_send', $command, $oProvider);
-    return ''; // nothing to return
+    $oService->application_execute($command, true);
+    return ''; // no response, nothing to return
   }
 
   public function process()

@@ -18,29 +18,48 @@ require_once dirname(__FILE__) . "/lib/init.php";
 class Core
 {
 
+  /**
+   * Initiate delivery / sending proces for a previously created transmission
+   * @param Transmission $oTransmission
+   */
   public static function send(Transmission $oTransmission)
   {
     Corelog::log('Executing transmission with id : ' . $oTransmission->transmission_id, Corelog::FLOW);
 
-    // Starting a new sequence for current transmission
-    $oSequence = new Sequence();
+    // Starting a new response for current transmission
+    $oResponse = new Response();
     if (!is_object($oTransmission->oSpool)) {
       $oTransmission->spool_create();
-      $oSequence->oResponse->spool_id = $oTransmission->oSpool->spool_id;
+      $oResponse->spool_id = $oTransmission->oSpool->spool_id;
     }
     Corelog::log('Attempting with spool_id : ' . $oTransmission->oSpool->spool_id, Corelog::FLOW);
     $oTransmission->oSpool->time_start = time();
 
     // Trigger program to handle further actions
     $oTransmission->status = Transmission::STATUS_PROCESSING;
-    $oSequence->token_create($oTransmission);
+
+    // load related program
     $oProgram = Program::load($oTransmission->program_id);
-    $oProgram->_execute($oTransmission, $oSequence);
+
+    // register transmission and response objects in session so they can be used by program if necessary
+    $oSession = Session::get_instance();
+    $oSession->program = $oProgram;
+    $oSession->transmission = $oTransmission;
+    $oSession->response = $oResponse;
+
+    // Finally execute selected program
+    $oSession->program->_execute($oSession->transmission);
 
     // update all status just before dying
-    self::wrapup($oTransmission);
+    self::wrapup($oSession->transmission);
   }
 
+  /**
+   * Entry point or main function to process inbound request from gateways
+   * @param Request $oRequest
+   * @return Response
+   * @throws CoreException
+   */
   public static function process(Request $oRequest)
   {
     Corelog::log('New request received to process status of application : ' . $oRequest->application_id, Corelog::FLOW);
@@ -48,9 +67,6 @@ class Core
     $spool_id = null;
     $transmission_id = null;
     $new_request = false;
-
-    // Starting a new sequence for current request
-    $oSequence = new Sequence($oRequest);
 
     // check if we have spool_id
     if ($oRequest->spool_id) {
@@ -84,108 +100,115 @@ class Core
       Corelog::log('No transmission found, searching for dialplan', Corelog::FLOW);
 
       try {
-        $account_id = null; // Note: following call will update account_id
-        $oProgram = self::locate_dialplan($oSequence, $account_id);
-        Corelog::log('Dialplan found with id : ' . $oSequence->oDialplan->dialplan_id, Corelog::FLOW);
+        $listDialplan = Dialplan::lookup($oRequest);
+        foreach ($listDialplan as $aDialplan) {
+          Corelog::log('Trying with dialplan id : ' . $aDialplan['dialplan_id'], Corelog::FLOW);
+          $oDialplan = new Dialplan($aDialplan['dialplan_id']);
+          $oProgram = new Program($aDialplan['program_id']);
+          list($oAccount, $oContact) = $oProgram->authorize($oRequest, $oDialplan);
+          if ($oAccount->account_id) {
+            Corelog::log('Successfully authenticated for program : ' . $oProgram->type, Corelog::FLOW);
+            break;
+          }
+        }
+        if (empty($oAccount)) {
+          throw new CoreException("404", "No recipient found");
+        }
+        if (empty($oContact)) {
+          throw new CoreException("404", "Unauthorized contact");
+        }
       } catch (Exception $ex) {
-        throw new CoreException("500", "Unable to locate dialplan", $ex);
+        throw new CoreException("404", "Unable to locate appropriate dialplan", $ex);
       }
 
       // determine call direction
-      if ($oSequence->oDialplan->context == 'internal') {
+      if ($oDialplan->context == 'internal') {
         $direction = Transmission::OUTBOUND;
       } else {
         $direction = Transmission::INBOUND;
       }
 
       // for time being create transmissing by using company contact
-      $oTransmission = $oProgram->transmission_create(Contact::COMPANY, $account_id, $direction);
+      $oTransmission = $oProgram->transmission_create(Contact::COMPANY, $oAccount->account_id, $direction);
       $oTransmission->activate_owner(); // Load permission
       // Finally update contact_id and status for newly created transmission
-      // Note: we can't locate or create contact before activating transmission owner
-      self::locate_contact($oTransmission, $oSequence);
+      // Note: we can't create and update contact before activating transmission owner
+      if (isset($oContact) && empty($oContact->contact_id)) {
+        $oContact->save();
+        $oTransmission->contact_id = $oContact->contact_id;
+        $oTransmission->result_create($oContact->contact_id, 'contact_new', Result::TYPE_CONTACT, 'inbound');
+      }
       $oTransmission->status = Transmission::STATUS_INITIALIZING;
       $oTransmission->save(); // we must save transmission to generate transmission_id for new spool
     }
 
     // At this point we are excepting to have a valid program and transmission
     // So we are ready to start with response, but first prepare spool objects
-    $oTransmission->spool_create($oSequence->oRequest->spool_id);
+    $oTransmission->spool_create($oRequest->spool_id);
+    $oResponse = new Response();
+    $oResponse->spool_id = $oTransmission->oSpool->spool_id;
+
+    // register program, transmission, request and response objects in session so they can be used by program if necessary
+    $oSession = Session::get_instance();
+    $oSession->program = $oProgram;
+    $oSession->transmission = $oTransmission;
+    $oSession->request = $oRequest;
+    $oSession->response = $oResponse;
 
     // process available data using selected program to produce results
-    $oSequence->token_create($oTransmission);
-    $oProgram->_process($oTransmission, $oSequence);
+    $oSession->program->_process($oSession->transmission);
 
     // update all status just before dying
-    self::wrapup($oTransmission);
+    self::wrapup($oSession->transmission);
 
     // return our response
-    return $oSequence->oResponse;
+    return $oSession->response;
   }
 
-  private static function locate_dialplan(Sequence &$oSequence, &$account_id)
-  {
-    try {
-      // Note: dialplan lookup will also set account_id
-      $oSequence->oDialplan = Dialplan::lookup($oSequence->oRequest, $account_id);
-    } catch (CoreException $ex) {
-      throw new CoreException("404", "No recipient found", $ex);
-    }
-
-    // Load concerned user credentials to permissions
-    try {
-      if (empty($account_id)) {
-        throw new CoreException("500", "Dialplan unable to find owner account");
-      }
-      $oAccount = new Account($account_id); // just for test
-      $account_id = $oAccount->account_id;
-    } catch (Exception $ex) {
-      throw new CoreException("500", "Unable to find assocated account", $ex);
-    }
-
-    try {
-      $oProgram = Program::load($oSequence->oDialplan->program_id);
-    } catch (CoreException $ex) {
-      throw new CoreException("500", "Error with program, unable to proceed", $ex);
-    }
-
-    return $oProgram;
-  }
-
-  private static function locate_contact(Transmission &$oTransmission, Sequence &$oSequence)
-  {
-    // We also need to know about current contact and call direction
-    // Both can be determined by examining current contaxt
-    try {
-      if ($oSequence->oDialplan->context == 'internal') {
-        $contact = $oSequence->oRequest->destination;
-      } else {
-        $contact = $oSequence->oRequest->source;
-      }
-      // search fo existing contact
-      $oGateway = Gateway::load($oSequence->oDialplan->gateway_flag);
-      $contactField = $oGateway::CONTACT_FIELD;
-      $contactFilter = array($contactField => $contact);
-      $listContact = Contact::search($contactFilter);
-      if ($listContact) {
-        $aContact = array_shift($listContact);
-        $oTransmission->contact_id = $aContact['contact_id'];
-      } else {
-        $oContact = new Contact();
-        $oContact->$contactField = $contact;
-        $oContact->save();
-        $oTransmission->contact_id = $oContact->contact_id;
-        $oTransmission->result_create($oTransmission->contact_id, 'contact_new', Result::TYPE_CONTACT, 'inbound');
-      }
-    } catch (CoreException $ex) {
-      throw new CoreException("500", "Unable to locate contact", $ex);
-    }
-  }
-
-  /* Closing
-    save all status in transmission and spool etc ..
+  /**
+   * Locate existing account for given phone or email address
+   * @param string $account phone number or email address
+   * @param string $accountField i.e 'phone' or 'email'
+   * @return boolean|Account
    */
+  public static function locate_account($account, $accountField = 'phone')
+  {
+    // locate an existing account
+    $accountFilter = array($accountField => $account);
+    $listAccount = Account::search($accountFilter);
+    if ($listAccount) {
+      $aAccount = array_shift($listAccount);
+      return new Account($aAccount['account_id']);
+    }
+    return false; // no account found
+  }
 
+  /**
+   * Locate existing contact or create new for given phone or email address
+   * @param string $contact phone number or email address
+   * @param string $contactField i.e phone or email
+   * @return Contact
+   */
+  public static function locate_contact($contact, $contactField = 'phone')
+  {
+    // locate an existing contact or create it
+    $contactFilter = array($contactField => $contact);
+    $listContact = Contact::search($contactFilter);
+    if ($listContact) {
+      $aContact = array_shift($listContact);
+      $oContact = new Contact($aContact['contact_id']);
+    } else { // create a new contact
+      $oContact = new Contact();
+      $oContact->$contactField = $contact;
+    }
+    return $oContact;
+  }
+
+  /**
+   * Closing
+   * save all status in transmission and spool etc ..
+   * @param Transmission $oTransmission
+   */
   private static function wrapup(Transmission &$oTransmission)
   {
     foreach ($oTransmission->aResult as $oResult) {

@@ -33,8 +33,7 @@ class Extension extends Account
     parent::save();
 
     $oToken = new Token();
-    $oToken->add('account', $this->token_get());
-    $oToken->add('extension', $this->token_get());
+    $oToken->add('account', $this);
 
     $oVoice = new Voice();
     $template = $oVoice->config_template($this->type, $this->username);

@@ -178,7 +178,8 @@ class DB
     );
 
     $row_id = FALSE;
-    $user_id = User::$activeUser->user_id;
+    $oSession = Session::get_instance();
+    $user_id = $oSession->user->user_id;
     $columns = array();
     $data = array();
     $query_start = '';
@@ -352,13 +353,14 @@ class DB
     if (can_access($table . '_admin')) {
       return TRUE;
     } else {
+      $oSession = Session::get_instance();
       if ($auth_key == 'created_by') { // main table
-        $auth_value = User::$activeUser->user_id;
+        $auth_value = $oSession->user->user_id;
         if (empty($auth_value)) {
           return FALSE; // null user id is not allowed
         }
       } else { // sub table
-        $user_value = User::$activeUser->user_id;
+        $user_value = $oSession->user->user_id;
         if (empty($user_value)) {
           return FALSE; // null user id is not allowed
         }

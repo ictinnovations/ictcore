@@ -13,6 +13,7 @@ use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\DB;
 use ICT\Core\Message;
+use ICT\Core\Session;
 use ICT\Core\User;
 
 class Document extends Message
@@ -150,15 +151,6 @@ class Document extends Message
     return $aDocument;
   }
 
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE document_id='%document_id%' ";
@@ -197,7 +189,8 @@ class Document extends Message
       $file_type = end($aType);
       $this->type = strtolower($file_type);
     }
-    $user_id = empty(User::$activeUser) ? 0 : User::$activeUser->user_id;
+    $oSession = Session::get_instance();
+    $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
     $file_name = 'document_' . $user_id . '_';
     $file_name .= DB::next_record_id($file_name);
     $tiff_file = $path_data . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . $file_name . '.tif';

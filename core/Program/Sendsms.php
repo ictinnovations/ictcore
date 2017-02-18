@@ -37,28 +37,31 @@ class Sendsms extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'text_id' => '[text:text_id]'
+      'text_id' => '[text_id]'
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load text
+   * Use text_id or content or data from program data as reference
+   * @return Text null or a valid text object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_text()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'text_id':
-        $dataMap['text'] = new Text($parameter_value);
-        break;
-      case 'content':
-      case 'data':
-        $oText = Text::construct_from_array(array('data' => $parameter_value));
+    if (isset($this->data['text_id']) && !empty($this->data['text_id'])) {
+      $oText = new Text($this->data['text_id']);
+      return $oText;
+    } else if (isset($this->data['data']) || isset($this->data['content'])) {
+      $data = !empty($this->data['data']) ? $this->data['data'] : $this->data['content'];
+      if (!empty($data)) {
+        $oText = Text::construct_from_array(array('data' => $data));
         $oText->save();
-        $dataMap['text'] = $oText;
-        break;
+         // update text_id with new value, and remove all temporary parameters
+        $this->data['text_id'] = $oText->text_id;
+        unset($this->data['data']);
+        unset($this->data['content']);
+        return $oText;
+      }
     }
-    return $dataMap;
   }
 
   /**
@@ -69,7 +72,7 @@ class Sendsms extends Program
   {
     $smsSend = new Sms_send();
     $smsSend->data = array(
-        'data' => $this->aCache['text']->data
+        'data' => $this->aResource['text']->data
     );
 
     $oScheme = new Scheme();

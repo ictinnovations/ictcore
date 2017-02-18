@@ -44,27 +44,28 @@ class Emailtofax extends Program
    * @var array 
    */
   public static $requiredParameter = array(
-      'account_id' => '[account:account_id]'
+      'account_id' => '[transmission:account:account_id]'
   );
 
   /**
-   * Function: data map
-   * Needed to load objects based data using their corresponding IDs from given program data
+   * Locate and load account
+   * Use account_id or email address from program data as reference
+   * @return Account null or a valid account object
    */
-  protected function data_map($parameter_name, $parameter_value)
+  protected function resource_load_account()
   {
-    $dataMap = array();
-    switch ($parameter_name) {
-      case 'account_id':
-        $dataMap['account'] = new Account($parameter_value);
-        break;
-      case 'email':
-        $oAccount = Account::construct_from_array(array('email' => $parameter_value));
-        $oAccount->save();
-        $dataMap['account'] = $oAccount;
-        break;
+    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
+      $oAccount = new Account($this->data['account_id']);
+      return $oAccount;
+    } else if (isset($this->data['email']) && !empty($this->data['email'])) {
+      $oAccount = Core::locate_account($this->data['email'], 'email');
+      if ($oAccount) {
+        // update account_id with new value, and remove all temporary parameters
+        $this->data['account_id'] = $oAccount->account_id;
+        unset($this->data['email']);
+        return $oAccount;
+      }
     }
-    return $dataMap;
   }
 
   /**
@@ -74,10 +75,10 @@ class Emailtofax extends Program
   public function scheme()
   {
     $emailRecieve = new Email_receive();
-    if (isset($this->aCache['account'])) {
+    if (isset($this->aResource['account'])) {
       $emailRecieve->data = array(
           'context' => 'internal',
-          'source' => $this->aCache['account']->email,
+          'source' => $this->aResource['account']->email,
           'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE)
       );
     } else {
@@ -128,7 +129,7 @@ class Emailtofax extends Program
           break;
         case Result::TYPE_CONTACT:
           // If system already have current contact then this clause will not be called
-          // so contact related code will be placed in following lines
+          // so contact related code will be placed in upcoming lines
           break;
         case Result::TYPE_MESSAGE:
           $oTemplate = new Template($oResult->data);
@@ -136,7 +137,7 @@ class Emailtofax extends Program
             $error = 'There is no attachment or invalid attachment';
             break 2; // in case of error, also terminate foreach loop
           }
-          $this->oSequence->token_create($oTemplate);
+          $this->aResource['template'] = $oTemplate;
           break;
       }
     }
@@ -147,7 +148,6 @@ class Emailtofax extends Program
       $error = 'Invalid destination or fax number';
     } else {
       $this->oTransmission->oContact->save();
-      $this->oSequence->token_create($this->oTransmission->oContact);
     }
 
     if ($result == 'success' && empty($error)) {
@@ -175,7 +175,8 @@ class Emailtofax extends Program
         $this->send_email_notification('emailtofax_mailreceived', "Program/Emailtofax/data/email_accepted.tpl.php", 'request');
         // then send fax to destination address
         // use attachment from inbound email, (see: token_create in transmission_done for oTemplate)
-        $attachment = $this->oSequence->oToken->render_string('[template:attachment]');
+        $oTemplate = $this->aResource['template'];
+        $attachment = $oTemplate->attachment;
         $this->send_fax($attachment);
       } else {
         // send notification to user, about email error
@@ -216,11 +217,10 @@ class Emailtofax extends Program
    */
   public function send_email_notification($notification_title, $template_file, $parent_alias = 'request')
   {
-    $this->oSequence->token_create($this->oTransmission->oContact);
-
     // Prepare token object for following transmissions
+    $currentToken = new Token(Token::SOURCE_ALL);
     $oToken = new Token();
-    $oToken->add($parent_alias, $this->oSequence->oToken->token);
+    $oToken->add($parent_alias, $currentToken);
 
     $oTemplate = Template::construct_from_file($template_file);
     // Now replace all program related tokens in loaded template, but remember to keep missing tokens

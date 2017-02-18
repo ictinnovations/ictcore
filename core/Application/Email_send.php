@@ -12,7 +12,6 @@ namespace ICT\Core\Application;
 use ICT\Core\Application;
 use ICT\Core\Service\Email;
 use ICT\Core\Spool;
-use ICT\Core\Token;
 
 class Email_send extends Application
 {
@@ -44,13 +43,10 @@ class Email_send extends Application
   public function execute()
   {
     $oService = new Email();
-    $oProvider = $oService->get_route();
-    $this->oSequence->oToken->add('provider', $oProvider);
-    $output = $oService->application_template('email_send');
-    $command = $this->oSequence->oToken->render_template($output, Token::KEEP_ORIGNAL); // keep provider related token intact
+    $command = $oService->application_template('email_send');
     // this application require gateway access to send an email
-    $oService->application_execute('email_send', $command, $oProvider);
-    return ''; // nothing to return
+    $oService->application_execute($command, true);
+    return ''; // no response, nothing to return
   }
 
   public function process()

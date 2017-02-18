@@ -13,7 +13,7 @@ use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\DB;
 use ICT\Core\Message;
-use ICT\Core\User;
+use ICT\Core\Session;
 
 class Recording extends Message
 {
@@ -136,15 +136,6 @@ class Recording extends Message
     return $aRecording;
   }
 
-  public function token_get()
-  {
-    $aToken = array();
-    foreach (self::$fields as $field) {
-      $aToken[$field] = $this->$field;
-    }
-    return $aToken;
-  }
-
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE recording_id='%recording_id%' ";
@@ -176,7 +167,8 @@ class Recording extends Message
   protected function set_file_name($file_path)
   {
     global $path_data;
-    $user_id = empty(User::$activeUser) ? 0 : User::$activeUser->user_id;
+    $oSession = Session::get_instance();
+    $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
     $file_type = empty($this->type) ? 'wav' : $this->type;
     $file_name = 'recording_' . $user_id . '_';
     $file_name .= DB::next_record_id($file_name);

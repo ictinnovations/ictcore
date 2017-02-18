@@ -36,7 +36,7 @@ class Scheme
   /** @var string $condCurrent  */
   private $condCurrent = null;
 
-  public function compile(Program &$oProgram, Sequence &$oSequence)
+  public function compile(Program &$oProgram)
   {
     Corelog::log("Compiling porgram", Corelog::LOGIC);
     foreach ($this->applicationCache as $appName => $oApplication) {
@@ -46,7 +46,9 @@ class Scheme
         $oApplication->weight = Application::ORDER_INIT;
       }
       // make sure no default value left, so REPLACE_EMPTY in token replacement
-      $oApplication->data = $oSequence->oToken->render_variable($data, Token::REPLACE_EMPTY);
+      $oToken = new Token();
+      $oToken->add('program', $oProgram);
+      $oApplication->data = $oToken->render_variable($data, Token::REPLACE_EMPTY);
       $oApplication->program_id = $oProgram->program_id;
       $oApplication->save();
       $oApplication->deploy($oProgram);

@@ -1,11 +1,11 @@
 {
   "smsc": "{{ provider.name }}",
-  "to": "{{ destination.phone }}",
-  "from": "{{ source.phone }}",
-  "data": "{{ message.data|replace({'\r': '', '\n': '\\n'}) }}",
-  "mclass": "{{ message.class }}",
-  "coding": "{{ message.encoding }}",
-  "charset": "{{ message.type }}",
-  "spool_id": "{{ spool.spool_id }}",
+  "to": "{{ transmission.destination.phone }}",
+  "from": "{{ transmission.source.phone }}",
+  "data": "{{ application.data|replace({'\r': '', '\n': '\\n'}) }}",
+  "mclass": "{{ application.class }}",
+  "coding": "{{ application.encoding }}",
+  "charset": "{{ application.type }}",
+  "spool_id": "{{ transmission.spool.spool_id }}",
   "application_id": "{{ application.application_id }}"
 }
