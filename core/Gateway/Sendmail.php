@@ -183,4 +183,10 @@ class Sendmail extends Gateway
     /*     * **************************************************** UPDATE END */
   }
 
+  public static function template_dir()
+  {
+    $core_dir = parent::template_dir();
+    return $core_dir . '/Gateway/Sendmail/templates';
+  }
+
 }

@@ -36,7 +36,7 @@ class Sip extends Provider
     $oToken->add('provider', $this);
 
     $oVoice = new Voice();
-    $template = $oVoice->config_template('sip', $this->username);
+    $template = $oVoice->template_path('sip');
     $aSetting = $oToken->render_template($template);
     $oVoice->config_delete('sip', $this->name);
     $oVoice->config_save('sip', $this->name, $aSetting);

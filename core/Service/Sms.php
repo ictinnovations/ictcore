@@ -58,27 +58,29 @@ class Sms extends Service
     return $oMessage;
   }
 
-  public static function config_template($type, $name = '')
+  public static function template_path($template_name = '')
   {
-    switch ($type) {
-      case 'did':
-        return 'account/did/kannel/default.twig';
-      case 'smpp':
-        return 'provider/smpp/kannel/default.twig';
-      default:
-        return 'invalid.twig';
-    }
-  }
+    $template_dir = Kannel::template_dir();
+    $template_path = '';
 
-  public static function application_template($application_name)
-  {
-    $gateway_type = Kannel::GATEWAY_TYPE;
-    switch ($application_name) {
+    switch ($template_name) {
+      case 'account':
+      case 'did':
+        $template_path = 'account/did.twig';
+        break;
+      case 'provider':
+      case 'smpp':
+        $template_path = 'provider/smpp.twig';
+        break;
+      // applications
       case 'sms_send':
       case 'sms_receive':
       case 'log':
-        return "application/$application_name/$gateway_type/default.json";
+        $template_path = "application/$template_name.json";
+        break;
     }
+
+    return "$template_dir/$template_path";
   }
 
 }

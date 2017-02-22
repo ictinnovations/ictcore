@@ -47,7 +47,8 @@ class Voice_play extends Application
   public function execute()
   {
     $oService = new Voice();
-    return $oService->application_template('voice_play');
+    $template_path = $oService->template_path('voice_play');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
 }

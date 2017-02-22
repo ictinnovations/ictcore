@@ -15,15 +15,15 @@ use ICT\Core\Conf\System as SystemConfiguration;
 global $path_lib, $path_core, $path_root, $path_www, $path_etc, $path_log, $path_data, $path_cache, $path_template, $website_log;
 
 // following lines will allow to include files from both core and lib directories
-$path_lib = realpath(dirname(__FILE__));   // /usr/ictcore/core
-$path_core = dirname($path_lib);
+$path_lib = realpath(dirname(__FILE__));   // /usr/ictcore/core/lib
+$path_core = dirname($path_lib); // /usr/ictcore/core
 $path_root = dirname($path_core); // /usr/ictcore
 $path_www = $path_root . DIRECTORY_SEPARATOR . 'wwwroot';
 $path_etc = $path_root . DIRECTORY_SEPARATOR . 'etc';
 $path_log = $path_root . DIRECTORY_SEPARATOR . 'log';
 $path_data = $path_root . DIRECTORY_SEPARATOR . 'data';
 $path_cache = $path_root . DIRECTORY_SEPARATOR . 'cache';
-$path_template = $path_core . DIRECTORY_SEPARATOR . 'templates';
+$path_template = $path_core; // /usr/ictcore/core
 
 // Default include path and Autoload
 // For Classes

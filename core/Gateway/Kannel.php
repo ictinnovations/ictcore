@@ -170,6 +170,12 @@ class Kannel extends Gateway
     /*     * **************************************************** UPDATE END */
   }
 
+  public static function template_dir()
+  {
+    $core_dir = parent::template_dir();
+    return $core_dir . '/Gateway/Kannel/templates';
+  }
+
   private function config_filename($type, $name)
   {
     global $path_etc;

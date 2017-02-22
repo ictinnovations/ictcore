@@ -34,7 +34,8 @@ class Connect extends Application
       $oService = new Fax();
     }
 
-    return $oService->application_template('connect');
+    $template_path = $oService->template_path('connect');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
   public function process()

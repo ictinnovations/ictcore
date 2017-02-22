@@ -105,31 +105,47 @@ class Service
     throw new CoreException('404', 'No provider available');
   }
 
-  public static function application_template($application_name)
+  public static function template_path($template_name)
   {
-    Corelog::log("Service->application_template demo. name: $application_name", Corelog::WARNING);
-    return 'invalid.twig';
+    Corelog::log("Service->template_path demo. name: $template_name", Corelog::WARNING);
   }
 
-  public function application_execute($command, $require_provider = true)
+  public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
   {
-    $oGateway = $this->get_gateway();
+    // initilize token cache
+    $oToken = new Token(Token::SOURCE_ALL);
+    $oToken->add('application', $oApplication);
 
-    if ($require_provider) {
+    // load provider if required
+    $oProvider = null;
+    if (Application::ORDER_INIT == $oApplication->weight) { // init application require provide
       $oProvider = static::get_route();
-      $tokenData = array('provider' => $oProvider);
-      $oToken = new Token(Token::SOURCE_ALL, $tokenData);
-      $command = $oToken->render_template($command, Token::KEEP_ORIGNAL); // keep provider related token intact
-      $oGateway->send($command, $oProvider);
-    } else {
-      $oGateway->send($command);
+      $oToken->add('provider', $oProvider);
     }
-  }
 
-  public static function config_template($config_type)
-  {
-    Corelog::log('Service->config_template demo. type: ' . $config_type, Corelog::WARNING);
-    return 'invalid.twig';
+    // render command data for token variables according to its type
+    switch ($command_type) {
+      case 'template':
+        $command = $oToken->render_template($command);
+        break;
+      case 'string':
+        $command = $oToken->render_string($command);
+        break;
+      case 'variable':
+      default:
+        $command = $oToken->render_variable($command);
+        break;
+    }
+
+    // if initial application then send it via gateway, otherwise put it in response cache
+    if (Application::ORDER_INIT == $oApplication->weight) {
+      $oGateway = $this->get_gateway();
+      $oGateway->send($command, $oProvider);
+    } else if (!empty($command)) { // add command to global response variable
+      $oSession = Session::get_instance();
+      $oSession->response->application_id = 'app_' . $oApplication->application_id;
+      $oSession->response->application_data = $command;
+    }
   }
 
   public function config_save($config_type, $config_name = 'default', $aSetting = array())

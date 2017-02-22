@@ -73,15 +73,21 @@ class Email extends Service
     }
   }
 
-  public static function application_template($application_name)
+  public static function template_path($template_name = '')
   {
-    $gateway_type = Sendmail::GATEWAY_TYPE;
-    switch ($application_name) {
+    $template_dir = Sendmail::template_dir();
+    $template_path = '';
+
+    switch ($template_name) {
+      // applications
       case 'email_send':
       case 'email_receive':
       case 'log':
-        return "application/$application_name/$gateway_type/default.json";
+        $template_path = "application/$template_name.json";
+        break;
     }
+
+    return "$template_dir/$template_path";
   }
 
 }

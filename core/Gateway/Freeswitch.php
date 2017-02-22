@@ -145,6 +145,12 @@ class Freeswitch extends Gateway
     return $response;
   }
 
+  public static function template_dir()
+  {
+    $core_dir = parent::template_dir();
+    return $core_dir . '/Gateway/Freeswitch/templates';
+  }
+
   private function config_filename($type, $name)
   {
     global $path_etc;

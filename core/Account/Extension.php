@@ -36,7 +36,7 @@ class Extension extends Account
     $oToken->add('account', $this);
 
     $oVoice = new Voice();
-    $template = $oVoice->config_template($this->type, $this->username);
+    $template = $oVoice->template_path($this->type);
     $extension = $oToken->render_template($template);
     $oVoice->config_save('extension', $this->username, $extension);
   }

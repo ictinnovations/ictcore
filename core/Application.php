@@ -97,7 +97,7 @@ class Application
    * ***************************************************** Runtime Variables **
    */
 
-  /** @var array */
+  /** @var array result produced durring application execution */
   protected $result = null;
 
   /** @var Action[] */
@@ -317,7 +317,8 @@ class Application
   public function execute()
   {
     $oService = new Service();
-    return $oService->application_template($this->name);
+    $command = $oService->template_path($this->name);
+    $oService->application_execute($this, $command, 'template');
   }
 
   public function _execute(Transmission &$oTransmission)
@@ -331,19 +332,7 @@ class Application
     $oToken->add('application', $this);
     $this->data = $oToken->render_variable($this->data);
 
-    $spool_id = $oTransmission->oSpool->spool_id;
-    $app_id = 'app_' . $this->application_id;
-    $app_data = $this->execute($oTransmission);
-
-    if (empty($app_data)) {
-      return NULL; // no output
-    } else {
-      $oResponse = new Response();
-      $oResponse->spool_id = $spool_id;
-      $oResponse->application_id = $app_id;
-      $oResponse->application_data = $oToken->render_template($app_data);
-      return $oResponse;
-    }
+    $this->execute();
   }
 
   /**

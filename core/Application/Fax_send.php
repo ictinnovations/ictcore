@@ -52,7 +52,8 @@ class Fax_send extends Application
   public function execute()
   {
     $oService = new Fax();
-    return $oService->application_template('fax_send');
+    $template_path = $oService->template_path('fax_send');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
   public function process()
@@ -67,7 +68,7 @@ class Fax_send extends Application
     }
 
     // TODO return Spool::STATUS_CONNECTED;
-    return Spool::STATUS_COMPLETED;
+    return Spool::STATUS_DONE;
   }
 
 }

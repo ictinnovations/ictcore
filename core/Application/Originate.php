@@ -25,6 +25,12 @@ class Originate extends Application
    */
   protected $type = 'originate';
 
+  /**
+   * This application initial application will start a new transmission
+   * @var int weight
+   */
+  public $weight = Application::ORDER_INIT;
+
   public function execute()
   {
     if ($this->oTransmission->service_flag == Voice::SERVICE_FLAG) {
@@ -32,10 +38,8 @@ class Originate extends Application
     } else if ($this->oTransmission->service_flag == Fax::SERVICE_FLAG) {
       $oService = new Fax();
     }
-    $command = $oService->application_template('originate');
-    // this application require gateway access to dial
-    $oService->application_execute($command, true);
-    return ''; // no response, nothing to return
+    $template_path = $oService->template_path('originate');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
 }

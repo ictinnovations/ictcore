@@ -61,34 +61,41 @@ class Fax extends Service
     return $oMessage;
   }
 
-  public static function config_template($type, $name = '')
+  public static function template_path($template_name = '')
   {
-    switch ($type) {
-      case 'did':
-        return 'account/did/freeswitch/default.twig';
-      case 'extension':
-        return 'account/extension/freeswitch/default.twig';
-      case 'sip':
-        return 'provider/sip/freeswitch/default.twig';
-      default:
-        return 'invalid.twig';
-    }
-  }
+    $template_dir = Freeswitch::template_dir();
+    $template_path = '';
 
-  public static function application_template($application_name)
-  {
-    $gateway_type = Freeswitch::GATEWAY_TYPE;
-    switch ($application_name) {
+    switch ($template_name) {
+      case 'user':
+        $template_path = 'user.twig';
+        break;
+      case 'did':
+        $template_path = 'account/did.twig';
+        break;
+      case 'account':
+      case 'extension':
+        $template_path = 'account/extension.twig';
+        break;
+      case 'provider':
+      case 'sip':
+        $template_path = 'provider/sip.twig';
+        break;
+      // applications
       case 'originate':
-        return "application/originate/$gateway_type/fax/default.json";
+        $template_path = "application/fax/originate.json";
+        break;
       case 'inbound':
       case 'connect':
       case 'disconnect':
       case 'fax_send':
       case 'fax_receive':
       case 'log':
-        return "application/$application_name/$gateway_type/default.json";
+        $template_path = "application/$template_name.json";
+        break;
     }
+
+    return "$template_dir/$template_path";
   }
 
 }

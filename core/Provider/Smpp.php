@@ -36,7 +36,7 @@ class Smpp extends Provider
     $oToken->add('provider', $this);
 
     $oVoice = new Sms();
-    $template = $oVoice->config_template('smpp', $this->username);
+    $template = $oVoice->template_path('smpp');
     $aSetting = $oToken->render_template($template);
     $oVoice->config_delete('smpp', $this->name);
     $oVoice->config_save('smpp', $this->name, $aSetting);

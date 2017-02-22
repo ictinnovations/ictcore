@@ -53,7 +53,8 @@ class Disconnect extends Application
       $oService = new Fax();
     }
 
-    return $oService->application_template('disconnect');
+    $template_path = $oService->template_path('disconnect');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
   public function process()

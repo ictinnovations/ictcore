@@ -75,10 +75,10 @@ class Gateway
     }
   }
 
-  public static function config_template($config_type)
+  public static function template_dir()
   {
-    Corelog::log('Gateway->config_template demo. type: ' . $config_type, Corelog::WARNING);
-    return 'invalid.twig';
+    global $path_core;
+    return $path_core;
   }
 
   public function config_save($type, $name, $data = '')

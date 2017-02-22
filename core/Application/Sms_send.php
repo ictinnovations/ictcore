@@ -26,6 +26,12 @@ class Sms_send extends Application
   protected $type = 'sms_send';
 
   /**
+   * This application initial application will start a new transmission
+   * @var int weight
+   */
+  public $weight = Application::ORDER_INIT;
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -53,10 +59,8 @@ class Sms_send extends Application
   public function execute()
   {
     $oService = new Sms();
-    $command = $oService->application_template('sms_send');
-    // this application require gateway access to send a sms
-    $oService->application_execute($command, true);
-    return ''; // no response, nothing to return
+    $template_path = $oService->template_path('sms_send');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
   public function process()

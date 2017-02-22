@@ -48,7 +48,8 @@ class Log extends Application
   {
     // All services should support log appliction
     $oService = Service::load($this->oTransmission->service_flag);
-    return $oService->application_template('log');
+    $template_path = $oService->template_path('log');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
 }

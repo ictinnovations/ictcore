@@ -26,6 +26,12 @@ class Email_send extends Application
   protected $type = 'email_send';
 
   /**
+   * This application initial application will start a new transmission
+   * @var int weight
+   */
+  public $weight = Application::ORDER_INIT;
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -43,10 +49,8 @@ class Email_send extends Application
   public function execute()
   {
     $oService = new Email();
-    $command = $oService->application_template('email_send');
-    // this application require gateway access to send an email
-    $oService->application_execute($command, true);
-    return ''; // no response, nothing to return
+    $template_path = $oService->template_path('email_send');
+    $oService->application_execute($this, $template_path, 'template');
   }
 
   public function process()
