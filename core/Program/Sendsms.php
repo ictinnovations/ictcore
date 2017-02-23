@@ -29,36 +29,46 @@ class Sendsms extends Program
   protected $type = 'sendsms';
 
   /**
-   * ************************************************ Default Program Values **
+   * **************************************************** Program Parameters **
    */
 
   /**
-   * Parameters required by this program along with default values
-   * @var array 
+   * text_id of text being used as message in this program
+   * @var int $text_id
    */
-  public static $requiredParameter = array(
-      'text_id' => '[text_id]'
-  );
+  public $text_id = '[text:text_id]';
+
+  /**
+   * return a name value pair of all aditional program parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'text_id' => $this->text_id
+    );
+    return $aParameters;
+  }
 
   /**
    * Locate and load text
-   * Use text_id or content or data from program data as reference
+   * Use text_id or content or data from program parameters as reference
    * @return Text null or a valid text object
    */
   protected function resource_load_text()
   {
-    if (isset($this->data['text_id']) && !empty($this->data['text_id'])) {
-      $oText = new Text($this->data['text_id']);
+    if (isset($this->text_id) && !empty($this->text_id)) {
+      $oText = new Text($this->text_id);
       return $oText;
-    } else if (isset($this->data['data']) || isset($this->data['content'])) {
-      $data = !empty($this->data['data']) ? $this->data['data'] : $this->data['content'];
-      if (!empty($data)) {
-        $oText = Text::construct_from_array(array('data' => $data));
+    } else if (isset($this->message) || isset($this->content)) {
+      $message = !empty($this->message) ? $this->message : $this->content;
+      if (!empty($message)) {
+        $oText = Text::construct_from_array(array('data' => $message));
         $oText->save();
          // update text_id with new value, and remove all temporary parameters
-        $this->data['text_id'] = $oText->text_id;
-        unset($this->data['data']);
-        unset($this->data['content']);
+        $this->text_id = $oText->text_id;
+        unset($this->message);
+        unset($this->content);
         return $oText;
       }
     }
@@ -71,9 +81,11 @@ class Sendsms extends Program
   public function scheme()
   {
     $smsSend = new Sms_send();
-    $smsSend->data = array(
-        'data' => $this->aResource['text']->data
-    );
+    $smsSend->message = $this->aResource['text']->data;
+    $smsSend->class = $this->aResource['text']->class;
+    $smsSend->encoding = $this->aResource['text']->encoding;
+    $smsSend->charset = $this->aResource['text']->type;
+    $smsSend->length = $this->aResource['text']->length;
 
     $oScheme = new Scheme();
     $oScheme->add($smsSend);

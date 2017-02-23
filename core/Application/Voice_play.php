@@ -25,6 +25,16 @@ class Voice_play extends Application
   protected $type = 'voice_play';
 
   /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * file name to recording for play
+   * @var string $message
+   */
+  public $message = '[recording:file_name]';
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -37,12 +47,16 @@ class Voice_play extends Application
   );
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
    */
-  public static $requiredParameter = array(
-      'message' => '[recording:file_name]'
-  );
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'message' => $this->message
+    );
+    return $aParameters;
+  }
 
   public function execute()
   {

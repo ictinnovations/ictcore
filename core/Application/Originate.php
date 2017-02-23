@@ -31,6 +31,22 @@ class Originate extends Application
    */
   public $weight = Application::ORDER_INIT;
 
+  /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * callerid / phone number of dialing party
+   * @var string $source
+   */
+  public $source = '[transmission:source:phone]';
+
+  /**
+   * phone number of remote party
+   * @var int $destination
+   */
+  public $destination = '[transmission:destination:phone]';
+
   public function execute()
   {
     if ($this->oTransmission->service_flag == Voice::SERVICE_FLAG) {

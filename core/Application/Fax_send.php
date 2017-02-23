@@ -27,6 +27,22 @@ class Fax_send extends Application
   protected $type = 'fax_send';
 
   /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * file name of fax document
+   * @var string $message
+   */
+  public $message = '[document:file_name]';
+
+  /**
+   * title for email document
+   * @var string $header
+   */
+  public $header = '[document:name]';
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -41,13 +57,17 @@ class Fax_send extends Application
   );
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
    */
-  public static $requiredParameter = array(
-      'message' => '[document:file_name]',
-      'header' => '[document:name]'
-  );
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'message' => $this->message,
+        'header' => $this->header
+    );
+    return $aParameters;
+  }
 
   public function execute()
   {

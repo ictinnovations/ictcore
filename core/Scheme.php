@@ -40,7 +40,6 @@ class Scheme
   {
     Corelog::log("Compiling porgram", Corelog::LOGIC);
     foreach ($this->applicationCache as $appName => $oApplication) {
-      $data = array_merge($oApplication::$requiredParameter, $oApplication->data);
       // First application must have ORDER_INIT weight
       if ($this->appFirst->name == $appName) {
         $oApplication->weight = Application::ORDER_INIT;
@@ -48,7 +47,11 @@ class Scheme
       // make sure no default value left, so REPLACE_EMPTY in token replacement
       $oToken = new Token();
       $oToken->add('program', $oProgram);
-      $oApplication->data = $oToken->render_variable($data, Token::REPLACE_EMPTY);
+      $oToken->add('application', $oApplication);
+      $aParameter = $oApplication->parameter_save();
+      foreach ($aParameter as $parameter_name => $parameter_value) {
+        $oApplication->{$parameter_name} = $oToken->render_variable($parameter_value, Token::KEEP_ORIGNAL);
+      }
       $oApplication->program_id = $oProgram->program_id;
       $oApplication->save();
       $oApplication->deploy($oProgram);

@@ -38,7 +38,8 @@ class Application
   );
   protected static $read_only = array(
       'application_id',
-      'type'
+      'type',
+      'data'
   );
 
   /**
@@ -57,8 +58,7 @@ class Application
   protected $type = 'unknown';
 
   /**
-   * @property array $data
-   * @see function Application::get_data() and Application::set_data()
+   * @property-read array $data
    * @var array
    */
   protected $data = array();
@@ -88,12 +88,6 @@ class Application
   );
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
-   */
-  public static $requiredParameter = array();
-
-  /**
    * ***************************************************** Runtime Variables **
    */
 
@@ -109,9 +103,7 @@ class Application
   public function __construct($application_id = null, $aParameter = null)
   {
     if (!empty($aParameter) && is_array($aParameter)) {
-      $this->set_data($aParameter);
-    } else {
-      $this->data = $this::$requiredParameter;
+      $this->parameter_load($aParameter);
     }
     if (!empty($application_id)) {
       $this->application_id = $application_id;
@@ -121,9 +113,34 @@ class Application
 
   public function token_resolve()
   {
-    foreach ($this->data as $name => $value) {
+    $oToken = new Token(Token::SOURCE_ALL);
+    $oToken->add('application', $this);
+
+    $parameterList = $this->parameter_save();
+    foreach ($parameterList as $name => $value) {
+      $this->{$name} = $oToken->render_variable($value);
+    }
+  }
+
+  /**
+   * set all aditional application properties according to given aParameter array
+   * @param array $aParameter
+   */
+  public function parameter_load($aParameter)
+  {
+    foreach($aParameter as $name => $value) {
       $this->{$name} = $value;
     }
+  }
+
+  /**
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array();
+    return $aParameters;
   }
 
   public static function search($program_id, $weight = NULL)
@@ -200,6 +217,9 @@ class Application
       $this->weight = $data['weight'];
       $this->program_id = $data['program_id'];
 
+      // expand data field and load all additional application parameters
+      $this->parameter_load($this->data, true);
+
       $this->aAction = array();
       $listAction = Action::search($this->application_id);
       foreach ($listAction as $action_id) {
@@ -261,28 +281,15 @@ class Application
     return $this->application_id;
   }
 
-  public function get_data($field = '_all_')
+  public function get_data()
   {
-    if ('_all_' == $field) {
-      return $this->data;
-    } else if (isset($this->data[$field])) {
-      return $this->data[$field];
-    }
-    return array(); // empty array
-  }
-
-  public function set_data($field, $value = '_reset_')
-  {
-    if ('_reset_' == $value) {
-      $newData = (array) $field; // use field as data array
-      $this->data = array_merge($this::$requiredParameter, $newData);
-    } else {
-      $this->data = array_merge($this->data, array($field => $value));
-    }
+    return $this->parameter_save();
   }
 
   public function save()
   {
+    // collect all aditional parameter to save in database
+    $this->data = $this->parameter_save();
     $data = array(
         'application_id' => $this->application_id,
         'name' => $this->name,
@@ -327,10 +334,8 @@ class Application
 
     $this->oTransmission = &$oTransmission;
 
-    // before processing update data with available tokens
-    $oToken = new Token();
-    $oToken->add('application', $this);
-    $this->data = $oToken->render_variable($this->data);
+    // before processing update parameters with available tokens
+    $this->token_resolve();
 
     $this->execute();
   }

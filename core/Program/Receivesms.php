@@ -31,33 +31,43 @@ class Receivesms extends Program
   protected $type = 'receivesms';
 
   /**
-   * ************************************************ Default Program Values **
+   * **************************************************** Program Parameters **
    */
 
   /**
-   * Parameters required by this program along with default values
-   * @var array 
+   * account_id of account associated with this program
+   * @var int $account_id
    */
-  public static $requiredParameter = array(
-      'account_id' => '[transmission:account:account_id]'
-  );
+  public $account_id = '[transmission:account:account_id]';
+
+  /**
+   * return a name value pair of all aditional program parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'account_id' => $this->account_id
+    );
+    return $aParameters;
+  }
 
   /**
    * Locate and load account
-   * Use account_id or phone from program data as reference
+   * Use account_id or phone from program parameters as reference
    * @return Account null or a valid account object
    */
   protected function resource_load_account()
   {
-    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
-      $oAccount = new Account($this->data['account_id']);
+    if (isset($this->account_id) && !empty($this->account_id)) {
+      $oAccount = new Account($this->account_id);
       return $oAccount;
-    } else if (isset($this->data['phone']) && !empty($this->data['phone'])) {
-      $oAccount = Core::locate_account($this->data['phone'], 'phone');
+    } else if (isset($this->phone) && !empty($this->phone)) {
+      $oAccount = Core::locate_account($this->phone, 'phone');
       if ($oAccount) {
         // update account_id with new value, and remove all temporary parameters
-        $this->data['account_id'] = $oAccount->account_id;
-        unset($this->data['phone']);
+        $this->account_id = $oAccount->account_id;
+        unset($this->phone);
         return $oAccount;
       }
     }
@@ -70,10 +80,8 @@ class Receivesms extends Program
   public function scheme()
   {
     $smsRecieve = new Sms_receive();
-    $smsRecieve->data = array(
-        'source' => $this->aResource['account']->phone,
-        'filter_flag' => Dialplan::FILTER_COMMON
-    );
+    $smsRecieve->source = $this->aResource['account']->phone;
+    $smsRecieve->filter_flag = Dialplan::FILTER_COMMON;
 
     $oScheme = new Scheme();
     $oScheme->add($smsRecieve);

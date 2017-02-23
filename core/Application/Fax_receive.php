@@ -28,6 +28,16 @@ class Fax_receive extends Application
   protected $type = 'fax_receive';
 
   /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * a none existant file name to save new fax document
+   * @var string $fax_file
+   */
+  public $fax_file = '/tmp/new_fax.tiff';
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -48,10 +58,10 @@ class Fax_receive extends Application
       'error' => '' // empty message expected on success
   );
 
-  public function __construct($application_id = NULL)
+  public function __construct($application_id = null, $aParameter = null)
   {
-    parent::__construct($application_id);
-    $this->data['fax_file'] = tempnam('/tmp', 'fax_') . '.tif';
+    parent::__construct($application_id, $aParameter);
+    $this->fax_file = tempnam('/tmp', 'fax_') . '.tif';
   }
 
   public function execute()

@@ -30,33 +30,61 @@ class Email_receive extends Application
   protected $type = 'email_receive';
 
   /**
-   * ******************************************** Default Application Values **
+   * ************************************************ Application Parameters **
    */
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * communication context, internal or external
+   * @var string $context
    */
-  public static $requiredParameter = array(
-      'context' => 'external',
-      'source' => '[contact:email]',
-      'destination' => '[account:email]',
-      'filter_flag' => Dialplan::FILTER_COMMON
-  );
+  public $context = 'external';
+
+  /**
+   * from email address
+   * @var string $source
+   */
+  public $source = '[contact:email]';
+
+  /**
+   * to email address
+   * @var string $detination
+   */
+  public $destination = '[account:email]';
+
+  /**
+   * to trigger this application from dialplan, which filter must be met
+   * @var int $filter_flag
+   */
+  public $filter_flag = Dialplan::FILTER_COMMON;
+
+  /**
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'context' => $this->context,
+        'source' => $this->source,
+        'destination' => $this->destination,
+        'filter_flag' => $this->filter_flag
+    );
+    return $aParameters;
+  }
 
   public function deploy(Program &$oProgram)
   {
     $oDialplan = new Dialplan();
     $oDialplan->application_id = $this->type;
     $oDialplan->program_id = $oProgram->program_id;
-    $oDialplan->context = $this->data['context'];
-    $oDialplan->filter_flag = $this->data['filter_flag'];
+    $oDialplan->context = $this->context;
+    $oDialplan->filter_flag = $this->filter_flag;
     $oDialplan->gateway_flag = Sendmail::GATEWAY_FLAG;
-    if (!empty($this->data['source'])) {
-      $oDialplan->source = $this->data['source'];
+    if (!empty($this->source)) {
+      $oDialplan->source = $this->source;
     }
-    if (!empty($this->data['destination'])) {
-      $oDialplan->destination = $this->data['destination'];
+    if (!empty($this->destination)) {
+      $oDialplan->destination = $this->destination;
     }
 
     return $oDialplan->save();

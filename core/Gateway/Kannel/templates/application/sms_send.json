@@ -2,10 +2,10 @@
   "smsc": "{{ provider.name }}",
   "to": "{{ transmission.destination.phone }}",
   "from": "{{ transmission.source.phone }}",
-  "data": "{{ application.data|replace({'\r': '', '\n': '\\n'}) }}",
+  "data": "{{ application.message|replace({'\r': '', '\n': '\\n'}) }}",
   "mclass": "{{ application.class }}",
   "coding": "{{ application.encoding }}",
-  "charset": "{{ application.type }}",
+  "charset": "{{ application.charset }}",
   "spool_id": "{{ transmission.spool.spool_id }}",
   "application_id": "{{ application.application_id }}"
 }

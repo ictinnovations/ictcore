@@ -112,7 +112,7 @@ class Kannel extends Gateway
         case 'dlr-url':
           $queryString[] = "dlr-url=" . rawurlencode($value);
           break;
-        case 'data':
+        case 'message':
           $queryString[] = "text=" . rawurlencode($value);
           break;
         default:

@@ -36,33 +36,43 @@ class Emailtofax extends Program
   protected $type = 'emailtofax';
 
   /**
-   * ************************************************ Default Program Values **
+   * **************************************************** Program Parameters **
    */
 
   /**
-   * Parameters required by this program along with default values
-   * @var array 
+   * account_id of account associated with this program
+   * @var int $account_id
    */
-  public static $requiredParameter = array(
-      'account_id' => '[transmission:account:account_id]'
-  );
+  public $account_id = '[transmission:account:account_id]';
+
+  /**
+   * return a name value pair of all aditional program parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'account_id' => $this->account_id
+    );
+    return $aParameters;
+  }
 
   /**
    * Locate and load account
-   * Use account_id or email address from program data as reference
+   * Use account_id or email address from program parameters as reference
    * @return Account null or a valid account object
    */
   protected function resource_load_account()
   {
-    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
-      $oAccount = new Account($this->data['account_id']);
+    if (isset($this->account_id) && !empty($this->account_id)) {
+      $oAccount = new Account($this->account_id);
       return $oAccount;
-    } else if (isset($this->data['email']) && !empty($this->data['email'])) {
-      $oAccount = Core::locate_account($this->data['email'], 'email');
+    } else if (isset($this->email) && !empty($this->email)) {
+      $oAccount = Core::locate_account($this->email, 'email');
       if ($oAccount) {
         // update account_id with new value, and remove all temporary parameters
-        $this->data['account_id'] = $oAccount->account_id;
-        unset($this->data['email']);
+        $this->account_id = $oAccount->account_id;
+        unset($this->email);
         return $oAccount;
       }
     }
@@ -75,17 +85,10 @@ class Emailtofax extends Program
   public function scheme()
   {
     $emailRecieve = new Email_receive();
+    $emailRecieve->context = 'internal';
+    $emailRecieve->filter_flag = (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE);
     if (isset($this->aResource['account'])) {
-      $emailRecieve->data = array(
-          'context' => 'internal',
-          'source' => $this->aResource['account']->email,
-          'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE)
-      );
-    } else {
-      $emailRecieve->data = array(
-          'context' => 'internal',
-          'filter_flag' => (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE)
-      );
+      $emailRecieve->source = $this->aResource['account']->email;
     }
 
     $oScheme = new Scheme();

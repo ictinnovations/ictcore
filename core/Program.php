@@ -27,7 +27,8 @@ class Program
   );
   protected static $read_only = array(
       'program_id',
-      'type'
+      'type',
+      'data'
   );
 
   /**
@@ -46,9 +47,8 @@ class Program
   protected $type = 'program';
 
   /**
-   * @property array $data
-   * @see function Program::get_data() and Program::set_data()
-   * @var array 
+   * @property-read array $data
+   * @var array
    */
   protected $data = array();
 
@@ -56,14 +56,18 @@ class Program
   public $parent_id = null;
 
   /**
-   * ************************************************ Default Program Values **
+   * **************************************************** Program Parameters **
    */
 
   /**
-   * Parameters required by this program along with default values
-   * @var array 
+   * account_id of account associated with this program
+   * @var int $account_id
    */
-  public static $requiredParameter = array();
+  public $account_id = null;
+
+  /**
+   * ************************************************ Default Program Values **
+   */
 
   /**
    * default condition
@@ -95,11 +99,8 @@ class Program
 
   public function __construct($program_id = null, $aParameter = null)
   {
-
     if (!empty($aParameter) && is_array($aParameter)) {
-      $this->set_data($aParameter);
-    } else {
-      $this->data = $this::$requiredParameter;
+      $this->parameter_load($aParameter);
     }
     if (!empty($program_id)) {
       $this->program_id = $program_id;
@@ -109,7 +110,16 @@ class Program
 
   public function token_resolve()
   {
-    // first load all available resources
+    // first resolve all token variables
+    $oToken = new Token(Token::SOURCE_ALL);
+    $oToken->add('program', $this);
+
+    $parameterList = $this->parameter_save();
+    foreach ($parameterList as $name => $value) {
+      $this->{$name} = $oToken->render_variable($value);
+    }
+
+    // and then load all available resources
     $this->resource_load();
 
     foreach ($this->aResource as $name => $value) {
@@ -118,6 +128,29 @@ class Program
       }
       $this->{$name} = $value;
     }
+  }
+
+  /**
+   * set all aditional program properties according to given aParameter array
+   * @param array $aParameter
+   */
+  public function parameter_load($aParameter)
+  {
+    foreach($aParameter as $name => $value) {
+      $this->{$name} = $value;
+    }
+  }
+
+  /**
+   * return a name value pair of all aditional program parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'account_id' => $this->account_id
+    );
+    return $aParameters;
   }
 
   public static function search($aFilter = array())
@@ -170,13 +203,13 @@ class Program
     Corelog::log("Creating program scheme", Corelog::LOGIC);
 
     $app1st = new Application();
-    $app1st->data = array('message' => 'test application one');
+    $app1st->name = 'application1';
 
     $app2nd = new Application();
-    $app2nd->data = array('message' => 'test application two');
+    $app2nd->name = 'application2';
 
     $app3rd = new Application();
-    $app3rd->data = array('message' => 'test application three');
+    $app3rd->name = 'application3';
 
     $oScheme = new Scheme();
     $oScheme->add($app1st);
@@ -248,21 +281,24 @@ class Program
     $this->program_id = $data['program_id'];
     $this->name = $data['name'];
     $this->type = $data['type'];
-    $this->set_data(json_decode($data['data'], true));
+    $this->data = json_decode($data['data'], true);
     $this->parent_id = $data['parent_id'];
+
+    // expand data field and load all additional program parameters
+    $this->parameter_load($this->data, true);
 
     Corelog::log("Program loaded: $this->name", Corelog::CRUD);
   }
 
   /**
    * Locate and load account
-   * Use account_id from program data as reference
+   * Use account_id from program parameters as reference
    * @return Account null or a valid account object
    */
   protected function resource_load_account()
   {
-    if (isset($this->data['account_id']) && !empty($this->data['account_id'])) {
-      $oAccount = new Account($this->data['account_id']);
+    if (isset($this->account_id) && !empty($this->account_id)) {
+      $oAccount = new Account($this->account_id);
       return $oAccount;
     }
   }
@@ -270,7 +306,7 @@ class Program
   /**
    * Locate and load objects / resources required by program
    * Note: Wrapper function for all resource hook starting with resource_load_
-   * Note: target function can use program data to locate ids and references
+   * Note: target function can use program parameters to locate ids and references
    */
   protected function resource_load()
   {
@@ -402,28 +438,15 @@ class Program
     return $this->program_id;
   }
 
-  public function get_data($field = '_all_')
+  public function get_data()
   {
-    if ('_all_' == $field) {
-      return $this->data;
-    } else if (isset($this->data[$field])) {
-      return $this->data[$field];
-    }
-    return array(); // empty array
-  }
-
-  public function set_data($field, $value = '_reset_')
-  {
-    if ('_reset_' == $value) {
-      $newData = (array)$field; // use field as data array
-      $this->data = array_merge($this::$requiredParameter, $newData);
-    } else {
-      $this->data = array_merge($this->data, array($field => $value));
-    }
+    return $this->parameter_save();
   }
 
   public function save()
   {
+    // collect all aditional parameter to save in database
+    $this->data = $this->parameter_save();
     $data = array(
         'program_id' => $this->program_id,
         'name' => $this->name,
@@ -522,10 +545,8 @@ class Program
 
     $this->oTransmission = &$oTransmission;
 
-    // before processing update data with available tokens
-    $oToken = new Token(Token::SOURCE_ALL);
-    $this->data = $oToken->render_variable($this->data);
-    $this->resource_load();
+    // before processing update parameters with available tokens
+    $this->token_resolve();
 
     return $this->execute();
   }
@@ -646,10 +667,8 @@ class Program
     // make input variable available at class level
     $this->oTransmission = &$oTransmission;
 
-    // before processing update data with available tokens
-    $oToken = new Token(Token::SOURCE_ALL);
-    $this->data = $oToken->render_variable($this->data);
-    $this->resource_load();
+    // before processing update program parameters with available tokens
+    $this->token_resolve();
 
     /**
      * ***************************************** Process application results **

@@ -32,6 +32,40 @@ class Sms_send extends Application
   public $weight = Application::ORDER_INIT;
 
   /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * message body / data for sms
+   * @var string $data
+   */
+  public $message = '[text:data]';
+
+  /**
+   * text encoding being used by sms
+   * @var string $encoding
+   */
+  public $encoding = '[text:encoding]';
+
+  /**
+   * sms class
+   * @var string $class
+   */
+  public $class = '[text:class]';
+
+  /**
+   * charset type
+   * @var string $charset
+   */
+  public $charset = '[text:type]';
+
+  /**
+   * message length in bytes
+   * @var int $length
+   */
+  public $length = '[text:length]';
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -45,16 +79,20 @@ class Sms_send extends Application
   );
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
    */
-  public static $requiredParameter = array(
-      'data' => '[text:data]',
-      'encoding' => '[text:encoding]',
-      'class' => '[text:class]',
-      'type' => '[text:type]',
-      'length' => '[text:length]'
-  );
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'message' => $this->message,
+        'encoding' => $this->encoding,
+        'class' => $this->class,
+        'charset' => $this->charset,
+        'length' => $this->length
+    );
+    return $aParameters;
+  }
 
   public function execute()
   {

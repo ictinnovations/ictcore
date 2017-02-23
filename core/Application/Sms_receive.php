@@ -30,6 +30,34 @@ class Sms_receive extends Application
   protected $type = 'sms_receive';
 
   /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * communication context, internal or external
+   * @var string $context
+   */
+  public $context = 'external';
+
+  /**
+   * caller id of incomming sms
+   * @var string $source
+   */
+  public $source = '[contact:phone]';
+
+  /**
+   * destination / long number for sms destination
+   * @var string $detination
+   */
+  public $destination = '[account:phone]';
+
+  /**
+   * to trigger this application from dialplan, which filter must be met
+   * @var int $filter_flag
+   */
+  public $filter_flag = Dialplan::FILTER_COMMON;
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -45,28 +73,32 @@ class Sms_receive extends Application
   );
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
    */
-  public static $requiredParameter = array(
-      'context' => 'external',
-      'source' => '[source:phone]',
-      'destination' => '[destination:phone]',
-      'filter_flag' => Dialplan::FILTER_COMMON
-  );
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'context' => $this->context,
+        'source' => $this->source,
+        'destination' => $this->destination,
+        'filter_flag' => $this->filter_flag
+    );
+    return $aParameters;
+  }
 
   public function deploy(Program &$oProgram)
   {
     $oDialplan = new Dialplan();
     $oDialplan->application_id = $this->type;
     $oDialplan->program_id = $oProgram->program_id;
-    $oDialplan->context = $this->data['context'];
+    $oDialplan->context = $this->context;
     $oDialplan->gateway_flag = Kannel::GATEWAY_FLAG;
-    if (!empty($this->data['source'])) {
-      $oDialplan->source = $this->data['source'];
+    if (!empty($this->source)) {
+      $oDialplan->source = $this->source;
     }
-    if (!empty($this->data['destination'])) {
-      $oDialplan->destination = $this->data['destination'];
+    if (!empty($this->destination)) {
+      $oDialplan->destination = $this->destination;
     }
 
     return $oDialplan->save();
@@ -96,7 +128,7 @@ class Sms_receive extends Application
       $oText = new Text();
       $oText->name = $file_name;
       $oText->description = 'sms received while processing transmission: ' . $this->oTransmission->transmission_id;
-      $oText->data = $this->result['data'];
+      $oText->data = $this->result['message'];
       $oText->save();
 
       // Save result

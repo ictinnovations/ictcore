@@ -333,10 +333,9 @@ class Account
     return $result;
   }
 
-  /*
-    Associate / assign current account to some user
+  /**
+   * Associate / assign current account to some user
    */
-
   public function associate($user_id, $aUser = array())
   {
     Corelog::log("Changing account owner for: $this->account_id from: $this->user_id to: $user_id", Corelog::CRUD);
@@ -357,17 +356,21 @@ class Account
     $this->associate(0);
   }
 
-  /*
-    Compile given program with current account
-    ( only if given program support it )
+  /**
+   * Compile given program with current account
+   * ( only if given program support it )
+   * @param \ICT\Core\Program $oProgram
+   * @return int $program_id
    */
-
-  public function install_program($oProgram)
+  public function install_program(Program $oProgram)
   {
     Corelog::log("Program installation for: $this->account_id Program: $oProgram->name", Corelog::CRUD);
     $oToken = new Token();
     $oToken->add('account', $this);
-    $oProgram->data = $oToken->render_variable($oProgram->data, Token::KEEP_ORIGNAL);
+    $aParameter = $oProgram->parameter_save();
+    foreach ($aParameter as $parameter_name => $parameter_value) {
+      $oProgram->{$parameter_name} = $oToken->render_variable($parameter_value, Token::KEEP_ORIGNAL);
+    }
     $oProgram->save();
     $oProgram->compile();
     return $oProgram->program_id;

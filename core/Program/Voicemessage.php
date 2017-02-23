@@ -31,36 +31,46 @@ class Voicemessage extends Program
   protected $type = 'voicemessage';
 
   /**
-   * ************************************************ Default Program Values **
+   * **************************************************** Program Parameters **
    */
 
   /**
-   * Parameters required by this program along with default values
-   * @var array 
+   * recording_id of recording being used as message in this program
+   * @var int $recording_id
    */
-  public static $requiredParameter = array(
-      'recording_id' => '[recording_id]'
-  );
+  public $recording_id = '[recording:recording_id]';
+
+  /**
+   * return a name value pair of all aditional program parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'recording_id' => $this->recording_id
+    );
+    return $aParameters;
+  }
 
   /**
    * Locate and load recording
-   * Use recording_id or content or data from program data as reference
+   * Use recording_id or content or data from program parameters as reference
    * @return Recording null or a valid recording object
    */
   protected function resource_load_recording()
   {
-    if (isset($this->data['recording_id']) && !empty($this->data['recording_id'])) {
-      $oRecording = new Recording($this->data['recording_id']);
+    if (isset($this->recording_id) && !empty($this->recording_id)) {
+      $oRecording = new Recording($this->recording_id);
       return $oRecording;
-    } else if (isset($this->data['file_name']) || isset($this->data['recording_file'])) {
-      $file_name = !empty($this->data['file_name']) ? $this->data['file_name'] : $this->data['recording_file'];
+    } else if (isset($this->file_name) || isset($this->recording_file)) {
+      $file_name = !empty($this->file_name) ? $this->file_name : $this->recording_file;
       if (!empty($file_name)) {
         $oRecording = Recording::construct_from_array(array('file_name' => $file_name));
         $oRecording->save();
          // update recording_id with new value, and remove all temporary parameters
-        $this->data['recording_id'] = $oRecording->recording_id;
-        unset($this->data['file_name']);
-        unset($this->data['recording_file']);
+        $this->recording_id = $oRecording->recording_id;
+        unset($this->file_name);
+        unset($this->recording_file);
         return $oRecording;
       }
     }
@@ -73,11 +83,11 @@ class Voicemessage extends Program
   public function scheme()
   {
     $outboundCall = new Originate();
+    $outboundCall->source = '[transmission:source:phone]';
+    $outboundCall->destination = '[transmission:destination:phone]';
 
     $voicePlay = new Voice_play();
-    $voicePlay->data = array(
-        'message' => $this->aResource['recording']->file_name
-    );
+    $voicePlay->message = $this->aResource['recording']->file_name;
 
     $hangupCall = new Disconnect();
 

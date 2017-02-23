@@ -9,8 +9,8 @@
     "codec_string": "'PCMU,PCMA'",
     "spool_status": "connected",
     "spool_id": "{{ transmission.spool.spool_id }}",
-    "origination_caller_id_number": "{{ transmission.source.phone }}",
-    "origination_caller_id_name": "{{ transmission.source.phone }}",
+    "origination_caller_id_number": "{{ application.source }}",
+    "origination_caller_id_name": "{{ application.source }}",
     "application_result": "success"
   },
   "output": {
@@ -20,7 +20,7 @@
   "batch": [
     {
       "name": "bgapi originate",
-      "data": "sofia/gateway/{{ provider.name }}/{{ provider.prefix }}{{ transmission.destination.phone }} '&lua(/usr/ictcore/bin/freeswitch/application.lua {{ transmission.spool.spool_id }} {{ application.application_id }} success)'"
+      "data": "sofia/gateway/{{ provider.name }}/{{ provider.prefix }}{{ application.destination }} '&lua(/usr/ictcore/bin/freeswitch/application.lua {{ transmission.spool.spool_id }} {{ application.application_id }} success)'"
     }
   ]
 }

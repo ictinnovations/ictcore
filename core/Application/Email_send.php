@@ -32,19 +32,47 @@ class Email_send extends Application
   public $weight = Application::ORDER_INIT;
 
   /**
-   * ******************************************** Default Application Values **
+   * ************************************************ Application Parameters **
    */
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * email subject
+   * @var string $subject
    */
-  public static $requiredParameter = array(
-      'subject' => '[template:subject]',
-      'body' => '[template:body]',
-      'body_alt' => '[template:body_alt]',
-      'attachment' => '[template:attachment]'
-  );
+  public $subject = '[template:subject]';
+
+  /**
+   * email body
+   * @var string $body
+   */
+  public $body = '[template:body]';
+
+  /**
+   * alternative email body
+   * @var string $body_alt
+   */
+  public $body_alt = '[template:body_alt]';
+
+  /**
+   * file name of email attachment
+   * @var string $attachment
+   */
+  public $attachment = '[template:attachment]';
+
+  /**
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'subject' => $this->subject,
+        'body' => $this->body,
+        'body_alt' => $this->body_alt,
+        'attachment' => $this->attachment
+    );
+    return $aParameters;
+  }
 
   public function execute()
   {

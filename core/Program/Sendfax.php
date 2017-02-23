@@ -32,36 +32,46 @@ class Sendfax extends Program
   protected $type = 'sendfax';
 
   /**
-   * ************************************************ Default Program Values **
+   * **************************************************** Program Parameters **
    */
 
   /**
-   * Parameters required by this program along with default values
-   * @var array 
+   * document_id of document being used as message in this program
+   * @var int $template_id
    */
-  public static $requiredParameter = array(
-      'document_id' => '[document_id]'
-  );
+  public $document_id = '[document:document_id]';
+
+  /**
+   * return a name value pair of all aditional program parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'document_id' => $this->document_id
+    );
+    return $aParameters;
+  }
 
   /**
    * Locate and load document
-   * Use document_id or content or data from program data as reference
+   * Use document_id or content or data from program parameters as reference
    * @return Document null or a valid document object
    */
   protected function resource_load_document()
   {
-    if (isset($this->data['document_id']) && !empty($this->data['document_id'])) {
-      $oDocument = new Document($this->data['document_id']);
+    if (isset($this->document_id) && !empty($this->document_id)) {
+      $oDocument = new Document($this->document_id);
       return $oDocument;
-    } else if (isset($this->data['file_name']) || isset($this->data['document_file'])) {
-      $file_name = !empty($this->data['file_name']) ? $this->data['file_name'] : $this->data['document_file'];
+    } else if (isset($this->file_name) || isset($this->document_file)) {
+      $file_name = !empty($this->file_name) ? $this->file_name : $this->document_file;
       if (!empty($file_name)) {
         $oDocument = Document::construct_from_array(array('file_name' => $file_name));
         $oDocument->save();
          // update document_id with new value, and remove all temporary parameters
-        $this->data['document_id'] = $oDocument->document_id;
-        unset($this->data['file_name']);
-        unset($this->data['document_file']);
+        $this->document_id = $oDocument->document_id;
+        unset($this->file_name);
+        unset($this->document_file);
         return $oDocument;
       }
     }
@@ -74,12 +84,12 @@ class Sendfax extends Program
   public function scheme()
   {
     $outboundCall = new Originate();
+    $outboundCall->source = '[transmission:source:phone]';
+    $outboundCall->destination = '[transmission:destination:phone]';
 
     $faxSend = new Fax_send();
-    $faxSend->data = array(
-        'message' => $this->aResource['document']->file_name,
-        'header' => $this->aResource['document']->name
-    );
+    $faxSend->message = $this->aResource['document']->file_name;
+    $faxSend->header = $this->aResource['document']->name;
 
     $hangupCall = new Disconnect();
 

@@ -25,6 +25,16 @@ class Log extends Application
   protected $type = 'log';
 
   /**
+   * ************************************************ Application Parameters **
+   */
+
+  /**
+   * log message
+   * @var string $message
+   */
+  public $message = 'running program [application:program_id] and application [application:application_id]';
+
+  /**
    * ******************************************** Default Application Values **
    */
 
@@ -37,12 +47,16 @@ class Log extends Application
   );
 
   /**
-   * Parameters required by this application along with default values
-   * @var array 
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
    */
-  public static $requiredParameter = array(
-      'message' => 'running program [application:program_id] and application [application:application_id]'
-  );
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'message' => $this->message
+    );
+    return $aParameters;
+  }
 
   public function execute()
   {
