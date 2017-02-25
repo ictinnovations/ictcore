@@ -9,9 +9,11 @@ namespace ICT\Core\Service;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Application;
 use ICT\Core\Gateway\Kannel;
 use ICT\Core\Message\Text;
 use ICT\Core\Service;
+use ICT\Core\Token;
 
 class Sms extends Service
 {
@@ -83,4 +85,27 @@ class Sms extends Service
     return "$template_dir/$template_path";
   }
 
+  public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
+  {
+    switch ($oApplication->type) {
+      case 'sms_send': // execute sms_send directly from gateway
+        // initilize token cache
+        $oToken = new Token(Token::SOURCE_ALL);
+        $oToken->add('application', $oApplication);
+
+        // load provider
+        $oProvider = static::get_route();
+        $oToken->add('provider', $oProvider);
+
+        // send it via gateway
+        $oGateway = $this->get_gateway();
+        $command = $oToken->render($command, $command_type); // render tokens
+        $oGateway->send($command, $oProvider);
+        break;
+
+      default: // all other applications
+        parent::application_execute($oApplication, $command, $command_type);
+        break;
+    }
+  }
 }

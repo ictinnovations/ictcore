@@ -84,6 +84,20 @@ class Token
     }
   }
 
+  public function render($data, $data_type = 'variable', $default_value = Token::KEEP_ORIGNAL)
+  {
+    // render data for token variables according to its type
+    switch ($data_type) {
+      case 'template':
+        return $this->render_template($data, $default_value);
+      case 'string':
+        return $this->render_string($data, $default_value);
+      case 'variable':
+      default:
+        return $this->render_variable($data, $default_value);
+    }
+  }
+
   public function render_template($template, $default_value = Token::KEEP_ORIGNAL)
   {
     // prepare

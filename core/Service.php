@@ -112,38 +112,15 @@ class Service
 
   public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
   {
-    // initilize token cache
-    $oToken = new Token(Token::SOURCE_ALL);
-    $oToken->add('application', $oApplication);
+    if (!empty($command)) {
+      // initilize token cache
+      $oToken = new Token(Token::SOURCE_ALL);
+      $oToken->add('application', $oApplication);
 
-    // load provider if required
-    $oProvider = null;
-    if (Application::ORDER_INIT == $oApplication->weight) { // init application require provide
-      $oProvider = static::get_route();
-      $oToken->add('provider', $oProvider);
-    }
-
-    // render command data for token variables according to its type
-    switch ($command_type) {
-      case 'template':
-        $command = $oToken->render_template($command);
-        break;
-      case 'string':
-        $command = $oToken->render_string($command);
-        break;
-      case 'variable':
-      default:
-        $command = $oToken->render_variable($command);
-        break;
-    }
-
-    // if initial application then send it via gateway, otherwise put it in response cache
-    if (Application::ORDER_INIT == $oApplication->weight) {
-      $oGateway = $this->get_gateway();
-      $oGateway->send($command, $oProvider);
-    } else if (!empty($command)) { // add command to global response variable
+      // put it in response cache
       $oSession = Session::get_instance();
       $oSession->response->application_id = 'app_' . $oApplication->application_id;
+      $command = $oToken->render($command, $command_type); // render tokens
       $oSession->response->application_data = $command;
     }
   }
