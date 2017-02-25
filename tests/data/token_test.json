@@ -1,0 +1,6 @@
+{
+  "to": "{{ element1 }}",
+  "from": "{{ array1.child1 }}",
+  "subject": "{{ array1.child3.dog2 }}",
+  "body": "{{ body|replace({'\r': '', '\n': '\\n'}) }}"
+}

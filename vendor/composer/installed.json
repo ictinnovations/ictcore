@@ -21,7 +21,7 @@
         "require-dev": {
             "phpunit/phpunit": "*"
         },
-        "time": "2015-10-26 16:11:30",
+        "time": "2015-10-26T16:11:30+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -73,7 +73,7 @@
         "suggest": {
             "ext-sockets": "Used for maximum efficiency"
         },
-        "time": "2013-05-28 13:05:06",
+        "time": "2013-05-28T13:05:06+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -139,7 +139,7 @@
             "ext-posix": "Used everywhere in component. Really it's a requirement for normal work.",
             "ext-proctitle": "Used to change process title"
         },
-        "time": "2013-05-28 13:02:20",
+        "time": "2013-05-28T13:02:20+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -207,7 +207,7 @@
         "suggest": {
             "ext-libevent": "Really it's a requirement for normal work."
         },
-        "time": "2013-05-28 13:02:36",
+        "time": "2013-05-28T13:02:36+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -272,7 +272,7 @@
             "ext-pcntl": "Only synchronous compatibility mode will be available without it",
             "ext-posix": "Only synchronous compatibility mode will be available without it"
         },
-        "time": "2013-05-28 13:05:37",
+        "time": "2013-05-28T13:05:37+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -332,7 +332,7 @@
         "require-dev": {
             "mockery/mockery": "~0.9.1"
         },
-        "time": "2016-11-24 01:01:23",
+        "time": "2016-11-24T01:01:23+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -388,7 +388,7 @@
             "symfony/debug": "~2.7",
             "symfony/phpunit-bridge": "~3.2@dev"
         },
-        "time": "2016-11-23 18:41:40",
+        "time": "2016-11-23T18:41:40+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -447,7 +447,7 @@
         "require": {
             "php": ">=5.3.3"
         },
-        "time": "2016-06-21 14:05:17",
+        "time": "2016-06-21T14:05:17+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {

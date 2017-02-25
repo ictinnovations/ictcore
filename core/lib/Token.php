@@ -80,7 +80,7 @@ class Token
       }
     } else if (is_array($token_data)) {
       $parent = "$parent:$token_name";
-      array_walk($token_data, array($this, 'token_resolve_callback', $parent));
+      array_walk($token_data, array($this, 'token_resolve_callback'), $parent);
     }
   }
 

@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "078938ce7a1e96c44cef95de9a967134",
     "content-hash": "cecdb0ac94faf3c3f8e678e6df137b26",
     "packages": [
         {
@@ -71,7 +70,7 @@
                 "signal",
                 "utility"
             ],
-            "time": "2013-05-28 13:02:20"
+            "time": "2013-05-28T13:02:20+00:00"
         },
         {
             "name": "aza/libevent",
@@ -133,7 +132,7 @@
                 "stream",
                 "timers"
             ],
-            "time": "2013-05-28 13:02:36"
+            "time": "2013-05-28T13:02:36+00:00"
         },
         {
             "name": "aza/socket",
@@ -193,7 +192,7 @@
                 "tcp",
                 "unix"
             ],
-            "time": "2013-05-28 13:05:06"
+            "time": "2013-05-28T13:05:06+00:00"
         },
         {
             "name": "aza/thread",
@@ -257,7 +256,7 @@
                 "parallel",
                 "serialization"
             ],
-            "time": "2013-05-28 13:05:37"
+            "time": "2013-05-28T13:05:37+00:00"
         },
         {
             "name": "jacwright/restserver",
@@ -305,7 +304,7 @@
                 "rest",
                 "rest-server"
             ],
-            "time": "2016-06-21 14:05:17"
+            "time": "2016-06-21T14:05:17+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -355,7 +354,7 @@
                 "rest",
                 "restful"
             ],
-            "time": "2015-10-26 16:11:30"
+            "time": "2015-10-26T16:11:30+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -408,7 +407,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2016-11-24 01:01:23"
+            "time": "2016-11-24T01:01:23+00:00"
         },
         {
             "name": "twig/twig",
@@ -469,7 +468,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-11-23 18:41:40"
+            "time": "2016-11-23T18:41:40+00:00"
         }
     ],
     "packages-dev": [],
