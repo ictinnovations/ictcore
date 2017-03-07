@@ -92,7 +92,7 @@ class Program
   protected $aResource = array();
 
   /** @var array */
-  protected $result = null;
+  public $result = null;
 
   /** @var Transmission */
   protected $oTransmission = null;
@@ -105,6 +105,16 @@ class Program
     if (!empty($program_id)) {
       $this->program_id = $program_id;
       $this->_load();
+    }
+  }
+
+  public function token_load()
+  {
+    foreach ($this->aResource as $name => $value) {
+      if (is_object($value) && method_exists($value, 'token_load')) {
+        $value->token_load();
+      }
+      $this->{$name} = $value;
     }
   }
 
@@ -121,13 +131,6 @@ class Program
 
     // and then load all available resources
     $this->resource_load();
-
-    foreach ($this->aResource as $name => $value) {
-      if (is_object($value) && method_exists($value, 'token_resolve')) {
-        $value->token_resolve();
-      }
-      $this->{$name} = $value;
-    }
   }
 
   /**
@@ -211,10 +214,11 @@ class Program
     $app3rd = new Application();
     $app3rd->name = 'application3';
 
-    $oScheme = new Scheme();
-    $oScheme->add($app1st);
-    $oScheme->condition('result', 'success')->add($app2nd);
-    $oScheme->condition('result', 'error')->add($app3rd);
+    $oScheme = new Scheme($app1st);
+    $app2Node = $oScheme->node_create(array('result' => 'success'));
+    $app2Node->link($app2nd);
+    $app3Node = $oScheme->node_create(array('result' => 'error'));
+    $app3Node->link($app3rd);
 
     return $oScheme;
   }
@@ -278,16 +282,20 @@ class Program
     $query = "SELECT * FROM " . self::$table . " WHERE program_id='%program_id%' ";
     $result = DB::query(self::$table, $query, array('program_id' => $this->program_id));
     $data = mysql_fetch_assoc($result);
-    $this->program_id = $data['program_id'];
-    $this->name = $data['name'];
-    $this->type = $data['type'];
-    $this->data = json_decode($data['data'], true);
-    $this->parent_id = $data['parent_id'];
+    if ($data) {
+      $this->program_id = $data['program_id'];
+      $this->name = $data['name'];
+      $this->type = $data['type'];
+      $this->data = json_decode($data['data'], true);
+      $this->parent_id = $data['parent_id'];
 
-    // expand data field and load all additional program parameters
-    $this->parameter_load($this->data, true);
+      // expand data field and load all additional program parameters
+      $this->parameter_load($this->data, true);
 
-    Corelog::log("Program loaded: $this->name", Corelog::CRUD);
+      Corelog::log("Program loaded: $this->name", Corelog::CRUD);
+    } else {
+      throw new CoreException('404', 'Program not found');
+    }
   }
 
   /**
@@ -337,15 +345,14 @@ class Program
 
     foreach ($this->aResource as $name => $value) {
       // in case of $value is not object we don't need to save its id
-      if (!is_object($value) || empty($value->id)) {
-        continue;
+      if (is_object($value) && $value->id) {
+        $fields = array(
+            'program_id' => $this->program_id,
+            'resource_type' => $name,
+            'resource_id' => $value->id
+        );
+        DB::update(self::$table . '_resource', $fields);
       }
-      $fields = array(
-          'program_id' => $this->program_id,
-          'resource_type' => $name,
-          'resource_id' => $value->id
-      );
-      DB::update(self::$table . '_resource', $fields);
     }
   }
 
@@ -383,7 +390,6 @@ class Program
     $listApplication = Application::search($this->program_id);
     foreach ($listApplication as $application_id) {
       $oApplication = Application::load($application_id);
-      $oApplication->remove(); // before delete, remove that application from dialplan
       $oApplication->delete();
     }
 
@@ -395,9 +401,9 @@ class Program
     }
 
     // also delete all resources
-    DB::delete(self::$table . '_resource', 'program_id', $this->program_id, true);
+    DB::delete(self::$table . '_resource', 'program_id', $this->program_id);
 
-    return DB::delete(self::$table, 'program_id', $this->program_id, true);
+    return DB::delete(self::$table, 'program_id', $this->program_id);
   }
 
   public function __isset($field)
@@ -467,7 +473,7 @@ class Program
     }
     // before leaving update program resources
     // but first clear all old resource and then save new resource
-    DB::delete(self::$table . '_resource', 'program_id', $this->program_id, true);
+    DB::delete(self::$table . '_resource', 'program_id', $this->program_id);
     $this->resource_save();
 
     return $result;
@@ -597,11 +603,6 @@ class Program
    */
   public function authorize(Request $oRequest, Dialplan $oDialplan)
   {
-    // confirm if it is a new request
-    if (!empty($oRequest->application_id)) {
-      return false;
-    }
-
     if ($oDialplan->context == 'internal') {
       $account = $oRequest->source;
       $contact = $oRequest->destination;
@@ -616,7 +617,7 @@ class Program
     $oAccount = Core::locate_account($account, $contactField);
     if ($oAccount) {
       $oContact = Core::locate_contact($contact, $contactField);
-      return array($oAccount, $oContact);
+      return array('account' => $oAccount, 'contact' => $oContact);
     } else {
       return false; // no account found
     }

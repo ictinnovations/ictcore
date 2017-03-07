@@ -30,6 +30,12 @@ class Sms_receive extends Application
   protected $type = 'sms_receive';
 
   /**
+   * This application, is initial application will be executed at start of transmission
+   * @var int weight
+   */
+  public $weight = Application::ORDER_INIT;
+
+  /**
    * ************************************************ Application Parameters **
    */
 
@@ -41,15 +47,17 @@ class Sms_receive extends Application
 
   /**
    * caller id of incomming sms
+   * by default it should be empty for dialplan to allow any number as source
    * @var string $source
    */
-  public $source = '[contact:phone]';
+  public $source = null;
 
   /**
    * destination / long number for sms destination
+   * by default it should be empty for dialplan to allow any number as destination
    * @var string $detination
    */
-  public $destination = '[account:phone]';
+  public $destination = null;
 
   /**
    * to trigger this application from dialplan, which filter must be met

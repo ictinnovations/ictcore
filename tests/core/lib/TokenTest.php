@@ -36,7 +36,7 @@ username :    test user,
 password :    test pass,
 
 Regards
-'      
+'
   );
 
   /**
@@ -67,14 +67,43 @@ Regards
 
   /**
    * @covers ICT\Core\Token::add
-   * @todo   Implement testAdd().
    */
   public function testAdd()
   {
-    // Remove the following lines when you implement this test.
-    $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-    );
+    $oToken = new Token(Token::SOURCE_NONE);
+    $oToken->add('parent', $this->object->token);
+
+    // first confirm existing structure
+    $hello = $oToken->render_string('[parent:element1]');
+    $world = $oToken->render_string('[parent:array1:child1]');
+    $this->assertSame($this->data['element1'], $hello);
+    $this->assertSame($this->data['array1']['child1'], $world);
+  }
+
+  /**
+   * @covers ICT\Core\Token::KEEP_ORIGNAL
+   */
+  public function testKeepOrignal()
+  {
+    $var1 = '[special]';
+    $var2 = '[more:special]';
+    $val1 = $this->object->render_variable($var1, Token::KEEP_ORIGNAL);
+    $val2 = $this->object->render_variable($var2, Token::KEEP_ORIGNAL);
+    $this->assertSame($var1, $val1);
+    $this->assertSame($var2, $val2);
+  }
+
+  /**
+   * @covers ICT\Core\Token::REPLACE_EMPTY
+   */
+  public function testReplaceEmpty()
+  {
+    $var1 = '[special]';
+    $var2 = '[more:special]';
+    $val1 = $this->object->render_variable($var1, Token::REPLACE_EMPTY);
+    $val2 = $this->object->render_variable($var2, Token::REPLACE_EMPTY);
+    $this->assertSame('', $val1);
+    $this->assertSame('', $val2);
   }
 
   /**

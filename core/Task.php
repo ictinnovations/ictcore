@@ -273,7 +273,7 @@ class Task
       DB::query(self::$table, $sql, array('status' => Task::EXPIRED, 'task_id' => $this->task_id));
 
     } else {
-      Corelog::log("proccessing task:" . $this->task_id, Corelog::FLOW);
+      Corelog::log("processing task:" . $this->task_id, Corelog::FLOW);
 
       $sql = "UPDATE task SET last_run = %cur_time%, expiry = %cur_time%, status = %status% WHERE task_id=%task_id%";
       DB::query(self::$table, $sql, array('cur_time' => time(), 'status' => Task::PROCESSED, 'task_id' => $this->task_id));

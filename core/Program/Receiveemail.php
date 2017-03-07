@@ -11,6 +11,7 @@ namespace ICT\Core\Program;
 
 use ICT\Core\Account;
 use ICT\Core\Application\Email_receive;
+use ICT\Core\Core;
 use ICT\Core\Exchange\Dialplan;
 use ICT\Core\Program;
 use ICT\Core\Result;
@@ -80,11 +81,11 @@ class Receiveemail extends Program
   public function scheme()
   {
     $emailRecieve = new Email_receive();
-    $emailRecieve->source = $this->aResource['account']->email;
+    $emailRecieve->source = null; // allow any from address
+    $emailRecieve->destination = $this->aResource['account']->email;
     $emailRecieve->filter_flag = Dialplan::FILTER_COMMON;
 
-    $oScheme = new Scheme();
-    $oScheme->add($emailRecieve);
+    $oScheme = new Scheme($emailRecieve);
 
     return $oScheme;
   }

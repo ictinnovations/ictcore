@@ -93,10 +93,8 @@ class Sendfax extends Program
 
     $hangupCall = new Disconnect();
 
-    $oScheme = new Scheme();
-    $oScheme->add($outboundCall);
-    $oScheme->add($faxSend);
-    $oScheme->add($hangupCall);
+    $oScheme = new Scheme($outboundCall);
+    $oScheme->link($faxSend)->link($hangupCall);
 
     return $oScheme;
   }

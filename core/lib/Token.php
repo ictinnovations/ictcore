@@ -37,7 +37,7 @@ class Token
    */
   public $template_dir = '';
 
-  public function __construct($token_flag = Token::SOURCE_NONE, $data = array())
+  public function __construct($token_flag = Token::SOURCE_CONF, $data = array())
   {
     $this->token = new Data();
     if (Token::SOURCE_HTTP == ($token_flag & Token::SOURCE_HTTP)) {
@@ -75,8 +75,8 @@ class Token
   {
     // also process sub tokens if current object provide any
     if (is_object($token_data)) {
-      if (method_exists($token_data, 'token_resolve')) {
-        $token_data->token_resolve();
+      if (method_exists($token_data, 'token_load')) {
+        $token_data->token_load();
       }
     } else if (is_array($token_data)) {
       $parent = "$parent:$token_name";

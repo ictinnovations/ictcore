@@ -91,10 +91,8 @@ class Voicemessage extends Program
 
     $hangupCall = new Disconnect();
 
-    $oScheme = new Scheme();
-    $oScheme->add($outboundCall);
-    $oScheme->add($voicePlay);
-    $oScheme->add($hangupCall);
+    $oScheme = new Scheme($outboundCall);
+    $oScheme->link($voicePlay)->link($hangupCall);
 
     return $oScheme;
   }

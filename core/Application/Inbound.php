@@ -27,6 +27,11 @@ class Inbound extends Application
    */
   protected $type = 'inbound';
 
+  /**
+   * This application, is initial application will be executed at start of transmission
+   * @var int weight
+   */
+  public $weight = Application::ORDER_INIT;
 
   /**
    * ************************************************ Application Parameters **
@@ -40,15 +45,17 @@ class Inbound extends Application
 
   /**
    * caller id of incomming call
+   * by default it should be empty for dialplan to allow any number as source
    * @var string $source
    */
-  public $source = '[contact:phone]';
+  public $source = null;
 
   /**
    * destination / did number for call destination
+   * by default it should be empty for dialplan to allow any number as destination
    * @var string $detination
    */
-  public $destination = '[account:phone]';
+  public $destination = null;
 
   /**
    * to trigger this application from dialplan, which filter must be met

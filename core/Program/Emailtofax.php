@@ -13,13 +13,17 @@ use ICT\Core\Account;
 use ICT\Core\Application\Email_receive;
 use ICT\Core\Conf;
 use ICT\Core\Contact;
+use ICT\Core\Core;
+use ICT\Core\CoreException;
 use ICT\Core\Exchange\Dialplan;
 use ICT\Core\Message\Document;
 use ICT\Core\Message\Template;
 use ICT\Core\Program;
+use ICT\Core\Request;
 use ICT\Core\Result;
 use ICT\Core\Scheme;
 use ICT\Core\Service\Email;
+use ICT\Core\Session;
 use ICT\Core\Token;
 use ICT\Core\Transmission;
 
@@ -86,15 +90,29 @@ class Emailtofax extends Program
   {
     $emailRecieve = new Email_receive();
     $emailRecieve->context = 'internal';
-    $emailRecieve->filter_flag = (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_SOURCE);
+    $emailRecieve->filter_flag = Dialplan::FILTER_COMMON;
+    $emailRecieve->destination = null; // allow any destination
     if (isset($this->aResource['account'])) {
       $emailRecieve->source = $this->aResource['account']->email;
     }
 
-    $oScheme = new Scheme();
-    $oScheme->add($emailRecieve);
+    $oScheme = new Scheme($emailRecieve);
 
     return $oScheme;
+  }
+
+  public function authorize(Request $oRequest, Dialplan $oDialplan)
+  {
+    $aAuth = parent::authorize($oRequest, $oDialplan);
+    // after valid authentication, if there is new contact
+    if (isset($aAuth['contact']) && empty($aAuth['contact']->phone)) {
+      // Update current contact to create phone field
+      $phone = $aAuth['contact']->email_to_phone();
+      if (empty($phone)) {
+        throw new CoreException("404", "Invalid email format, unable to read destination fax number");
+      }
+    }
+    return $aAuth;
   }
 
   /**
@@ -140,17 +158,11 @@ class Emailtofax extends Program
             $error = 'There is no attachment or invalid attachment';
             break 2; // in case of error, also terminate foreach loop
           }
-          $this->aResource['template'] = $oTemplate;
+          // save a refer
+          $oSession = Session::get_instance();
+          $oSession->template = $oTemplate;
           break;
       }
-    }
-
-    // Update current contact to create phone field
-    $phone = $this->oTransmission->oContact->email_to_phone();
-    if (empty($phone)) {
-      $error = 'Invalid destination or fax number';
-    } else {
-      $this->oTransmission->oContact->save();
     }
 
     if ($result == 'success' && empty($error)) {
@@ -175,15 +187,16 @@ class Emailtofax extends Program
       // check program status, to decide if we can continue with fax or not
       if ($oProgram->result['result'] == 'success') {
         // send notification to user, about email receipt
-        $this->send_email_notification('emailtofax_mailreceived', "Program/Emailtofax/data/email_accepted.tpl.php", 'request');
+        $this->send_email_notification('emailtofax_emailreceived');
         // then send fax to destination address
-        // use attachment from inbound email, (see: token_create in transmission_done for oTemplate)
-        $oTemplate = $this->aResource['template'];
+        // use attachment from inbound email, (see: token_create in transmission_done for oSession->template)
+        $oSession = Session::get_instance();
+        $oTemplate = $oSession->template;
         $attachment = $oTemplate->attachment;
         $this->send_fax($attachment);
       } else {
         // send notification to user, about email error
-        $this->send_email_notification('emailtofax_mailreceived', "Program/Emailtofax/data/email_error.tpl.php", 'request');
+        $this->send_email_notification('emailtofax_emailrejected');
       }
     } else { // for all other associated programs
       switch ($oProgram->name) {
@@ -194,19 +207,21 @@ class Emailtofax extends Program
           // check program status, to decide if we have to send success or failure notification
           if ($oProgram->result['result'] == 'success') {
             // Send email notification to user, about fax delivery
-            $this->send_email_notification('emailtofax_faxsent', "Program/Emailtofax/data/fax_success.tpl.php", 'fax');
+            $this->send_email_notification('emailtofax_faxsent');
           } else {
             // send notification to user, about fax error
-            $this->send_email_notification('emailtofax_faxsent', "Program/Emailtofax/data/fax_error.tpl.php", 'fax');
+            $this->send_email_notification('emailtofax_faxfailed');
           }
           break;
         /**
          * ************************************* Process notification emails **
          */
-        case 'emailtofax_mailreceived':
+        case 'emailtofax_emailreceived':
+        case 'emailtofax_emailrejected':
           // nothing to do
           break;
         case 'emailtofax_faxsent':
+        case 'emailtofax_faxfailed':
           // Its is the end of program, again nothing to do
           break;
       }
@@ -218,12 +233,33 @@ class Emailtofax extends Program
    * Send Email Notification
    * **************************************************************************
    */
-  public function send_email_notification($notification_title, $template_file, $parent_alias = 'request')
+  public function send_email_notification($notification_type)
   {
+    switch ($notification_type) {
+      case 'emailtofax_emailreceived':
+        $parent_alias = 'request';
+        $template_file = 'Program/Emailtofax/data/email_accepted.tpl.php';
+        break;
+      case 'emailtofax_emailrejected':
+        $parent_alias = 'request';
+        $template_file = 'Program/Emailtofax/data/email_error.tpl.php';
+        break;
+      case 'emailtofax_faxsent':
+        $parent_alias = 'fax';
+        $template_file = 'Program/Emailtofax/data/fax_success.tpl.php';
+        break;
+      case 'emailtofax_faxfailed':
+      default:
+        $parent_alias = 'fax';
+        $template_file = 'Program/Emailtofax/data/fax_error.tpl.php';
+        break;
+    }
+
     // Prepare token object for following transmissions
     $currentToken = new Token(Token::SOURCE_ALL);
+    $currentToken->add('program', $this);
     $oToken = new Token();
-    $oToken->add($parent_alias, $currentToken);
+    $oToken->add($parent_alias, $currentToken->token); // put everything into new sub group to avoid token conflicts
 
     $oTemplate = Template::construct_from_file($template_file);
     // Now replace all program related tokens in loaded template, but remember to keep missing tokens
@@ -232,11 +268,9 @@ class Emailtofax extends Program
 
     // prepare data for new program
     $programData = array(
-        'name' => $notification_title,
+        'name' => $notification_type,
         'parent_id' => $this->program_id,
-        'data' => array(
-            'template_id' => $oTemplate->template_id
-        )
+        'template_id' => $oTemplate->template_id
     );
 
     // prepare data for new transmission
@@ -269,9 +303,7 @@ class Emailtofax extends Program
     $programData = array(
         'name' => 'emailtofax_sendfax',
         'parent_id' => $this->program_id,
-        'data' => array(
-            'document_id' => $oDocument->document_id
-        )
+        'document_id' => $oDocument->document_id
     );
 
     // prepare data for new transmission

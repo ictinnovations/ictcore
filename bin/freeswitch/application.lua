@@ -31,25 +31,25 @@ function application_Hangup(s, status, arg)
   oFreeswitch.consoleLog("INFO", string.format("[ spool_id=%s ]\n", spool_id))
   oFreeswitch.consoleLog("INFO", "call hangup: " .. tostring(oCall:getVariable("hangup_cause")))
 
-  local startAppResult = {}
-  startAppResult['time_start']   = tostring(oCall:getVariable("start_epoch"))
-  startAppResult['time_connect'] = tostring(oCall:getVariable("answer_epoch"))
-  startAppResult['time_end']     = tostring(oCall:getVariable("end_epoch"))
-  startAppResult['amount']       = tostring(oCall:getVariable("duration"))
-  startAppResult['amount_net']   = tostring(oCall:getVariable("billsec"))
-  startAppResult['status']       = "completed"
-  startAppResult['response']     = ''
+  local hangupApplicationResult = {}
+  hangupApplicationResult['time_start']   = tostring(oCall:getVariable("start_epoch"))
+  hangupApplicationResult['time_connect'] = tostring(oCall:getVariable("answer_epoch"))
+  hangupApplicationResult['time_end']     = tostring(oCall:getVariable("end_epoch"))
+  hangupApplicationResult['amount']       = tostring(oCall:getVariable("duration"))
+  hangupApplicationResult['amount_net']   = tostring(oCall:getVariable("billsec"))
+  hangupApplicationResult['status']       = "completed"
+  hangupApplicationResult['response']     = ''
 
-  if (startAppResult['amount'] == nil or startAppResult['amount'] == '') then
-    startAppResult['amount']     = 0
-    startAppResult['amount_net'] = 0
+  if (hangupApplicationResult['amount'] == nil or hangupApplicationResult['amount'] == '') then
+    hangupApplicationResult['amount']     = 0
+    hangupApplicationResult['amount_net'] = 0
   end
 
   -- only update in case of failure
   local response_str = oCall:hangupCause()
   if oCall:answered() == false then
-    startAppResult['status']   = 'failed'
-    startAppResult['response'] = oCall:hangupCause()
+    hangupApplicationResult['status']   = 'failed'
+    hangupApplicationResult['response'] = oCall:hangupCause()
   end
 
   -- USER AND NETWORK INFO
@@ -70,18 +70,16 @@ function application_Hangup(s, status, arg)
     end
   end
 
-  -- if current application is not starting application then also include 
-  -- starting application in results as extra
-  if startAppId ~= app_id then
-    -- before submitting also add start app final update as extra data
-    -- collect data for start app
-    extra_start_request = ictcore_access   -- include default parameters
-    extra_start_request['spool_id']         = spool_id
-    extra_start_request['application_id']   = startAppId
-    extra_start_request['application_data'] = startAppResult
-    -- in the array of extra data, start application is one element
+  -- if hangup application is set then also include hangup application results as extra
+  if hangupApplicationID ~= nil then
+    -- collect data for hangup application
+    extra_hangup_request = ictcore_access   -- include default parameters
+    extra_hangup_request['spool_id']         = spool_id
+    extra_hangup_request['application_id']   = hangupApplicationID
+    extra_hangup_request['application_data'] = hangupApplicationResult
+    -- in the array of extra data, hangup application is one element
     extra = {}
-    extra['start']      = extra_start_request
+    extra['hangup']     = extra_hangup_request
     app_result['extra'] = extra
   end
 
@@ -146,8 +144,9 @@ function application_execute(appData)
       for var_name, var_value in pairs(aInput) do
         if var_name == 'spool_id' then
           spool_id = var_value
-        elseif var_name == 'start_app_id' then
-          startAppId = var_value
+        end
+        if var_name == 'disconnect_application_id' then
+          hangupApplicationID = var_value
         end
         oCall:setVariable(var_name, var_value)
       end
@@ -209,9 +208,9 @@ if app_id == 'inbound' then
   app_result['destination'] = oCall:getVariable('destination_number')
   app_result['source']      = oCall:getVariable('caller_id_number')
   app_result['context']     = 'external' -- TODO oCall:getVariable('context')
+else -- probably it is an originate request so try to read disconnect_application_id
+  hangupApplicationID = oCall:getVariable('disconnect_application_id')
 end
-
-startAppId = app_id   -- probably app_id for originate or inbound application, we are saving it for future use
 
 oCall:setVariable('api_hangup_hook', '')  -- cancel default hangup hook
 oCall:setHangupHook("application_Hangup") -- set hangup to a function

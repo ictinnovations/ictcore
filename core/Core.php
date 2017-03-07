@@ -52,6 +52,7 @@ class Core
 
     // update all status just before dying
     self::wrapup($oSession->transmission);
+    Corelog::log('Transmission execution completed', Corelog::FLOW);
   }
 
   /**
@@ -104,14 +105,17 @@ class Core
         foreach ($listDialplan as $aDialplan) {
           Corelog::log('Trying with dialplan id : ' . $aDialplan['dialplan_id'], Corelog::FLOW);
           $oDialplan = new Dialplan($aDialplan['dialplan_id']);
-          $oProgram = new Program($aDialplan['program_id']);
-          list($oAccount, $oContact) = $oProgram->authorize($oRequest, $oDialplan);
-          if ($oAccount->account_id) {
+          $oProgram = Program::load($aDialplan['program_id']);
+          $aAuth = $oProgram->authorize($oRequest, $oDialplan);
+          if (isset($aAuth['account'])) {
+            $oAccount = $aAuth['account'];
+            $oContact = $aAuth['contact'];
             Corelog::log('Successfully authenticated for program : ' . $oProgram->type, Corelog::FLOW);
             break;
           }
         }
         if (empty($oAccount)) {
+          Corelog::log('Request: '.print_r($oRequest,true), Corelog::ERROR);
           throw new CoreException("404", "No recipient found");
         }
         if (empty($oContact)) {
@@ -128,15 +132,17 @@ class Core
         $direction = Transmission::INBOUND;
       }
 
-      // for time being create transmissing by using company contact
+      // for time being create transmission by using company contact
       $oTransmission = $oProgram->transmission_create(Contact::COMPANY, $oAccount->account_id, $direction);
       $oTransmission->activate_owner(); // Load permission
-      // Finally update contact_id and status for newly created transmission
-      // Note: we can't create and update contact before activating transmission owner
-      if (isset($oContact) && empty($oContact->contact_id)) {
-        $oContact->save();
+      if (isset($oContact)) {
+        if (empty($oContact->contact_id)) {
+          // Finally update contact_id and status for newly created transmission
+          // Note: we can't create and update contact before activating transmission owner
+          $oContact->save();
+          $oTransmission->result_create($oContact->contact_id, 'contact_new', Result::TYPE_CONTACT, 'inbound');
+        }
         $oTransmission->contact_id = $oContact->contact_id;
-        $oTransmission->result_create($oContact->contact_id, 'contact_new', Result::TYPE_CONTACT, 'inbound');
       }
       $oTransmission->status = Transmission::STATUS_INITIALIZING;
       $oTransmission->save(); // we must save transmission to generate transmission_id for new spool
@@ -160,6 +166,7 @@ class Core
 
     // update all status just before dying
     self::wrapup($oSession->transmission);
+    Corelog::log('Request processing completed', Corelog::FLOW);
 
     // return our response
     return $oSession->response;
@@ -214,9 +221,9 @@ class Core
     foreach ($oTransmission->aResult as $oResult) {
       $oResult->save();
     }
-    Corelog::log('Last spool status : ' . $oTransmission->oSpool->status, Corelog::FLOW);
+    Corelog::log('Final spool status : ' . $oTransmission->oSpool->status, Corelog::FLOW);
     $oTransmission->oSpool->save();
-    Corelog::log('Last transmission status : ' . $oTransmission->status, Corelog::FLOW);
+    Corelog::log('Final transmission status : ' . $oTransmission->status, Corelog::FLOW);
     $oTransmission->save();
   }
 

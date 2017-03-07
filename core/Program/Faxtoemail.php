@@ -16,13 +16,17 @@ use ICT\Core\Application\Fax_receive;
 use ICT\Core\Application\Inbound;
 use ICT\Core\Conf;
 use ICT\Core\Contact;
+use ICT\Core\Core;
+use ICT\Core\CoreException;
 use ICT\Core\Exchange\Dialplan;
 use ICT\Core\Message\Document;
 use ICT\Core\Message\Template;
 use ICT\Core\Program;
+use ICT\Core\Request;
 use ICT\Core\Result;
 use ICT\Core\Scheme;
 use ICT\Core\Service\Fax;
+use ICT\Core\Session;
 use ICT\Core\Token;
 use ICT\Core\Transmission;
 
@@ -103,7 +107,8 @@ class Faxtoemail extends Program
   {
     $inboundCall = new Inbound();
     $inboundCall->context = 'external';
-    $inboundCall->filter_flag = (Dialplan::FILTER_COMMON | Dialplan::FILTER_ACCOUNT_DESTINATION);
+    $inboundCall->filter_flag = Dialplan::FILTER_COMMON;
+    $inboundCall->source = null; // allow any source
     if (isset($this->aResource['account'])) {
       $inboundCall->destination = $this->aResource['account']->phone;
     }
@@ -114,13 +119,24 @@ class Faxtoemail extends Program
 
     $hangupCall = new Disconnect();
 
-    $oScheme = new Scheme();
-    $oScheme->add($inboundCall);
-    $oScheme->add($answerCall);
-    $oScheme->add($faxReceive);
-    $oScheme->add($hangupCall);
+    $oScheme = new Scheme($inboundCall);
+    $oScheme->link($answerCall)->link($faxReceive)->link($hangupCall);
 
     return $oScheme;
+  }
+
+  public function authorize(Request $oRequest, Dialplan $oDialplan)
+  {
+    $aAuth = parent::authorize($oRequest, $oDialplan);
+    // after valid authentication, if there is no email address in contact
+    if (isset($aAuth['contact']) && empty($aAuth['contact']->email)) {
+      // Update current contact to create email field
+      $email = $aAuth['contact']->phone_to_email();
+      if (empty($email)) {
+        throw new CoreException("404", "Unable to create a from email address");
+      }
+    }
+    return $aAuth;
   }
 
   /**
@@ -167,7 +183,9 @@ class Faxtoemail extends Program
             $error = 'There is no or invalid fax file';
             break 2; // in case of error, also terminate foreach loop
           }
-          $this->aResource['document'] = $oDocument;
+          // save a reference in session, so it can be used later ( to launch email notification )
+          $oSession = Session::get_instance();
+          $oSession->document = $oDocument;
           break;
         case Result::TYPE_INFO:
           if ($oResult->name == 'pages') {
@@ -179,14 +197,6 @@ class Faxtoemail extends Program
           $error = $oResult->data;
           break 2; // in case of error, also terminate foreach loop
       }
-    }
-
-    // Update current contact to create email field
-    $email = $this->oTransmission->oContact->phone_to_email();
-    if (empty($email)) {
-      $error = 'Invalid source fax number';
-    } else {
-      $this->oTransmission->oContact->save();
     }
 
     if ($result == 'success' && empty($error) && $pages > 0) {
@@ -209,8 +219,10 @@ class Faxtoemail extends Program
     if ($program_type == 'primary') {
       // check program status, to decide if we can continue with email notification or not
       if ($oProgram->result['result'] == 'success') {
-        // send notification to user, about fax receipt
-        $this->send_email_notification();
+        // send notification to user, about fax receipt along with received fax document
+        // read fax document from session
+        $oSession = Session::get_instance();
+        $this->send_email_notification($oSession->document);
       } else {
         // primary transmission failed, we can't do anything
       }
@@ -229,12 +241,14 @@ class Faxtoemail extends Program
    * Send Email Notification
    * **************************************************************************
    */
-  public function send_email_notification()
+  public function send_email_notification(Document $oDocument)
   {
     // Prepare token object for following transmissions
     $currentToken = new Token(Token::SOURCE_ALL);
+    $currentToken->add('program', $this);
+    $currentToken->add('document', $oDocument); // document is required by following template
     $oToken = new Token();
-    $oToken->add('fax', $currentToken);
+    $oToken->add('fax', $currentToken->token); // put everything into new sub group to avoid token conflicts
 
     $oTemplate = Template::construct_from_file("Program/Faxtoemail/data/fax_received.tpl.php");
     // Now replace all program related tokens in loaded template, but remember to keep missing tokens
@@ -246,9 +260,7 @@ class Faxtoemail extends Program
     $programData = array(
         'name' => 'faxtoemail_faxreceived',
         'parent_id' => $this->program_id,
-        'data' => array(
-            'template_id' => $oTemplate->template_id
-        )
+        'template_id' => $oTemplate->template_id
     );
 
     // prepare data for new transmission

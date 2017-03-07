@@ -26,7 +26,7 @@ class Originate extends Application
   protected $type = 'originate';
 
   /**
-   * This application initial application will start a new transmission
+   * This application, is initial application will be executed at start of transmission
    * @var int weight
    */
   public $weight = Application::ORDER_INIT;
@@ -46,6 +46,19 @@ class Originate extends Application
    * @var int $destination
    */
   public $destination = '[transmission:destination:phone]';
+
+  /**
+   * return a name value pair of all aditional application parameters which we need to save
+   * @return array
+   */
+  public function parameter_save()
+  {
+    $aParameters = array(
+        'source' => $this->source,
+        'destination' => $this->destination
+    );
+    return $aParameters;
+  }
 
   public function execute()
   {

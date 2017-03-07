@@ -84,7 +84,7 @@ class Voice extends Service
         break;
       // applications
       case 'originate':
-        $template_path = "application/voice/originate.json";
+        $template_path = "application/originate/voice.json";
         break;
       case 'inbound':
       case 'connect':
@@ -100,6 +100,16 @@ class Voice extends Service
 
   public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
   {
+    // originate and connect application require to provide last / disconnect application id
+    // to collect call status
+    if ($oApplication->type == 'originate' || $oApplication->type == 'connect') {
+      $appList = $oApplication->search($oApplication->program_id, Application::ORDER_END);
+      foreach ($appList as $disconnectApp) {
+        $oApplication->disconnect_application_id = $disconnectApp['application_id'];
+        break; // only first
+      }
+    }
+
     switch ($oApplication->type) {
       case 'originate': // execute originate directly from gateway
         // initilize token cache

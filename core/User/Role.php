@@ -81,9 +81,9 @@ class Role
     Corelog::log("Deleting role: $this->role_id", Corelog::CRUD);
     // first remove permissions for current role
     $query = 'DELETE FROM ' . self::$link_permission . ' WHERE role_id=%role_id%';
-    DB::query(self::$link_permission, $query, array('role_id' => $this->role_id), true);
+    DB::query(self::$link_permission, $query, array('role_id' => $this->role_id));
     // now delete role
-    return DB::delete(self::$table, 'role_id', $this->role_id, true);
+    return DB::delete(self::$table, 'role_id', $this->role_id);
   }
 
   public function __isset($field)
@@ -145,13 +145,13 @@ class Role
     if (isset($data['role_id']) && !empty($data['role_id'])) {
       // first remove permissions for current role
       $query = 'DELETE FROM ' . self::$link_permission . ' WHERE role_id=%role_id%';
-      DB::query(self::$link_permission, $query, array('role_id' => $this->role_id), true);
+      DB::query(self::$link_permission, $query, array('role_id' => $this->role_id));
       // update existing record
-      DB::update(self::$table, $data, 'role_id', true);
+      DB::update(self::$table, $data, 'role_id');
       Corelog::log("Role updated: $this->role_id", Corelog::CRUD);
     } else {
       // add new
-      DB::update(self::$table, $data, false, true);
+      DB::update(self::$table, $data, false);
       $this->role_id = $data['role_id'];
       Corelog::log("New role created: $this->role_id", Corelog::CRUD);
     }
@@ -159,7 +159,7 @@ class Role
     // save permissions for current role
     foreach ($this->aPermission as $permission_id) {
       $query = "INSERT INTO " . self::$link_permission . " (role_id, permission_id) VALUES (%role_id%, %permission_id%)";
-      DB::query(self::$link_permission, $query, array('role_id' => $this->role_id, 'permission_id' => $permission_id), true);
+      DB::query(self::$link_permission, $query, array('role_id' => $this->role_id, 'permission_id' => $permission_id));
     }
   }
 

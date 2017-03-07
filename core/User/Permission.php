@@ -89,7 +89,7 @@ class Permission
   public function delete()
   {
     Corelog::log("Deleting permission: $this->permission_id", Corelog::CRUD);
-    return DB::delete(self::$table, 'permission_id', $this->permission_id, true);
+    return DB::delete(self::$table, 'permission_id', $this->permission_id);
   }
 
   public function __isset($field)
@@ -138,11 +138,11 @@ class Permission
     );
     if (isset($data['permission_id']) && !empty($data['permission_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'permission_id', true);
+      $result = DB::update(self::$table, $data, 'permission_id');
       Corelog::log("Permission updated: $this->permission_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->permission_id = $data['permission_id'];
       Corelog::log("New permission created: $this->permission_id", Corelog::CRUD);
     }

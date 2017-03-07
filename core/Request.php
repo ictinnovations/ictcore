@@ -17,6 +17,9 @@ class Request
   /** @var integer $gateway_flag */
   public $gateway_flag = Gateway::GATEWAY_FLAG;
 
+  /** @var string $context */
+  public $context = 'internal';
+
   /** @var integer $spool_id */
   public $spool_id = null;
 

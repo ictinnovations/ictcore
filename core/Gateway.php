@@ -77,8 +77,7 @@ class Gateway
 
   public static function template_dir()
   {
-    global $path_core;
-    return $path_core;
+    return '.';
   }
 
   public function config_save($type, $name, $data = '')

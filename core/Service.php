@@ -44,7 +44,7 @@ class Service
       case 'account':
       case 'provider':
       default:
-        if ($capabilities[$type] && in_array($feature, $capabilities)) {
+        if (isset($capabilities[$type]) && in_array($feature, $capabilities[$type])) {
           return TRUE;
         } else {
           return FALSE;

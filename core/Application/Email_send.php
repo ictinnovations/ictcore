@@ -26,7 +26,7 @@ class Email_send extends Application
   protected $type = 'email_send';
 
   /**
-   * This application initial application will start a new transmission
+   * This application, is initial application will be executed at start of transmission
    * @var int weight
    */
   public $weight = Application::ORDER_INIT;

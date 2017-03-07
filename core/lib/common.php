@@ -106,7 +106,7 @@ function do_login($user)
   }
 
   $oSession->user = $oUser;
-  Corelog::log("do_login, results", Corelog::DEBUG, User::$user);
+  Corelog::log("do_login, results", Corelog::DEBUG, $oSession->user);
 
   return $oSession->user;
 }

@@ -87,8 +87,7 @@ class Sendemail extends Program
     $emailSend->body_alt = $this->aResource['template']->body_alt;
     $emailSend->attachment = $this->aResource['template']->attachment;
 
-    $oScheme = new Scheme();
-    $oScheme->add($emailSend);
+    $oScheme = new Scheme($emailSend);
 
     return $oScheme;
   }

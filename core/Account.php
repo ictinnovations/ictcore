@@ -383,10 +383,10 @@ class Account
     if ($aProgram) { // no error / false
       foreach (array_keys($aProgram) as $program_id) {
         if (ctype_digit($program_name) && $program_name == $program_id) {
-          $oProgram = new Program($program_id);
+          $oProgram = Program::load($program_id);
           $oProgram->delete();
         } else {
-          $oProgram = new Program($program_id);
+          $oProgram = Program::load($program_id);
           if (empty($program_name) || 'all' == strtolower($program_name) || strtolower($program_name) == $oProgram->name) {
             $oProgram->delete();
           }

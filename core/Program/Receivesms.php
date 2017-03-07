@@ -11,6 +11,7 @@ namespace ICT\Core\Program;
 
 use ICT\Core\Account;
 use ICT\Core\Application\Sms_receive;
+use ICT\Core\Core;
 use ICT\Core\Exchange\Dialplan;
 use ICT\Core\Program;
 use ICT\Core\Result;
@@ -83,8 +84,7 @@ class Receivesms extends Program
     $smsRecieve->source = $this->aResource['account']->phone;
     $smsRecieve->filter_flag = Dialplan::FILTER_COMMON;
 
-    $oScheme = new Scheme();
-    $oScheme->add($smsRecieve);
+    $oScheme = new Scheme($smsRecieve);
 
     return $oScheme;
   }

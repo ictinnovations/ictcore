@@ -167,10 +167,8 @@ class Transmission
     }
   }
 
-  public function token_resolve()
+  public function token_load()
   {
-    $oCompany = new Account(Account::COMPANY);
-    $this->company = $oCompany;
     $this->account = $this->oAccount;
     $this->contact = $this->oContact;
     if ($this->direction == Transmission::INBOUND) {
@@ -544,7 +542,7 @@ class Transmission
   {
     Corelog::log("New result, type: " . $type . ", name: " . $name . ", data: " . print_r($data, true), Corelog::LOGIC);
     $this->aResult[$name] = new Result();
-    $this->aResult[$name]->spool_id = $this->oSpool->spool_id;
+    $this->aResult[$name]->spool_id = isset($this->oSpool) ? $this->oSpool->spool_id : null;
     $this->aResult[$name]->name = $name;
     $this->aResult[$name]->data = $data;
     $this->aResult[$name]->type = $type;

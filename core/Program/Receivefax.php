@@ -14,6 +14,7 @@ use ICT\Core\Application\Connect;
 use ICT\Core\Application\Disconnect;
 use ICT\Core\Application\Fax_receive;
 use ICT\Core\Application\Inbound;
+use ICT\Core\Core;
 use ICT\Core\Exchange\Dialplan;
 use ICT\Core\Message\Document;
 use ICT\Core\Program;
@@ -107,11 +108,8 @@ class Receivefax extends Program
 
     $hangupCall = new Disconnect();
 
-    $oScheme = new Scheme();
-    $oScheme->add($inboundCall);
-    $oScheme->add($answerCall);
-    $oScheme->add($faxReceive);
-    $oScheme->add($hangupCall);
+    $oScheme = new Scheme($inboundCall);
+    $oScheme->link($answerCall)->link($faxReceive)->link($hangupCall);
 
     return $oScheme;
   }

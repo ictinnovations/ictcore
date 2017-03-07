@@ -27,6 +27,12 @@ class Disconnect extends Application
   protected $type = 'disconnect';
 
   /**
+   * This application, is last application and will be executed to collect transmission status
+   * @var int weight
+   */
+  public $weight = Application::ORDER_END;
+
+  /**
    * ******************************************** Default Application Values **
    */
 

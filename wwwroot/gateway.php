@@ -50,7 +50,7 @@ echo $oResponse->application_data;
 if (isset($application_data['extra']) && is_array($application_data['extra'])) {
   foreach ($application_data['extra'] as $app_type => $aApp) {
     // no need to collect any type of output
-    Core::process($aApp['spool_id'], $aApp['application_id'], $aApp['application_data'], $aApp['gateway_flag']);
+    process_response($aApp['spool_id'], $aApp['application_id'], $aApp['application_data'], $aApp['gateway_flag']);
   }
 }
 
@@ -64,6 +64,9 @@ function process_response($spool_id, $application_id, $application_data = array(
   $oRequest->application_data = $application_data;
   $oRequest->gateway_flag = $gateway_flag;
 
+  if (!empty($application_data['context'])) {
+    $oRequest->context = $application_data['context'];
+  }
   if (!empty($application_data['source'])) {
     if ($gateway_flag == Freeswitch::GATEWAY_FLAG) {
       $oRequest->source = preg_replace("/[^0-9]/", "", $application_data['source']);

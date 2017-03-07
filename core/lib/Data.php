@@ -74,7 +74,7 @@ class Data implements ArrayAccess, Iterator, Countable
     return FALSE;
   }
 
-  public function &offsetGet($offset)
+  public function offsetGet($offset)
   {
     $data = &$this->locate_parent($offset);
     $output = NULL;
@@ -132,7 +132,8 @@ class Data implements ArrayAccess, Iterator, Countable
 
   public function &__get($name)
   {
-    return $this->offsetGet($name);
+    $value = $this->offsetGet($name);
+    return $value;
   }
 
   public function __set($name, $value)

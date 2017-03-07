@@ -9,11 +9,9 @@ namespace ICT\Core\Exchange;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-use ICT\Core\Account;
 use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\DB;
-use ICT\Core\Gateway;
 use ICT\Core\Gateway\Freeswitch;
 use ICT\Core\Request;
 
@@ -27,13 +25,8 @@ class Dialplan
   const FILTER_DESTINATION = 4;
   const FILTER_SOURCE = 8;
   const FILTER_APPLICATION_ID = 16;
+  //const FILTER_PROGRAM_ID = 32;
   const FILTER_COMMON = 31; // include gateway, context, source, destination and application
-  // Additional filters
-  const FILTER_ACCOUNT = 128;
-  const FILTER_ACCOUNT_DESTINATION = 384; // 128 + 256
-  const FILTER_ACCOUNT_SOURCE = 640; // 128 + 512
-
-  //const FILTER_PROGRAM = 1024;
 
   private static $table = 'dialplan';
   private static $primary_key = 'dialplan_id';
@@ -126,38 +119,7 @@ class Dialplan
     }
 
     // fetch and return all available dialplans
-    $listDialplan = self::search($aFilter);
-
-    foreach ($listDialplan as $dialplan_id => $aDialplan) {
-      if (($aDialplan['filter_flag'] & self::FILTER_ACCOUNT) == self::FILTER_ACCOUNT) {
-        $aDialplan['account'] = array();
-        // first of all know the contact field
-        $oGateway = Gateway::load($aDialplan['gateway_flag']);
-        $contactFiled = $oGateway::CONTACT_FIELD;
-        // check for account filters
-        if (($listDialplan['filter_flag'] & self::FILTER_ACCOUNT_SOURCE) == self::FILTER_ACCOUNT_SOURCE) {
-          $accountFilter = array($contactFiled => $oRequest->source);
-          $listAccount = Account::search($accountFilter);
-          if ($listAccount) {
-            $aDialplan['account']['source'] = $listAccount;
-          } else {
-            continue; // unable to statisfy source filter drop current dialplan
-          }
-        }
-        if (($listDialplan['filter_flag'] & self::FILTER_ACCOUNT_DESTINATION) == self::FILTER_ACCOUNT_DESTINATION) {
-          $accountFilter = array($contactFiled => $oRequest->destination);
-          $listAccount = Account::search($accountFilter);
-          if ($listAccount) {
-            $aDialplan['account']['destination'] = $listAccount;
-          } else {
-            continue; // unable to statisfy destination filter drop current dialplan
-          }
-        }
-      }
-      $listDialplan[$dialplan_id] = $aDialplan;
-    }
-
-    return $listDialplan;
+    return self::search($aFilter);
   }
 
   public static function search($aFilter = array())
@@ -224,7 +186,7 @@ class Dialplan
   public function delete()
   {
     Corelog::log("Dialplan delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'dialplan_id', $this->dialplan_id, true);
+    return DB::delete(self::$table, 'dialplan_id', $this->dialplan_id);
   }
 
   public function __isset($field)

@@ -30,6 +30,12 @@ class Email_receive extends Application
   protected $type = 'email_receive';
 
   /**
+   * This application, is initial application will be executed at start of transmission
+   * @var int weight
+   */
+  public $weight = Application::ORDER_INIT;
+
+  /**
    * ************************************************ Application Parameters **
    */
 
@@ -41,15 +47,17 @@ class Email_receive extends Application
 
   /**
    * from email address
+   * by default it should be empty for dialplan to allow any number as from address
    * @var string $source
    */
-  public $source = '[contact:email]';
+  public $source = null;
 
   /**
    * to email address
+   * by default it should be empty for dialplan to allow any number as to address
    * @var string $detination
    */
-  public $destination = '[account:email]';
+  public $destination = null;
 
   /**
    * to trigger this application from dialplan, which filter must be met

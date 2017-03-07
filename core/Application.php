@@ -111,6 +111,11 @@ class Application
     }
   }
 
+  public function token_load()
+  {
+    // nothing to do
+  }
+
   public function token_resolve()
   {
     $oToken = new Token(Token::SOURCE_ALL);
@@ -240,6 +245,7 @@ class Application
         $oAction->delete();
       }
     }
+    $this->remove();
     return DB::delete(self::$table, 'application_id', $this->application_id);
   }
 
@@ -363,6 +369,9 @@ class Application
     // processing application results
     $oSession = Session::get_instance();
     $this->result = &$oSession->request->application_data;
+
+    // before processing update parameters with available tokens
+    $this->token_resolve();
     $spool_status = $this->process();
 
     Corelog::log('Application processing completed with result: ' . $this->result['result'], Corelog::FLOW);

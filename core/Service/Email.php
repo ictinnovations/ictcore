@@ -95,13 +95,13 @@ class Email extends Service
   public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
   {
     switch ($oApplication->type) {
-      case 'send_email': // execute send_email directly from gateway
+      case 'email_send': // execute send_email directly from gateway
         // initilize token cache
         $oToken = new Token(Token::SOURCE_ALL);
         $oToken->add('application', $oApplication);
 
         // load provider
-        $oProvider = static::get_route();
+        $oProvider = $this->get_route();
         $oToken->add('provider', $oProvider);
 
         // send it via gateway

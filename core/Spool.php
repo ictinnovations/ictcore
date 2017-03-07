@@ -190,7 +190,7 @@ class Spool
   public function delete()
   {
     Corelog::log("Spool delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'spool_id', $this->spool_id, true);
+    return DB::delete(self::$table, 'spool_id', $this->spool_id);
   }
 
   public function is_done()

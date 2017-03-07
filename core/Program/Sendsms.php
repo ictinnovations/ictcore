@@ -87,8 +87,7 @@ class Sendsms extends Program
     $smsSend->charset = $this->aResource['text']->type;
     $smsSend->length = $this->aResource['text']->length;
 
-    $oScheme = new Scheme();
-    $oScheme->add($smsSend);
+    $oScheme = new Scheme($smsSend);
 
     return $oScheme;
   }
