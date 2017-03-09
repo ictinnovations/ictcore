@@ -30,6 +30,7 @@ class ProgramApi extends Api
     $this->set($oProgram, $data);
 
     if ($oProgram->save()) {
+      $oProgram->deploy();
       return $oProgram->program_id;
     } else {
       throw new CoreException(417, 'Program creation failed');

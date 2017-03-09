@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cecdb0ac94faf3c3f8e678e6df137b26",
+    "content-hash": "572e2bc9801f576059fd767e702fc46e",
     "packages": [
         {
             "name": "aza/clibase",
@@ -264,12 +264,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jacwright/RestServer.git",
-                "reference": "adfa1460e61178d53d63e72b2e65ab68d53b8ad7"
+                "reference": "584aa063caeb88f2bbbdcd145786ae0df1df029c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jacwright/RestServer/zipball/adfa1460e61178d53d63e72b2e65ab68d53b8ad7",
-                "reference": "adfa1460e61178d53d63e72b2e65ab68d53b8ad7",
+                "url": "https://api.github.com/repos/jacwright/RestServer/zipball/584aa063caeb88f2bbbdcd145786ae0df1df029c",
+                "reference": "584aa063caeb88f2bbbdcd145786ae0df1df029c",
                 "shasum": ""
             },
             "require": {
@@ -304,7 +304,7 @@
                 "rest",
                 "rest-server"
             ],
-            "time": "2016-06-21T14:05:17+00:00"
+            "time": "2016-12-20T19:04:05+00:00"
         },
         {
             "name": "nategood/httpful",
@@ -475,8 +475,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "jacwright/restserver": 20,
-        "swiftmailer/swiftmailer": 0
+        "swiftmailer/swiftmailer": 0,
+        "jacwright/restserver": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

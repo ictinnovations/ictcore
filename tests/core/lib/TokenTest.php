@@ -136,6 +136,30 @@ Regards
   }
 
   /**
+   * @covers ICT\Core\Token::token_resolve
+   * @todo   Implement testToken_resolve().
+   */
+  public function testToken_resolve()
+  {
+    // Remove the following lines when you implement this test.
+    $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+    );
+  }
+
+  /**
+   * @covers ICT\Core\Token::render
+   * @todo   Implement testRender().
+   */
+  public function testRender()
+  {
+    // Remove the following lines when you implement this test.
+    $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+    );
+  }
+
+  /**
    * @covers ICT\Core\Token::render_template
    * @todo   Implement testRender_template().
    */
@@ -185,6 +209,29 @@ Regards
     $this->assertSame($this->data['array1']['child1'], $world);
     $this->assertSame($this->data['array1']['child3']['dog2'], $title);
     $this->assertEmpty($unknown, "Testing with REPLACE_EMPTY failed");
+  }
+
+  /**
+   * @covers ICT\Core\Token::render_string_callback
+   * @todo   Implement testRender_string_callback().
+   */
+  public function testRender_string_callback()
+  {
+    // Remove the following lines when you implement this test.
+    $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+    );
+  }
+
+  /**
+   * @covers ICT\Core\Token::is_token
+   */
+  public function testIs_token()
+  {
+    $this->assertTrue($this->object->is_token("[somthting]"));
+    $this->assertTrue($this->object->is_token("[somthting:special]"));
+    $this->assertFalse($this->object->is_token("[somthting] other"));
+    $this->assertFalse($this->object->is_token("everything else"));
   }
 
 }

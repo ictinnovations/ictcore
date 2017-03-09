@@ -1,6 +1,6 @@
 Basic components of ICTCore
 ===========================
-Before starting developed with ICTCore, it is recommended to get an introduction with basic building block of ICTCore. for ease of understanding, we can divide them into four main categories as mentioned in following.
+Before starting development with ICTCore, it is recommended to get an introduction with basic building block of ICTCore. for ease of understanding, we can divide them into four main categories as mentioned in following.
 
 1. User Data
 2. Logic
@@ -27,7 +27,7 @@ Stored data / file holding information received or need to be delivered via some
 4. Text (for sms)
 
 
-Logic 
+Logic
 -----
 In ICTCore we have tried to keep logic related components independent and separate from other technical things. there are three components in this category.
 
@@ -100,8 +100,8 @@ Telecommunication engine / backend like Asterisk, Freeswitch, Sendmail etc .. cu
 2. Sendmail
 3. Kannel
 
-### Schedule
-In case some transmission need scheduling, reminder or a transmission configured for retry got failed, don't worry Schedule is here to take care of such things.
+### Task and Schedule
+In case a transmission or some other action require a delay execution, Task and Schedule interfaces can be used for that. For example a reminder or failed transmission can be configured for retry, by using Schedule interface.
 
 
 Infrastructure
@@ -116,6 +116,8 @@ Currently we only support Providers but later on we will add other components.
 5. (TODO) Backup servers
 
 ### Provider
-A trunk, 3rd party provider required to originate / terminate transmissions.
+A trunk, 3rd party provider required to originate / terminate transmissions. ICTCore support following 3 type providers
 
-
+1. Sip for Voice and Fax
+2. Smpp for SMS
+3. Sendmail for Email

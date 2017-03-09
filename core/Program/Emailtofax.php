@@ -68,7 +68,7 @@ class Emailtofax extends Program
    */
   protected function resource_load_account()
   {
-    if (isset($this->account_id) && !empty($this->account_id)) {
+    if (!Token::is_token($this->account_id) && !empty($this->account_id)) {
       $oAccount = new Account($this->account_id);
       return $oAccount;
     } else if (isset($this->email) && !empty($this->email)) {

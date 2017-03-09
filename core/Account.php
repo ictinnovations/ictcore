@@ -357,7 +357,7 @@ class Account
   }
 
   /**
-   * Compile given program with current account
+   * Deploy given program with current account
    * ( only if given program support it )
    * @param \ICT\Core\Program $oProgram
    * @return int $program_id
@@ -372,7 +372,7 @@ class Account
       $oProgram->{$parameter_name} = $oToken->render_variable($parameter_value, Token::KEEP_ORIGNAL);
     }
     $oProgram->save();
-    $oProgram->compile();
+    $oProgram->deploy();
     return $oProgram->program_id;
   }
 

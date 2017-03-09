@@ -171,4 +171,17 @@ class Token
     }
   }
 
+  /**
+   * Test if given text is a token placeholder or not
+   * @param string $subject what we need to examine
+   * @return boolean test result true or false
+   */
+  public static function is_token($subject) {
+    if (preg_match("/^\[(([\w]+)(:[\w]+)*)\]$/", $subject)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }

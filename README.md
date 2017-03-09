@@ -74,8 +74,10 @@ Getting started
 Following is an example about sending fax by using ICTCore
 
     // prepare a program with fax document
-    $programData = array('file_name' => '/some/pdf/file.pdf');
-    $faxProgram = new Sendfax(null, array('data' => $programData));
+    $faxProgram = new Sendfax();
+    $faxProgram->file_name = '/some/pdf/file.pdf';
+    $faxProgram->save();
+    $faxProgram->compile();
 
     // create a transmission
     $contact_id = 12;

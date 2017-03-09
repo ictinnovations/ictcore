@@ -1,3 +1,16 @@
+ICTCore 0.7.5
+--------------
+
+Dated: 07-March-2017
+
+* Extension support added for accounts
+* Twig based template added for gateway configurations and Application data
+* Data and Token libraries updated
+* Sip, SMTP and SMPP added as provider sub-type
+* Multi tasking support improved for Task and Schedule
+* Namespaces and PSR-4 based auto-loading support added
+* PhpUnit support added for unit testing
+
 ICTCore 0.7.0
 --------------
 

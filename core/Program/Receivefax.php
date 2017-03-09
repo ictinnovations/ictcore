@@ -21,6 +21,7 @@ use ICT\Core\Program;
 use ICT\Core\Result;
 use ICT\Core\Scheme;
 use ICT\Core\Service\Fax;
+use ICT\Core\Token;
 use ICT\Core\Transmission;
 
 class Receivefax extends Program
@@ -78,7 +79,7 @@ class Receivefax extends Program
    */
   protected function resource_load_account()
   {
-    if (isset($this->account_id) && !empty($this->account_id)) {
+    if (!Token::is_token($this->account_id) && !empty($this->account_id)) {
       $oAccount = new Account($this->account_id);
       return $oAccount;
     } else if (isset($this->phone) && !empty($this->phone)) {
