@@ -3,7 +3,7 @@
   "input": {
     "spool_id": "{{ transmission.spool.spool_id }}",
     "spool_status": "connected",
-    "disconnect_application_id": "{{ application.hangup_application_id }}",
+    "disconnect_application_id": "{{ application.disconnect_application_id }}",
     "application_result": "success"
   },
   "output": {

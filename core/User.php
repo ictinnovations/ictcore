@@ -254,9 +254,14 @@ class User
 
   private function load_permission()
   {
+    $this->aPermission = array();
+
     $query = "SELECT up.permission_id FROM " . self::$link_permission . " up WHERE up.usr_id=" . $this->user_id;
     $filter = array('query' => $query);
-    $this->aPermission = Permission::search($filter);
+    $listPermission = Permission::search($filter);
+    foreach($listPermission as $permission_id => $aPermission) {
+      $this->aPermission[$permission_id] = $aPermission['name'];
+    }
   }
 
   public function delete()

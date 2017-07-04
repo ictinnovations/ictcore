@@ -87,8 +87,8 @@ class Fax_send extends Application
       $this->result['result'] = 'error';
     }
 
-    // TODO return Spool::STATUS_CONNECTED;
-    return Spool::STATUS_DONE;
+    return Spool::STATUS_CONNECTED;
+    // return Spool::STATUS_DONE;
   }
 
 }

@@ -258,7 +258,7 @@ CREATE TABLE task
    task_id                       int(11) unsigned       NOT NULL auto_increment,
    type                          varchar(64)            NOT NULL default '',
    action                        varchar(64)            NOT NULL default 0,
-   data                          varchar(64)            NOT NULL default '',
+   data                          text,
    weight                        int(4)                 NOT NULL default 0,
    status                        int(4)                 NOT NULL default 0,
    is_recurring                  int(4)                 NOT NULL default 0,

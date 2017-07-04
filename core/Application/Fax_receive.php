@@ -93,8 +93,8 @@ class Fax_receive extends Application
       $this->result_create('invalid fax', 'error', Result::TYPE_ERROR);
     }
 
-    // TODO return Spool::STATUS_CONNECTED;
-    return Spool::STATUS_COMPLETED;
+    return Spool::STATUS_CONNECTED;
+    // return Spool::STATUS_COMPLETED;
   }
 
 }

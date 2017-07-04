@@ -48,8 +48,11 @@ function application_Hangup(s, status, arg)
   -- only update in case of failure
   local response_str = oCall:hangupCause()
   if oCall:answered() == false then
+    hangupApplicationResult['result']   = 'error'
     hangupApplicationResult['status']   = 'failed'
     hangupApplicationResult['response'] = oCall:hangupCause()
+  else
+    hangupApplicationResult['result']   = 'success'
   end
 
   -- USER AND NETWORK INFO
@@ -72,15 +75,20 @@ function application_Hangup(s, status, arg)
 
   -- if hangup application is set then also include hangup application results as extra
   if hangupApplicationID ~= nil then
-    -- collect data for hangup application
-    extra_hangup_request = ictcore_access   -- include default parameters
-    extra_hangup_request['spool_id']         = spool_id
-    extra_hangup_request['application_id']   = hangupApplicationID
-    extra_hangup_request['application_data'] = hangupApplicationResult
-    -- in the array of extra data, hangup application is one element
-    extra = {}
-    extra['hangup']     = extra_hangup_request
-    app_result['extra'] = extra
+    if app_id ~= nil then
+      -- collect data for hangup application
+      extra_hangup_request = ictcore_access   -- include default parameters
+      extra_hangup_request['spool_id']         = spool_id
+      extra_hangup_request['application_id']   = hangupApplicationID
+      extra_hangup_request['application_data'] = hangupApplicationResult
+      -- in the array of extra data, hangup application is one element
+      extra = {}
+      extra['hangup']     = extra_hangup_request
+      app_result['extra'] = extra
+    else
+      app_id     = hangupApplicationID
+      app_result = hangupApplicationResult
+    end
   end
 
   -- finally submit data
@@ -103,6 +111,9 @@ function application_fetch()
   api_request['spool_id']         = spool_id
   api_request['application_id']   = app_id
   api_request['application_data'] = JSON:encode(app_result)
+
+  -- disable any further execution, untill we have fresh application id
+  app_id = nil
 
   if call_status == 'active' then
     oCall:execute("curl", ictcore_url .. " post " .. UrlEncode.table(api_request))

@@ -158,7 +158,7 @@ class Application
     $query = "SELECT application_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id, 'weight' => $weight));
     while ($data = mysql_fetch_assoc($result)) {
-      $aApplication[$data['application_id']] = $data['application_id'];
+      $aApplication[$data['application_id']] = $data;
     }
     Corelog::log("Application search for program: $program_id", Corelog::CRUD, $aApplication);
     return $aApplication;
@@ -227,7 +227,7 @@ class Application
 
       $this->aAction = array();
       $listAction = Action::search($this->application_id);
-      foreach ($listAction as $action_id) {
+      foreach (array_keys($listAction) as $action_id) {
         $this->aAction[$action_id] = new Action($action_id);
       }
       Corelog::log("Application loaded: $this->name", Corelog::CRUD);
@@ -417,6 +417,11 @@ class Application
 
     // if no further application has been exectuted then mark this spool as done
     if ($action_executed == false) {
+      // Prepare an empty response
+      $oSession = Session::get_instance();
+      $oSession->response->application_id = NULL;
+      $oSession->response->application_data = '';
+      // And mark current transaction as done
       $oTransmission->oSpool->status = Spool::STATUS_DONE;
       return Spool::STATUS_DONE;
     } else {

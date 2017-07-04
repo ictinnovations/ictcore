@@ -190,7 +190,7 @@ class Program
     $query = "SELECT program_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id));
     while ($data = mysql_fetch_assoc($result)) {
-      $aProgram[$data['program_id']] = $data['program_id'];
+      $aProgram[$data['program_id']] = $data;
     }
     Corelog::log("Child program search for program: $program_id", Corelog::CRUD, $aProgram);
     return $aProgram;
@@ -388,14 +388,14 @@ class Program
 
     // then delete all application linked to this program
     $listApplication = Application::search($this->program_id);
-    foreach ($listApplication as $application_id) {
+    foreach (array_keys($listApplication) as $application_id) {
       $oApplication = Application::load($application_id);
       $oApplication->delete();
     }
 
     // then delete all child programs
     $listChild = $this->search_child($this->program_id);
-    foreach ($listChild as $program_id) {
+    foreach (array_keys($listChild) as $program_id) {
       $oProgram = Program::load($program_id);
       $oProgram->delete();
     }
@@ -537,7 +537,7 @@ class Program
     $result = false;
     // fetch program's initial applications (identified by ORDER_INIT as weight)
     $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
-    foreach ($listApplication as $application_id) {
+    foreach (array_keys($listApplication) as $application_id) {
       $oApplication = Application::load($application_id);
       $oApplication->_execute($this->oTransmission);
       $result = true;
@@ -679,7 +679,7 @@ class Program
       // first of all change transmission status
       $oTransmission->status = Transmission::STATUS_PROCESSING;
       $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
-      foreach ($listApplication as $application_id) {
+      foreach (array_keys($listApplication) as $application_id) {
         $oApplication = Application::load($application_id);
         break; // only one application is needed
       }

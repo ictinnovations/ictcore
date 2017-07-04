@@ -322,6 +322,11 @@ class Document extends Message
     return $pdfFile;
   }
 
+  public function get_pdf_file()
+  {
+    return $this->create_pdf($this->file_name, $this->type);
+  }
+
   public function get_link()
   {
     return $this->file_name;

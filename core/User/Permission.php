@@ -66,7 +66,7 @@ class Permission
     Corelog::log("permission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('permission', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aPermission[$data['permission_id']] = $data['name'];
+      $aPermission[$data['permission_id']] = $data;
     }
 
     return $aPermission;

@@ -262,7 +262,7 @@ class Task
       if (($this->due_at + $this->expiry) <= $this->server_time) {
         $task_status = Task::EXPIRED;
       }
-    } else if ($this->expiry <= $this->server_time) {
+    } else if (!empty($this->expiry) && $this->expiry <= $this->server_time) {
       $task_status = Task::EXPIRED;
     }
 
@@ -286,7 +286,7 @@ class Task
           $result = call_user_func_array(array($classType, 'task_process'), array($this));
         }
       }
-    
+
       return $result;
     }
   }

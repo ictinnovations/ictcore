@@ -24,6 +24,7 @@ class Core
    */
   public static function send(Transmission $oTransmission)
   {
+    Corelog::log('=================> transmission execution <=================', Corelog::FLOW);
     Corelog::log('Executing transmission with id : ' . $oTransmission->transmission_id, Corelog::FLOW);
 
     // Starting a new response for current transmission
@@ -63,7 +64,8 @@ class Core
    */
   public static function process(Request $oRequest)
   {
-    Corelog::log('New request received to process status of application : ' . $oRequest->application_id, Corelog::FLOW);
+    Corelog::log('=================> processing response <=================', Corelog::FLOW);
+    Corelog::log('Processing status of application : ' . $oRequest->application_id, Corelog::FLOW);
 
     $spool_id = null;
     $transmission_id = null;
@@ -225,6 +227,7 @@ class Core
     $oTransmission->oSpool->save();
     Corelog::log('Final transmission status : ' . $oTransmission->status, Corelog::FLOW);
     $oTransmission->save();
+    Corelog::log('-----------------> transaction ended <-----------------', Corelog::FLOW);
   }
 
 }

@@ -562,7 +562,7 @@ class Transmission
   public function &result_load()
   {
     $aResult = Result::search($this->oSpool->spool_id);
-    foreach ($aResult as $spool_result_id) {
+    foreach (array_keys($aResult) as $spool_result_id) {
       $oResult = new Result($spool_result_id);
       $this->aResult[$oResult->name] = $oResult;
     }

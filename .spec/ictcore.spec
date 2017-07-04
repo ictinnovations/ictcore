@@ -348,7 +348,7 @@ setfacl -d -m g::rw %{core_home}/cache
 grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-scheduler=ON/" /etc/my.cnf
 # enable and start cron service
 /sbin/chkconfig crond on
-/sbin/service crond start
+/sbin/service crond restart
 # enable and start mysql or mariadb server
 %if %{rhel} > 6
 /bin/systemctl enable mariadb.service
@@ -359,7 +359,17 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 %endif
 # enable and start apache server
 /sbin/chkconfig httpd on
-/sbin/service httpd start
+/sbin/service httpd restart
+# configure firewall for web
+%if %{rhel} > 6
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT    # web
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT   # ssl web
+/etc/init.d/iptables save
+%else
+/bin/firewall-cmd --zone=public --add-port=80/tcp --permanent    # web
+/bin/firewall-cmd --zone=public --add-port=443/tcp --permanent   # ssl web
+/bin/firewall-cmd --reload
+%elseif
 
 %post voice
 # all new data files must be writable for group users
@@ -385,11 +395,26 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /etc/freeswitch/autoload_configs/modules.conf.xml
 # enable and start freeswitch server
 /sbin/chkconfig freeswitch on
-/sbin/service freeswitch start
+/sbin/service freeswitch restart
 # alter firewall for sip
+%if %{rhel} > 6
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5060 -j ACCEPT    # sip internal profile
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5060 -j ACCEPT    # sip internal profile
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5070 -j ACCEPT    # sip ictcore profile
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5070 -j ACCEPT    # sip ictcore profile
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5071 -j ACCEPT    # sip tcp
+/sbin/iptables -I INPUT -p udp -m state --state NEW -m udp --dport 5071 -j ACCEPT    # sip
+/sbin/iptables -I INPUT -p udp --dport 10000:20000 -j ACCEPT
 /etc/init.d/iptables save
+%else
+/bin/firewall-cmd --zone=public --add-port=5060/udp --permanent  # sip tcp
+/bin/firewall-cmd --zone=public --add-port=5060/tcp --permanent  # sip udp
+/bin/firewall-cmd --zone=public --add-port=5061/udp --permanent  # sip test tcp
+/bin/firewall-cmd --zone=public --add-port=5061/tcp --permanent  # sip test udp
+/bin/firewall-cmd --zone=public --add-port=5672/tcp --permanent  # rabbit-mq
+/bin/firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+/bin/firewall-cmd --reload
+%endif
 
 %post kannel
 # all new configuration files must be writable for group users
@@ -401,7 +426,7 @@ if [ ! -L "/etc/kannel.conf" ]; then
   ln -s /usr/ictcore/etc/kannel/kannel.conf /etc/kannel.conf
 fi
 /sbin/chkconfig kannel on
-/sbin/service kannel start
+/sbin/service kannel restart
 
 %post sendmail
 # enable sendmail on public ip address
@@ -417,11 +442,15 @@ echo "apache" >> /etc/mail/trusted-users
 /etc/mail/make
 # enable and start sendmail server
 /sbin/chkconfig sendmail on
-/sbin/service sendmail start
+/sbin/service sendmail restart
 # alter firewall for smtp
+%if %{rhel} > 6
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 25 -j ACCEPT    # smtp
 /etc/init.d/iptables save
-
+%else
+/bin/firewall-cmd --zone=public --add-port=25/tcp --permanent  # smtp
+/bin/firewall-cmd --reload
+%endif
 
 %changelog
 * Tue Sep 20 2016 Nasir Iqbal <nasir@ictinnovations.com> - 0.7.0

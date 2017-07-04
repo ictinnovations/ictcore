@@ -71,9 +71,14 @@ class Role
 
   private function load_permission()
   {
+    $this->aPermission = array();
+
     $query = "SELECT rp.permission_id FROM " . self::$link_permission . " rp WHERE rp.role_id=" . $this->role_id;
     $filter = array('query' => $query);
-    $this->aPermission = Permission::search($filter);
+    $listPermission = Permission::search($filter);
+    foreach($listPermission as $permission_id => $aPermission) {
+      $this->aPermission[$permission_id] = $aPermission['name'];
+    }
   }
 
   public function delete()

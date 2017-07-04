@@ -9,7 +9,7 @@
     "codec_string": "'PCMU,PCMA'",
     "spool_status": "connected",
     "spool_id": "{{ transmission.spool.spool_id }}",
-    "disconnect_application_id": "{{ application.hangup_application_id }}",
+    "disconnect_application_id": "{{ application.disconnect_application_id }}",
     "origination_caller_id_number": "{{ application.source }}",
     "origination_caller_id_name": "{{ application.source }}",
     "application_result": "success"
