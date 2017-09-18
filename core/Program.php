@@ -614,6 +614,9 @@ class Program
     // search fo existing account and contact
     $oGateway = Gateway::load($oDialplan->gateway_flag);
     $contactField = $oGateway::CONTACT_FIELD;
+    if (empty($contactField)) {
+      $contactField = $oGateway->CONTACT_ANONYMOUS;
+    }
     $oAccount = Core::locate_account($account, $contactField);
     if ($oAccount) {
       $oContact = Core::locate_contact($contact, $contactField);

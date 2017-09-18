@@ -23,6 +23,7 @@ class Kannel extends Gateway
   const GATEWAY_FLAG = 2;
   const GATEWAY_TYPE = 'kannel';
   const CONTACT_FIELD = 'phone';
+  const CONTACT_ANONYMOUS = '0000000';
 
   /** @var boolean $conn */
   protected $conn = false;

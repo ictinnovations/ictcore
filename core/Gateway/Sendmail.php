@@ -32,6 +32,7 @@ class Sendmail extends Gateway
   const GATEWAY_FLAG = 4;
   const GATEWAY_TYPE = 'sendmail';
   const CONTACT_FIELD = 'email';
+  const CONTACT_ANONYMOUS = 'unknown@localhost';
 
   /** @var boolean $conn */
   protected $conn = false;

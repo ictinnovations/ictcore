@@ -37,7 +37,7 @@ class Sendfax extends Program
 
   /**
    * document_id of document being used as message in this program
-   * @var int $template_id
+   * @var int $document_id
    */
   public $document_id = '[document:document_id]';
 

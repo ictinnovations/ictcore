@@ -22,6 +22,7 @@ class Freeswitch extends Gateway
   const GATEWAY_FLAG = 8;
   const GATEWAY_TYPE = 'freeswitch';
   const CONTACT_FIELD = 'phone';
+  const CONTACT_ANONYMOUS = '000000';
 
   /** @var boolean $conn */
   protected $conn = false;

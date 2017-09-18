@@ -103,7 +103,11 @@ class Contact
           $aWhere[] = "$search_field = $search_value";
           break;
         case 'phone':
+          $aWhere[] = "$search_field LIKE '%$search_value'";
+          break;
         case 'email':
+          $aWhere[] = "$search_field = '$search_value'";
+          break;
         case 'first_name':
         case 'last_name':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
