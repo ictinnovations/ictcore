@@ -5,6 +5,7 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     # Turn Rewrite Engine on
     RewriteEngine On
+    RewriteBase /ictcore/
 
     # Send empty /directory index request to index.php
     RewriteRule ^$ index.php [QSA,L]

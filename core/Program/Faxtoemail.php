@@ -222,6 +222,10 @@ class Faxtoemail extends Program
         // send notification to user, about fax receipt along with received fax document
         // read fax document from session
         $oSession = Session::get_instance();
+        if (empty($oSession->transmission->oContact->email)) {
+          $oSession->transmission->oContact->phone_to_email();
+          $oSession->transmission->oContact->save();
+        }
         $this->send_email_notification($oSession->document);
       } else {
         // primary transmission failed, we can't do anything

@@ -19,7 +19,7 @@ include_once "Core.php";
 
 // **************************************************** PREPARE SYSTEM
 $oApi = new Api();
-$oApi->create_interface('rest'); // create rest server interface
+$oApi->create_interface('rest', '/ictcore/'); // create rest server interface
 // ****************************************** AUTHENTICATE AND EXECUTE
 try {
   if (http_authenticate() === true) {
@@ -59,9 +59,8 @@ function http_authenticate()
   }
 
   try {
-    do_login($oUser);
+    ICT\Core\do_login($oUser);
   } catch (CoreException $ex) {
-    header("WWW-Authenticate: Basic realm=\"$realm\"");
     throw new CoreException('401', "User account disabled / banned, please contact admin", $ex);
   }
   return true;

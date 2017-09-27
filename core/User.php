@@ -221,7 +221,7 @@ class User
       $this->role_id = $data['role_id'];
       $this->role_list = $data['role_list'];
       $this->username = $data['username'];
-      $this->password_hash = $data['passwd'];
+      $this->passwd = $data['passwd'];
       $this->first_name = $data['first_name'];
       $this->last_name = $data['last_name'];
       $this->phone = $data['phone'];

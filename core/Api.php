@@ -39,7 +39,7 @@ class Api
     }
   }
 
-  public function create_interface($interface_type = null)
+  public function create_interface($interface_type = null, $root_path = null)
   {
     global $path_cache;
     if (!empty($interface_type) && $interface_type = 'rest') {
@@ -47,6 +47,7 @@ class Api
       $this->interface_type = 'rest';
       $realm = Conf::get('company:name', 'ICTCore') . ' :: REST API Server';
       $this->oInterface = new RestServer('production', $realm); // debug / production
+      $this->oInterface->root = $root_path;
       $this->oInterface->cacheDir = $path_cache; // set folder for rest server url mapping
       self::rest_load($this->oInterface, 'Api');
     }
