@@ -166,4 +166,8 @@ class UserApi extends Api
     return $oUser->save();
   }
 
+  protected static function rest_include()
+  {
+    return 'Api/User';
+  }
 }

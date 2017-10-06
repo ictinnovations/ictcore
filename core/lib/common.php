@@ -47,6 +47,9 @@ function include_once_directory($folder, $suffix = '.php')
 function path_to_namespace($path)
 {
   global $path_core;
+  if (!is_dir($path)) {
+    $path = dirname($path);
+  }
   if (substr($path, 0, strlen($path_core)) == $path_core) {
     $path = substr($path, strlen($path_core));
   }

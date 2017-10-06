@@ -14,4 +14,10 @@ use ICT\Core\Api;
 class MessageApi extends Api
 {
   // empty class just to include classes from message folder
+
+  protected static function rest_include()
+  {
+    return 'Api/Message';
+  }
+
 }

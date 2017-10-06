@@ -49,7 +49,7 @@ class Api
       $this->oInterface = new RestServer('production', $realm); // debug / production
       $this->oInterface->root = $root_path;
       $this->oInterface->cacheDir = $path_cache; // set folder for rest server url mapping
-      self::rest_load($this->oInterface, 'Api');
+      self::rest_load($this->oInterface);
     }
   }
 
@@ -61,21 +61,31 @@ class Api
     }
   }
 
-  public static function rest_load($restInterface, $dir = null)
+  protected static function rest_include()
   {
-    if (empty($restInterface)) {
+    if (property_exists (get_called_class(), 'interface_type')) {
+      return 'Api'; // Api class return sub api folder
+    }
+    // in child class return null
+    return null;
+  }
+
+  protected static function rest_load(&$restInterface)
+  {
+    $dir = static::rest_include();
+    if (empty($restInterface) || empty($dir)) {
       return false;
     }
 
     include_once_directory($dir);
     $namespace = path_to_namespace($dir);
-    $listApi = list_available_classes($namespace);
+    $listClass = get_declared_classes();
+    // escape slashes from namespace and add an extra slash to select child classes only
+    $listApi   = preg_grep('!^'.addslashes($namespace.'\\').'!', $listClass);
     foreach ($listApi as $apiClass) {
       $restInterface->addClass($apiClass);
-      if (method_exists($apiClass, 'rest_load')) {
-        $className = str_replace($namespace, '', $apiClass);
-        $child_dir = $dir . DIRECTORY_SEPARATOR . str_replace('Api', '', $className);
-        $apiClass::rest_load($restInterface, $child_dir);
+      if (method_exists($apiClass, 'rest_include')) {
+        $apiClass::rest_load($restInterface);
       }
     }
   }

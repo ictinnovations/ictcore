@@ -175,7 +175,7 @@ class Application
     // nothing to remove
   }
 
-  public static function getClass($application_id, $namespace = 'ICT\\Core\\Application')
+  public static function getClass(&$application_id, $namespace = 'ICT\\Core\\Application')
   {
     if (ctype_digit(trim($application_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE application_id='%application_id%' ";
@@ -185,12 +185,13 @@ class Application
       }
     } else {
       $application_type = $application_id;
+      $application_id   = null;
     }
     $class_name = ucfirst(strtolower(trim($application_type)));
     if (!empty($namespace)) {
       $class_name = $namespace . '\\' . $class_name;
     }
-    if (class_exists($class_name)) {
+    if (class_exists($class_name, true)) {
       return $class_name;
     } else {
       return false;

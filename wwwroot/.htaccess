@@ -2,10 +2,25 @@ Order allow,deny
 Allow from all
 
 DirectoryIndex index.php
+
+## To allow Cross-origin access enable following code
+# Header add Access-Control-Allow-Origin "*"
+# #Header always set Access-Control-Allow-Origin "http://localhost:4200"
+# Header add Access-Control-Allow-Methods: "GET,POST,OPTIONS,DELETE,PUT"
+# Header always set Access-Control-Allow-Credentials: "true"
+# Header always set Access-Control-Max-Age: "1000"
+# Header always set Access-Control-Allow-Headers: "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding"
+
 <IfModule mod_rewrite.c>
     # Turn Rewrite Engine on
     RewriteEngine On
     RewriteBase /ictcore/
+
+    ## To allow Cross-origin access enable following code
+    # For cors preflight options request
+    # RewriteCond %{REQUEST_METHOD} OPTIONS
+    # #RewriteRule ^(.*)$ $1 [R=200,L]
+    # RewriteRule ^(.*)$ $1 [R=200,L,E=HTTP_ORIGIN:%{HTTP:ORIGIN}]]
 
     # Send empty /directory index request to index.php
     RewriteRule ^$ index.php [QSA,L]

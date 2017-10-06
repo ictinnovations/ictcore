@@ -258,7 +258,7 @@ class Program
     if (!empty($namespace)) {
       $class_name = $namespace . '\\' . $class_name;
     }
-    if (class_exists($class_name)) {
+    if (class_exists($class_name, true)) {
       return $class_name;
     } else {
       return false;

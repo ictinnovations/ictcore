@@ -191,7 +191,7 @@ class Account
     return $aAccount;
   }
 
-  public static function getClass($account_id, $namespace = 'ICT\\Core\\Account')
+  public static function getClass(&$account_id, $namespace = 'ICT\\Core\\Account')
   {
     if (ctype_digit(trim($account_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
@@ -201,12 +201,13 @@ class Account
       }
     } else {
       $account_type = $account_id;
+      $account_id   = null;
     }
     $class_name = ucfirst(strtolower(trim($account_type)));
     if (!empty($namespace)) {
       $class_name = $namespace . '\\' . $class_name;
     }
-    if (class_exists($class_name)) {
+    if (class_exists($class_name, true)) {
       return $class_name;
     } else {
       return false;

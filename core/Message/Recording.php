@@ -13,6 +13,7 @@ use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\DB;
 use ICT\Core\Message;
+use ICT\Core\User;
 use ICT\Core\Session;
 
 class Recording extends Message
@@ -221,6 +222,8 @@ class Recording extends Message
     if (in_array(strtolower($type), $sox_type)) {
       if (version_compare($sox_version, '13.0.0', '<')) {
         $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -w -r 8000 -c 1 -s '$targetFile'";
+      } else if (version_compare($sox_version, '14.3.0', '>')) {
+        $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -b 16 -r 8000 -c 1 -e signed-integer '$targetFile'");
       } else {
         $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -2 -r 8000 -c 1 -s '$targetFile'";
       }

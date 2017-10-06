@@ -131,7 +131,7 @@ class Provider
     return $aProvider;
   }
 
-  public static function getClass($provider_id, $namespace = 'ICT\\Core\\Provider')
+  public static function getClass(&$provider_id, $namespace = 'ICT\\Core\\Provider')
   {
     if (ctype_digit(trim($provider_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
@@ -141,12 +141,13 @@ class Provider
       }
     } else {
       $provider_type = $provider_id;
+      $provider_id   = null;
     }
     $class_name = ucfirst(strtolower(trim($provider_type)));
     if (!empty($namespace)) {
       $class_name = $namespace . '\\' . $class_name;
     }
-    if (class_exists($class_name)) {
+    if (class_exists($class_name, true)) {
       return $class_name;
     } else {
       return false;
