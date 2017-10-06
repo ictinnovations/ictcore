@@ -3,6 +3,7 @@ ICTCore 0.7.6
 
 Dated: 06-October-2017
 
+* Session support added
 * Bug fixes
 
 ICTCore 0.7.5

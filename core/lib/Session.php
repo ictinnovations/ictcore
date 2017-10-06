@@ -90,14 +90,15 @@ class Session extends Data
   {
     Corelog::log("Session read requested with id: $id", Corelog::DEBUG);
     session_write_close();
-    $query = "SELECT data FROM transmission_session WHERE transmission_id='$id'";
-    if (!$result = DB::query('transmission_session', $query)) {
+    $query = "SELECT data FROM session WHERE session_id='$id'";
+    if (!$result = DB::query('session', $query)) {
       Corelog::log("Session read failed with error: " . mysql_error(DB::$link), Corelog::WARNING);
       return FALSE;
     }
     if (mysql_num_rows($result)) {
       $row = mysql_fetch_assoc($result);
-      return unserialize($row["data"]);
+      self::$_instance = unserialize($row["data"]);
+      return self::$_instance;
     } else {
       Corelog::log("Session read found zero rows", Corelog::WARNING);
       return "";
@@ -107,15 +108,14 @@ class Session extends Data
   public static function write($id, $data)
   {
     Corelog::log("Session write requested with id: $id", Corelog::DEBUG, $data);
-    $sessionRs = DB::query('transmission_session', "SELECT count(*) FROM transmission_session s WHERE s.transmission_id = '$id'");
-    $row = mysql_fetch_row($sessionRs);
-    if ($row[0] > 0) {
-      $query = "UPDATE transmission_session SET data='%data%', time_start=UNIX_TIMESTAMP() WHERE transmission_id ='$id'";
+    $sessionRs = DB::query('session', "SELECT session_id FROM session s WHERE s.session_id = '$id'");
+    if(mysql_fetch_array($sessionRs) !== false) {
+      $query = "UPDATE session SET data='%data%', time_start=UNIX_TIMESTAMP() WHERE session_id ='$id'";
     } else {
-      $query = "INSERT INTO transmission_session (transmission_id, time_start, data) 
+      $query = "INSERT INTO session (session_id, time_start, data) 
                   VALUES ('$id', UNIX_TIMESTAMP(), '%data%')";
     }
-    DB::query('transmission_session', $query, array('data' => serialize($data)));
+    DB::query('session', $query, array('data' => serialize(self::$_instance)));
     if (mysql_affected_rows(DB::$link)) {
       return TRUE;
     }
@@ -125,8 +125,8 @@ class Session extends Data
   public static function destroy($id)
   {
     Corelog::log("Session delete requested with id: $id", Corelog::DEBUG);
-    $query = "DELETE FROM transmission_session where transmission_id='$id'";
-    $result = DB::query('transmission_session', $query);
+    $query = "DELETE FROM session where session_id='$id'";
+    $result = DB::query('session', $query);
     if ($result) {
       $oSession = Session::get_instance();
       unset($oSession);
@@ -139,8 +139,8 @@ class Session extends Data
   public static function gc($life)
   {
     Corelog::log("Session gc requested with lif: $life", Corelog::DEBUG);
-    $query = "DELETE FROM transmission_session WHERE time_start < " . (time() - $life);
-    $result = DB::query('transmission_session', $query);
+    $query = "DELETE FROM session WHERE time_start < " . (time() - $life);
+    $result = DB::query('session', $query);
     if ($result) {
       return TRUE;
     } else {

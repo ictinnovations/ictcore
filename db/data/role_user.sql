@@ -3,6 +3,8 @@ INSERT INTO role(name, description) VALUES ('user', 'authorized user');
 -- permissions for user role
 SELECT @roleId := role_id FROM role WHERE name='user';
 -- provider permissions
+SELECT @permissionId := permission_id FROM permission WHERE name='api';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* api */
 SELECT @permissionId := permission_id FROM permission WHERE name='contact';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* contact */
 SELECT @permissionId := permission_id FROM permission WHERE name='document';
@@ -17,6 +19,8 @@ SELECT @permissionId := permission_id FROM permission WHERE name='program';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* program */
 SELECT @permissionId := permission_id FROM permission WHERE name='transmission';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* transmission */
+SELECT @permissionId := permission_id FROM permission WHERE name='task';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* task */
 SELECT @permissionId := permission_id FROM permission WHERE name='schedule';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* schedule */
 SELECT @permissionId := permission_id FROM permission WHERE name='spool';

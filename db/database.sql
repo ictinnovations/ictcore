@@ -131,7 +131,9 @@ CREATE TABLE role_permission
 /*==============================================================*/
 /* Table: insert core permissions                               */
 /*==============================================================*/
--- Provider related permissions
+-- Common permissions
+INSERT INTO permission VALUES (NULL, 'api', '');
+INSERT INTO permission VALUES (NULL, 'api_access', '');
 -- Program permissions
 INSERT INTO permission VALUES (NULL, 'program', '');
 INSERT INTO permission VALUES (NULL, 'program_create', '');
@@ -493,15 +495,15 @@ CREATE TABLE transmission (
 ) ENGINE = InnoDB;
 
 /*==============================================================*/
-/* Table: transmission_session                                  */
+/* Table: session                                               */
 /* Desc: session data regarding each transmission               */
 /*==============================================================*/
-CREATE TABLE transmission_session
+CREATE TABLE session
 (
-   transmission_id                int(11) unsigned       default NULL,
+   session_id                     varchar(80)            default NULL,
    time_start                     int(11)                default 0,
    data                           text,
-   PRIMARY KEY (transmission_id)
+   PRIMARY KEY (session_id)
 ) ENGINE = InnoDB;
 
 /*==============================================================*/

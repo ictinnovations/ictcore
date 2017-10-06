@@ -17,12 +17,18 @@ chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 // Include the framework
 include_once "Core.php";
 
+// *************************************** PREPARE SESSION AND COOKIES
+$session_name = Conf::get('website:cookie', 'ictcore');
+session_name($session_name);
+session_start(); // session start
+
 // **************************************************** PREPARE SYSTEM
 $oApi = new Api();
-$oApi->create_interface('rest', '/ictcore/'); // create rest server interface
+$oApi->create_interface('rest', Conf::get('website:path', null)); // create rest server interface
+
 // ****************************************** AUTHENTICATE AND EXECUTE
 try {
-  if (http_authenticate() === true) {
+  if (ICT\Core\can_access('api_access') === true || http_authenticate() === true) {
     $oApi->process_request();  // serve rest request
   } else {
     throw new CoreException('401', 'Unknown authentication error');
@@ -36,7 +42,7 @@ exit();
 
 function http_authenticate()
 {
-  $realm = Conf::get('company:name', 'ICTCore') . ' :: REST API Server';
+  $realm = Conf::get('website:title', 'ICTCore') . ' :: REST API Server';
   // select authentication method
   if (!empty($_SERVER['PHP_AUTH_USER'])) {
     $username = $_SERVER['PHP_AUTH_USER'];

@@ -114,6 +114,12 @@ function do_login($user)
   return $oSession->user;
 }
 
+function do_logout() {
+    session_unset();
+    session_destroy();
+    session_regenerate_id(true);
+}
+
 function json_check($string)
 {
   json_decode($string);
