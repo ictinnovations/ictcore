@@ -125,7 +125,7 @@ class Provider
     Corelog::log("provider search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query(self::$table, $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aProvider[$data['provider_id']] = $data;
+      $aProvider[] = $data;
     }
 
     return $aProvider;

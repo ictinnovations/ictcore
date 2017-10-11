@@ -117,7 +117,7 @@ class Template extends Message
     Corelog::log("template search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('template', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aTemplate[$data['template_id']] = $data;
+      $aTemplate[] = $data;
     }
 
     return $aTemplate;

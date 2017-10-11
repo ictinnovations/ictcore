@@ -131,7 +131,7 @@ class Recording extends Message
     Corelog::log("recording search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('recording', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aRecording[$data['recording_id']] = $data;
+      $aRecording[] = $data;
     }
 
     return $aRecording;
@@ -223,7 +223,7 @@ class Recording extends Message
       if (version_compare($sox_version, '13.0.0', '<')) {
         $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -w -r 8000 -c 1 -s '$targetFile'";
       } else if (version_compare($sox_version, '14.3.0', '>')) {
-        $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -b 16 -r 8000 -c 1 -e signed-integer '$targetFile'");
+        $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -b 16 -r 8000 -c 1 -e signed-integer '$targetFile'";
       } else {
         $sox_cmd = \ICT\Core\sys_which('sox', '/usr/bin') . " '$sourceFile' -2 -r 8000 -c 1 -s '$targetFile'";
       }

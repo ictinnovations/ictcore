@@ -181,7 +181,7 @@ class User
     Corelog::log("user search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('user', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aUser[$data['user_id']] = $data;
+      $aUser[] = $data;
     }
 
     // if no user found, check for guest user
@@ -259,7 +259,8 @@ class User
     $query = "SELECT up.permission_id FROM " . self::$link_permission . " up WHERE up.usr_id=" . $this->user_id;
     $filter = array('query' => $query);
     $listPermission = Permission::search($filter);
-    foreach($listPermission as $permission_id => $aPermission) {
+    foreach($listPermission as $aPermission) {
+      $permission_id = $aPermission['permission_id'];
       $this->aPermission[$permission_id] = $aPermission['name'];
     }
   }

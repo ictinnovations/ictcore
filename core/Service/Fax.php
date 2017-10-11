@@ -106,8 +106,8 @@ class Fax extends Service
     // to collect call status
     if ($oApplication->type == 'originate' || $oApplication->type == 'connect') {
       $appList = $oApplication->search($oApplication->program_id, Application::ORDER_END);
-      foreach (array_keys($appList) as $disconnect_application_id) {
-        $oApplication->disconnect_application_id = $disconnect_application_id;
+      foreach ($appList as $disconnectApp) {
+        $oApplication->disconnect_application_id = $disconnectApp['application_id'];
         break; // only first
       }
     }

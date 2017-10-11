@@ -84,7 +84,7 @@ class Action
     $query = "SELECT action_id FROM " . self::$table . " WHERE application_id='%application_id%' ";
     $result = DB::query(self::$table, $query, array('application_id' => $application_id));
     while ($data = mysql_fetch_assoc($result)) {
-      $aAction[$data['action_id']] = $data;
+      $aAction[] = $data;
     }
     Corelog::log("Search actions for application: $application_id", Corelog::DEBUG, $aAction);
     return $aAction;

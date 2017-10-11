@@ -126,7 +126,7 @@ class Task
     Corelog::log("task search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('task', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aTask[$data['task_id']] = $data;
+      $aTask[] = $data;
     }
 
     return $aTask;
@@ -142,7 +142,7 @@ class Task
                 AND (t.last_run IS NULL OR (t.last_run + 59) < UNIX_TIMESTAMP())"; // don't run a task twice
     $rsTask = DB::query(self::$table, $query, array());
     while ($data = mysql_fetch_assoc($rsTask)) {
-      $aTask[$data['task_id']] = $data;
+      $aTask[] = $data;
     }
     Corelog::log("Task search", Corelog::CRUD, $aTask);
     return $aTask;
@@ -249,7 +249,8 @@ class Task
   {
     $listTask = self::search_pending();
     // now process each aTask in a separate thread
-    foreach ($listTask as $task_id => $aTask) {
+    foreach ($listTask as $aTask) {
+      $task_id = $aTask['task_id'];
       $taskThread = new TaskThread();
       $taskThread->wait()->run($task_id, $aTask['server_time']);
     }

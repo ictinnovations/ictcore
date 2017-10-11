@@ -122,7 +122,7 @@ class Contact
     Corelog::log("contact search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('contact', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aContact[$data['contact_id']] = $data;
+      $aContact[] = $data;
     }
 
     // if no contact found, check for special contacts

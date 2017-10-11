@@ -158,7 +158,7 @@ class Application
     $query = "SELECT application_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id, 'weight' => $weight));
     while ($data = mysql_fetch_assoc($result)) {
-      $aApplication[$data['application_id']] = $data;
+      $aApplication[] = $data;
     }
     Corelog::log("Application search for program: $program_id", Corelog::CRUD, $aApplication);
     return $aApplication;
@@ -228,7 +228,8 @@ class Application
 
       $this->aAction = array();
       $listAction = Action::search($this->application_id);
-      foreach (array_keys($listAction) as $action_id) {
+      foreach ($listAction as $aAction) {
+        $action_id = $aAction['action_id'];
         $this->aAction[$action_id] = new Action($action_id);
       }
       Corelog::log("Application loaded: $this->name", Corelog::CRUD);

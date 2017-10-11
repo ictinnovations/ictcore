@@ -215,7 +215,7 @@ class Transmission
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aTransmission[$data['transmission_id']] = $data;
+      $aTransmission[] = $data;
     }
 
     return $aTransmission;
@@ -561,9 +561,9 @@ class Transmission
 
   public function &result_load()
   {
-    $aResult = Result::search($this->oSpool->spool_id);
-    foreach (array_keys($aResult) as $spool_result_id) {
-      $oResult = new Result($spool_result_id);
+    $listResult = Result::search($this->oSpool->spool_id);
+    foreach ($listResult as $aResult) {
+      $oResult = new Result($aResult['spool_result_id']);
       $this->aResult[$oResult->name] = $oResult;
     }
     return $this->aResult;

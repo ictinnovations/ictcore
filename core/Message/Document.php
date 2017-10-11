@@ -145,7 +145,7 @@ class Document extends Message
     Corelog::log("document search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('document', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aDocument[$data['document_id']] = $data;
+      $aDocument[] = $data;
     }
 
     return $aDocument;

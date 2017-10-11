@@ -170,7 +170,7 @@ class Account
     Corelog::log("account search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('account', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aAccount[$data['account_id']] = $data;
+      $aAccount[] = $data;
     }
 
     // if no account found, check for special accounts
@@ -382,7 +382,8 @@ class Account
     Corelog::log("Removing program from: $this->account_id Program: $program_name", Corelog::CRUD);
     $aProgram = Program::resource_search('account', $this->account_id);
     if ($aProgram) { // no error / false
-      foreach (array_keys($aProgram) as $program_id) {
+      foreach ($aProgram as $aProgram) {
+        $program_id = $aProgram['program_id'];
         if (ctype_digit($program_name) && $program_name == $program_id) {
           $oProgram = Program::load($program_id);
           $oProgram->delete();

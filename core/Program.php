@@ -177,7 +177,7 @@ class Program
     Corelog::log("program search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('program', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aProgram[$data['program_id']] = $data;
+      $aProgram[] = $data;
     }
 
     return $aProgram;
@@ -190,7 +190,7 @@ class Program
     $query = "SELECT program_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id));
     while ($data = mysql_fetch_assoc($result)) {
-      $aProgram[$data['program_id']] = $data;
+      $aProgram[] = $data;
     }
     Corelog::log("Child program search for program: $program_id", Corelog::CRUD, $aProgram);
     return $aProgram;
@@ -369,7 +369,7 @@ class Program
     $query = "SELECT program_id FROM " . self::$table . "_resource WHERE resource_type='%resource_type%' AND resource_id=%resource_id%";
     $result = DB::query(self::$table . "_resource", $query, array('resource_type' => $resource_type, 'resource_id' => $resource_id));
     while ($resource = mysql_fetch_assoc($result)) {
-      $aProgram[$resource['program_id']] = $resource;
+      $aProgram[] = $resource;
     }
 
     if (empty($aProgram)) {
@@ -388,15 +388,15 @@ class Program
 
     // then delete all application linked to this program
     $listApplication = Application::search($this->program_id);
-    foreach (array_keys($listApplication) as $application_id) {
-      $oApplication = Application::load($application_id);
+    foreach ($listApplication as $aApplication) {
+      $oApplication = Application::load($aApplication['application_id']);
       $oApplication->delete();
     }
 
     // then delete all child programs
     $listChild = $this->search_child($this->program_id);
-    foreach (array_keys($listChild) as $program_id) {
-      $oProgram = Program::load($program_id);
+    foreach ($listChild as $childProgram) {
+      $oProgram = Program::load($childProgram['program_id']);
       $oProgram->delete();
     }
 
@@ -537,8 +537,8 @@ class Program
     $result = false;
     // fetch program's initial applications (identified by ORDER_INIT as weight)
     $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
-    foreach (array_keys($listApplication) as $application_id) {
-      $oApplication = Application::load($application_id);
+    foreach ($listApplication as $aApplication) {
+      $oApplication = Application::load($aApplication['application_id']);
       $oApplication->_execute($this->oTransmission);
       $result = true;
     }
@@ -682,8 +682,8 @@ class Program
       // first of all change transmission status
       $oTransmission->status = Transmission::STATUS_PROCESSING;
       $listApplication = Application::search($this->program_id, Application::ORDER_INIT);
-      foreach (array_keys($listApplication) as $application_id) {
-        $oApplication = Application::load($application_id);
+      foreach ($listApplication as $aApplication) {
+        $oApplication = Application::load($aApplication['application_id']);
         break; // only one application is needed
       }
     } else { // in case of existing in-process transmission

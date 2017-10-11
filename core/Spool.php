@@ -154,7 +154,7 @@ class Spool
     Corelog::log("spool search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('spool', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aSpool[$data['spool_id']] = $data;
+      $aSpool[] = $data;
     }
 
     return $aSpool;

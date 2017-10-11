@@ -72,7 +72,7 @@ class Result
     $query = "SELECT * FROM " . self::$table . " WHERE spool_id=%spool_id%";
     $result = DB::query(self::$table, $query, array('spool_id' => $spool_id));
     while ($data = mysql_fetch_assoc($result)) {
-      $aResult[$data['spool_result_id']] = $data;
+      $aResult[] = $data;
     }
     Corelog::log("Result search for spool_id: $spool_id", Corelog::CRUD, $aResult);
     return $aResult;

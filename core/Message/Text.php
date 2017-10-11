@@ -118,7 +118,7 @@ class Text extends Message
     Corelog::log("text search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('text', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aText[$data['text_id']] = $data;
+      $aText[] = $data;
     }
 
     return $aText;

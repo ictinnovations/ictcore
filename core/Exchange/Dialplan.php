@@ -155,7 +155,7 @@ class Dialplan
     Corelog::log("dialplan search with $query", Corelog::DEBUG);
     $result = DB::query(self::$table, $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $listDialplan[$data['dialplan_id']] = $data;
+      $listDialplan[] = $data;
     }
 
     Corelog::log("Dialplan search results", Corelog::CRUD, $listDialplan);

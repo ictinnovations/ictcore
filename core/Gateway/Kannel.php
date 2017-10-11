@@ -100,7 +100,7 @@ class Kannel extends Gateway
        */
       $spool_id = $data['spool_id'];
       $dlrMask = 1 | 2 | 4 | 8 | 16;
-      $rsp_url = Conf::get('site:base_url', 'http://localhost/ictcore') . '/gateway.php';
+      $rsp_url = Conf::get('website:url', 'http://localhost/ictcore') . '/gateway.php';
       $dlrUrl = "$rsp_url?spool_id=$spool_id&gateway_flag=" . Kannel::GATEWAY_FLAG;
       $dlrUrl .= "&application_data[result]=%d&application_data[error]=%A";
 

@@ -76,7 +76,8 @@ class Role
     $query = "SELECT rp.permission_id FROM " . self::$link_permission . " rp WHERE rp.role_id=" . $this->role_id;
     $filter = array('query' => $query);
     $listPermission = Permission::search($filter);
-    foreach($listPermission as $permission_id => $aPermission) {
+    foreach($listPermission as $aPermission) {
+      $permission_id = $aPermission['permission_id'];
       $this->aPermission[$permission_id] = $aPermission['name'];
     }
   }
