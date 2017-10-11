@@ -1,9 +1,16 @@
 {
+  "repositories":
+  [
+    {
+      "type": "vcs",
+      "url": "https://github.com/ictinnovations/RestServer"
+    }
+  ],
   "require": {
-    "swiftmailer/swiftmailer": "@stable",
+    "swiftmailer/swiftmailer": "^5.4.8",
     "nategood/httpful": "^0.2.20",
     "aza/thread": "^1.1",
-    "twig/twig": "^1.28",
+    "twig/twig": "^1.35",
     "jacwright/restserver": "dev-master"
   },
   "autoload": {
