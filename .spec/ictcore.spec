@@ -27,7 +27,7 @@ Requires: php php-cli php-curl php-mcrypt php-mbstring php-xmlrpc php-posix php-
 Requires: php-pear php-pear-Pager php-pear-SOAP php-pear-HTTP-Request
 Requires: php-pecl-imagick php-pecl-json php-pecl-libevent
 # ICTCore use mysql as database in centos 6 or mariadb in centos 7
-%if %{rhel} > 6
+%if %{rhel} < 7
 Requires: mariadb mariadb-server mysql-connector-odbc
 %else
 Requires: mysql mysql-server mysql-connector-odbc
@@ -350,18 +350,18 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 /sbin/chkconfig crond on
 /sbin/service crond restart
 # enable and start mysql or mariadb server
-%if %{rhel} > 6
-/bin/systemctl enable mariadb.service
-/bin/systemctl start mariadb.service
-%else
+%if %{rhel} < 7
 /sbin/chkconfig mysqld on
 /sbin/service mysqld start
+%else
+/bin/systemctl enable mariadb.service
+/bin/systemctl start mariadb.service
 %endif
 # enable and start apache server
 /sbin/chkconfig httpd on
 /sbin/service httpd restart
 # configure firewall for web
-%if %{rhel} > 6
+%if %{rhel} < 7
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT    # web
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT   # ssl web
 /etc/init.d/iptables save
@@ -369,7 +369,7 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 /bin/firewall-cmd --zone=public --add-port=80/tcp --permanent    # web
 /bin/firewall-cmd --zone=public --add-port=443/tcp --permanent   # ssl web
 /bin/firewall-cmd --reload
-%elseif
+%endif
 
 %post voice
 # all new data files must be writable for group users
@@ -397,22 +397,43 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /sbin/chkconfig freeswitch on
 /sbin/service freeswitch restart
 # alter firewall for sip
-%if %{rhel} > 6
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5060 -j ACCEPT    # sip internal profile
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5060 -j ACCEPT    # sip internal profile
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5070 -j ACCEPT    # sip ictcore profile
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5070 -j ACCEPT    # sip ictcore profile
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5071 -j ACCEPT    # sip tcp
-/sbin/iptables -I INPUT -p udp -m state --state NEW -m udp --dport 5071 -j ACCEPT    # sip
-/sbin/iptables -I INPUT -p udp --dport 10000:20000 -j ACCEPT
+%if %{rhel} < 7
+# sip internal profile
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5060 -j ACCEPT    # tcp
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5060 -j ACCEPT    # udp
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5061 -j ACCEPT    # tls
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5061 -j ACCEPT    # dtls
+# sip external profile
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8060 -j ACCEPT    # tcp
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 8060 -j ACCEPT    # udp
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8060 -j ACCEPT    # tls
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 8060 -j ACCEPT    # dtls
+# sip ictcore profile
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5070 -j ACCEPT    # tcp
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5070 -j ACCEPT    # udp
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5071 -j ACCEPT    # tls
+/sbin/iptables -I INPUT -p udp -m state --state NEW -m udp --dport 5071 -j ACCEPT    # dtls
+# media ports
+/sbin/iptables -I INPUT -p udp --dport 10000:20000 -j ACCEPT     # rtp
 /etc/init.d/iptables save
 %else
-/bin/firewall-cmd --zone=public --add-port=5060/udp --permanent  # sip tcp
-/bin/firewall-cmd --zone=public --add-port=5060/tcp --permanent  # sip udp
-/bin/firewall-cmd --zone=public --add-port=5061/udp --permanent  # sip test tcp
-/bin/firewall-cmd --zone=public --add-port=5061/tcp --permanent  # sip test udp
-/bin/firewall-cmd --zone=public --add-port=5672/tcp --permanent  # rabbit-mq
-/bin/firewall-cmd --zone=public --add-port=10000-20000/udp --permanent
+# sip internal profile
+/bin/firewall-cmd --zone=public --add-port=5060/udp --permanent  # udp
+/bin/firewall-cmd --zone=public --add-port=5060/tcp --permanent  # tcp
+/bin/firewall-cmd --zone=public --add-port=5061/udp --permanent  # tls
+/bin/firewall-cmd --zone=public --add-port=5061/tcp --permanent  # dtls
+# sip external profile
+/bin/firewall-cmd --zone=public --add-port=5080/udp --permanent  # udp
+/bin/firewall-cmd --zone=public --add-port=5080/tcp --permanent  # tcp
+/bin/firewall-cmd --zone=public --add-port=5081/udp --permanent  # tls
+/bin/firewall-cmd --zone=public --add-port=5081/tcp --permanent  # dtls
+# sip ictcore profile
+/bin/firewall-cmd --zone=public --add-port=5070/udp --permanent  # udp
+/bin/firewall-cmd --zone=public --add-port=5070/tcp --permanent  # tcp
+/bin/firewall-cmd --zone=public --add-port=5071/udp --permanent  # tls
+/bin/firewall-cmd --zone=public --add-port=5071/tcp --permanent  # dtls
+# media ports
+/bin/firewall-cmd --zone=public --add-port=10000-20000/udp --permanent # rtp
 /bin/firewall-cmd --reload
 %endif
 
@@ -444,7 +465,7 @@ echo "apache" >> /etc/mail/trusted-users
 /sbin/chkconfig sendmail on
 /sbin/service sendmail restart
 # alter firewall for smtp
-%if %{rhel} > 6
+%if %{rhel} < 7
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 25 -j ACCEPT    # smtp
 /etc/init.d/iptables save
 %else
