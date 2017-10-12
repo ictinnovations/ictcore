@@ -19,10 +19,10 @@ participant Program
 participant Database
 participant Dialplan
 
-RestClient->Message:create a new document\n /document/create
+RestClient->Message:create a new document\n POST /documents
 Message->Database: save
 Message->RestClient: message_id
-RestClient->Program:create new program instance\n /program/create/sendfax
+RestClient->Program:create new program instance\n POST /programs/sendfax
 Program->Database: save
 Program->Dialplan:deploy()
 Program->RestClient: program_id
@@ -70,10 +70,10 @@ participant Program
 participant Application
 participant Gateway
 
-RestClient->Transmission:create a new transmission\n /program/$program_id/transmission
+RestClient->Transmission:create a new transmission\n POST /programs/$program_id/transmissions
 Transmission->Transmission:save()
 Transmission->RestClient:transmission_id
-RestClient->Transmission:send / start transmission\n /transmission/$transmission_id/send
+RestClient->Transmission:send / start transmission\n GET /transmissions/$transmission_id/send
 Transmission->Spool:create a\n new spool
 Spool->Spool:save()
 Transmission->Program:execute program

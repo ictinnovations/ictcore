@@ -20,8 +20,8 @@ class RecordingApi extends Api
   /**
    * Create a new recording
    *
-   * @url POST /recording/create
-   * @url POST /message/recording/create
+   * @url POST /recordings
+   * @url POST /messages/recordings
    */
   public function create($data = array())
   {
@@ -51,22 +51,20 @@ class RecordingApi extends Api
   /**
    * List all available recordings
    *
-   * @url GET /recording/list
-   * @url GET /message/recording/list
-   * @url POST /recording/list
-   * @url POST /message/recording/list
+   * @url GET /recordings
+   * @url GET /messages/recordings
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('recording_list');
-    return Recording::search($data);
+    return Recording::search($query);
   }
 
   /**
    * Gets the recording by id
    *
-   * @url GET /recording/$recording_id
-   * @url GET /message/recording/$recording_id
+   * @url GET /recordings/$recording_id
+   * @url GET /messages/recordings/$recording_id
    */
   public function read($recording_id)
   {
@@ -79,8 +77,8 @@ class RecordingApi extends Api
   /**
    * Download recording by id
    *
-   * @url GET /recording/$recording_id/download
-   * @url GET /message/recording/$recording_id/download
+   * @url GET /recordings/$recording_id/download
+   * @url GET /messages/recordings/$recording_id/download
    */
   public function download($recording_id)
   {
@@ -110,10 +108,8 @@ class RecordingApi extends Api
   /**
    * Update existing recording
    *
-   * @url POST /recording/$recording_id/update
-   * @url POST /message/recording/$recording_id/update
-   * @url PUT /recording/$recording_id/update
-   * @url PUT /message/recording/$recording_id/update
+   * @url PUT /recordings/$recording_id
+   * @url PUT /messages/recordings/$recording_id
    */
   public function update($recording_id, $data = array())
   {
@@ -143,10 +139,8 @@ class RecordingApi extends Api
   /**
    * Create a new recording
    *
-   * @url GET /recording/$recording_id/delete
-   * @url GET /message/recording/$recording_id/delete
-   * @url DELETE /recording/$recording_id/delete
-   * @url DELETE /message/recording/$recording_id/delete
+   * @url DELETE /recordings/$recording_id
+   * @url DELETE /messages/recordings/$recording_id
    */
   public function remove($recording_id)
   {

@@ -28,12 +28,15 @@ class TransmissionApi extends Api
   /**
    * Create a new custom transmission
    *
-   * @url POST /transmission/create/$program_id
+   * @url POST /transmissions
    */
-  public function create($program_id, $data = array())
+  public function create($data = array())
   {
     $this->_authorize('transmission_create');
 
+    if (empty($data['program_id'])) {
+      throw new CoreException(412, 'program_id is missing');
+    }
     if (empty($data['contact_id'])) {
       throw new CoreException(412, 'contact_id is missing');
     } else {
@@ -52,7 +55,7 @@ class TransmissionApi extends Api
     $direction = empty($data['direction']) ? Transmission::OUTBOUND : $data['direction'];
     unset($data['direction']);
 
-    $oProgram = Program::load($program_id);
+    $oProgram = Program::load($data['program_id']);
     $oTransmission = $oProgram->transmission_create($contact_id, $account_id, $direction);
     $this->set($oTransmission, $data);
 
@@ -66,20 +69,18 @@ class TransmissionApi extends Api
   /**
    * List all available transmissions
    *
-   * @url GET /transmission/list
-   * @url POST /transmission/list
+   * @url GET /transmissions
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('transmission_list');
-    return Transmission::search($data);
+    return Transmission::search($query);
   }
 
   /**
    * List all available calls
    *
-   * @url GET /call/list
-   * @url POST /call/list
+   * @url GET /calls
    */
   public function call_list($data = array())
   {
@@ -90,8 +91,7 @@ class TransmissionApi extends Api
   /**
    * List all available faxs
    *
-   * @url GET /fax/list
-   * @url POST /fax/list
+   * @url GET /faxes
    */
   public function fax_list($data = array())
   {
@@ -102,8 +102,7 @@ class TransmissionApi extends Api
   /**
    * List all available SMS messages
    *
-   * @url GET /sms/list
-   * @url POST /sms/list
+   * @url GET /smses
    */
   public function sms_list($data = array())
   {
@@ -114,8 +113,7 @@ class TransmissionApi extends Api
   /**
    * List all available emails
    *
-   * @url GET /email/list
-   * @url POST /email/list
+   * @url GET /emails
    */
   public function email_list($data = array())
   {
@@ -126,11 +124,11 @@ class TransmissionApi extends Api
   /**
    * Gets the transmission by id
    *
-   * @url GET /transmission/$transmission_id
-   * @url GET /call/$transmission_id
-   * @url GET /fax/$transmission_id
-   * @url GET /sms/$transmission_id
-   * @url GET /email/$transmission_id
+   * @url GET /transmissions/$transmission_id
+   * @url GET /calls/$transmission_id
+   * @url GET /faxes/$transmission_id
+   * @url GET /smses/$transmission_id
+   * @url GET /emails/$transmission_id
    */
   public function read($transmission_id)
   {
@@ -149,16 +147,11 @@ class TransmissionApi extends Api
   /**
    * Delete a transmission
    *
-   * @url GET /transmission/$transmission_id/delete
-   * @url DELETE /transmission/$transmission_id/delete
-   * @url GET /call/$transmission_id/delete
-   * @url DELETE /call/$transmission_id/delete
-   * @url GET /fax/$transmission_id/delete
-   * @url DELETE /fax/$transmission_id/delete
-   * @url GET /sms/$transmission_id/delete
-   * @url DELETE /sms/$transmission_id/delete
-   * @url GET /email/$transmission_id/delete
-   * @url DELETE /email/$transmission_id/delete
+   * @url DELETE /transmissions/$transmission_id
+   * @url DELETE /calls/$transmission_id
+   * @url DELETE /faxes/$transmission_id
+   * @url DELETE /smses/$transmission_id
+   * @url DELETE /emails/$transmission_id
    */
   public function remove($transmission_id)
   {
@@ -177,16 +170,18 @@ class TransmissionApi extends Api
   /**
    * Send already saved transmission
    *
-   * @url GET /transmission/$transmission_id/send
-   * @url GET /call/$transmission_id/dial
-   * @url GET /fax/$transmission_id/send
-   * @url GET /sms/$transmission_id/send
-   * @url GET /email/$transmission_id/send
-   * @url GET /transmission/$transmission_id/retry
-   * @url GET /call/$transmission_id/retry
-   * @url GET /fax/$transmission_id/retry
-   * @url GET /sms/$transmission_id/retry
-   * @url GET /email/$transmission_id/retry
+   * @url GET /transmissions/$transmission_id/send
+   * @url GET /calls/$transmission_id/dial
+   * @url GET /faxes/$transmission_id/send
+   * @url GET /smses/$transmission_id/send
+   * @url GET /emails/$transmission_id/send
+   * @url GET /transmissions/$transmission_id/retry
+   * @url GET /calls/$transmission_id/retry
+   * @url GET /faxes/$transmission_id/retry
+   * @url GET /smses/$transmission_id/retry
+   * @url GET /emails/$transmission_id/retry
+   * 
+   * TODO / TBD: Replace it with POST or PUT as GET is not allowed to modify data
    */
   public function send($transmission_id)
   {
@@ -199,11 +194,11 @@ class TransmissionApi extends Api
   /**
    * Schedule transmission 
    *
-   * @url POST /transmission/$transmission_id/schedule
-   * @url POST /call/$transmission_id/schedule
-   * @url POST /fax/$transmission_id/schedule
-   * @url POST /sms/$transmission_id/schedule
-   * @url POST /email/$transmission_id/schedule
+   * @url PUT /transmissions/$transmission_id/schedule
+   * @url PUT /calls/$transmission_id/schedule
+   * @url PUT /faxes/$transmission_id/schedule
+   * @url PUT /smses/$transmission_id/schedule
+   * @url PUT /emails/$transmission_id/schedule
    */
   public function schedule_create($transmission_id, $data = array())
   {
@@ -226,11 +221,11 @@ class TransmissionApi extends Api
   /**
    * Cancel transmission schedule
    *
-   * @url GET /transmission/$transmission_id/schedule/cancel
-   * @url GET /call/$transmission_id/schedule/cancel
-   * @url GET /fax/$transmission_id/schedule/cancel
-   * @url GET /sms/$transmission_id/schedule/cancel
-   * @url GET /email/$transmission_id/schedule/cancel
+   * @url DELETE /transmissions/$transmission_id/schedule
+   * @url DELETE /calls/$transmission_id/schedule
+   * @url DELETE /faxes/$transmission_id/schedule
+   * @url DELETE /smses/$transmission_id/schedule
+   * @url DELETE /emails/$transmission_id/schedule
    */
   public function schedule_cancel($transmission_id)
   {
@@ -244,11 +239,13 @@ class TransmissionApi extends Api
   /**
    * Create new transmission by cloning existing one
    *
-   * @url GET /transmission/$transmission_id/clone
-   * @url GET /call/$transmission_id/clone
-   * @url GET /fax/$transmission_id/clone
-   * @url GET /sms/$transmission_id/clone
-   * @url GET /email/$transmission_id/clone
+   * @url GET /transmissions/$transmission_id/clone
+   * @url GET /calls/$transmission_id/clone
+   * @url GET /faxes/$transmission_id/clone
+   * @url GET /smses/$transmission_id/clone
+   * @url GET /emails/$transmission_id/clone
+   * 
+   * TBD / TODO: replace GET method with POST, as it voilate REST GET no data change rule
    */
   public function create_clone($transmission_id)
   {
@@ -267,11 +264,11 @@ class TransmissionApi extends Api
   /**
    * Get transmission status
    *
-   * @url GET /transmission/$transmission_id/status
-   * @url GET /call/$transmission_id/status
-   * @url GET /fax/$transmission_id/status
-   * @url GET /sms/$transmission_id/status
-   * @url GET /email/$transmission_id/status
+   * @url GET /transmissions/$transmission_id/status
+   * @url GET /calls/$transmission_id/status
+   * @url GET /faxes/$transmission_id/status
+   * @url GET /smses/$transmission_id/status
+   * @url GET /emails/$transmission_id/status
    */
   public function status($transmission_id)
   {
@@ -284,11 +281,11 @@ class TransmissionApi extends Api
   /**
    * Get transmission details
    *
-   * @url GET /transmission/$transmission_id/detail
-   * @url GET /call/$transmission_id/detail
-   * @url GET /fax/$transmission_id/detail
-   * @url GET /sms/$transmission_id/detail
-   * @url GET /email/$transmission_id/detail
+   * @url GET /transmissions/$transmission_id/detail
+   * @url GET /calls/$transmission_id/detail
+   * @url GET /faxes/$transmission_id/detail
+   * @url GET /smses/$transmission_id/detail
+   * @url GET /emails/$transmission_id/detail
    */
   public function detail($transmission_id)
   {
@@ -301,11 +298,11 @@ class TransmissionApi extends Api
   /**
    * Get transmission details
    *
-   * @url GET /transmission/$transmission_id/result
-   * @url GET /call/$transmission_id/result
-   * @url GET /fax/$transmission_id/result
-   * @url GET /sms/$transmission_id/result
-   * @url GET /email/$transmission_id/result
+   * @url GET /transmissions/$transmission_id/result
+   * @url GET /calls/$transmission_id/result
+   * @url GET /faxes/$transmission_id/result
+   * @url GET /smses/$transmission_id/result
+   * @url GET /emails/$transmission_id/result
    */
   public function result($transmission_id)
   {

@@ -19,7 +19,7 @@ class SpoolApi extends Api
   /**
    * Get spool status
    *
-   * @url GET /spool/$spool_id/status
+   * @url GET /spools/$spool_id/status
    */
   public function status($spool_id)
   {
@@ -32,7 +32,7 @@ class SpoolApi extends Api
   /**
    * Get spool details
    *
-   * @url GET /spool/$spool_id/result
+   * @url GET /spools/$spool_id/result
    */
   public function result($spool_id)
   {

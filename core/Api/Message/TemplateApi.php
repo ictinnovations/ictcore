@@ -20,8 +20,8 @@ class TemplateApi extends Api
   /**
    * Create a new template
    *
-   * @url POST /template/create
-   * @url POST /message/template/create
+   * @url POST /template
+   * @url POST /message/template
    */
   public function create($data = array())
   {
@@ -51,22 +51,20 @@ class TemplateApi extends Api
   /**
    * List all available templates
    *
-   * @url GET /template/list
-   * @url GET /message/template/list
-   * @url POST /template/list
-   * @url POST /message/template/list
+   * @url GET /templates
+   * @url GET /messages/templates
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('template_list');
-    return Template::search($data);
+    return Template::search($query);
   }
 
   /**
    * Gets the template by id
    *
-   * @url GET /template/$template_id
-   * @url GET /message/template/$template_id
+   * @url GET /templates/$template_id
+   * @url GET /messages/templates/$template_id
    */
   public function read($template_id)
   {
@@ -79,8 +77,8 @@ class TemplateApi extends Api
   /**
    * Download template by id
    *
-   * @url GET /template/$template_id/download
-   * @url GET /message/template/$template_id/download
+   * @url GET /templates/$template_id/download
+   * @url GET /messages/templates/$template_id/download
    */
   public function download($template_id)
   {
@@ -110,10 +108,8 @@ class TemplateApi extends Api
   /**
    * Update existing template
    *
-   * @url POST /template/$template_id/update
-   * @url POST /message/template/$template_id/update
-   * @url PUT /template/$template_id/update
-   * @url PUT /message/template/$template_id/update
+   * @url PUT /templates/$template_id
+   * @url PUT /messages/templates/$template_id
    */
   public function update($template_id, $data = array())
   {
@@ -143,10 +139,8 @@ class TemplateApi extends Api
   /**
    * Create a new template
    *
-   * @url GET /template/$template_id/delete
-   * @url GET /message/template/$template_id/delete
-   * @url DELETE /template/$template_id/delete
-   * @url DELETE /message/template/$template_id/delete
+   * @url DELETE /templates/$template_id
+   * @url DELETE /messages/templates/$template_id
    */
   public function remove($template_id)
   {

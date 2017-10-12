@@ -21,7 +21,7 @@ class UserApi extends Api
   /**
    * Create a new user
    *
-   * @url POST /user/create
+   * @url POST /users
    */
   public function create($data = array())
   {
@@ -40,19 +40,18 @@ class UserApi extends Api
   /**
    * List all available users
    *
-   * @url GET /user/list
-   * @url POST /user/list
+   * @url GET /users
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('user_list');
-    return User::search($data);
+    return User::search($query);
   }
 
   /**
    * Gets the user by id
    *
-   * @url GET /user/$user_id
+   * @url GET /users/$user_id
    */
   public function read($user_id)
   {
@@ -65,8 +64,7 @@ class UserApi extends Api
   /**
    * Update existing user
    *
-   * @url POST /user/$user_id/update
-   * @url PUT /user/$user_id/update
+   * @url PUT /users/$user_id
    */
   public function update($user_id, $data = array())
   {
@@ -85,8 +83,7 @@ class UserApi extends Api
   /**
    * Create a new user
    *
-   * @url GET /user/$user_id/delete
-   * @url DELETE /user/$user_id/delete
+   * @url DELETE /users/$user_id
    */
   public function remove($user_id)
   {
@@ -105,7 +102,7 @@ class UserApi extends Api
   /**
    * Allow / authorize user for a certain permission
    *
-   * @url GET /user/$user_id/allow/$permission_id
+   * @url PUT /users/$user_id/permissions/$permission_id
    */
   public function allow($user_id, $permission_id)
   {
@@ -121,7 +118,7 @@ class UserApi extends Api
   /**
    * Disallow / prevent a user form using a certain permission
    *
-   * @url GET /user/$user_id/disallow/$permission_id
+   * @url DELETE /users/$user_id/permissions/$permission_id
    */
   public function disallow($user_id, $permission_id)
   {
@@ -137,7 +134,7 @@ class UserApi extends Api
   /**
    * Assign a role to user
    *
-   * @url GET /user/$user_id/assign/$role_id
+   * @url PUT /users/$user_id/roles/$role_id
    */
   public function assign($user_id, $role_id)
   {
@@ -153,7 +150,7 @@ class UserApi extends Api
   /**
    * Remove certain role from user
    *
-   * @url GET /user/$user_id/unassign/$role_id
+   * @url DELETE /users/$user_id/roles/$role_id
    */
   public function unassign($user_id, $role_id)
   {

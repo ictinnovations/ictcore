@@ -13,10 +13,10 @@ participant Program
 participant Database
 participant Dialplan
 
-RestClient->Message:create a new message\n /$message_type/create
+RestClient->Message:create a new message\n POST /messages/$message_type
 Message->Database: save
 Message->RestClient: message_id
-RestClient->Program:create an instance of program\n /program/create/$program_name
+RestClient->Program:create an instance of program\n POST /programs/$program_name
 Program->Database: save
 Program->Dialplan: deploy
 Program->RestClient: program_id
@@ -72,8 +72,8 @@ participant Program
 participant Application
 participant Gateway
 
-RestClient->Program:create a new transmission\n /program/$program_id/transmission
-RestClient->Transmission:send / start transmission\n /transmission/$transmission_id/send
+RestClient->Program:create a new transmission\n POST /programs/$program_id/transmissions
+RestClient->Transmission:send / start transmission\n GET /transmissions/$transmission_id/send
 Transmission->Spool:create a\n new spool
 Transmission->Program:execute program
 Program->Application:Load initial\n applications

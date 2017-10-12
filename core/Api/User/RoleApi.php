@@ -20,7 +20,7 @@ class RoleApi extends Api
   /**
    * Create a new role
    *
-   * @url POST /role/create
+   * @url POST /roles
    */
   public function create($data = array())
   {
@@ -39,19 +39,18 @@ class RoleApi extends Api
   /**
    * List all available roles
    *
-   * @url GET /role/list
-   * @url POST /role/list
+   * @url GET /roles
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('role_list');
-    return Role::search($data);
+    return Role::search($query);
   }
 
   /**
    * Gets the role by id
    *
-   * @url GET /role/$role_id
+   * @url GET /roles/$role_id
    */
   public function read($role_id)
   {
@@ -64,8 +63,7 @@ class RoleApi extends Api
   /**
    * Update existing role
    *
-   * @url POST /role/$role_id/update
-   * @url PUT /role/$role_id/update
+   * @url PUT /roles/$role_id
    */
   public function update($role_id, $data = array())
   {
@@ -84,8 +82,7 @@ class RoleApi extends Api
   /**
    * Create a new role
    *
-   * @url GET /role/$role_id/delete
-   * @url DELETE /role/$role_id/delete
+   * @url DELETE /roles/$role_id
    */
   public function remove($role_id)
   {
@@ -104,7 +101,7 @@ class RoleApi extends Api
   /**
    * Allow / authorize role for a certain permission
    *
-   * @url GET /role/$role_id/allow/$permission_id
+   * @url PUT /roles/$role_id/permissions/$permission_id
    */
   public function allow($role_id, $permission_id)
   {
@@ -120,7 +117,7 @@ class RoleApi extends Api
   /**
    * Disallow / prevent a role form using a certain permission
    *
-   * @url GET /role/$role_id/disallow/$permission_id
+   * @url DELETE /roles/$role_id/permissions/$permission_id
    */
   public function disallow($role_id, $permission_id)
   {

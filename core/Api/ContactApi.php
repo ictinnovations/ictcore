@@ -19,7 +19,7 @@ class ContactApi extends Api
   /**
    * Create a new contact
    *
-   * @url POST /contact/create
+   * @url POST /contacts
    */
   public function create($data = array())
   {
@@ -38,19 +38,18 @@ class ContactApi extends Api
   /**
    * List all available contacts
    *
-   * @url GET /contact/list
-   * @url POST /contact/list
+   * @url GET /contacts
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('contact_list');
-    return Contact::search($data);
+    return Contact::search($query);
   }
 
   /**
    * Gets the contact by id
    *
-   * @url GET /contact/$contact_id
+   * @url GET /contacts/$contact_id
    */
   public function read($contact_id)
   {
@@ -63,8 +62,7 @@ class ContactApi extends Api
   /**
    * Update existing contact
    *
-   * @url POST /contact/$contact_id/update
-   * @url PUT /contact/$contact_id/update
+   * @url PUT /contacts/$contact_id
    */
   public function update($contact_id, $data = array())
   {
@@ -83,8 +81,7 @@ class ContactApi extends Api
   /**
    * Create a new contact
    *
-   * @url GET /contact/$contact_id/delete
-   * @url DELETE /contact/$contact_id/delete
+   * @url DELETE /contacts/$contact_id
    */
   public function remove($contact_id)
   {

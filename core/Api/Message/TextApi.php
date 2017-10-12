@@ -19,8 +19,8 @@ class TextApi extends Api
   /**
    * Create a new text
    *
-   * @url POST /text/create
-   * @url POST /message/text/create
+   * @url POST /texts
+   * @url POST /messages/texts
    */
   public function create($data = array())
   {
@@ -39,22 +39,20 @@ class TextApi extends Api
   /**
    * List all available texts
    *
-   * @url GET /text/list
-   * @url GET /message/text/list
-   * @url POST /text/list
-   * @url POST /message/text/list
+   * @url GET /texts
+   * @url GET /message/texts
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('text_list');
-    return Text::search($data);
+    return Text::search($query);
   }
 
   /**
    * Gets the text by id
    *
-   * @url GET /text/$text_id
-   * @url GET /message/text/$text_id
+   * @url GET /texts/$text_id
+   * @url GET /messages/texts/$text_id
    */
   public function read($text_id)
   {
@@ -67,10 +65,8 @@ class TextApi extends Api
   /**
    * Update existing text
    *
-   * @url POST /text/$text_id/update
-   * @url POST /message/text/$text_id/update
-   * @url PUT /text/$text_id/update
-   * @url PUT /message/text/$text_id/update
+   * @url PUT /texts/$text_id
+   * @url PUT /messages/texts/$text_id
    */
   public function update($text_id, $data = array())
   {
@@ -89,10 +85,8 @@ class TextApi extends Api
   /**
    * Create a new text
    *
-   * @url GET /text/$text_id/delete
-   * @url GET /message/text/$text_id/delete
-   * @url DELETE /text/$text_id/delete
-   * @url DELETE /message/text/$text_id/delete
+   * @url DELETE /texts/$text_id
+   * @url DELETE /messages/texts/$text_id
    */
   public function remove($text_id)
   {

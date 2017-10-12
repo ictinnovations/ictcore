@@ -41,6 +41,6 @@ $files = array(
   'file_name' => '/home/data/Desktop/ict-innovations/all_test-data/fax.pdf'
 );
 
-$result  = ictcore_api('document/create', $arguments, $files);
+$result  = ictcore_api('documents', $arguments, $files);
 echo print_r($result, true)."\n";
 exit(0);

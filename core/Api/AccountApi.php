@@ -21,7 +21,7 @@ class AccountApi extends Api
   /**
    * Create a new account
    *
-   * @url POST /account/create
+   * @url POST /accounts
    */
   public function create($data = array())
   {
@@ -40,19 +40,18 @@ class AccountApi extends Api
   /**
    * List all available accounts
    *
-   * @url GET /account/list
-   * @url POST /account/list
+   * @url GET /accounts
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('account_list');
-    return Account::search($data);
+    return Account::search($query);
   }
 
   /**
    * Gets the account by id
    *
-   * @url GET /account/$account_id
+   * @url GET /accounts/$account_id
    */
   public function read($account_id)
   {
@@ -65,8 +64,7 @@ class AccountApi extends Api
   /**
    * Update existing account
    *
-   * @url POST /account/$account_id/update
-   * @url PUT /account/$account_id/update
+   * @url PUT /accounts/$account_id
    */
   public function update($account_id, $data = array())
   {
@@ -83,10 +81,9 @@ class AccountApi extends Api
   }
 
   /**
-   * Create a new account
+   * Delete a account
    *
-   * @url GET /account/$account_id/delete
-   * @url DELETE /account/$account_id/delete
+   * @url DELETE /accounts/$account_id
    */
   public function remove($account_id)
   {
@@ -105,7 +102,7 @@ class AccountApi extends Api
   /**
    * Subscribe to selected program
    *
-   * @url GET /account/$account_id/subscribe/$program_name
+   * @url PUT /accounts/$account_id/programs/$program_name
    */
   public function subscribe($account_id, $program_name)
   {
@@ -121,8 +118,8 @@ class AccountApi extends Api
   /**
    * Unsubscribe from selected program
    *
-   * @url GET /account/$account_id/unsubscribe/$program_name
-   * @url GET /account/$account_id/unsubscribe
+   * @url DELETE /accounts/$account_id/programs
+   * @url DELETE /accounts/$account_id/programs/$program_name
    */
   public function unsubscribe($account_id, $program_name = 'all')
   {
@@ -136,7 +133,7 @@ class AccountApi extends Api
   /**
    * Associate account to selected user
    *
-   * @url GET /account/$account_id/associate/$user_id
+   * @url PUT /accounts/$account_id/users/$user_id
    */
   public function associate($account_id, $user_id)
   {
@@ -152,7 +149,7 @@ class AccountApi extends Api
   /**
    * Unsubscribe from selected program
    *
-   * @url GET /account/$account_id/dissociate
+   * @url DELETE /accounts/$account_id/users
    */
   public function dissociate($account_id)
   {

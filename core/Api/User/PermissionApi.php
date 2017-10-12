@@ -19,7 +19,7 @@ class PermissionApi extends Api
   /**
    * Create a new permission
    *
-   * @url POST /permission/create
+   * @url POST /permissions
    */
   public function create($data = array())
   {
@@ -38,13 +38,12 @@ class PermissionApi extends Api
   /**
    * List all available permissions
    *
-   * @url GET /permission/list
-   * @url POST /permission/list
+   * @url GET /permissions
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('permission_list');
-    return Permission::search($data);
+    return Permission::search($query);
   }
 
   // no further api needed to update or delete permissions

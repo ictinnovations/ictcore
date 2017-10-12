@@ -20,8 +20,8 @@ class DocumentApi extends Api
   /**
    * Create a new document
    *
-   * @url POST /document/create
-   * @url POST /message/document/create
+   * @url POST /documents
+   * @url POST /messages/documents
    */
   public function create($data = array())
   {
@@ -51,22 +51,20 @@ class DocumentApi extends Api
   /**
    * List all available documents
    *
-   * @url GET /document/list
-   * @url GET /message/document/list
-   * @url POST /document/list
-   * @url POST /message/document/list
+   * @url GET /documents
+   * @url GET /messages/documents
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('document_list');
-    return Document::search($data);
+    return Document::search($query);
   }
 
   /**
    * Gets the document by id
    *
-   * @url GET /document/$document_id
-   * @url GET /message/document/$document_id
+   * @url GET /documents/$document_id
+   * @url GET /messages/documents/$document_id
    */
   public function read($document_id)
   {
@@ -79,8 +77,8 @@ class DocumentApi extends Api
   /**
    * Download document by id
    *
-   * @url GET /document/$document_id/download
-   * @url GET /message/document/$document_id/download
+   * @url GET /documents/$document_id/download
+   * @url GET /messages/documents/$document_id/download
    */
   public function download($document_id)
   {
@@ -111,10 +109,8 @@ class DocumentApi extends Api
   /**
    * Update existing document
    *
-   * @url POST /document/$document_id/update
-   * @url POST /message/document/$document_id/update
-   * @url PUT /document/$document_id/update
-   * @url PUT /message/document/$document_id/update
+   * @url PUT /documents/$document_id
+   * @url PUT /messages/documents/$document_id
    */
   public function update($document_id, $data = array())
   {
@@ -144,10 +140,8 @@ class DocumentApi extends Api
   /**
    * Create a new document
    *
-   * @url GET /document/$document_id/delete
-   * @url GET /message/document/$document_id/delete
-   * @url DELETE /document/$document_id/delete
-   * @url DELETE /message/document/$document_id/delete
+   * @url DELETE /documents/$document_id
+   * @url DELETE /messages/documents/$document_id
    */
   public function remove($document_id)
   {

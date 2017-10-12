@@ -7,7 +7,7 @@ Overview
 * __API Access__ : Any valid combination of username and password created in usr table.
 * __POST Method__: Any data submitted to POST method based APIs must be encoded as json.
 * __DELETE Method__: user can use both DELETE and GET methods for delete APIs.
-* __List APIs__: All list APIs support optional search filter, to search user need to submit search filter as json string using POST method.
+* __List APIs__: All list APIs support optional search filter, to search user need to use search parameters in url as query string using key value pair.
 
 ### HTTP Response Code
 * __200__	Function successfully executed.
@@ -29,12 +29,12 @@ cURL
 ### Simple request
 GET request with no arguments. ( but with http authentication )
 ```shell
-curl -user myuser:mysecret "https://core.example.com/account/list"
+curl -user myuser:mysecret "https://core.example.com/accounts"
 ```
 
 Another GET request to list all recordings
 ```shell
-curl -user myuser:mysecret "https://core.example.com/recording/list"
+curl -user myuser:mysecret "https://core.example.com/recordings"
 ```
 
 ### 1. Creating message and program
@@ -51,7 +51,7 @@ create a data.json file as following
 ```
 then use this file with curl request
 ```shell
-curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/message/template/create"
+curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/messages/templates"
 ```
 In response to this request ICTCore will return template_id, we will use this id while creating program
 
@@ -66,7 +66,7 @@ create a data.json file as following
 ```
 then use this file with curl request
 ```shell
-curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/program/sendemail/create"
+curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/programs/sendemail"
 }
 ```
 In response to this request ICTCore will return program_id, we will use this id while creating new transmission
@@ -85,7 +85,7 @@ create a data.json file as following
 ```
 then use this file with curl request
 ```shell
-curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/contact/create"
+curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/contacts"
 }
 ```
 In response to this request ICTCore will return contact_id for newly created record
@@ -99,7 +99,7 @@ create a data.json file as following
 }
 ```
 ```shell
-curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/program/124/transmission"
+curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/programs/124/transmissions"
 }
 ```
 In response to this request ICTCore will return newly created transmission_id
@@ -107,14 +107,14 @@ In response to this request ICTCore will return newly created transmission_id
 __2.3 Sending Transmission__  
 GET request ICTCore to send / dial previously saved transmission  
 ```shell
-curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/transmission/144/send"
+curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.json "https://core.example.com/transmissions/144/send"
 }
 ```
 
 
 Contact / pre defined destination number
 ========================================
-### POST contact/create
+### POST contacts
 Create new contact
 
 * __Parameters__  
@@ -135,21 +135,19 @@ An associative array containing key and value pairs based on following fields
 * __Response__  
 __contact_id__ of created contact record
 
-### GET contact/list
-list all exiting contacts, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "first_name": "__String__",
-    "last_name": "__String__",
-    "phone": "__Digits__",
-    "email": "__Email__",
-}
+### GET contacts
+list all exiting contacts, optionally client can filter contacts using query string (key value pair) in url, while using any of following fields
+```
+  first_name: __String__
+  last_name: __String__
+  phone: __Digits__
+  email: __Email__
 ```
 
 * __Response__  
 an array of contacts indexed on contact_id
 
-### GET contact/{contact_id}
+### GET contacts/{contact_id}
 Read / view complete contact data
 
 * __Parameters__  
@@ -158,16 +156,16 @@ Replace {contact_id} in url with valid contact_id
 * __Response__  
 Contact details in associative array
 
-### POST contact/{contact_id}/update
+### PUT contacts/{contact_id}
 Update an existing contact
 
 * __Parameters__  
-Replace {contact_id} in url with valid contact_id, fields require modifications will be POSTed in same way as contact/create
+Replace {contact_id} in url with valid contact_id, fields require modifications will be POSTed in same way as `contacts`
 
 * __Response__  
 Return updated contact data as an associative array
 
-### DELETE contact/{contact_id}/delete
+### DELETE contacts/{contact_id}
 Delete an existing contact
 
 * __Parameters__  
@@ -178,7 +176,7 @@ Message / pre defined information to be send
 
 Fax Documents
 -------------
-### POST message/document/create
+### POST messages/documents
 Create new document
 
 * __Parameters__  
@@ -194,20 +192,18 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __document_id__ of recently created document record
 
-### GET message/document/list
-list all exiting documents, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "name": "__String__",
-    "type": "__String__, three digit file extension representing file type",
-    "description": "__String__",
-}
+### GET messages/documents
+list all exiting documents, optionally client can filter documents using query string (key value pair) in url, while using any of following fields
+```
+  name: __String__
+  type: __String__, three digit file extension representing file type
+  description: __String__
 ```
 
 * __Response__  
 an array of documents indexed on document_id
 
-### GET message/document/{document_id}
+### GET messages/documents/{document_id}
 Read / view complete document data
 
 * __Parameters__  
@@ -216,22 +212,22 @@ Replace {document_id} in url with valid document_id
 * __Response__  
 document details in associative array
 
-### POST message/document/{document_id}/update
+### PUT messages/documents/{document_id}
 Update an existing document
 
 * __Parameters__  
-Replace {document_id} in url with valid document_id, fields require modifications will be POSTed in same way as document/create
+Replace {document_id} in url with valid document_id, fields require modifications will be POSTed in same way as `documents`
 
 * __Response__  
 Return updated document data as an associative array
 
-### DELETE message/document/{document_id}/delete
+### DELETE messages/documents/{document_id}
 Delete an existing document
 
 * __Parameters__  
 Replace {document_id} in url with valid document_id
 
-### GET message/document/{document_id}/download
+### GET messages/documents/{document_id}/download
 Download pdf file for an existing document
 
 * __Parameters__  
@@ -242,7 +238,7 @@ Pdf file download will be started
 
 Voice Recordings
 ----------------
-### POST message/recording/create
+### POST messages/recordings
 Create new recording
 
 * __Parameters__  
@@ -258,20 +254,18 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __recording_id__ of recently created recording record
 
-### GET message/recording/list
-list all exiting recordings, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "name": "__String__",
-    "type": "__String__, three digit file extension representing file type",
-    "description": "__String__",
-}
+### GET messages/recordings
+list all exiting recordings, optionally client can filter recordings using query string (key value pair) in url, while using any of following fields
+```
+  name: __String__
+  type: __String__, three digit file extension representing file type
+  description: __String__
 ```
 
 * __Response__  
 an array of recordings indexed on recording_id
 
-### GET message/recording/{recording_id}
+### GET messages/recordings/{recording_id}
 Read / view complete recording data
 
 * __Parameters__  
@@ -280,22 +274,22 @@ Replace {recording_id} in url with valid recording_id
 * __Response__  
 recording details in associative array
 
-### POST message/recording/{recording_id}/update
+### PUT messages/recordings/{recording_id}
 Update an existing recording
 
 * __Parameters__  
-Replace {recording_id} in url with valid recording_id, fields require modifications will be POSTed in same way as recording/create
+Replace {recording_id} in url with valid recording_id, fields require modifications will be POSTed in same way as `recordings`
 
 * __Response__  
 Return updated recording data as an associative array
 
-### DELETE message/recording/{recording_id}/delete
+### DELETE messages/recordings/{recording_id}
 Delete an existing recording
 
 * __Parameters__  
 Replace {recording_id} in url with valid recording_id
 
-### GET message/recording/{recording_id}/download
+### GET messages/recordings/{recording_id}/download
 Download wave file for an existing recording
 
 * __Parameters__  
@@ -306,7 +300,7 @@ Wave file download will be started
 
 Email templates
 ---------------
-### POST message/template/create
+### POST messages/templates
 Create new template
 
 * __Parameters__  
@@ -325,23 +319,21 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __template_id__ of recently created template record
 
-### GET message/template/list
-list all exiting templates, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "name": "__String__",
-    "type": "__String__, three digit file extension representing file type",
-    "description": "__String__",
-    "subject": "__String__",
-    "body": "__String__",
-    "body_alt": "__String__",
-}
+### GET messages/templates
+list all exiting templates, optionally client can filter templates using query string (key value pair) in url, while using any of following fields
+```
+  name: __String__
+  type: __String__, three digit file extension representing file type
+  description: __String__
+  subject: __String__
+  body: __String__
+  body_alt: __String__
 ```
 
 * __Response__  
 an array of templates indexed on template_id
 
-### GET message/template/{template_id}
+### GET messages/templates/{template_id}
 Read / view complete template data
 
 * __Parameters__  
@@ -350,22 +342,22 @@ Replace {template_id} in url with valid template_id
 * __Response__  
 template details in associative array
 
-### POST message/template/{template_id}/update
+### PUT messages/templates/{template_id}
 Update an existing template
 
 * __Parameters__  
-Replace {template_id} in url with valid template_id, fields require modifications will be POSTed in same way as template/create
+Replace {template_id} in url with valid template_id, fields require modifications will be POSTed in same way as `templates`
 
 * __Response__  
 Return updated template data as an associative array
 
-### DELETE message/template/{template_id}/delete
+### DELETE messages/templates/{template_id}
 Delete an existing template
 
 * __Parameters__  
 Replace {template_id} in url with valid template_id
 
-### GET message/template/{template_id}/download
+### GET messages/templates/{template_id}/download
 Download text / html file for an existing template
 
 * __Parameters__  
@@ -376,7 +368,7 @@ File download will be started
 
 SMS Text Message
 ----------------
-### POST message/text/create
+### POST messages/texts
 Create new text
 
 * __Parameters__  
@@ -392,21 +384,19 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __text_id__ of recently created text record
 
-### GET message/text/list
-list all exiting texts, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "name": "__String__",
-    "data": "__String__",
-    "type": "__String__, unicode or plain or binary",
-    "description": "__String__",
-}
+### GET messages/texts
+list all exiting texts, optionally client can filter texts using query string (key value pair) in url, while using any of following fields
+```
+  name: __String__
+  data: __String__
+  type: __String__, unicode or plain or binary
+  description: __String__
 ```
 
 * __Response__  
 an array of texts indexed on text_id
 
-### GET message/text/{text_id}
+### GET messages/texts/{text_id}
 Read / view complete text data
 
 * __Parameters__  
@@ -415,16 +405,16 @@ Replace {text_id} in url with valid text_id
 * __Response__  
 text details in associative array
 
-### POST message/text/{text_id}/update
+### PUT messages/texts/{text_id}
 Update an existing text
 
 * __Parameters__  
-Replace {text_id} in url with valid text_id, fields require modifications will be POSTed in same way as text/create
+Replace {text_id} in url with valid text_id, fields require modifications will be POSTed in same way as `texts`
 
 * __Response__  
 Return updated text data as an associative array
 
-### DELETE message/text/{text_id}/delete
+### DELETE messages/texts/{text_id}
 Delete an existing text
 
 * __Parameters__  
@@ -435,30 +425,37 @@ Programs
 ========
 General program related function
 --------------------------------
-### POST program/create
+### POST programs
 To create program please use respective APIs separately designed for each type of program.
 
-### GET program/list
-list all exiting programs, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "name": "__String__",
-    "type": "__String__, program type",
-    "parent_id": "__Numeric_ID__, program_id of parent program if any",
-}
+### GET programs
+list all exiting programs, optionally client can filter programs using query string (key value pair) in url, while using any of following fields
+```
+  name: __String__
+  type: __String__, program type
+  parent_id: __Numeric_ID__, program_id of parent program
 ```
 
 * __Response__  
 an array of programs indexed on program_id
 
-### DELETE program/{program_id}/delete
+### GET programs/{program_id}
+Read / view complete program data
+
+* __Parameters__  
+Replace {program_id} in url with valid program_id
+
+* __Response__  
+program details in associative array
+
+### DELETE programs/{program_id}
 Delete an existing program
 
 * __Parameters__  
 Replace {program_id} in url with valid program_id
 
-### POST program/{program_name}/transmission
-Prepare a new transmission for program given its name, Actually its a shortcut way to create new transmissions. contrary to transmission/create/{program_id} where user have to first create required program, this APIs complete both steps in one call.
+### PUT programs/{program_name}/transmissions
+Prepare a new transmission for program given its name, Actually its a shortcut way to create new transmissions. contrary to transmissions/{program_id} where user have to first create required program, this APIs complete both steps in one call.
 
 * __Parameters__  
   * Replace {program_id} in url with valid program_id
@@ -468,34 +465,32 @@ Prepare a new transmission for program given its name, Actually its a shortcut w
     "contact_id": "__Numeric_ID__, contact_id to contact where to transmit message",
     "account_id": "__Optional_Numeric_ID__, account_id of associated account",
     "direction": "__Optional_String__, either can be outbound or inbound",
-    ".....": Further fields can be added, as per program requirement, for more details please see respective program/create functions
+    ".....": Further fields can be added, as per program requirement, for more details please see respective programs functions
 }
 ```
 
 * __Response__  
 __transmission_id__ of recently created transmission record
 
-### GET program/{program_id}/transmission/list
-list all transmissions created using certain program which id is given in url, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "title": "__String__",
-    "contact_id": "__Numeric_ID__, contact_id of target contact",
-    "origin": "__String__, reference to function / program which is responsible creation of this transmission",
-    "status": "__String__, if completed or failed",
-    "response": "__String__, the cause of error, transmission failure",
-}
+### GET programs/{program_id}/transmissions
+list all transmissions created using certain program which id is given in url, optionally client can filter transmissions using query string (key value pair) in url, while using any of following fields
+```
+  title: __String__
+  contact_id: __Numeric_ID__, contact_id of target contact
+  origin: __String__, reference to function / program which is responsible creation of this transmission
+  status: __String__, if complete or failed
+  response: __String__, the cause of error, transmission failure
 ```
 
 * __Parameters__  
-Replace {program_id} in url with any valid program_id or program type (as listed below), i.e program/list/emailtofax
+Replace {program_id} in url with any valid program_id or program type (as listed below), i.e `programs/emailtofax`
 
 * __Response__  
 an array of transmissions indexed on transmission_id
 
 Email to Fax program
 --------------------
-### POST program/create/emailtofax
+### POST programs/emailtofax
 Enable an account to receive emails from email address configured in account and forward them to fax
 
 * __Parameters__  
@@ -513,7 +508,7 @@ __program_id__ of recently created program record
 
 Fax to Email program
 -------------
-### POST program/create/faxtoemail
+### POST programs/faxtoemail
 Enable an account to receive faxes and forward them to account's email address
 
 * __Parameters__  
@@ -531,7 +526,7 @@ __program_id__ of recently created program record
 
 Receive Email program
 ---------------------
-### POST program/create/receiveemail
+### POST programs/receiveemail
 Enable an account to receive emails
 
 * __Parameters__  
@@ -549,7 +544,7 @@ __program_id__ of recently created program record
 
 Receive FAX program
 -------------------
-### POST program/create/receivefax
+### POST programs/receivefax
 Enable an account to receive faxes
 
 * __Parameters__  
@@ -567,7 +562,7 @@ __program_id__ of recently created program record
 
 Receive SMS program
 -------------------
-### POST program/create/receivesms
+### POST programs/receivesms
 Enable an account to receive SMS messages
 
 * __Parameters__  
@@ -585,7 +580,7 @@ __program_id__ of recently created program record
 
 Send Email program
 ------------------
-### POST program/create/sendemail
+### POST programs/sendemail
 Prepare given email message for provided account, and make it ready to be sent
 
 * __Parameters__  
@@ -603,7 +598,7 @@ __program_id__ of recently created program record
 
 Send FAX program
 ----------------
-### POST program/create/sendfax
+### POST programs/sendfax
 Prepare given fax document for provided account, and make it ready to be sent
 
 * __Parameters__  
@@ -621,7 +616,7 @@ __program_id__ of recently created program record
 
 Send SMS program
 ----------------
-### POST program/create/sendsms
+### POST programs/sendsms
 Prepare given SMS for provided account, and make it ready to be sent
 
 * __Parameters__  
@@ -639,7 +634,7 @@ __program_id__ of recently created program record
 
 Voice Call with pre recorded message
 ------------------------------------
-### POST program/create/voicemessage
+### POST programs/voicemessage
 Prepare given voice recording for provided account, and make it ready to be played during call
 
 * __Parameters__  
@@ -662,15 +657,15 @@ Transmission - the actual call or action
 
 create call request / dial / send message
 -----------------------------------------
-### POST transmission/create/{program_id}
+### POST transmissions
 Create new transmission
 
 * __Parameters__  
-  * Replace {program_id} in url with valid program_id
   * A json encoded associative array containing key and value pairs based on following fields
 ```json
 {
     "title": "__String__",
+    "program_id": "__Numeric_ID__, program_id of selected program",
     "account_id": "__Numeric_ID__, account_id of associated account",
     "contact_id": "__Numeric_ID__, contact_id of target contact",
     "origin": "__String__, reference to function / program which is responsible creation of this transmission",
@@ -680,26 +675,24 @@ Create new transmission
 * __Response__  
 __transmission_id__ of recently created transmission record
 
-### GET transmission/list
-list all exiting transmissions, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "title": "__String__",
-    "service_flag": "__Numeric_ID__, Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG",
-    "account_id": "__Numeric_ID__, account_id of associated account",
-    "contact_id": "__Numeric_ID__, contact_id of target contact",
-    "program_id": "__Numeric_ID__, program_id of program which will be used with this transmission",
-    "origin": "__String__, reference to function / program which is responsible creation of this transmission",
-    "direction": "__String__, either can be inbound or outbound",
-    "status": "__String__, if completed or failed",
-    "response": "__String__, the cause of error, transmission failure",
-}
+### GET transmissions
+list all exiting transmissions, optionally client can filter transmissions using query string (key value pair) in url, while using any of following fields
+```
+  title: __String__
+  service_flag: __Numeric_ID__, Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG
+  account_id: __Numeric_ID__, account_id of associated account
+  contact_id: __Numeric_ID__, contact_id of target contact
+  program_id: __Numeric_ID__, program_id of program which will be used with this transmission
+  origin: __String__, reference to function / program which is responsible creation of this transmission
+  direction: __String__, either can be inbound or outbound
+  status: __String__, if complete or failed
+  response: __String__, the cause of error, transmission failure
 ```
 
 * __Response__  
 an array of transmissions indexed on transmission_id
 
-### GET transmission/{transmission_id}/send ( or /call or /dial )
+### GET transmissions/{transmission_id}/send ( or /call or /dial )
 Trigger already prepared transmission to dial / connect assigned contact and deliver desired message.  
 __Note:__ call or dial synonymous can also be used in place of send
 
@@ -709,7 +702,7 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 transmission details in associative array
 
-### POST transmission/{transmission_id}/schedule
+### PUT transmissions/{transmission_id}/schedule
 Instead of delivering message instantly, schedule its delivery in near future.
 
 * __Parameters__  
@@ -718,19 +711,19 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 __schedule_id__ of recently created schedule record
 
-### GET transmission/{transmission_id}/schedule/cancel
+### DELETE transmissions/{transmission_id}/schedule
 Cancel any schedule associated with given transmission
 
 * __Parameters__  
 Replace {transmission_id} in url with valid transmission_id
 
-### GET transmission/{transmission_id}/retry
+### GET transmissions/{transmission_id}/retry
 In case earlier transmission attempt failed, give it another try
 
 * __Parameters__  
 Replace {transmission_id} in url with valid transmission_id
 
-### GET transmission/{transmission_id}/clone
+### GET transmissions/{transmission_id}/clone
 Want to resend an already completed transmission, copy it (Note: after copying, client still need to request send method for message delivery)
 
 * __Parameters__  
@@ -739,7 +732,7 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 __transmission_id__ of newly created transmission
 
-### GET transmission/{transmission_id}
+### GET transmissions/{transmission_id}
 Read / view complete transmission data
 
 * __Parameters__  
@@ -751,7 +744,7 @@ transmission details in associative array
 
 Reports
 -------
-### GET transmission/{transmission_id}/status
+### GET transmissions/{transmission_id}/status
 Get current status of an existing transmission
 
 * __Parameters__  
@@ -760,7 +753,7 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 Will return one of the following status ( pending, processing, completed, failed, invalid )
 
-### GET transmission/{transmission_id}/detail
+### GET transmissions/{transmission_id}/detail
 A list of attempts (spool) with their detail, which system has made to deliver that transmission
 
 * __Parameters__  
@@ -769,7 +762,7 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 Will return an array of spool record indexed on spool_id
 
-### GET transmission/{transmission_id}/result
+### GET transmissions/{transmission_id}/result
 Complete details of each step along with remote side responses, for requested transmission
 
 * __Parameters__  
@@ -778,7 +771,7 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 Will return a array of application results
 
-### GET spool/{spool_id}/status
+### GET spools/{spool_id}/status
 Get current status of an existing transmission attempt (spool)
 
 * __Parameters__  
@@ -787,7 +780,7 @@ Replace {spool_id} in url with valid spool_id
 * __Response__  
 Will return one of the following status ( initiated, completed, failed )
 
-### GET spool/{spool_id}/result
+### GET spools/{spool_id}/result
 Complete details of each step along with remote side responses, for requested transmission attempt (spool_id)
 
 * __Parameters__  
@@ -799,7 +792,7 @@ Will return a array of application results against given transmission attempt (s
 
 User account / Email / DID / Extension
 --------------------------------------
-### POST account/create
+### POST accounts
 Create new account
 
 * __Parameters__  
@@ -820,24 +813,22 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __account_id__ of recently created account record
 
-### GET account/list
-list all exiting accounts, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "username": "__String__",
-    "passwd": "__String__",
-    "passwd_pin": "__String__",
-    "first_name": "__String__",
-    "last_name": "__String__",
-    "phone": "__Digits__",
-    "email": "__Numeric__, 1 for active, 0 for disabled",
-}
+### GET accounts
+list all exiting accounts, optionally client can filter accounts using query string (key value pair) in url, while using any of following fields
+```
+  username: __String__
+  passwd: __String__
+  passwd_pin: __String__
+  first_name: __String__
+  last_name: __String__
+  phone: __Digits__
+  email: __Email__
 ```
 
 * __Response__  
 an array of accounts indexed on account_id
 
-### GET account/{account_id}
+### GET accounts/{account_id}
 Read / view complete account data
 
 * __Parameters__  
@@ -846,49 +837,49 @@ Replace {account_id} in url with valid account_id
 * __Response__  
 account details in associative array
 
-### POST account/{account_id}/update
+### PUT accounts/{account_id}
 Update an existing account
 
 * __Parameters__  
-Replace {account_id} in url with valid account_id, fields require modifications will be POSTed in same way as account/create
+Replace {account_id} in url with valid account_id, fields require modifications will be POSTed in same way as `accounts`
 
 * __Response__  
 Return updated account data as an associative array
 
-### DELETE account/{account_id}/delete
+### DELETE accounts/{account_id}
 Delete an existing account
 
 * __Parameters__  
 Replace {account_id} in url with valid account_id
 
-### GET account/{account_id}/subscribe/{program\_id}
+### PUT accounts/{account_id}/programs/{program\_id}
 Subscribe an account to some exiting program, i.e enable an account to use a certain program for inbound transmissions
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
   * Replace {program_id} in url with some existing program's program_id
 
-### GET account/{account_id}/unsubscribe/{program\_id}
+### DELETE accounts/{account_id}/programs/{program\_id}
 Unsubscribe an account from given program, i.e stop an account from using certain program
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
   * Replace {program_id} in url with valid program name or program_id
 
-### GET account/{account_id}/unsubscribe/all
+### DELETE accounts/{account_id}/programs
 Clear an account from all subscribed programs
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
 
-### GET account/{account_id}/associate/{user\_id}
+### PUT accounts/{account_id}/users/{user\_id}
 Change account ownership, assign account to some other user
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
   * Replace {user_id} in url with valid user_id
 
-### GET account/{account_id}/dissociate
+### DELETE accounts/{account_id}/users
 Dissociate a account from any user, make it free to assign
 
 * __Parameters__  
@@ -897,7 +888,7 @@ Dissociate a account from any user, make it free to assign
 
 User Management
 ---------------
-### GET user/create
+### POST users
 Create new user
 
 * __Parameters__  
@@ -920,22 +911,20 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __user_id__ of recently created user record
 
-### GET user/list
-list all exiting users, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "username": "__String__",
-    "first_name": "__String__",
-    "last_name": "__String__",
-    "phone": "__Digits__",
-    "email": "__Email__",
-}
+### GET users
+list all exiting users, optionally client can filter users using query string (key value pair) in url, while using any of following fields
+```
+  username: __String__
+  first_name: __String__
+  last_name: __String__
+  phone: __Digits__
+  email: __Email__
 ```
 
 * __Response__  
 an array of users indexed on user_id
 
-### GET user/{user_id}
+### GET users/{user_id}
 Read / view complete user data
 
 * __Parameters__  
@@ -944,43 +933,43 @@ Replace {user_id} in url with valid user_id
 * __Response__  
 user details in associative array
 
-### POST user/{user_id}/update
+### PUT users/{user_id}
 Update an existing user
 
 * __Parameters__  
-Replace {user_id} in url with valid user_id, fields require modifications will be POSTed in same way as user/create
+Replace {user_id} in url with valid user_id, fields require modifications will be POSTed in same way as `users`
 
 * __Response__  
 Return updated user data as an associative array
 
-### DELETE user/{user_id}/delete
+### DELETE users/{user_id}
 Delete an existing user
 
 * __Parameters__  
 Replace {user_id} in url with valid user_id
 
-### GET user/{user_id}/assign/{role\_id}
+### PUT users/{user_id}/roles/{role\_id}
 Assign a role ( a set of permissions ) to user
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
   * Replace {role_id} in url with valid role_id
   
-### GET user/{user_id}/unassign/{role\_id}
+### DELETE users/{user_id}/roles/{role\_id}
 Drop a role ( a set of permissions ) from user
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
   * Replace {role_id} in url with valid role_id
 
-### GET user/{user_id}/allow/{permission\_id}
+### PUT users/{user_id}/permissions/{permission\_id}
 Assign certain permission to user (If client does't want to assign complete role)
 
 * __Parameters__  
   * Replace {account_id} in url with valid account_id
   * Replace {permission_id} in url with valid permission_id
   
-### GET user/{user_id}/disallow/{permission\_id}
+### DELETE users/{user_id}/permissions/{permission\_id}
 Drop an already assigned permission from user (Please note it will drop permissions assigned by role)
 
 * __Parameters__  
@@ -990,7 +979,7 @@ Drop an already assigned permission from user (Please note it will drop permissi
 
 Trunk / Termination Providers APIs
 ----------------------------------
-### POST provider/create
+### POST providers
 Create new provider
 
 * __Parameters__  
@@ -1017,22 +1006,20 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __provider_id__ of recently created provider record
 
-### GET provider/list
-list all exiting providers, optionally client can submit / POST search filter (json key value pair) using any of following fields
-```json
-{
-    "name": "__String__",
-    "gateway_flag": "__Numeric_ID__, Type of gateway i.e Freeswitch::GATEWAY_FLAG or Kannel::GATEWAY_FLAG",
-    "service_flag": "__Numeric_ID__, Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG",
-    "host": "__IPAddress__, ip address to termination server",
-    "active": "__Numeric__, 1 for active, 0 for disabled",
-}
+### GET providers
+list all exiting providers, optionally client can filter providers using query string (key value pair) in url, while using any of following fields
+```
+  name: __String__
+  gateway_flag: __Numeric_ID__, Type of gateway i.e Freeswitch::GATEWAY_FLAG or Kannel::GATEWAY_FLAG
+  service_flag: __Numeric_ID__, Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG
+  host: __IPAddress__, ip address to termination server
+  active: __Numeric__, 1 for active, 0 for disabled
 ```
 
 * __Response__  
 an array of providers indexed on provider_id
 
-### GET provider/{provider_id}
+### GET providers/{provider_id}
 Read / view complete provider data
 
 * __Parameters__  
@@ -1041,16 +1028,16 @@ Replace {user_id} in url with valid provider_id
 * __Response__  
 provider details in associative array
 
-### POST provider/{provider_id}/update
+### PUT providers/{provider_id}
 Update an existing provider
 
 * __Parameters__  
-Replace {user_id} in url with valid provider_id, fields require modifications will be POSTed in same way as provider/create
+Replace {user_id} in url with valid provider_id, fields require modifications will be POSTed in same way as `providers`
 
 * __Response__  
 Return updated provider data as an associative array
 
-### DELETE provider/{provider_id}/delete
+### DELETE providers/{provider_id}
 Delete an existing provider
 
 * __Parameters__  

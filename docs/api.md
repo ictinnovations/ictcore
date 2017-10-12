@@ -3,136 +3,150 @@ ICTCore REST APIs Guide
 
 Contact / pre defined destination number
 ----------------------------------------
-* contact/create
-* contact/list
-* contact/{contact_id}
-* contact/{contact_id}/update
-* contact/{contact_id}/delete
+* POST contacts
+* GET contacts
+* GET contacts/{contact_id}
+* PUT contacts/{contact_id}
+* DELETE contacts/{contact_id}
 
 Message / pre defined information to be send
 --------------------------------------------
 
 ### Fax Documents
-* message/document/create
-* message/document/list
-* message/document/{document_id}
-* message/document/{document_id}/update
-* message/document/{document_id}/delete
-* message/document/{document_id}/download
+* POST messages/documents
+* GET messages/documents
+* GET messages/documents/{document_id}
+* PUT messages/documents/{document_id}
+* DELETE messages/documents/{document_id}
+* GET messages/documents/{document_id}/download
 
 ### Voice Recordings
-* message/recording/create
-* message/recording/list
-* message/recording/{recording_id}
-* message/recording/{recording_id}/update
-* message/recording/{recording_id}/delete
-* message/recording/{recording_id}/download
+* POST messages/recordings
+* GET messages/recordings
+* GET messages/recordings/{recording_id}
+* PUT messages/recordings/{recording_id}
+* DELETE messages/recordings/{recording_id}
+* GET messages/recordings/{recording_id}/download
 
 ### Email templates
-* message/template/create
-* message/template/list
-* message/template/{template_id}
-* message/template/{template_id}/update
-* message/template/{template_id}/delete
-* message/template/{template_id}/download
+* POST messages/templates
+* GET messages/templates
+* GET messages/templates/{template_id}
+* PUT messages/templates/{template_id}
+* DELETE messages/templates/{template_id}
+* GET messages/templates/{template_id}/download
 
 ### SMS Text Message
-* message/text/create
-* message/text/list
-* message/text/{text_id}
-* message/text/{text_id}/update
-* message/text/{text_id}/delete
+* POST messages/texts
+* GET messages/texts
+* GET messages/texts/{text_id}
+* PUT messages/texts/{text_id}
+* DELETE messages/texts/{text_id}
 
 
 Programs
 --------
 
 ### General program related function
-* program/create (dummy, instead use create method from relevant program)
-* program/list
-* program/{program_id}/delete
-* program/{program_id}/transmission
+* POST programs (dummy, instead use a relevant program)
+* GET programs
+* GET programs/{program_id}
+* DELETE programs/{program_id}
+* POST programs/{program_id}/transmissions
+* GET programs/{program_id}/transmissions
 
 ### Email to Fax program
-* program/create/emailtofax
+* POST programs/emailtofax
 
 ### Fax to Email program
-* program/create/faxtoemail
+* POST programs/faxtoemail
 
 ### Receive Email program
-* program/create/receiveemail
+* POST programs/receiveemail
 
 ### Receive FAX program
-* program/create/receivefax
+* POST programs/receivefax
 
 ### Receive SMS program
-* program/create/receivesms
+* POST programs/receivesms
 
 ### Send Email program
-* program/create/sendemail
+* POST programs/sendemail
 
 ### Send FAX program
-* program/create/sendfax
+* POST programs/sendfax
 
 ### Send SMS program
-* program/create/sendsms
-s
-### Voice Call with pre recorded message
-* program/create/voicemessage
+* POST programs/sendsms
 
-### General program related function
-* program/list
-* program/{program_id}/delete
+### Voice Call with pre recorded message
+* POST programs/voicemessage
 
 Transmission - the actual call or action
 ----------------------------------------
 
 ### create call request / dial / send message
-* transmission/create (dummy, instead use program/{program_id}/transmission)
-* transmission/list
-* transmission/{transmission_id}/send ( or /call or /dial )
-* transmission/{transmission_id}/schedule
-* transmission/{transmission_id}/schedule/cancel
-* transmission/{transmission_id}/retry
-* transmission/{transmission_id}/clone
+* POST transmissions (dummy, instead use programs/{program_id}/transmissions)
+* GET transmissions
+* GET transmissions/{transmission_id}
+* DELETE transmissions/{transmission_id}
+* GET transmissions/{transmission_id}/send ( or /call or /dial )
+* GET transmissions/{transmission_id}/retry
+* GET transmissions/{transmission_id}/clone
+* PUT transmissions/{transmission_id}/schedule
+* DELETE transmissions/{transmission_id}/schedule
 
 ### Reports
-* transmission/{transmission_id}/status
-* transmission/{transmission_id}/detail
-* transmission/{transmission_id}/result
-* spool/{spool_id}/status
-* spool/{spool_id}/result
-
+* GET transmissions/{transmission_id}/status
+* GET transmissions/{transmission_id}/detail
+* GET transmissions/{transmission_id}/result
+* GET spools/{spool_id}/status
+* GET spools/{spool_id}/result
 
 Account / Email / DID / Extension
 ---------------------------------
-* account/create
-* account/list
-* account/{account_id}
-* account/{account_id}/update
-* account/{account_id}/delete
-* account/{account_id}/subscribe/{program\_id}
-* account/{account_id}/unsubscribe/{program\_id}
-* account/{account_id}/unsubscribe/all
-* account/{account_id}/associate/{user\_id}
-* account/{account_id}/dissociate
+* POST accounts
+* GET accounts
+* GET accounts/{account_id}
+* PUT accounts/{account_id}
+* DELETE accounts/{account_id}
+* PUT /accounts/{account_id}/programs/{program\_name}
+* DELETE /accounts/{account_id}/programs
+* DELETE /accounts/{account_id}/programs/{program\_name}
+* PUT /accounts/{account_id}/users/{user\_id}
+* DELETE /accounts/{account_id}/users
 
 User Management
 ---------------
-* user/create
-* user/list
-* user/{user_id}
-* user/{user_id}/update
-* user/{user_id}/delete
-* user/{user_id}/assign/{role\_id}
-* user/{user_id}/unassign/{role\_id}
-* user/{user_id}/allow/{permission\_id}
-* user/{user_id}/disallow/{permission\_id}
+* POST users
+* GET users
+* GET users/{user_id}
+* PUT users/{user_id}
+* DELETE users/{user_id}
+* PUT users/{user_id}/permissions/{permission\_id}
+* DELETE users/{user_id}/permissions/{permission\_id}
+* PUT users/{user_id}/roles/{role\_id}
+* DELETE users/{user_id}/roles/{role\_id}
 
 Trunk / Termination Providers APIs
 ----------------------------------
-* provider/create
-* provider/list
-* provider/{provider_id}
-* provider/{provider_id}/update
-* provider/{provider_id}/delete
+* POST providers
+* GET providers
+* GET providers/{provider_id}
+* PUT providers/{provider_id}
+* DELETE providers/{provider_id}
+
+Permission Management
+---------------------
+* POST permissions
+* GET permissions
+
+Role management
+---------------
+* POST roles
+* GET roles
+* GET roles/{role_id}
+* PUT roles/{role_id}
+* DELETE roles/{role_id}
+* PUT roles/{role_id}/permissions/{permission_id}
+* DELETE roles/{role_id}/permissions/{permission_id}

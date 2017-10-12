@@ -19,7 +19,7 @@ class ProviderApi extends Api
   /**
    * Create a new provider
    *
-   * @url POST /provider/create
+   * @url POST /providers
    */
   public function create($data = array())
   {
@@ -38,19 +38,18 @@ class ProviderApi extends Api
   /**
    * List all available providers
    *
-   * @url GET /provider/list
-   * @url POST /provider/list
+   * @url GET /providers
    */
-  public function list_view($data = array())
+  public function list_view($query = array())
   {
     $this->_authorize('provider_list');
-    return Provider::search($data);
+    return Provider::search($query);
   }
 
   /**
    * Gets the provider by id
    *
-   * @url GET /provider/$provider_id
+   * @url GET /providers/$provider_id
    */
   public function read($provider_id)
   {
@@ -63,8 +62,7 @@ class ProviderApi extends Api
   /**
    * Update existing provider
    *
-   * @url POST /provider/$provider_id/update
-   * @url PUT /provider/$provider_id/update
+   * @url PUT /providers/$provider_id
    */
   public function update($provider_id, $data = array())
   {
@@ -83,8 +81,7 @@ class ProviderApi extends Api
   /**
    * Create a new provider
    *
-   * @url GET /provider/$provider_id/delete
-   * @url DELETE /provider/$provider_id/delete
+   * @url DELETE /providers/$provider_id
    */
   public function remove($provider_id)
   {

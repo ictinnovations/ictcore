@@ -12,6 +12,7 @@ namespace ICT\Core\Api;
 use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Program;
+use ICT\Core\Transmission;
 
 class ProgramApi extends Api
 {
@@ -19,8 +20,8 @@ class ProgramApi extends Api
   /**
    * Create a new program
    *
-   * @url POST /program/create
-   * @url POST /program/create/$program_name
+   * @url POST /programs
+   * @url POST /programs/$program_name
    */
   public function create($program_name = null, $data = array())
   {
@@ -40,7 +41,7 @@ class ProgramApi extends Api
   /**
    * Initiate a new transmission for given program
    *
-   * @url POST /program/$program_name/transmission
+   * @url POST /programs/$program_name/transmissions
    */
   public function transmission($program_name, $data = array())
   {
@@ -64,27 +65,39 @@ class ProgramApi extends Api
   }
 
   /**
-   * List all available programs
+   * List transmissions after filtering by given program id
    *
-   * @url GET /program/list
-   * @url POST /program/list
-   * @url GET /program/list/$program_name
-   * @url POST /program/list/$program_name
+   * @url GET /programs/$program_id/transmissions
    */
-  public function list_view($data = array(), $program_name = null)
+  public function list_transmission($program_id)
   {
-    $this->_authorize('program_list');
-    if ($program_name) {
-      $data['type'] = $program_name; // add program_name i.e class name as filter
-    }
-    return Program::search($data);
+    return Transmission::search(array('program_id' => $program_id));
   }
 
   /**
-   * Gets the program by id
+   * List all available programs
    *
-   * @url GET /program/$program_id
+   * @url GET /programs
+   * @url GET /programs/$program_name
+   * 
+   * @toto: can't use multiple functions due to similar url pattern
+   * Gets the program by id (will redirect to read function)
+   * 
+   * @url GET /programs/$program_id
    */
+  public function list_view($query = array(), $program_name = null)
+  {
+    if (ctype_digit($program_name)) {
+      return $this->read($program_name);
+    }
+
+    $this->_authorize('program_list');
+    if ($program_name) {
+      $query['type'] = $program_name; // add program_name i.e class name as filter
+    }
+    return Program::search($query);
+  }
+
   public function read($program_id)
   {
     $this->_authorize('program_read');
@@ -98,8 +111,7 @@ class ProgramApi extends Api
   /**
    * Remove a program
    *
-   * @url GET /program/$program_id/delete
-   * @url DELETE /program/$program_id/delete
+   * @url DELETE /programs/$program_id
    */
   public function remove($program_id)
   {
