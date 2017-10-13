@@ -27,3 +27,9 @@ SELECT @permissionId := permission_id FROM permission WHERE name='spool';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* spool */
 SELECT @permissionId := permission_id FROM permission WHERE name='result';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* result */
+SELECT @permissionId := permission_id FROM permission WHERE name='group';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* group */
+SELECT @permissionId := permission_id FROM permission WHERE name='campaign';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* campaign */
+
+
