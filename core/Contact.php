@@ -122,7 +122,7 @@ class Contact
     Corelog::log("contact search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('contact', $query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aContact[] = $data;
+      $aContact[$data['contact_id']] = $data;
     }
 
     // if no contact found, check for special contacts
@@ -165,6 +165,8 @@ class Contact
   public function delete()
   {
     Corelog::log("Contact delete", Corelog::CRUD);
+
+    mysql_query("DELETE from  contact_link where contact_id=".$this->contact_id); 
     return DB::delete(self::$table, 'contact_id', $this->contact_id, true);
   }
 
@@ -247,6 +249,43 @@ class Contact
       Corelog::log("New Contact created: $this->contact_id", Corelog::CRUD);
     }
     return $result;
+  }
+
+
+  public function contact_link($contact_id,$group_id)
+  {
+
+      // add new
+           //$result = DB::update($table,$data, false, true);
+      $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value ($group_id,$contact_id)");
+      $result = mysql_insert_id();
+
+      $count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
+      $cont_result =  mysql_num_rows($count_contact);
+      
+      $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
+      Corelog::log("New group contacts created: ", Corelog::CRUD);
+       return $result ;
+  }
+  public function contact_link_delete($contact_id,$group_id)
+
+  {
+
+    $result_add = mysql_query("DELETE from contact_link where contact_id=".$contact_id." AND group_id=".$group_id);
+            // $this->contact_link_id = $data['contact_link_id'];
+
+      $result =  mysql_affected_rows();
+
+      $count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
+      $cont_result =  mysql_num_rows($count_contact);
+      $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
+      Corelog::log("group contacts Deleted: ", Corelog::CRUD);
+    
+    return $result ;
+  }
+  public function contact_link_id($id)
+  {
+    return $id;
   }
 
 }
