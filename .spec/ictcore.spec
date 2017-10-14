@@ -28,9 +28,9 @@ Requires: php-pear php-pear-Pager php-pear-SOAP php-pear-HTTP-Request
 Requires: php-pecl-imagick php-pecl-json php-pecl-libevent
 # ICTCore use mysql as database in centos 6 or mariadb in centos 7
 %if %{rhel} < 7
-Requires: mariadb mariadb-server mysql-connector-odbc
-%else
 Requires: mysql mysql-server mysql-connector-odbc
+%else
+Requires: mariadb mariadb-server mysql-connector-odbc
 %endif
 # ICTCore exposse its services via apache web server
 Requires: httpd
