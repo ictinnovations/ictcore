@@ -45,7 +45,7 @@ class UserApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('user_list');
-    return User::search($query);
+    return User::search((array)$query);
   }
 
   /**

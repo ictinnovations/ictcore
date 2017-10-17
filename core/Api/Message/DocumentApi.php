@@ -57,7 +57,7 @@ class DocumentApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('document_list');
-    return Document::search($query);
+    return Document::search((array)$query);
   }
 
   /**

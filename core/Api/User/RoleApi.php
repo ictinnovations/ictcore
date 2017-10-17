@@ -44,7 +44,7 @@ class RoleApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('role_list');
-    return Role::search($query);
+    return Role::search((array)$query);
   }
 
   /**

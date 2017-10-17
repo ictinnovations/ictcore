@@ -31,6 +31,7 @@ try {
   exit(); // terminate program execution
 }
 
+Http::get_instance(); // to prepare input cache
 $spool_id = Http::input_get('spool_id', 0);
 $gateway_flag = Http::input_get('gateway_flag', Freeswitch::GATEWAY_FLAG);
 $application_id = Http::input_get('application_id', null);

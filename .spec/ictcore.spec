@@ -446,6 +446,14 @@ if [ ! -L "/etc/kannel.conf" ]; then
   mv /etc/kannel.conf /etc/kannel.conf.backup
   ln -s /usr/ictcore/etc/kannel/kannel.conf /etc/kannel.conf
 fi
+# alter firewall for smtp
+%if %{rhel} < 7
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 2775 -j ACCEPT    # smpp
+/etc/init.d/iptables save
+%else
+/bin/firewall-cmd --zone=public --add-port=2775/tcp --permanent  # smpp
+/bin/firewall-cmd --reload
+%endif
 /sbin/chkconfig kannel on
 /sbin/service kannel restart
 

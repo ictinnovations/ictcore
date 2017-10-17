@@ -43,7 +43,7 @@ class ContactApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('contact_list');
-    return Contact::search($query);
+    return Contact::search((array)$query);
   }
 
   /**

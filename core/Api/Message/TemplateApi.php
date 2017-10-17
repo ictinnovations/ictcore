@@ -57,7 +57,7 @@ class TemplateApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('template_list');
-    return Template::search($query);
+    return Template::search((array)$query);
   }
 
   /**

@@ -45,7 +45,7 @@ class TextApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('text_list');
-    return Text::search($query);
+    return Text::search((array)$query);
   }
 
   /**

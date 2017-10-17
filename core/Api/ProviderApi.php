@@ -43,7 +43,7 @@ class ProviderApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('provider_list');
-    return Provider::search($query);
+    return Provider::search((array)$query);
   }
 
   /**

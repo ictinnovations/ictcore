@@ -74,7 +74,7 @@ class TransmissionApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('transmission_list');
-    return Transmission::search($query);
+    return Transmission::search((array)$query);
   }
 
   /**

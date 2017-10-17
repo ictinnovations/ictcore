@@ -95,7 +95,7 @@ class ProgramApi extends Api
     if ($program_name) {
       $query['type'] = $program_name; // add program_name i.e class name as filter
     }
-    return Program::search($query);
+    return Program::search((array)$query);
   }
 
   public function read($program_id)

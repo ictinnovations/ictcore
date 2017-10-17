@@ -9,17 +9,29 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-// initializing global variables
-$oHttp = Http::get_instance();
-$oHttp->input = array_merge($_GET, $_FILES, $_POST);
+use Jacwright\RestServer\AuthServer;
+use Jacwright\RestServer\RestException;
 
-class Http extends Data
+class Http extends Data implements AuthServer
 {
 
   /**
    * @var Http
    */
   protected static $_instance;
+
+  /**
+   *
+   * @param string $realm
+   */
+  protected $realm = '';
+
+  public function __construct(&$data = array())
+  {
+    parent::__construct($data);
+    $this->realm = Conf::get('website:title', 'ICTCore') . ' :: REST API Server';
+    $this->input = array_merge($_GET, $_FILES, $_POST);
+  }
 
   /**
    * @staticvar boolean $initialized
@@ -71,4 +83,35 @@ class Http extends Data
     self::set("output:$name", $value);
   }
 
+  public function isAuthorized($classObj) {
+    if (method_exists($classObj, 'authorize')) {
+      return $classObj->authorize();
+		}
+
+    // select authentication method
+    if (!empty($_SERVER['PHP_AUTH_USER'])) {
+      $username = $_SERVER['PHP_AUTH_USER'];
+      $password = $_SERVER['PHP_AUTH_PW'];
+    } else {
+      return false;
+    }
+
+    // authenticate using username and password method
+    try {
+      $oUser = new User($username);
+      if (empty($oUser->user_id) || $oUser->authenticate($password) == false) {
+        return false;
+      }
+      do_login($oUser);
+    } catch (CoreException $e) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public function unauthorized($classObj) {
+    header("WWW-Authenticate: Basic realm=\"$this->realm\"");
+    throw new RestException(401, "You are not authorized to access this resource.");
+  }
 }

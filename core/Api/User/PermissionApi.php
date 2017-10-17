@@ -43,7 +43,7 @@ class PermissionApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('permission_list');
-    return Permission::search($query);
+    return Permission::search((array)$query);
   }
 
   // no further api needed to update or delete permissions

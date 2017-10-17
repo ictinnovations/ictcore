@@ -49,6 +49,14 @@ class Api
       $this->oInterface = new RestServer('production', $realm); // debug / production
       $this->oInterface->root = $root_path;
       $this->oInterface->cacheDir = $path_cache; // set folder for rest server url mapping
+      // CORS support
+      $cors = Conf::get('website:cors', '');
+      $origin_list = trim(str_replace(array('no', '0', 'disable', 'disabled'), '', $cors));
+      if (!empty($origin_list)) {
+        $this->oInterface->useCors = true;
+        $this->oInterface->allowedOrigin = explode(' ', $origin_list);
+      }
+      $this->oInterface->authHandler = new Http(); // Authentication via HTTP interface
       self::rest_load($this->oInterface);
     }
   }

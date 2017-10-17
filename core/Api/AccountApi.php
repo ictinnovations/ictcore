@@ -45,7 +45,7 @@ class AccountApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('account_list');
-    return Account::search($query);
+    return Account::search((array)$query);
   }
 
   /**

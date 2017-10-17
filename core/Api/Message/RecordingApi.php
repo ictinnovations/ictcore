@@ -57,7 +57,7 @@ class RecordingApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('recording_list');
-    return Recording::search($query);
+    return Recording::search((array)$query);
   }
 
   /**
