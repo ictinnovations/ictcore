@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Twig\\' => array($vendorDir . '/twig/twig/src'),
+    'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'ICT\\Core\\Test\\' => array($baseDir . '/tests/core', $baseDir . '/tests/core/lib'),
     'ICT\\Core\\' => array($baseDir . '/core', $baseDir . '/core/lib'),
+    'Firehed\\ProcessControl\\' => array($vendorDir . '/firehed/processmanager/src'),
 );
