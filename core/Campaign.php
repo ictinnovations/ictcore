@@ -1,7 +1,8 @@
 <?php
-
+//https://github.com/misterion/ko-process#do-not-use-composer
+//require __DIR__ . '/vendor/autoload.php'; 
 namespace ICT\Core;
-
+//namespace misterion\Ko;
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -10,9 +11,16 @@ namespace ICT\Core;
  * *************************************************************** */
 use Exception;
 use ICT\Core\Contact;
+use Cocur\BackgroundProcess\BackgroundProcess;
+use dgr\nohup\Nohup;
+use dgr\nohup\Process;
+//use Firehed\ProcessControl;
+//use misterion\ko-process\src\Ko\ProcessManager;
+//use Ko\ProcessManager   ;
+//use Ko\Process;
+
 class Campaign
 {
-
   /** @const */
   const COMPANY = -2;
 
@@ -32,7 +40,6 @@ class Campaign
   private static $read_only = array(
       'campaign_id'
   );
-
   /**
    * @property-read integer $campaign_id
    * @var integer
@@ -137,7 +144,7 @@ class Campaign
       $this->campaign_id = $data['campaign_id'];
       $this->program_id  = $data['program_id'];
       $this->group_id    = $data['group_id'];
-      $this->delay       =  $data['delay'];
+      $this->delay       = $data['delay'];
       $this->try_allowed = $data['try_allowed'];
       $this->account_id  = $data['account_id'];
       $this->status      = $data['status'];
@@ -149,6 +156,8 @@ class Campaign
 
   public function delete()
   {
+
+     $this->task_cancel();
     Corelog::log("Campaign delete", Corelog::CRUD);
     return DB::delete(self::$table, 'campaign_id', $this->campaign_id, true);
   }
@@ -190,7 +199,6 @@ class Campaign
   {
     return $this->campaign_id;
   }
-
   /*public function email_to_phone()
   {
     $aEmail = imap_rfc822_parse_adrlist($this->email, Conf::get('sendmail:domain', 'localhost'));
@@ -205,7 +213,6 @@ class Campaign
     $this->email = $strEmail;
     return $this->email;
   }*/
-
   public function save()
   {
     $data = array(
@@ -224,7 +231,7 @@ class Campaign
       Corelog::log("Campaign updated: $this->campaign_id", Corelog::CRUD);
     } else {
       // add new
- $act_id = $this->account_id;
+     $act_id = $this->account_id;
 
      $result = DB::update(self::$table, $data, false, true);
 
@@ -269,58 +276,63 @@ class Campaign
           }
      }
 
-
-
-
-
       Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
     }
     return $result;
   }
-
-  public function start($string)
-  {
-       
-          $oCampaign = new Campaign($this->campaign_id);
-
-          $get_group_id = $oCampaign->group_id;
-
-           $query = "SELECT c.transmission_id,c.program_id,c.contact_id ,cl.contact_link_id,cl.contact_id ,cl.group_id FROM transmission c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$get_group_id." AND c.program_id=".$oCampaign->program_id." GROUP BY cl.contact_id";
-        
-            $result = mysql_query($query);
-
-
-        while ($data = mysql_fetch_assoc($result)) 
-        {
-
+/*public function deamon($strng)
+{
+       echo $strng;
+       echo  posix_getpid(); 
+       echo "<br>";
+       echo $this->campaign_id;
+       $query = "UPDATE campaign set process_id=".posix_getpid() ."  where campaign_id =".$this->campaign_id;
       
-          $oTransmission = new Transmission($data['transmission_id']);
-        //echo "<pre>";print_r($oTransmission);
+       mysql_query($query);
 
-        if($oTransmission->status !='processing'){
-
-           $oTransmission->send();
-         }
-         else{
-
-          echo "contact_id: ".$data['contact_id'].' '.$oTransmission->status."<br>";
-          
-         }
-
-          if($string == 'stop')
-          {
-
-            break;
-          }
-
+         for ($i = 1; $i <=100; $i++)
+        {
+            // $result = $this->check($url);
+            sleep(1);
+            echo "count: ".$i."<br>";
+            ob_flush(); flush();
         }
-   }
-
-  public function check($strig)
+}*/
+  public function start()
   {
-            //echo $strig;
-          $this->start($strig);
-   
-  }
 
+    //echo dirname(__FILE__);
+
+    exec(dirname(__FILE__)."/ex.php $this->campaign_id start", $output);
+       //exec("/home/ictvision/Desktop/ictcore/core/ex.php $this->campaign_id start", $output);
+
+      // print_r($output);
+       echo $output[0];
+  }
+  public function stop()
+  {
+  
+    exec(dirname(__FILE__)."/ex.php $this->campaign_id stop", $output);
+    //print_r($output);
+     echo $output[0];
+     /*$query = "SELECT * FROM campaign where campaign_id=".$this->campaign_id;
+      $result_campaign = mysql_query($query);
+      $campaign_data = mysql_fetch_assoc($result_campaign);
+     $p_id = $campaign_data['process_id'];
+      echo "Process with : ".$p_id." has been Stoped";
+      exec("kill -9 $p_id");*/
+  }
+  public function task_cancel()
+  {
+      $aSchedule = Schedule::search(array('type'=>'campaign', 'data'=>$this->campaign_id));
+
+      foreach ($aSchedule as $schedule) 
+      {
+        $oSchedule = new Schedule($schedule['task_id']);
+        $oSchedule->delete();
+
+      }
+
+  }
+ 
 }
