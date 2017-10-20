@@ -485,5 +485,89 @@
             "mail",
             "mailer"
         ]
+    },
+    {
+        "name": "psr/log",
+        "version": "1.0.2",
+        "version_normalized": "1.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-fig/log.git",
+            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-10-10T12:19:37+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\Log\\": "Psr/Log/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interface for logging libraries",
+        "homepage": "https://github.com/php-fig/log",
+        "keywords": [
+            "log",
+            "psr",
+            "psr-3"
+        ]
+    },
+    {
+        "name": "firehed/processmanager",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Firehed/ProcessManager.git",
+            "reference": "a6feb8c216d6db6460fbd65e0ac5e5c767e94358"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Firehed/ProcessManager/zipball/a6feb8c216d6db6460fbd65e0ac5e5c767e94358",
+            "reference": "a6feb8c216d6db6460fbd65e0ac5e5c767e94358",
+            "shasum": ""
+        },
+        "require": {
+            "ext-pcntl": "*",
+            "ext-posix": "*",
+            "php": ">=5.4.0",
+            "psr/log": ">=1.0.0"
+        },
+        "time": "2016-02-27T01:29:32+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "Firehed\\ProcessControl\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "description": "Simple base for daemonized wokers"
     }
 ]
