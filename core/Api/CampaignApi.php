@@ -11,6 +11,8 @@ namespace ICT\Core\Api;
 
 use ICT\Core\Api;
 use ICT\Core\Campaign;
+use ICT\Core\Schedule;
+use ICT\Core\Transmission;
 use ICT\Core\CoreException;
 
 class CampaignApi extends Api
@@ -116,16 +118,14 @@ class CampaignApi extends Api
     
     public function start_campaign($campaign_id)
     {
+      $this->_authorize('campaign_start');
+
        $string = 'start';
 
       $oCampaign= new Campaign($campaign_id);
          
-        $result = $oCampaign->check($string);
-
-
-
+        $result = $oCampaign->start();
     }
-
 
      /**
    * stop campaign
@@ -136,10 +136,53 @@ class CampaignApi extends Api
     
     public function stop_campaign($campaign_id)
     {
+       $this->_authorize('campaign_stop');
      // echo $campaign_id;
       $oCampaign= new Campaign($campaign_id);
           
-        $result = $oCampaign->check('stop');
+        $result = $oCampaign->stop();
 
     }
+
+    /**
+   * Schedule Campaign 
+   *
+   * @url PUT /campaign/$campaign_id/$action/schedule
+   * @url POST /campaign/$campaign_id/$action/schedule
+   */
+  public function schedule_create($campaign_id,$action,$data = array())
+  {
+
+    //$this->_authorize('task_create');
+
+    $oSchedule = new Schedule();
+    $this->set($oSchedule, $data);
+
+    $oCampaign = new Campaign($campaign_id);
+
+
+    $oSchedule->type = 'campaign';
+    $oSchedule->action = $action ;
+    $oSchedule->data = $oCampaign->campaign_id;
+    $oSchedule->account_id = $oCampaign->account_id;
+
+    $oSchedule->save();
+
+    return $oSchedule->task_id;
+  }
+
+
+  /**
+   * Cancel Campaing schedule
+   *
+   * @url DELETE /campaign/$campaign_id/schedule/cancel
+   */
+  public function schedule_cancel($campaign_id,$data = array())
+  {
+   // $this->_authorize('task_delete');
+    $oCampaign = new Campaign($campaign_id);
+   // return $campaign_id;
+    return $oCampaign->task_cancel();
+  }
+
 }
