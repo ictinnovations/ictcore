@@ -197,6 +197,8 @@ INSERT INTO permission VALUES (NULL, 'campaign_list', '');
 INSERT INTO permission VALUES (NULL, 'campaign_read', '');
 INSERT INTO permission VALUES (NULL, 'campaign_update', '');
 INSERT INTO permission VALUES (NULL, 'campaign_delete', '');
+INSERT INTO permission VALUES (NULL, 'campaign_start', '');
+INSERT INTO permission VALUES (NULL, 'campaign_stop', '');
 -- text permissions
 INSERT INTO permission VALUES (NULL, 'text', '');
 INSERT INTO permission VALUES (NULL, 'text_create', '');
