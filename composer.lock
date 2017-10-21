@@ -297,12 +297,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ictinnovations/RestServer.git",
-                "reference": "b816e32291f0e5329e84a1ede8b1ef3114eb101a"
+                "reference": "3bac89e6101851fc4b6545e1dbe5cf1462929ce6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ictinnovations/RestServer/zipball/b816e32291f0e5329e84a1ede8b1ef3114eb101a",
-                "reference": "b816e32291f0e5329e84a1ede8b1ef3114eb101a",
+                "url": "https://api.github.com/repos/ictinnovations/RestServer/zipball/3bac89e6101851fc4b6545e1dbe5cf1462929ce6",
+                "reference": "3bac89e6101851fc4b6545e1dbe5cf1462929ce6",
                 "shasum": ""
             },
             "require": {
@@ -339,7 +339,7 @@
             "support": {
                 "source": "https://github.com/ictinnovations/RestServer/tree/master"
             },
-            "time": "2017-10-11T14:13:33+00:00"
+            "time": "2017-10-14T14:51:18+00:00"
         },
         {
             "name": "nategood/httpful",
