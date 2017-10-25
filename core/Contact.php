@@ -8,7 +8,6 @@ namespace ICT\Core;
  * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
-
 class Contact
 {
 
@@ -235,7 +234,6 @@ class Contact
         'custom3' => $this->custom3,
         'description' => $this->description
     );
-
     if (isset($data['contact_id']) && !empty($data['contact_id'])) {
       // update existing record
       $result = DB::update(self::$table, $data, 'contact_id', true);
@@ -247,6 +245,39 @@ class Contact
       Corelog::log("New Contact created: $this->contact_id", Corelog::CRUD);
     }
     return $result;
+  }
+  public function link($group_id)
+  {
+      // add new
+     $get_contact = mysql_query("SELECT * from contact where contact_id=".$this->contact_id);
+     $get_group = mysql_query("SELECT * from contact_group where group_id=".$group_id);
+
+   // echo $this->contact_id . '======='.$this->group_id;
+      if(mysql_num_rows($get_group)>0 AND mysql_num_rows($get_contact)>0)
+      {
+        $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value ($group_id,$this->contact_id)");
+        $result = mysql_insert_id();
+
+        $count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
+        $cont_result =  mysql_num_rows($count_contact);
+        $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
+        Corelog::log("New group contacts created: ", Corelog::CRUD);
+      } 
+       return $result ;
+  }
+  public function link_delete($group_id)
+  {
+      $result_add = mysql_query("DELETE from contact_link where contact_id=".$this->contact_id." AND group_id=".$group_id);
+      $result =  mysql_affected_rows();
+      $count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
+      $cont_result =  mysql_num_rows($count_contact);
+      $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
+      Corelog::log("group contacts Deleted: ", Corelog::CRUD);
+    return $result ;
+  }
+  public function link_id($id)
+  {
+    return $id;
   }
 
 }
