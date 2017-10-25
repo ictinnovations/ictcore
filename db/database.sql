@@ -573,7 +573,44 @@ CREATE TABLE contact
    PRIMARY KEY (contact_id)
 ) ENGINE = InnoDB;
 CREATE INDEX contact_created_by ON contact (created_by);
-
+/*==============================================================*/
+/* Table: group                                              */
+/* Desc: user can create group  */
+/*==============================================================*/
+CREATE TABLE contact_group
+(
+   group_id                 int(11) unsigned       NOT NULL auto_increment,
+   name                     varchar(128)           NOT NULL,
+   description              varchar(255)           NOT NULL default '',
+   contact_count            varchar(128)           NOT NULL default '0',
+   PRIMARY KEY (group_id)
+) ENGINE = InnoDB;
+/*==============================================================*/
+/* Table: group_contacts                                              */
+/* Desc: link table for contact and group  */
+/*==============================================================*/
+CREATE TABLE contact_link
+(
+   contact_link_id              int(11) unsigned  NOT NULL auto_increment,
+   group_id                     int(11)           NOT NULL,
+   contact_id                   int(11)           NOT NULL ,
+   PRIMARY KEY (contact_link_id)
+) ENGINE = InnoDB;
+/*==============================================================*/
+/* Table: campaign                                              */
+/* Desc: user can  create campaign*/
+/*==============================================================*/
+CREATE TABLE campaign
+(
+   campaign_id               int(11) unsigned       NOT NULL auto_increment,
+   program_id                int(11)                NOT NULL,
+   group_id                  int(11)                NOT NULL ,
+   delay                     varchar(128)           NOT NULL default '',
+   try_allowed               varchar(128)           NOT NULL default '',
+   account_id                int(11)                NOT NULL ,
+   status                    varchar(128)           NOT NULL default '',
+   PRIMARY KEY (campaign_id)
+) ENGINE = InnoDB;
 /*==============================================================*/
 /* Table: ivr                                                   */
 /*==============================================================*/
