@@ -82,7 +82,7 @@ Following is an example about sending fax by using ICTCore
     // create a transmission
     $contact_id = 12;
     $account_id = 1;
-    $faxTransmission = faxProgram->transmission_create($contact_id, $account_id);
+    $faxTransmission = $faxProgram->transmission_create($contact_id, $account_id);
 
     // schedule transmission 
     $faxTransmission->schedule(array('delay' => 3600)); // in seconds
