@@ -96,61 +96,59 @@ public function search_contact()
   //export csv
   public function contact_export()
   {
-      header('Content-Type: text/csv; charset=utf-8');  
-      header('Content-Disposition: attachment; filename=contact.csv');  
-      $output = fopen("php://output", "w");  
-      fputcsv($output, array('First Name', 'Last Name', 'phone'));  
-  
-     $query = "SELECT c.first_name,c.last_name,c.phone,c.contact_id ,cl.contact_link_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
-      $result = mysql_query($query);  
-      while($row = mysql_fetch_assoc($result))  
-      {  
-           unset($row['contact_link_id']);
-           unset($row['contact_id']);
-           unset($row['group_id']);
-           fputcsv($output, $row);  
-      }  
-      //$filename = 'contacts_'.date('m-d-Y_hia').'.csv';
-      //file_put_contents(__DIR__.'/'.$filename, $output);
-      fclose($output);  
+     $tmpfname = tempnam("", "contact_");
+     //$output = fopen($tmpfname.".csv", "w");  
+     $output = fopen('php://output', 'w');
+    fputcsv($output, array('First Name', 'Last Name', 'Phone','Email'));  
+    $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id ,cl.contact_link_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
+    $result = mysql_query($query);  
+    while($row = mysql_fetch_assoc($result))  
+    {  
+      unset($row['contact_link_id']);
+      unset($row['contact_id']);
+      unset($row['group_id']);
+      fputcsv($output, $row);  
+
+    }  
+    return $tmpfname;
   }
    //end
   // import csv
-    public function contact_import($id,$file)
+    public function contact_import($file)
     {
-              $file_tmpname = fopen($file['file_contents']['tmp_name'], "r");
-              $i=0;
-              while (($value = fgetcsv($file_tmpname, 10000, ",")) !== FALSE)
-              {
-              if(!empty($value))
-              {
-                //echo $getData[0];
+        $file_tmpname = fopen($file['file_contents']['tmp_name'], "r");
+        $i=0;
+        while (($value = fgetcsv($file_tmpname, 10000, ",")) !== FALSE)
+        {
+        if(!empty($value))
+        {
+          //echo $getData[0];
+          $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
+          $result = mysql_insert_id();
+         $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value (".$this->group_id.",$result )");
+        }
+         $i++;
+        }
+        /*foreach ($data as $key => $value) 
+        {
+         // echo "Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'";
+            $check_pone_email= mysql_query("Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'");
+
+            if(mysql_num_rows($check_pone_email)== 0)
+            {
                 $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
                 $result = mysql_insert_id();
-               $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value ($id,$result )");
-              }
-               $i++;
-              }
-              /*foreach ($data as $key => $value) 
-              {
-               // echo "Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'";
-                  $check_pone_email= mysql_query("Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'");
-
-                  if(mysql_num_rows($check_pone_email)== 0)
-                  {
-                      $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
-                      $result = mysql_insert_id();
-                      $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value ($id,$result )");
-                      $i++;
-                  }
-              }*/
-           //updade count contact group wise
-        // $count_contact = mysql_query("SELECT * from contact_link where group_id=".$id." GROUP BY contact_id");
-         //$cont_result =  mysql_num_rows($count_contact);
-        // $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$id);
-         $reslt = " Rows Added";
-         return $i.$reslt ;
-    }
+                $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value ($id,$result )");
+                $i++;
+            }
+        }*/
+       //updade count contact group wise
+    // $count_contact = mysql_query("SELECT * from contact_link where group_id=".$id." GROUP BY contact_id");
+     //$cont_result =  mysql_num_rows($count_contact);
+    // $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$id);
+     $reslt = " Rows Added";
+     return $i.$reslt ;
+  }
   // END
   private function load()
   {
@@ -206,6 +204,11 @@ public function search_contact()
   public function get_id()
   {
     return $this->group_id;
+  }
+  public function sample_link()
+  {
+    $filename = __DIR__.'/../data/contact.csv';
+    readfile($filename);
   }
   public function save()
   {
