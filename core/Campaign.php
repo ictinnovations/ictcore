@@ -8,8 +8,6 @@ namespace ICT\Core;
  * *************************************************************** */
 use Exception;
 use ICT\Core\Contact;
-
-
 class Campaign
 {
   /** @const */
@@ -28,7 +26,6 @@ class Campaign
       'status',
       'pid',
       'last_run'
-
   );
   private static $read_only = array(
       'campaign_id',
@@ -39,27 +36,20 @@ class Campaign
    * @var integer
    */
   private $campaign_id = NULL;
-
   /** @var integer */
   public $program_id = NULL;
-
   /** @var integer */
   public $group_id = NULL;
-
   /** @var string */
   public $delay = NULL;
-
   /** @var string */
   public $try_allowed = NULL;
-
   /** @var integer */
   public $account_id = NULL;
-
   /** @var string */
   public $status = NULL;
    /** @var integer */
   public $created_by = NULL;
-
   public function __construct($campaign_id = NULL)
   {
     if (!empty($campaign_id) && $campaign_id > 0) {
@@ -91,7 +81,6 @@ class Campaign
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
-
     $query = "SELECT * FROM " . $from_str;
     Corelog::log("Campaign search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('Campaign', $query);
@@ -106,12 +95,10 @@ class Campaign
           'program_id' => $oCampaign->program_id,
           'group_id' => $oCampaign->group_id,
           'status' => $oCampaign->status
-         
       );
     }*/
     return $aCampaign;
   }
-
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE campaign_id='%campaign_id%' ";
@@ -131,15 +118,12 @@ class Campaign
       throw new CoreException('404', 'Campaign not found');
     }
   }
-
   public function delete()
   {
-
      $this->task_cancel();
     Corelog::log("Campaign delete", Corelog::CRUD);
     return DB::delete(self::$table, 'campaign_id', $this->campaign_id, true);
   }
-
   public function __isset($field)
   {
     $method_name = 'isset_' . $field;
@@ -149,7 +133,6 @@ class Campaign
       return isset($this->$field);
     }
   }
-
   public function __get($field)
   {
     $method_name = 'get_' . $field;
@@ -160,7 +143,6 @@ class Campaign
     }
     return NULL;
   }
-
   public function __set($field, $value)
   {
     $method_name = 'set_' . $field;
@@ -172,7 +154,6 @@ class Campaign
       $this->$field = $value;
     }
   }
-
   public function get_id()
   {
     return $this->campaign_id;
@@ -184,7 +165,6 @@ class Campaign
     $this->phone = preg_replace("/[^0-9]/", "", $strPhone); // keep only digits
     return $this->phone;
   }
-
   public function phone_to_email()
   {
     $strEmail = $this->phone . '@' . Conf::get('sendmail:domain', 'localhost');
@@ -238,7 +218,6 @@ class Campaign
             throw new CoreException(417, 'Transmission creation failed');
           }
      }
-
       Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
     }
     return $result;
@@ -252,7 +231,6 @@ class Campaign
        $query = "UPDATE campaign set process_id=".posix_getpid() ."  where campaign_id =".$this->campaign_id;
       
        mysql_query($query);
-
          for ($i = 1; $i <=100; $i++)
         {
             // $result = $this->check($url);
@@ -263,35 +241,18 @@ class Campaign
 }*/
   public function start()
   {
-   // echo dirname(__FILE__)."<br>". dirname(__DIR__);
-    //echo dirname(__DIR__)."/bin/campaign.php";
-    echo $uer = $_SERVER['PHP_AUTH_USER'];
-      //return do_login(1);
     exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id $uer start", $output);
 
-     print_r($output);
-    //echo $_SERVER['PHP_AUTH_USER'];
-   // echo $_SERVER['PHP_AUTH_PW'];
-   //return do_login($_SERVER['PHP_AUTH_USER']);
+        $query_campiagn = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " where campaign_id =".$this->campaign_id;
+         mysql_query($query_campaign);
 
-         //$query_campiagn = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " where campaign_id =".$this->campaign_id;
-         //mysql_query($query_campaign);
-        // print_r($output);
-       // return $output[0];
+    return $output[0];
   }
   public function stop()
   {
-
      $uer = $_SERVER['PHP_AUTH_USER'];
      exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id $uer  stop", $output);
      return $output[0];
-     //return $output[0];
-     /*$query = "SELECT * FROM campaign where campaign_id=".$this->campaign_id;
-      $result_campaign = mysql_query($query);
-      $campaign_data = mysql_fetch_assoc($result_campaign);
-     $p_id = $campaign_data['process_id'];
-      echo "Process with : ".$p_id." has been Stoped";
-      exec("kill -9 $p_id");*/
   }
   public function task_cancel()
   {
@@ -300,9 +261,7 @@ class Campaign
       {
         $oSchedule = new Schedule($schedule['task_id']);
         $oSchedule->delete();
-
       }
-
   }
  
 }
