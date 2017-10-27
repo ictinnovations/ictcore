@@ -100,14 +100,16 @@ class GroupApi extends Api
  /**
    * Export Contact by group id
    *
-   * @url GET /groups/$group_id/export/contact_csv
+   * @url GET /groups/$group_id/export/contact.csv
    * 
    */
-
    public function export_csv($group_id)
    {
+      //header('Content-Disposition: attachment; filename=contact.csv');
      $oGroup = new Group($group_id);
-     return $oGroup->contact_export();
+     header('Content-Type: text/csv; charset=utf-8');  
+     header('Content-Disposition: attachment; filename='.$oGroup->contact_export().'.csv'); 
+     return ;
    }
 /**
    * Import  Contact by group id
@@ -121,27 +123,14 @@ class GroupApi extends Api
       global $_FILES, $_POST;
       $f_name = explode('.',$_FILES['file_contents']['name']);
        $chk_f_type = end($f_name );
-
       if($chk_f_type == 'csv' || $chk_f_type == 'CSV' || $chk_f_type == 'Csv'){
-
             $file = fopen($_FILES['file_contents']['tmp_name'], "r");
-              /*$csv_array = array();
-              $i=0;
-              while (($getData = fgetcsv($file, 10000, ",")) !== FALSE)
-              {
-	            if(!empty($getData[0]))
-	            {
-	              $csv_array[] = $getData;
-	            }
-               $i++;
-              }*/
-               return Group::contact_import($group_id,$_FILES);
+               return Group::contact_import($_FILES);
            }
          else{
           return "Upload Csv file";
          }
     }
-     
    /**
    * Export  Contact Sample
    *
@@ -150,7 +139,20 @@ class GroupApi extends Api
    */
    public function export_csv_sample()
    {
-      $url = 'http://localhost/fileurl/contact.csv';
-      header("Location:".$url);
+     // $url = 'http://localhost/fileurl/contact.csv';
+     // header("Location:".$url);
+      $oGroup = new Group();
+      header("Content-Type: application/csv");
+      return $oGroup->sample_link();
    }
+     /**
+   * Export  Contact Sample
+   *
+   * @url GET /download/$filename
+   * 
+   */
+     public function download($filename)
+     {
+      echo $filename;
+     }
 }
