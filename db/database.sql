@@ -609,8 +609,12 @@ CREATE TABLE campaign
    try_allowed               varchar(128)           NOT NULL default '',
    account_id                int(11)                NOT NULL ,
    status                    varchar(128)           NOT NULL default '',
+   created_by                int(11)                default NULL,
+   pid                       varchar(128)           NOT NULL default '',
+   last_run                   int(11)                default NULL,
    PRIMARY KEY (campaign_id)
 ) ENGINE = InnoDB;
+CREATE INDEX campaign_created_by ON campaign (created_by);
 /*==============================================================*/
 /* Table: ivr                                                   */
 /*==============================================================*/
