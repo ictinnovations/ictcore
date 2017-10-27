@@ -183,6 +183,22 @@ INSERT INTO permission VALUES (NULL, 'contact_list', '');
 INSERT INTO permission VALUES (NULL, 'contact_read', '');
 INSERT INTO permission VALUES (NULL, 'contact_update', '');
 INSERT INTO permission VALUES (NULL, 'contact_delete', '');
+-- GROUP permissions
+INSERT INTO permission VALUES (NULL, 'group', '');
+INSERT INTO permission VALUES (NULL, 'group_create', '');
+INSERT INTO permission VALUES (NULL, 'group_list', '');
+INSERT INTO permission VALUES (NULL, 'group_read', '');
+INSERT INTO permission VALUES (NULL, 'group_update', '');
+INSERT INTO permission VALUES (NULL, 'group_delete', '');
+-- Campaign permissions
+INSERT INTO permission VALUES (NULL, 'campaign', '');
+INSERT INTO permission VALUES (NULL, 'campaign_create', '');
+INSERT INTO permission VALUES (NULL, 'campaign_list', '');
+INSERT INTO permission VALUES (NULL, 'campaign_read', '');
+INSERT INTO permission VALUES (NULL, 'campaign_update', '');
+INSERT INTO permission VALUES (NULL, 'campaign_delete', '');
+INSERT INTO permission VALUES (NULL, 'campaign_start', '');
+INSERT INTO permission VALUES (NULL, 'campaign_stop', '');
 -- Account permissions
 INSERT INTO permission VALUES (NULL, 'account', '');
 INSERT INTO permission VALUES (NULL, 'account_create', '');
