@@ -1,11 +1,12 @@
 #!/usr/bin/php  
 <?php
 namespace ICT\Core;
-use ICT\Core\Api;
-use \ICT\Core\Campaign;
-use \ICT\Core\Transmission;
-use ICT\Core\CoreException;
-use ICT\Core\Corelog;
+ use \ICT\Core\Api;
+ use \ICT\Core\Campaign;
+ use \ICT\Core\Transmission;
+ use \ICT\Core\CoreException;
+ use \ICT\Core\Corelog;
+
 require dirname(__DIR__).'/vendor/autoload.php'; // composer
 declare(ticks=1);
 (new \Firehed\ProcessControl\Daemon)
@@ -17,7 +18,7 @@ declare(ticks=1);
  require_once dirname(__FILE__).'/../core/core.php';
 $campaign_id = $argv[1];  
  $user = $argv[2];  
-$oCampaign = new Campaign($campaign_id);
+$oCampaign = new Campaign($campaign_id );
 $get_group_id = $oCampaign->group_id;
 $get_user_id = $oCampaign->created_by;
  do_login($get_user_id);
@@ -28,7 +29,7 @@ if(mysql_num_rows($result)>0)
 {
   while ($data = mysql_fetch_assoc($result)) 
     {
-         sleep(2);
+         sleep(1);
          $oTransmission = new Transmission($data['transmission_id']);
          $oTransmission->send() ;
         $i++;
@@ -37,6 +38,6 @@ if(mysql_num_rows($result)>0)
   else
   {
     throw new CoreException(404, 'no transmission found');
-
   }
+  
 ?>
