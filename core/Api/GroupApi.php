@@ -109,7 +109,7 @@ class GroupApi extends Api
      $oGroup = new Group($group_id);
      header('Content-Type: text/csv; charset=utf-8');  
      header('Content-Disposition: attachment; filename='.$oGroup->contact_export().'.csv'); 
-     return ;
+     return NULL;
    }
 /**
    * Import  Contact by group id
@@ -145,14 +145,5 @@ class GroupApi extends Api
       header("Content-Type: application/csv");
       return $oGroup->sample_link();
    }
-     /**
-   * Export  Contact Sample
-   *
-   * @url GET /download/$filename
-   * 
-   */
-     public function download($filename)
-     {
-      echo $filename;
-     }
+
 }
