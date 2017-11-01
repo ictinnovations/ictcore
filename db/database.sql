@@ -607,10 +607,10 @@ CREATE TABLE contact_group
 /*==============================================================*/
 CREATE TABLE contact_link
 (
-   contact_link_id              int(11) unsigned  NOT NULL auto_increment,
+   /*contact_link_id              int(11) unsigned  NOT NULL auto_increment,*/
    group_id                     int(11)           NOT NULL,
    contact_id                   int(11)           NOT NULL ,
-   PRIMARY KEY (contact_link_id)
+   PRIMARY KEY (group_id,contact_id)
 ) ENGINE = InnoDB;
 /*==============================================================*/
 /* Table: campaign                                              */
