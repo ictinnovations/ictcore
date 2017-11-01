@@ -191,52 +191,21 @@ class Campaign
      $act_id = $this->account_id;
      $result = DB::update(self::$table, $data, false, true);
      $this->campaign_id = $data['campaign_id'];
-     
-      /*$query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
-      $result_contacts = mysql_query($query);
-      while ($datacontact = mysql_fetch_assoc($result_contacts)) 
-      {
-        $aGroupcontact[] = $datacontact;
-      }
-       foreach($aGroupcontact as $rowcontact)
-      {
-            $data_transmission = array(
-            'title'            =>'bulk system',
-            'account_id'       =>$act_id ,
-            'contact_id'       =>$rowcontact['contact_id'],
-            'origin'           =>'',
-            'direction'         =>''
-            );
-           $oProgram = Program::load($this->program_id);
-          $direction = empty($data_transmission['direction']) ? Transmission::OUTBOUND : $data_transmission['direction'];
-          $oTransmission = $oProgram->transmission_create($rowcontact['contact_id'],$act_id , $direction);
-         // $this->set($oTransmission, $data_transmission);
-          if ($oTransmission->save()) 
-          {
-            $trans_id =  $oTransmission->transmission_id;
-          } else 
-          {
-            throw new CoreException(417, 'Transmission creation failed');
-          }
-     }*/
-      Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
+     Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
     }
     return $result;
   }
-
   public function start()
   {
         /* Excutable file  Start deamon */
-        exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id start", $output);
+          exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id start", $output);
         /* Update campaign process id and last run */
-
          $query_campiagn = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " where campaign_id =".$this->campaign_id;
          $res = mysql_query($query_campaign);
          if (mysql_errno()) {
 
             Corelog::log("Campaign update failed", Corelog::CRUD);
-        } 
-
+          } 
     return $output[0];
   }
 
