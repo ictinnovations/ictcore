@@ -5,15 +5,11 @@ namespace ICT\Core;
 use \ICT\Core\Campaign;
 use \ICT\Core\Transmission;
 //use \ICT\Core\CoreException;
-
-//error_reporting(E_ALL);
 require dirname(__DIR__).'/vendor/autoload.php'; // composer
 declare(ticks=1);
-
 /*ini_set("log_errors", 1);
 ini_set("error_log", "/tmp/php-errorwe.log");
 error_log( "Hello, errors!" );*/
-
 /* forking */
 (new \Firehed\ProcessControl\Daemon)
  ->setPidFileLocation('/tmp/coreCampaign_td1.pid')
@@ -47,8 +43,7 @@ if(mysql_num_rows($result)>0)
               ini_set("error_log", "/tmp/php-error10.log");
               error_log( "Hello, errors!" );*/
           }
-          catch (Exception $e) 
-          {
+          catch (Exception $e){
             ini_set("error_log", "/tmp/transmission_error.log");
             error_log( "Transmission not found:".$e->getMessage());
           }
