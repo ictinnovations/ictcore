@@ -171,6 +171,22 @@ Delete an existing contact
 * __Parameters__  
 Replace {contact_id} in url with valid contact_id
 
+### GET contact/{contact_id}/join/{group_id}
+link contact to group
+
+* __Parameters__  
+Replace {contact_id} and {group_id} in url with valid contact_id and group_id
+
+* __Response__  
+ 
+ ### GET contact/{contact_id}/leave/{group_id}
+remove link
+
+* __Parameters__  
+Replace {contact_id} and {group_id} in url with valid contact_id and group_id
+
+* __Response__ 
+
 Group / pre defined to bulk system
 ========================================
 ### POST group
