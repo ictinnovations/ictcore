@@ -22,7 +22,6 @@ class GroupApi extends Api
     $this->_authorize('group_create');
     $oGroup = new Group();
     $this->set($oGroup, $data);
-
     if ($oGroup->save()) {
       return $oGroup->group_id;
     } else {
@@ -36,7 +35,6 @@ class GroupApi extends Api
    */
   public function list_view($query = array())
   {
-
     $this->_authorize('group_list');
     return Group::search((array)$query);
   }
@@ -80,17 +78,15 @@ class GroupApi extends Api
     }
   }
   /**
-   * Create a new group
+   * remove group
    *
-   * @url GET /group/$group_id/delete
-   * @url DELETE /group/$group_id/delete
+   * @url DELETE /groups/$group_id/delete
    */
   public function remove($group_id)
   {
     $this->_authorize('group_delete');
     $oGroup = new Group($group_id);
     $result = $oGroup->delete();
-
     if ($result) {
       return $result;
     } else {
@@ -135,7 +131,7 @@ class GroupApi extends Api
    /**
    * Export  Contact Sample
    *
-   * @url GET /group/export/contact_csv/sample
+   * @url GET /groups/export/contact_csv/sample
    * 
    */
    public function export_csv_sample()
