@@ -79,6 +79,11 @@ if(mysql_num_rows($result)>0)
           }
         $i++;
     }
+         $query_campaign = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " ,status='completed' where campaign_id =".$campaign_id;
+         $res = mysql_query($query_campaign);
+         if (mysql_errno()) {
+            Corelog::log("Campaign update failed", Corelog::CRUD);
+        } 
 }
   else
   {
