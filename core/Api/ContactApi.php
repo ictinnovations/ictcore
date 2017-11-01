@@ -100,7 +100,7 @@ class ContactApi extends Api
 /**
    * Create a new contact Link
    *
-   * @url GET /contact/$contact_id/join/$group_id
+   * @url GET /contacts/$contact_id/join/$group_id
    * 
    */
   public function join($contact_id,$group_id)
@@ -113,13 +113,13 @@ class ContactApi extends Api
     if ($check > 0) {
       return $oContact->link_id($check1);
     } else {
-      throw new CoreException(417, 'Contact creation failed');
+      throw new CoreException(417, 'Group not found');
     }
   }
 /**
    * Create a new contact Link
    *
-   * @url GET /contact/$contact_id/leave/$group_id
+   * @url GET /contacts/$contact_id/leave/$group_id
    * 
    */
   public function leave($contact_id,$group_id)
@@ -132,7 +132,8 @@ class ContactApi extends Api
       if ($check) {
         return $oContact->link_id($check1);
       } else {
-        throw new CoreException(417, 'Contact creation failed');
+        throw new CoreException(417, 'Group Deletion failed');
       }
   }
+
 }
