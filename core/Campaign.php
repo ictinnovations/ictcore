@@ -191,7 +191,8 @@ class Campaign
      $act_id = $this->account_id;
      $result = DB::update(self::$table, $data, false, true);
      $this->campaign_id = $data['campaign_id'];
-      $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
+     
+      /*$query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
       $result_contacts = mysql_query($query);
       while ($datacontact = mysql_fetch_assoc($result_contacts)) 
       {
@@ -217,7 +218,7 @@ class Campaign
           {
             throw new CoreException(417, 'Transmission creation failed');
           }
-     }
+     }*/
       Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
     }
     return $result;
