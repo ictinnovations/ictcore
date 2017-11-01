@@ -84,11 +84,11 @@ public function search_contact()
     $aGroupcontact = array();
     $aWhere = array();
    //$from_str .= ' WHERE cl.group_id='.$this->group_id;
-    $query = "SELECT c.first_name,c.last_name,c.phone,c.contact_id ,cl.contact_link_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
+    $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id ,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
     Corelog::log("groupcontact search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = mysql_query($query);
     while ($data = mysql_fetch_assoc($result)) {
-      $aGroupcontact[$data['contact_link_id']] = $data;
+      $aGroupcontact[] = $data;
     }
     return $aGroupcontact;
 }
@@ -100,11 +100,10 @@ public function search_contact()
      //$output = fopen($tmpfname.".csv", "w");  
      $output = fopen('php://output', 'w');
     fputcsv($output, array('First Name', 'Last Name', 'Phone','Email'));  
-    $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id ,cl.contact_link_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
+    $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id ,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
     $result = mysql_query($query);  
     while($row = mysql_fetch_assoc($result))  
     {  
-      unset($row['contact_link_id']);
       unset($row['contact_id']);
       unset($row['group_id']);
       fputcsv($output, $row);  
@@ -113,22 +112,26 @@ public function search_contact()
     return $tmpfname;
   }
    //end
-  // import csv
+  // import csv using Deamon
     public function contact_import($file)
     {
-        $file_tmpname = fopen($file['file_contents']['tmp_name'], "r");
+       //exec(dirname(__DIR__)."/bin/contact.php hello start" , $output);
+        $contact_imp  = $file['file_contents']['tmp_name'];
+        exec(dirname(__DIR__)."/bin/contact.php $contact_imp $this->group_id start ", $output);
+        return $output[0] ;
+       /* $file_tmpname = fopen($file['file_contents']['tmp_name'], "r");
         $i=0;
         while (($value = fgetcsv($file_tmpname, 10000, ",")) !== FALSE)
         {
-        if(!empty($value))
-        {
-          //echo $getData[0];
-          $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
-          $result = mysql_insert_id();
-         $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value (".$this->group_id.",$result )");
-        }
-         $i++;
-        }
+          if(!empty($value))
+          {
+            //echo $getData[0];
+            $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
+            $result = mysql_insert_id();
+            $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value (".$this->group_id.",$result )");
+          }
+           $i++;
+        }*/
         /*foreach ($data as $key => $value) 
         {
          // echo "Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'";
@@ -146,8 +149,8 @@ public function search_contact()
     // $count_contact = mysql_query("SELECT * from contact_link where group_id=".$id." GROUP BY contact_id");
      //$cont_result =  mysql_num_rows($count_contact);
     // $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$id);
-     $reslt = " Rows Added";
-     return $i.$reslt ;
+     /*$reslt = " Rows Added";
+     return $i.$reslt ;*/
   }
   // END
   private function load()
