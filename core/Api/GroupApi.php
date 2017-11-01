@@ -119,13 +119,14 @@ class GroupApi extends Api
    */
   public function import_csv($group_id,$data = array())
    {
-      $oGroup = new Group();
+      $oGroup = new Group($group_id);
       global $_FILES, $_POST;
       $f_name = explode('.',$_FILES['file_contents']['name']);
        $chk_f_type = end($f_name );
       if($chk_f_type == 'csv' || $chk_f_type == 'CSV' || $chk_f_type == 'Csv'){
             $file = fopen($_FILES['file_contents']['tmp_name'], "r");
-               return Group::contact_import($_FILES);
+              // return Group::contact_import($_FILES);
+                   return $oGroup->contact_import($_FILES);
            }
          else{
           return "Upload Csv file";
