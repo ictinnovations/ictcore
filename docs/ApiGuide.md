@@ -217,7 +217,7 @@ Import contact by backend process (deamon)
 An associative array containing csv file pairs based on following fields
 ```json
 {
-    "attachment": "__File__, upload a file",
+    "attachment": "__File__, upload a csv file",
 }
 ```
 * __Response__  
