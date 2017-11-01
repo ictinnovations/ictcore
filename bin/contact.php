@@ -6,9 +6,7 @@ use \ICT\Core\Campaign;
 use \ICT\Core\Transmission;
 require dirname(__DIR__).'/vendor/autoload.php'; // composer
 declare(ticks=1);
-
 /* forking */
-
 $group_id = $argv[2];
 (new \Firehed\ProcessControl\Daemon)
  ->setPidFileLocation('/tmp/coreCampaign_td1.pid')
@@ -17,8 +15,6 @@ $group_id = $argv[2];
  ->setProcessName('coreCampaign')
  ->autoRun();
  //parent close database conection that y i put here
- 
-
  require_once dirname(__FILE__).'/../core/core.php';
  $file_tmpname = $argv[1];
  $file_tm = fopen($file_tmpname, "r");
