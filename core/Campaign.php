@@ -57,6 +57,7 @@ class Campaign
       $this->load();
     } 
   }
+  
   public static function search($aFilter = array())
   {
     $aCampaign = array();
@@ -87,18 +88,10 @@ class Campaign
     while ($data = mysql_fetch_assoc($result)) {
       $aCampaign[] = $data;
     }
-    // if no Campaign found, check for special Campaigns
-    /*if (empty($aCampaign) && isset($aFilter['campaign_id']) && $aFilter['campaign_id'] == Campaign::COMPANY) {
-      $oCampaign = new Campaign($aFilter['campaign_id']);
-      $aCampaign[$oCampaign->campaign_id] = array(
-          'campaign_id' => $oCampaign->campaign_id,
-          'program_id' => $oCampaign->program_id,
-          'group_id' => $oCampaign->group_id,
-          'status' => $oCampaign->status
-      );
-    }*/
+
     return $aCampaign;
   }
+
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE campaign_id='%campaign_id%' ";
@@ -118,12 +111,14 @@ class Campaign
       throw new CoreException('404', 'Campaign not found');
     }
   }
+
   public function delete()
   {
      $this->task_cancel();
     Corelog::log("Campaign delete", Corelog::CRUD);
     return DB::delete(self::$table, 'campaign_id', $this->campaign_id, true);
   }
+
   public function __isset($field)
   {
     $method_name = 'isset_' . $field;
@@ -133,6 +128,7 @@ class Campaign
       return isset($this->$field);
     }
   }
+
   public function __get($field)
   {
     $method_name = 'get_' . $field;
@@ -143,6 +139,7 @@ class Campaign
     }
     return NULL;
   }
+
   public function __set($field, $value)
   {
     $method_name = 'set_' . $field;
@@ -158,19 +155,7 @@ class Campaign
   {
     return $this->campaign_id;
   }
-  /*public function email_to_phone()
-  {
-    $aEmail = imap_rfc822_parse_adrlist($this->email, Conf::get('sendmail:domain', 'localhost'));
-    $strPhone = $aEmail[0]->mailbox; // we are only interested in 1st (0) part of aEmail list
-    $this->phone = preg_replace("/[^0-9]/", "", $strPhone); // keep only digits
-    return $this->phone;
-  }
-  public function phone_to_email()
-  {
-    $strEmail = $this->phone . '@' . Conf::get('sendmail:domain', 'localhost');
-    $this->email = $strEmail;
-    return $this->email;
-  }*/
+
   public function save()
   {
     $data = array(
@@ -186,44 +171,38 @@ class Campaign
       // update existing record
       $result = DB::update(self::$table, $data, 'campaign_id', true);
       Corelog::log("Campaign updated: $this->campaign_id", Corelog::CRUD);
-    } else {
+    }else {
       // add new
      $act_id = $this->account_id;
      $result = DB::update(self::$table, $data, false, true);
      $this->campaign_id = $data['campaign_id'];
-     Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
+      Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
     }
     return $result;
   }
+
   public function start()
   {
-        /* Excutable file  Start deamon */
-          exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id start", $output);
-        /* Update campaign process id and last run */
-         $query_campiagn = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " where campaign_id =".$this->campaign_id;
-         $res = mysql_query($query_campaign);
-         if (mysql_errno()) {
-
-            Corelog::log("Campaign update failed", Corelog::CRUD);
-          } 
+    /* Excutable file  Start deamon */
+    exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id start", $output);
     return $output[0];
   }
 
   public function stop()
   {
-    /* Excutable file  stop deamon */
-     exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id  stop", $output);
-     return $output[0];
+   /* Excutable file  stop deamon */
+    exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id  stop", $output);
+    return $output[0];
   }
 
   public function task_cancel()
   {
-      $aSchedule = Schedule::search(array('type'=>'campaign', 'data'=>$this->campaign_id));
-      foreach ($aSchedule as $schedule) 
-      {
-        $oSchedule = new Schedule($schedule['task_id']);
-        $oSchedule->delete();
-      }
+    $aSchedule = Schedule::search(array('type'=>'campaign', 'data'=>$this->campaign_id));
+    foreach ($aSchedule as $schedule) 
+    {
+      $oSchedule = new Schedule($schedule['task_id']);
+      $oSchedule->delete();
+    }
   }
  
 }
