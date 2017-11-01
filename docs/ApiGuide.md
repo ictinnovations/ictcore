@@ -171,6 +171,73 @@ Delete an existing contact
 * __Parameters__  
 Replace {contact_id} in url with valid contact_id
 
+Group / pre defined to bulk system
+========================================
+### POST group
+Create new groups
+
+* __Parameters__  
+An associative array containing key and value pairs based on following fields
+```json
+{
+    "name": "__String__",
+    "description": "__Optional_String__",
+}
+```
+* __Response__  
+__group_id__ of created group record
+
+### GET groups/{group_id}
+Read / view complete group data
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id
+
+* __Response__  
+group details in associative array
+
+### PUT groups/{group_id}
+Update an existing group
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id, fields require modifications will be POSTed in same way as `groups`
+
+* __Response__  
+Return updated group data as an associative array
+
+### DELETE group/{group_id}
+Delete an existing group
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id
+ 
+### POST group/import/contact_group/{group_id}
+Import contact by backend process (deamon)
+* __Parameters__  
+An associative array containing csv file pairs based on following fields
+```json
+{
+    "attachment": "__File__, upload a file",
+}
+```
+* __Response__  
+deaman starting ok
+
+### GET  groups/{group_id}/export/contact.csv 
+read / view complete group contact data
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id
+
+* __Response__  
+contact details in csv downloadable file 
+
+### GET groups/import/contact_csv/sample
+sample csv contact file
+
+* __Response__  
+sample csv downloadable file 
+
 Message / pre defined information to be send
 ============================================
 
