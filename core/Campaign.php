@@ -191,11 +191,11 @@ class Campaign
      $act_id = $this->account_id;
      $result = DB::update(self::$table, $data, false, true);
      $this->campaign_id = $data['campaign_id'];
-      $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id ,cl.contact_link_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
+      $query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id,cl.contact_id ,cl.group_id FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id where cl.group_id=".$this->group_id." GROUP BY cl.contact_id";
       $result_contacts = mysql_query($query);
       while ($datacontact = mysql_fetch_assoc($result_contacts)) 
       {
-        $aGroupcontact[$datacontact['contact_link_id']] = $datacontact;
+        $aGroupcontact[] = $datacontact;
       }
        foreach($aGroupcontact as $rowcontact)
       {
@@ -222,38 +222,30 @@ class Campaign
     }
     return $result;
   }
-/*public function deamon($strng)
-{
-       echo $strng;
-       echo  posix_getpid(); 
-       echo "<br>";
-       echo $this->campaign_id;
-       $query = "UPDATE campaign set process_id=".posix_getpid() ."  where campaign_id =".$this->campaign_id;
-      
-       mysql_query($query);
-         for ($i = 1; $i <=100; $i++)
-        {
-            // $result = $this->check($url);
-            sleep(1);
-            echo "count: ".$i."<br>";
-            ob_flush(); flush();
-        }
-}*/
+
   public function start()
   {
-    exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id $uer start", $output);
+        /* Excutable file  Start deamon */
+        exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id start", $output);
+        /* Update campaign process id and last run */
 
-        $query_campiagn = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " where campaign_id =".$this->campaign_id;
-         mysql_query($query_campaign);
+         $query_campiagn = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " where campaign_id =".$this->campaign_id;
+         $res = mysql_query($query_campaign);
+         if (mysql_errno()) {
+
+            Corelog::log("Campaign update failed", Corelog::CRUD);
+        } 
 
     return $output[0];
   }
+
   public function stop()
   {
-     $uer = $_SERVER['PHP_AUTH_USER'];
-     exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id $uer  stop", $output);
+    /* Excutable file  stop deamon */
+     exec(dirname(__DIR__)."/bin/campaign.php $this->campaign_id  stop", $output);
      return $output[0];
   }
+
   public function task_cancel()
   {
       $aSchedule = Schedule::search(array('type'=>'campaign', 'data'=>$this->campaign_id));
