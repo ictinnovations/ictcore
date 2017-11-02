@@ -171,7 +171,7 @@ Delete an existing contact
 * __Parameters__  
 Replace {contact_id} in url with valid contact_id
 
-### GET contact/{contact_id}/join/{group_id}
+### GET contacts/{contact_id}/join/{group_id}
 link contact to group
 
 * __Parameters__  
@@ -179,7 +179,7 @@ Replace {contact_id} and {group_id} in url with valid contact_id and group_id
 
 * __Response__  
  
- ### GET contact/{contact_id}/leave/{group_id}
+ ### GET contacts/{contact_id}/leave/{group_id}
 remove link
 
 * __Parameters__  
@@ -733,7 +733,79 @@ A json encoded associative array containing key and value pairs based on followi
 * __Response__  
 __program_id__ of recently created program record
 
+Campaign - the actual bulk system 
+========================================
 
+### POST campaigns
+* __Parameters__  
+  * A json encoded associative array containing key and value pairs based on following fields
+```json
+{
+    "program_id": "__Numeric_ID__, program_id of selected program",
+    "group_id": "__Numeric_ID__, group_id of selected group",
+    "delay": "__Numeric__, pause between transmissions (milliseconds)",
+    "try_allowed": "__Numeric__ ",
+    "account_id": "__Numeric_ID__, account_id of associated account",
+    "status": "__String__",
+}
+```
+* __Response__  
+__campaign_id__ of recently created campaign record
+
+### GET campaigns
+Read / view complete campaign data
+
+* __Response__  
+campaign details in associative array
+
+### PUT campaigns/{campaign_id}
+Update an existing group
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id, fields require modifications will be POSTed in same way as `campaign`
+
+* __Response__  
+Return updated campaign data as an associative array
+
+### DELETE campaigns/{campaign_id}
+Delete an existing campaign
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+ 
+### GET campaign/{campaign_id}/start
+start system daemon programs and is used to control the creation and sending termination of system-level processes
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+```
+* __Response__  
+Program is running
+
+### GET  campaign/{campaign_id}/stop
+stop system daemon programs
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+
+* __Response__  
+Program is stoping
+   * @url POST /campaign/$campaign_id/$action/schedule
+
+### POST campaigns/{campaign_id}/{action}/schedule
+Instead of delivering message instantly, schedule its delivery in near future.
+
+* __Parameters__  
+Replace {campaign_id} and {action} like (start or stop) in url with valid campaign_id
+
+* __Response__  
+__schedule_id__ of recently created schedule record
+
+### DELETE campaign/{campaign_id}/schedule/cancel
+Cancel any schedule associated with given campaign
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
 
 Transmission - the actual call or action
 ========================================
