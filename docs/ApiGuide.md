@@ -790,7 +790,6 @@ Replace {campaign_id} in url with valid campaign_id
 
 * __Response__  
 Program is stoping
-   * @url POST /campaign/$campaign_id/$action/schedule
 
 ### POST campaigns/{campaign_id}/{action}/schedule
 Instead of delivering message instantly, schedule its delivery in near future.
