@@ -15,10 +15,18 @@ class ComposerStaticInit310410ba0498529560857ea7544dea3a
         array (
             'Twig\\' => 5,
         ),
+        'P' => 
+        array (
+            'Psr\\Log\\' => 8,
+        ),
         'I' => 
         array (
             'ICT\\Core\\Test\\' => 14,
             'ICT\\Core\\' => 9,
+        ),
+        'F' => 
+        array (
+            'Firehed\\ProcessControl\\' => 23,
         ),
     );
 
@@ -26,6 +34,10 @@ class ComposerStaticInit310410ba0498529560857ea7544dea3a
         'Twig\\' => 
         array (
             0 => __DIR__ . '/..' . '/twig/twig/src',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
         'ICT\\Core\\Test\\' => 
         array (
@@ -36,6 +48,10 @@ class ComposerStaticInit310410ba0498529560857ea7544dea3a
         array (
             0 => __DIR__ . '/../..' . '/core',
             1 => __DIR__ . '/../..' . '/core/lib',
+        ),
+        'Firehed\\ProcessControl\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firehed/processmanager/src',
         ),
     );
 

@@ -183,6 +183,22 @@ INSERT INTO permission VALUES (NULL, 'contact_list', '');
 INSERT INTO permission VALUES (NULL, 'contact_read', '');
 INSERT INTO permission VALUES (NULL, 'contact_update', '');
 INSERT INTO permission VALUES (NULL, 'contact_delete', '');
+-- GROUP permissions
+INSERT INTO permission VALUES (NULL, 'group', '');
+INSERT INTO permission VALUES (NULL, 'group_create', '');
+INSERT INTO permission VALUES (NULL, 'group_list', '');
+INSERT INTO permission VALUES (NULL, 'group_read', '');
+INSERT INTO permission VALUES (NULL, 'group_update', '');
+INSERT INTO permission VALUES (NULL, 'group_delete', '');
+-- Campaign permissions
+INSERT INTO permission VALUES (NULL, 'campaign', '');
+INSERT INTO permission VALUES (NULL, 'campaign_create', '');
+INSERT INTO permission VALUES (NULL, 'campaign_list', '');
+INSERT INTO permission VALUES (NULL, 'campaign_read', '');
+INSERT INTO permission VALUES (NULL, 'campaign_update', '');
+INSERT INTO permission VALUES (NULL, 'campaign_delete', '');
+INSERT INTO permission VALUES (NULL, 'campaign_start', '');
+INSERT INTO permission VALUES (NULL, 'campaign_stop', '');
 -- Account permissions
 INSERT INTO permission VALUES (NULL, 'account', '');
 INSERT INTO permission VALUES (NULL, 'account_create', '');
@@ -573,7 +589,48 @@ CREATE TABLE contact
    PRIMARY KEY (contact_id)
 ) ENGINE = InnoDB;
 CREATE INDEX contact_created_by ON contact (created_by);
-
+/*==============================================================*/
+/* Table: group                                              */
+/* Desc: user can create group  */
+/*==============================================================*/
+CREATE TABLE contact_group
+(
+   group_id                 int(11) unsigned       NOT NULL auto_increment,
+   name                     varchar(128)           NOT NULL,
+   description              varchar(255)           NOT NULL default '',
+   contact_count            varchar(128)           NOT NULL default '0',
+   PRIMARY KEY (group_id)
+) ENGINE = InnoDB;
+/*==============================================================*/
+/* Table: group_contacts                                              */
+/* Desc: link table for contact and group  */
+/*==============================================================*/
+CREATE TABLE contact_link
+(
+   /*contact_link_id              int(11) unsigned  NOT NULL auto_increment,*/
+   group_id                     int(11)           NOT NULL,
+   contact_id                   int(11)           NOT NULL ,
+   PRIMARY KEY (group_id,contact_id)
+) ENGINE = InnoDB;
+/*==============================================================*/
+/* Table: campaign                                              */
+/* Desc: user can  create campaign*/
+/*==============================================================*/
+CREATE TABLE campaign
+(
+   campaign_id               int(11) unsigned       NOT NULL auto_increment,
+   program_id                int(11)                NOT NULL,
+   group_id                  int(11)                NOT NULL ,
+   delay                     varchar(128)           NOT NULL default '',
+   try_allowed               varchar(128)           NOT NULL default '',
+   account_id                int(11)                NOT NULL ,
+   status                    varchar(128)           NOT NULL default '',
+   created_by                int(11)                default NULL,
+   pid                       varchar(128)           NOT NULL default '',
+   last_run                   int(11)                default NULL,
+   PRIMARY KEY (campaign_id)
+) ENGINE = InnoDB;
+CREATE INDEX campaign_created_by ON campaign (created_by);
 /*==============================================================*/
 /* Table: ivr                                                   */
 /*==============================================================*/

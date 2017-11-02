@@ -243,8 +243,9 @@ class Program
     }
   }
 
-  public static function getClass($program_id, $namespace = 'ICT\\Core\\Program')
+  public static function getClass(&$program_id, $namespace = 'ICT\\Core\\Program')
   {
+      
     if (ctype_digit(trim($program_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE program_id='%program_id%' ";
       $result = DB::query(self::$table, $query, array('program_id' => $program_id));
@@ -253,9 +254,13 @@ class Program
       }
     } else {
       $program_type = $program_id;
+      $program_id = NULL;
+
     }
     $class_name = ucfirst(strtolower(trim($program_type)));
+
     if (!empty($namespace)) {
+
       $class_name = $namespace . '\\' . $class_name;
     }
     if (class_exists($class_name, true)) {
@@ -267,11 +272,16 @@ class Program
 
   public static function load($program_id, $aParameter = null)
   {
+     // return $program_id;
     $class_name = self::getClass($program_id);
+
     if ($class_name) {
       Corelog::log("Creating instance of : $class_name for program: $program_id", Corelog::CRUD);
+
       return new $class_name($program_id, $aParameter);
+
     } else {
+
       Corelog::log("$class_name class not found, Creating instance of : Program", Corelog::CRUD);
       return new self($program_id, $aParameter);
     }

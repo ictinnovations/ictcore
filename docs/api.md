@@ -9,6 +9,17 @@ Contact / pre defined destination number
 * PUT contacts/{contact_id}
 * DELETE contacts/{contact_id}
 
+Group / pre defined for bulk system
+----------------------------------------
+* POST   groups
+* GET    groups
+* GET    groups/{group_id}
+* PUT    groups/{group_id}
+* DELETE groups/{group_id}
+* GET    groups/{group_id}/export/contact.csv
+* POST   groups/import/contact_group/{group_id}
+* GET    groups/import/contact_csv/sample
+
 Message / pre defined information to be send
 --------------------------------------------
 
@@ -81,6 +92,19 @@ Programs
 
 ### Voice Call with pre recorded message
 * POST programs/voicemessage
+
+Campaign - the actual for bulk system
+-----------------------------------------
+cammpaign create for bulk process using system-level processes (deamon)
+
+* POST   campaigns
+* GET    campaigns
+* PUT    campaigns/{campaign_id}
+* DELETE campaigns/{campaign_id}
+* GET    campaign/{campaign_id}/start
+* GET    campaign/{campaign_id}/stop
+* POST   campaigns/{campaign_id}/{action}/schedule
+* DELETE campaign/{campaign_id}/schedule/cancel
 
 Transmission - the actual call or action
 ----------------------------------------
