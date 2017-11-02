@@ -178,6 +178,7 @@ link contact to group
 Replace {contact_id} and {group_id} in url with valid contact_id and group_id
 
 * __Response__  
+ Return the number of contact link in the "contact_link" table
  
  ### GET contacts/{contact_id}/leave/{group_id}
 remove link
@@ -186,6 +187,7 @@ remove link
 Replace {contact_id} and {group_id} in url with valid contact_id and group_id
 
 * __Response__ 
+Return the number of contact link in the "contact_link" table
 
 Group / pre defined for bulk system
 ========================================
