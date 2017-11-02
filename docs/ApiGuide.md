@@ -187,7 +187,7 @@ Replace {contact_id} and {group_id} in url with valid contact_id and group_id
 
 * __Response__ 
 
-Group / pre defined to bulk system
+Group / pre defined for bulk system
 ========================================
 ### POST group
 Create new groups
@@ -227,7 +227,7 @@ Delete an existing group
 * __Parameters__  
 Replace {group_id} in url with valid group_id
  
-### POST group/import/contact_group/{group_id}
+### POST groups/import/contact_group/{group_id}
 Import contact by backend process (deamon)
 * __Parameters__  
 An associative array containing csv file pairs based on following fields
@@ -735,6 +735,7 @@ __program_id__ of recently created program record
 
 Campaign - the actual bulk system 
 ========================================
+cammpaign create for bulk process using system-level processes (deamon)
 
 ### POST campaigns
 * __Parameters__  
