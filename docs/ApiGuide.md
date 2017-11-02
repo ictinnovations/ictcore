@@ -778,7 +778,7 @@ start system daemon programs and is used to control the creation and sending ter
 
 * __Parameters__  
 Replace {campaign_id} in url with valid campaign_id
-```
+
 * __Response__  
 Program is running
 
