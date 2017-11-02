@@ -68,14 +68,6 @@ class Group
     while ($data = mysql_fetch_assoc($result)) {
       $aGroup[] = $data;
     }
-    // if no group found, check for special groups
-    /*if (empty($aGroup) && isset($aFilter['group_id']) && $aFilter['group_id'] == Group::COMPANY) {
-      $ogroup = new Group($aFilter['group_id']);
-      $aGroup[$ogroup->group_id] = array(
-          'group_id' => $ogroup->group_id,
-          'name' => $ogroup->name,
-      );
-    }*/
     return $aGroup;
   }
   //List Group Contact
@@ -115,43 +107,10 @@ public function search_contact()
   // import csv using Deamon
     public function contact_import($file)
     {
-       //exec(dirname(__DIR__)."/bin/contact.php hello start" , $output);
         $contact_imp  = $file['file_contents']['tmp_name'];
         exec(dirname(__DIR__)."/bin/contact.php $contact_imp $this->group_id start ", $output);
         return $output[0] ;
-       /* $file_tmpname = fopen($file['file_contents']['tmp_name'], "r");
-        $i=0;
-        while (($value = fgetcsv($file_tmpname, 10000, ",")) !== FALSE)
-        {
-          if(!empty($value))
-          {
-            //echo $getData[0];
-            $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
-            $result = mysql_insert_id();
-            $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value (".$this->group_id.",$result )");
-          }
-           $i++;
-        }*/
-        /*foreach ($data as $key => $value) 
-        {
-         // echo "Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'";
-            $check_pone_email= mysql_query("Select * from contact where phone=".$value[0]." AND email ='".$value[3]."'");
-
-            if(mysql_num_rows($check_pone_email)== 0)
-            {
-                $result_add = mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) value ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".$value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
-                $result = mysql_insert_id();
-                $result_add = mysql_query("INSERT INTO contact_link(group_id,contact_id) value ($id,$result )");
-                $i++;
-            }
-        }*/
-       //updade count contact group wise
-    // $count_contact = mysql_query("SELECT * from contact_link where group_id=".$id." GROUP BY contact_id");
-     //$cont_result =  mysql_num_rows($count_contact);
-    // $udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$id);
-     /*$reslt = " Rows Added";
-     return $i.$reslt ;*/
-  }
+    }
   // END
   private function load()
   {
@@ -164,7 +123,7 @@ public function search_contact()
         $this->name = $data['name'];
         $this->description = $data['description'];
         Corelog::log("group loaded name: $this->name", Corelog::CRUD);
-      } else 
+      }else 
       {
         throw new CoreException('404', 'Group not found');
       }
@@ -226,8 +185,10 @@ public function search_contact()
       Corelog::log("group updated: $this->group_id", Corelog::CRUD);
     }else{
       // add new
-      $result = DB::update(self::$table, $data, false, true);
-      $this->group_id = $data['group_id'];
+     // $result = DB::update(self::$table, $data, false, true);
+      $result_add = mysql_query("INSERT INTO ".self::$table ." (name,description) value ('".$this->name."', '".$this->description."')");
+      $this->group_id = mysql_insert_id();
+      $result =  $this->group_id ;
       Corelog::log("New group created: $this->group_id", Corelog::CRUD);
     }
     return $result;
