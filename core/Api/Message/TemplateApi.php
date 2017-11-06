@@ -20,8 +20,8 @@ class TemplateApi extends Api
   /**
    * Create a new template
    *
-   * @url POST /template
-   * @url POST /message/template
+   * @url POST /templates
+   * @url POST /messages/templates
    */
   public function create($data = array())
   {

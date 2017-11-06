@@ -18,7 +18,7 @@ class Http extends Data implements AuthServer
   /**
    * @var Http
    */
-  protected static $_instance;
+  protected static $_instance = null;
 
   /**
    *

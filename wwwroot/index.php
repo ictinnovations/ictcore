@@ -9,6 +9,7 @@
 use ICT\Core\Api;
 use ICT\Core\Conf;
 use ICT\Core\CoreException;
+use ICT\Core\Session;
 
 // default include is /usr/ictcore/core
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
@@ -17,9 +18,8 @@ chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');
 include_once "Core.php";
 
 // *************************************** PREPARE SESSION AND COOKIES
-$session_name = Conf::get('website:cookie', 'ictcore');
-session_name($session_name);
-session_start(); // session start
+Session::setHandler();
+Session::start();
 
 // **************************************************** PREPARE SYSTEM
 $oApi = new Api();

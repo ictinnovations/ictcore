@@ -51,17 +51,6 @@ DB::$link = DB::connect();
 /* load default system configuration from database */
 SystemConfiguration::load();
 
-/* Setup Session handlers */
-// bond session management with following functions
-$oSession = Session::get_instance();
-session_set_save_handler(
-        array($oSession, 'open'),
-        array($oSession, 'close'),
-        array($oSession, 'read'),
-        array($oSession, 'write'),
-        array($oSession, 'destroy'),
-        array($oSession, 'gc')
-          );
-
 /* Start with guest user */
+$oSession = Session::get_instance();
 $oSession->user = new User(User::GUEST);

@@ -243,7 +243,7 @@ class Program
     }
   }
 
-  public static function getClass($program_id, $namespace = 'ICT\\Core\\Program')
+  public static function getClass(&$program_id, $namespace = 'ICT\\Core\\Program')
   {
     if (ctype_digit(trim($program_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE program_id='%program_id%' ";
@@ -253,6 +253,7 @@ class Program
       }
     } else {
       $program_type = $program_id;
+      $program_id   = null;
     }
     $class_name = ucfirst(strtolower(trim($program_type)));
     if (!empty($namespace)) {

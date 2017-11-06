@@ -11,14 +11,15 @@ namespace ICT\Core;
  * *************************************************************** */
 
 // Database Session Handling Functions
-
 class Session extends Data
 {
 
   /**
    * @var Session
    */
-  protected static $_instance;
+  protected static $_instance = null;
+
+  private $_db_link = null;
 
   /**
    * currently active user
@@ -44,6 +45,12 @@ class Session extends Data
    */
   private $transmission;
 
+  public function __construct(&$data = array())
+  {
+    parent::__construct($data);
+    $this->_db_link = DB::connect();
+  }
+
   /**
    * @staticvar boolean $initialized
    * @return Session
@@ -60,87 +67,90 @@ class Session extends Data
 
   public static function set($name, $value)
   {
-    $_instance = self::get_instance();
-    $_instance->__set($name, $value);
+    $this->data->__set($name, $value);
   }
 
   public static function &get($name, $default = NULL)
   {
-    $_instance = self::get_instance();
-    $value = &$_instance->__get($name);
+    $value = &$this->data->__get($name);
     if (NULL === $value) {
       return $default;
     }
     return $value;
   }
 
-  public static function open($path, $name)
+  public function open($path, $name)
   {
     Corelog::log("Session open requested with path: $path, and name: $name", Corelog::DEBUG);
     return TRUE;
   }
 
-  public static function close()
+  public function close()
   {
     Corelog::log("Session close requested", Corelog::DEBUG);
     return TRUE;
   }
 
-  public static function read($id)
+  public function read($id)
   {
     Corelog::log("Session read requested with id: $id", Corelog::DEBUG);
     session_write_close();
     $query = "SELECT data FROM session WHERE session_id='$id'";
-    if (!$result = DB::query('session', $query)) {
-      Corelog::log("Session read failed with error: " . mysql_error(DB::$link), Corelog::WARNING);
+    if (!$result = mysql_query($query, $this->_db_link)) {
+      Corelog::log("Session read failed with error: " . mysql_error($this->_db_link), Corelog::WARNING);
       return FALSE;
     }
     if (mysql_num_rows($result)) {
       $row = mysql_fetch_assoc($result);
-      self::$_instance = unserialize($row["data"]);
-      return self::$_instance;
+      $data = unserialize($row["data"]);
+      if ($data instanceof Data) {
+        $this->data = $data;
+      }
+      return $data;
     } else {
       Corelog::log("Session read found zero rows", Corelog::WARNING);
       return "";
     }
   }
 
-  public static function write($id, $data)
+  public function write($id, $data)
   {
     Corelog::log("Session write requested with id: $id", Corelog::DEBUG, $data);
-    $sessionRs = DB::query('session', "SELECT session_id FROM session s WHERE s.session_id = '$id'");
-    if(mysql_fetch_array($sessionRs) !== false) {
-      $query = "UPDATE session SET data='%data%', time_start=UNIX_TIMESTAMP() WHERE session_id ='$id'";
-    } else {
-      $query = "INSERT INTO session (session_id, time_start, data) 
-                  VALUES ('$id', UNIX_TIMESTAMP(), '%data%')";
+    if (!($data instanceof Data)) {
+      $data = $this->data;
     }
-    DB::query('session', $query, array('data' => serialize(self::$_instance)));
-    if (mysql_affected_rows(DB::$link)) {
+    $values = array(
+      '%id%'   => mysql_real_escape_string($id, $this->_db_link),
+      '%data%' => mysql_real_escape_string(serialize($data), $this->_db_link)
+    );
+    $query = "INSERT INTO session (session_id, time_start, data)
+                     VALUES ('%id%', UNIX_TIMESTAMP(), '%data%')
+              ON DUPLICATE KEY UPDATE time_start=UNIX_TIMESTAMP(), data='%data%'";
+    $final_query = str_replace(array_keys($values), array_values($values), $query);
+    mysql_query($final_query, $this->_db_link);
+    if (mysql_affected_rows($this->_db_link)) {
       return TRUE;
     }
     Corelog::log("Session write failed", Corelog::WARNING);
   }
 
-  public static function destroy($id)
+  public function destroy($id)
   {
     Corelog::log("Session delete requested with id: $id", Corelog::DEBUG);
     $query = "DELETE FROM session where session_id='$id'";
-    $result = DB::query('session', $query);
+    $result = mysql_query($query, $this->_db_link);
     if ($result) {
-      $oSession = Session::get_instance();
-      unset($oSession);
       return TRUE;
     } else {
       return FALSE;
     }
   }
 
-  public static function gc($life)
+  public function gc($life)
   {
     Corelog::log("Session gc requested with lif: $life", Corelog::DEBUG);
     $query = "DELETE FROM session WHERE time_start < " . (time() - $life);
-    $result = DB::query('session', $query);
+    $result = mysql_query($query, $this->_db_link);
     if ($result) {
       return TRUE;
     } else {
@@ -148,4 +158,31 @@ class Session extends Data
     }
   }
 
+  public static function newId() {}
+
+  public static function start() {
+    $session_name = Conf::get('website:cookie', 'ictcore');
+    session_name($session_name);
+    session_start();   //calls: open()->read()
+  }
+
+  /**
+   * Defines custom session handler.
+   */
+  public static function setHandler() {
+    // commit automatic session
+    //if (ini_get('session.auto_start') == 1) {
+       session_write_close();
+    //}
+    $_instance = static::get_instance();
+    session_set_save_handler(
+        array($_instance, 'open'),
+        array($_instance, 'close'),
+        array($_instance, 'read'),
+        array($_instance, 'write'),
+        array($_instance, 'destroy'),
+        array($_instance, 'gc')
+    );
+    // session_set_save_handler($_instance, true);
+  }
 }
