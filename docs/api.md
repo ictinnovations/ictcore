@@ -127,6 +127,7 @@ User Management
 * DELETE users/{user_id}/permissions/{permission\_id}
 * PUT users/{user_id}/roles/{role\_id}
 * DELETE users/{user_id}/roles/{role\_id}
+* POST users/authenticate
 
 Trunk / Termination Providers APIs
 ----------------------------------

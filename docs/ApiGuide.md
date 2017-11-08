@@ -976,6 +976,16 @@ Drop an already assigned permission from user (Please note it will drop permissi
   * Replace {account_id} in url with valid account_id
   * Replace {permission_id} in url with valid permission_id
 
+### POST users/authenticate
+Authenticate a user by sending credentials via post request
+
+A json encoded associative array containing key and value pairs based on following fields
+```json
+{
+    "username": "__String__",
+    "password": "__String__"
+}
+```
 
 Trunk / Termination Providers APIs
 ----------------------------------

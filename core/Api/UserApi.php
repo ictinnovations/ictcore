@@ -49,6 +49,40 @@ class UserApi extends Api
   }
 
   /**
+   * Gets the user after authenticating provided credentials
+   *
+   * @noAuth
+   * @url POST /users/authenticate
+   */
+  public function authenticate($data = array())
+  {
+    // no _authorize needed
+    if (!empty($data['username'])) {
+      throw new CoreException(401, 'No valid username found');
+    }
+
+    $key_type = null;
+    if (isset($data['password'])) {
+      $key_type = 'password';
+    } else if (isset($data['hash']) || isset($data['password_hash'])) {
+      $key_type = 'password_hash';
+    } else if (isset($data['cert']) || isset($data['certificate'])) {
+      $key_type = 'certificate';
+    } else if (!empty($_SERVER['REMOTE_ADDR'])) {
+      $key_type = 'host';
+      $data['host'] = $_SERVER['REMOTE_ADDR'];
+    }
+    if (!empty($key_type)) {
+      $oUser = new User($data['username']);
+      if ($oUser->authenticate($data[$key_type], $key_type)) {
+        return $oUser;
+      }
+    }
+
+    throw new CoreException(401, 'Invalid user name and password');
+  }
+
+  /**
    * Gets the user by id
    *
    * @url GET /users/$user_id
