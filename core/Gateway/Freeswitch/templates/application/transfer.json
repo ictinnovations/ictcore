@@ -1,0 +1,15 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "application_result": "success"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "transfer",
+      "data": "{{ application.extension }} XML user_{{ application.user_id }}"
+    }
+  ]
+}

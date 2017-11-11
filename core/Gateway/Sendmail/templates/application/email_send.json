@@ -2,8 +2,8 @@
   "to": "{{ transmission.destination.email }}",
   "from": "{{ transmission.source.email }}",
   "subject": "{{ application.subject }}",
-  "body": "{{ application.body|replace({'\r': '', '\n': '\\n'}) }}",
-  "body_alt": "{{ application.body_alt|replace({'\r': '', '\n': '\\n'}) }}",
+  "body": "{{ application.body|escape('json') }}",
+  "body_alt": "{{ application.body_alt|escape('json') }}",
   "attachment": "{{ application.attachment }}",
   "spool_id": "{{ transmission.spool.spool_id }}",
   "application_id": "{{ application.application_id }}"

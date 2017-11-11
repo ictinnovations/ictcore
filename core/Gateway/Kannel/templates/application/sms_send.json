@@ -2,7 +2,7 @@
   "smsc": "{{ provider.name }}",
   "to": "{{ transmission.destination.phone }}",
   "from": "{{ transmission.source.phone }}",
-  "data": "{{ application.message|replace({'\r': '', '\n': '\\n'}) }}",
+  "data": "{{ application.message|escape('json') }}",
   "mclass": "{{ application.class }}",
   "coding": "{{ application.encoding }}",
   "charset": "{{ application.charset }}",

@@ -1,0 +1,10 @@
+<context name="user_{{ user.user_id }}">
+  <!-- one or more extension tags -->
+{% for extension in extension_list %}
+  <extension name="{{ extension.phone }}">
+    <condition field="destination_number" expression="^{{ extension.phone }}$">
+      <action application="bridge" data="user/{{ extension.phone }}"/>
+    </condition>
+  </extension>
+{% endfor %}
+</context>
