@@ -108,9 +108,10 @@ function application_fetch()
   local api_request  = ictcore_access
   local api_response = ''
 
+  -- application_data = JSON:encode must be placed before application_id, And I don't know why ?
+  api_request['application_data'] = JSON:encode(app_result)
   api_request['spool_id']         = spool_id
   api_request['application_id']   = app_id
-  api_request['application_data'] = JSON:encode(app_result)
 
   -- disable any further execution, untill we have fresh application id
   app_id = nil
