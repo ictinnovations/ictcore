@@ -11,7 +11,7 @@ Dear [transmission:account:first_name] [transmission:account:last_name],
 <p>
 We have tried to send your fax to [fax:transmission:contact:phone] but unfortunately it failed.
 </p>
-Error: [fax:program:result:response]
+Error: [fax:transmission:result:error:data]
 <p>
 Please try again later.
 </p>
@@ -27,7 +27,7 @@ Dear [transmission:account:first_name] [transmission:account:last_name],
 
 We have tried to send your fax to [fax:transmission:contact:phone] but unfortunately it failed.
 
-Error: [fax:program:result:response]
+Error: [fax:transmission:result:error:data]
 
 Please try again later.
 

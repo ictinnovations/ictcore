@@ -28,17 +28,6 @@ class TemplateApi extends Api
     $this->_authorize('template_create');
 
     $oTemplate = new Template();
-    global $_FILES, $_POST;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oTemplate->type = $type;
-      $oTemplate->attachment = $file['tmp_name'];
-      // WORK-AROUND as currently JSON is not possible with file uploads
-      if (empty($data)) {
-        $data = $_POST;
-      }
-    }
     $this->set($oTemplate, $data);
 
     if ($oTemplate->save()) {
@@ -75,17 +64,45 @@ class TemplateApi extends Api
   }
 
   /**
+   * Upload template file by id
+   *
+   * @url PUT /templates/$template_id/media
+   * @url PUT /messages/templates/$template_id/media
+   */
+  public function upload($template_id, $data = array())
+  {
+    $this->_authorize('template_create');
+
+    $oTemplate = new Template($template_id);
+    global $_FILES;
+    if (!empty($_FILES)) {
+      $file = array_shift(array_values($_FILES));
+      $type = strtolower(end(explode('.', $file['name'])));
+      $oTemplate->type = $type;
+      $oTemplate->file_name = $file['tmp_name'];
+
+      if ($oTemplate->save()) {
+        return $oTemplate->template_id;
+      } else {
+        throw new CoreException(417, 'Template media upload failed');
+      }
+    } else {
+      throw new CoreException(417, 'Template media upload failed, no file uploaded');
+    }
+  }
+
+  /**
    * Download template by id
    *
-   * @url GET /templates/$template_id/download
-   * @url GET /messages/templates/$template_id/download
+   * @url GET /templates/$template_id/media
+   * @url GET /messages/templates/$template_id/media
    */
   public function download($template_id)
   {
     $this->_authorize('template_read');
 
     $oTemplate = new Template($template_id);
-    Corelog::log("Template file / download requested :$oTemplate->attachment", Corelog::CRUD);
+    Corelog::log("Template media / download requested :$oTemplate->attachment", Corelog::CRUD);
 
     $quoted = sprintf('"%s"', addcslashes(basename($oTemplate->attachment), '"\\'));
     $size = filesize($oTemplate->attachment);
@@ -116,17 +133,6 @@ class TemplateApi extends Api
     $this->_authorize('template_update');
 
     $oTemplate = new Template($template_id);
-    global $_FILES, $_POST;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oTemplate->type = $type;
-      $oTemplate->attachment = $file['tmp_name'];
-      // WORK-AROUND as currently JSON is not possible with file uploads
-      if (empty($data)) {
-        $data = $_POST;
-      }
-    }
     $this->set($oTemplate, $data);
 
     if ($oTemplate->save()) {

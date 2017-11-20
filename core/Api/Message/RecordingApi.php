@@ -28,17 +28,6 @@ class RecordingApi extends Api
     $this->_authorize('recording_create');
 
     $oRecording = new Recording();
-    global $_FILES, $_POST;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oRecording->type = $type;
-      $oRecording->file_name = $file['tmp_name'];
-      // WORK-AROUND as currently JSON is not possible with file uploads
-      if (empty($data)) {
-        $data = $_POST;
-      }
-    }
     $this->set($oRecording, $data);
 
     if ($oRecording->save()) {
@@ -75,17 +64,45 @@ class RecordingApi extends Api
   }
 
   /**
+   * Upload recording file by id
+   *
+   * @url PUT /recordings/$recording_id/media
+   * @url PUT /messages/recordings/$recording_id/media
+   */
+  public function upload($recording_id, $data = array())
+  {
+    $this->_authorize('recording_create');
+
+    $oRecording = new Recording($recording_id);
+    global $_FILES;
+    if (!empty($_FILES)) {
+      $file = array_shift(array_values($_FILES));
+      $type = strtolower(end(explode('.', $file['name'])));
+      $oRecording->type = $type;
+      $oRecording->file_name = $file['tmp_name'];
+
+      if ($oRecording->save()) {
+        return $oRecording->recording_id;
+      } else {
+        throw new CoreException(417, 'Recording media upload failed');
+      }
+    } else {
+      throw new CoreException(417, 'Recording media upload failed, no file uploaded');
+    }
+  }
+
+  /**
    * Download recording by id
    *
-   * @url GET /recordings/$recording_id/download
-   * @url GET /messages/recordings/$recording_id/download
+   * @url GET /recordings/$recording_id/media
+   * @url GET /messages/recordings/$recording_id/media
    */
   public function download($recording_id)
   {
     $this->_authorize('recording_read');
 
     $oRecording = new Recording($recording_id);
-    Corelog::log("Recording file / download requested :$oRecording->file_name", Corelog::CRUD);
+    Corelog::log("Recording media / download requested :$oRecording->file_name", Corelog::CRUD);
 
     $quoted = sprintf('"%s"', addcslashes(basename($oRecording->file_name), '"\\'));
     $size = filesize($oRecording->file_name);
@@ -116,17 +133,6 @@ class RecordingApi extends Api
     $this->_authorize('recording_update');
 
     $oRecording = new Recording($recording_id);
-    global $_FILES, $_POST;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oRecording->type = $type;
-      $oRecording->file_name = $file['tmp_name'];
-      // WORK-AROUND as currently JSON is not possible with file uploads
-      if (empty($data)) {
-        $data = $_POST;
-      }
-    }
     $this->set($oRecording, $data);
 
     if ($oRecording->save()) {

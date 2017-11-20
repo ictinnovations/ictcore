@@ -12,7 +12,7 @@ Dear [transmission:account:first_name] [transmission:account:last_name],
 We are unable to process your email.<br/>
 Please check if you have followed all the instructions.<br/>
 </p>
-Error: [request:program:result:response]
+Error: [request:transmission:result:error:data]
 
 <p>
 Thanks<br/>
@@ -27,7 +27,7 @@ Dear [transmission:account:first_name] [transmission:account:last_name],
 We are unable to process your email.
 Please check if you have followed all the instructions.
 
-Error: [request:program:result:response]
+Error: [request:transmission:result:error:data]
 
 Thanks
 -----------------------

@@ -184,13 +184,14 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "file_name": "__Optional_File__, upload a file",
-    "type": "__Optional_String__, three digit file extension representing file type",
     "description": "__Optional_String__",
 }
 ```
 * __Response__  
 __document_id__ of recently created document record
+
+* __Note__  
+Media / document will be uploaded separately using PUT messages/documents/{document_id}/media
 
 ### GET messages/documents
 list all exiting documents, optionally client can filter documents using query string (key value pair) in url, while using any of following fields
@@ -202,6 +203,9 @@ list all exiting documents, optionally client can filter documents using query s
 
 * __Response__  
 an array of documents indexed on document_id
+
+* __Note__  
+Media / document can be downloaded separately using GET messages/documents/{document_id}/media
 
 ### GET messages/documents/{document_id}
 Read / view complete document data
@@ -227,14 +231,26 @@ Delete an existing document
 * __Parameters__  
 Replace {document_id} in url with valid document_id
 
-### GET messages/documents/{document_id}/download
-Download pdf file for an existing document
+### PUT messages/documents/{document_id}/media
+Upload media / pdf file for an existing document, this method should be called followed by POST messages/documents
+
+* __URL Parameters__  
+Replace {document_id} in url with valid document_id
+
+* __POST Parameters__  
+File contents and related headers
+
+* __Response__  
+document_id of updated record
+
+### GET messages/documents/{document_id}/media
+Download media / pdf file for an existing document
 
 * __Parameters__  
 Replace {document_id} in url with valid document_id
 
 * __Response__  
-Pdf file download will be started
+Media / Pdf file download will be started
 
 Voice Recordings
 ----------------
@@ -246,13 +262,14 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "file_name": "__Optional_File__, upload a file",
-    "type": "__String__, three digit file extension representing file type",
     "description": "__Optional_String__",
 }
 ```
 * __Response__  
 __recording_id__ of recently created recording record
+
+* __Note__  
+Media / recording will be uploaded separately using PUT messages/recordings/{recording_id}/media
 
 ### GET messages/recordings
 list all exiting recordings, optionally client can filter recordings using query string (key value pair) in url, while using any of following fields
@@ -264,6 +281,9 @@ list all exiting recordings, optionally client can filter recordings using query
 
 * __Response__  
 an array of recordings indexed on recording_id
+
+* __Note__  
+Media / recording can be downloaded separately using GET messages/recordings/{recording_id}/media
 
 ### GET messages/recordings/{recording_id}
 Read / view complete recording data
@@ -289,14 +309,26 @@ Delete an existing recording
 * __Parameters__  
 Replace {recording_id} in url with valid recording_id
 
-### GET messages/recordings/{recording_id}/download
-Download wave file for an existing recording
+### PUT messages/recordings/{recording_id}/media
+Upload media / wave file for an existing recording, this method should be called followed by POST messages/recordings
+
+* __URL Parameters__  
+Replace {recording_id} in url with valid recording_id
+
+* __POST Parameters__  
+File contents and related headers
+
+* __Response__  
+recording_id of updated record
+
+### GET messages/recordings/{recording_id}/media
+Download wave file / media for an existing recording
 
 * __Parameters__  
 Replace {recording_id} in url with valid recording_id
 
 * __Response__  
-Wave file download will be started
+Download of Wave file / recording will be started
 
 Email templates
 ---------------
@@ -312,12 +344,14 @@ A json encoded associative array containing key and value pairs based on followi
     "subject": "__String__",
     "body": "__String__, HTML Message",
     "body_alt": "__Optional_String__, Plain Message",
-    "attachment": "__Optional_File__, upload a file",
     "type": "__Optional_String__, three digit file extension representing file type",
 }
 ```
 * __Response__  
 __template_id__ of recently created template record
+
+* __Note__  
+Media / attachment will be uploaded separately using PUT messages/templates/{template_id}/media
 
 ### GET messages/templates
 list all exiting templates, optionally client can filter templates using query string (key value pair) in url, while using any of following fields
@@ -332,6 +366,9 @@ list all exiting templates, optionally client can filter templates using query s
 
 * __Response__  
 an array of templates indexed on template_id
+
+* __Note__  
+Media / attachment can be downloaded separately using GET messages/templates/{template_id}/media
 
 ### GET messages/templates/{template_id}
 Read / view complete template data
@@ -357,14 +394,26 @@ Delete an existing template
 * __Parameters__  
 Replace {template_id} in url with valid template_id
 
-### GET messages/templates/{template_id}/download
-Download text / html file for an existing template
+### PUT messages/templates/{template_id}/media
+Upload media / attachment for an existing template, this method should be called followed by POST messages/templates
+
+* __URL Parameters__  
+Replace {template_id} in url with valid template_id
+
+* __POST Parameters__  
+File contents and related headers
+
+* __Response__  
+template_id of updated record
+
+### GET messages/templates/{template_id}/media
+Download attachment / media file for an existing template
 
 * __Parameters__  
 Replace {template_id} in url with valid template_id
 
 * __Response__  
-File download will be started
+File / attachment download will be started
 
 SMS Text Message
 ----------------

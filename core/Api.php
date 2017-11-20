@@ -49,6 +49,7 @@ class Api
       $this->oInterface = new RestServer('production', $realm); // debug / production
       $this->oInterface->root = $root_path;
       $this->oInterface->cacheDir = $path_cache; // set folder for rest server url mapping
+      $this->oInterface->jsonAssoc = true; // always get associated array for POST data
       // CORS support
       $cors = Conf::get('website:cors', '');
       $origin_list = trim(str_replace(array('no', '0', 'disable', 'disabled'), '', $cors));

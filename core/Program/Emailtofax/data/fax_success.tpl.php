@@ -13,7 +13,7 @@ We have successfully sent your fax. Following are the details:
 </p>
 <p>
 Destination: [fax:transmission:contact:phone]<br />
-Total pages: [fax:program:result:pages]
+Total pages: [fax:transmission:result:pages:data]
 </p>
 
 <p>
@@ -28,7 +28,7 @@ Dear [transmission:account:first_name] [transmission:account:last_name],
 We have successfully sent your fax. Following are the details:
 
 Destination: [fax:transmission:contact:phone]
-Total pages: [fax:program:result:pages]
+Total pages: [fax:transmission:result:pages:data]
 
 Thanks
 -----------------------

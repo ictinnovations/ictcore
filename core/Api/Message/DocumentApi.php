@@ -28,17 +28,6 @@ class DocumentApi extends Api
     $this->_authorize('document_create');
 
     $oDocument = new Document();
-    global $_FILES, $_POST;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oDocument->type = $type;
-      $oDocument->file_name = $file['tmp_name'];
-      // WORK-AROUND as currently JSON is not possible with file uploads
-      if (empty($data)) {
-        $data = $_POST;
-      }
-    }
     $this->set($oDocument, $data);
 
     if ($oDocument->save()) {
@@ -75,17 +64,45 @@ class DocumentApi extends Api
   }
 
   /**
+   * Upload document file by id
+   *
+   * @url PUT /documents/$document_id/media
+   * @url PUT /messages/documents/$document_id/media
+   */
+  public function upload($document_id, $data = array())
+  {
+    $this->_authorize('document_create');
+
+    $oDocument = new Document($document_id);
+    global $_FILES;
+    if (!empty($_FILES)) {
+      $file = array_shift(array_values($_FILES));
+      $type = strtolower(end(explode('.', $file['name'])));
+      $oDocument->type = $type;
+      $oDocument->file_name = $file['tmp_name'];
+
+      if ($oDocument->save()) {
+        return $oDocument->document_id;
+      } else {
+        throw new CoreException(417, 'Document media upload failed');
+      }
+    } else {
+      throw new CoreException(417, 'Document media upload failed, no file uploaded');
+    }
+  }
+
+  /**
    * Download document by id
    *
-   * @url GET /documents/$document_id/download
-   * @url GET /messages/documents/$document_id/download
+   * @url GET /documents/$document_id/media
+   * @url GET /messages/documents/$document_id/media
    */
   public function download($document_id)
   {
     $this->_authorize('document_read');
 
     $oDocument = new Document($document_id);
-    Corelog::log("Document file / download requested :$oDocument->file_name", Corelog::CRUD);
+    Corelog::log("Document media / download requested :$oDocument->file_name", Corelog::CRUD);
     $pdf_file = $oDocument->create_pdf($oDocument->file_name, 'tif');
 
     $quoted = sprintf('"%s"', addcslashes(basename($pdf_file), '"\\'));
@@ -117,17 +134,6 @@ class DocumentApi extends Api
     $this->_authorize('document_update');
 
     $oDocument = new Document($document_id);
-    global $_FILES, $_POST;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oDocument->type = $type;
-      $oDocument->file_name = $file['tmp_name'];
-      // WORK-AROUND as currently JSON is not possible with file uploads
-      if (empty($data)) {
-        $data = $_POST;
-      }
-    }
     $this->set($oDocument, $data);
 
     if ($oDocument->save()) {
