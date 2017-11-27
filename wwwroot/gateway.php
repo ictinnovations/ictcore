@@ -32,10 +32,10 @@ try {
 }
 
 Http::get_instance(); // to prepare input cache
-$spool_id = Http::input_get('spool_id', 0);
-$gateway_flag = Http::input_get('gateway_flag', Freeswitch::GATEWAY_FLAG);
-$application_id = Http::input_get('application_id', null);
-$application_data = Http::input_get('application_data', array());
+$spool_id = Http::request_get('spool_id', 0);
+$gateway_flag = Http::request_get('gateway_flag', Freeswitch::GATEWAY_FLAG);
+$application_id = Http::request_get('application_id', null);
+$application_data = Http::request_get('application_data', array());
 if (\ICT\Core\json_check($application_data)) {
   $application_data = json_decode($application_data, TRUE); // we need associated array
 }
@@ -91,9 +91,9 @@ function http_authenticate()
   $realm = Conf::get('company:name', 'ICTCore') . ' :: Gateway Hub';
 
   // select authentication method
-  if (Http::input_get('username', null)) {
-    $username = Http::input_get('username', null);
-    $password = Http::input_get('password', null);
+  if (Http::request_get('username', null)) {
+    $username = Http::request_get('username', null);
+    $password = Http::request_get('password', null);
   } else {
     header("WWW-Authenticate: Basic realm=\"$realm\"");
     throw new CoreException('401', "You are not authorized to access this resource");

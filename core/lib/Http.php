@@ -30,7 +30,8 @@ class Http extends Data implements AuthServer
   {
     parent::__construct($data);
     $this->realm = Conf::get('website:title', 'ICTCore') . ' :: REST API Server';
-    $this->input = array_merge($_GET, $_FILES, $_POST);
+    $this->server = $_SERVER;
+    $this->request = $_REQUEST;
   }
 
   /**
@@ -63,24 +64,14 @@ class Http extends Data implements AuthServer
     return $value;
   }
 
-  public static function input_get($name, $default = null)
+  public static function request_get($name, $default = null)
   {
-    return self::get("input:$name", $default);
+    return self::get("request:$name", $default);
   }
 
-  public static function input_set($name, $value)
+  public static function server_get($name, $default = null)
   {
-    self::set("input:$name", $value);
-  }
-
-  public static function output_get($name, $default = null)
-  {
-    return self::get("output:$name", $default);
-  }
-
-  public static function output_set($name, $value)
-  {
-    self::set("output:$name", $value);
+    return self::get("server:$name", $default);
   }
 
   public function isAuthorized($classObj) {
