@@ -132,7 +132,11 @@ class User
   {
     if (!empty($user_id)) {
       if (!is_numeric($user_id)) {
-        $this->username = $user_id;
+        if (filter_var($user_id, FILTER_VALIDATE_EMAIL)) {
+          $this->email = $user_id;
+        } else {
+          $this->username = $user_id;
+        }
       } else {
         $this->user_id = $user_id;
         if (User::GUEST == $user_id) {
@@ -203,7 +207,10 @@ class User
   private function load()
   {
     Corelog::log("Loading user with id:" . $this->user_id . ' name:' . $this->username, Corelog::CRUD);
-    if (!empty($this->username)) {
+    if (!empty($this->email)) {
+      $search_field = 'u.email';
+      $search_value = $this->email;
+    } else if (!empty($this->username)) {
       $search_field = 'u.username';
       $search_value = $this->username;
     } else {

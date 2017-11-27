@@ -150,6 +150,9 @@ class Account
         case 'account_id':
           $aWhere[] = "$search_field = $search_value";
           break;
+        case 'created_by':
+          $aWhere[] = "created_by = $search_value";
+          break;
         case 'type':
         case 'username':
         case 'phone':
