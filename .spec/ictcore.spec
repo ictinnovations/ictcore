@@ -80,7 +80,11 @@ add voice related services support in ICTCore
 Group: ict
 Summary: fax addon for ICTCore
 # for pdf and tiff handling  # TODO yudit
-Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client
+%if %{rhel} < 7
+Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client libtiff
+%else
+Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client libtiff-tools
+%endif
 
 %description fax
 add sms related services support in ICTCore
