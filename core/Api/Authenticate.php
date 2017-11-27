@@ -12,52 +12,28 @@ namespace ICT\Core\Api;
 use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\User;
-use ICT\Core\User\Permission;
-use ICT\Core\User\Role;
 
-class UserApi extends Api
+class AuthenticateApi extends Api
 {
-
-  /**
-   * Create a new user
-   *
-   * @url POST /users
-   */
-  public function create($data = array())
-  {
-    $this->_authorize('user_create');
-
-    $oUser = new User();
-    $this->set($oUser, $data);
-
-    if ($oUser->save()) {
-      return $oUser->user_id;
-    } else {
-      throw new CoreException(417, 'User creation failed');
-    }
-  }
-
-  /**
-   * List all available users
-   *
-   * @url GET /users
-   */
-  public function list_view($query = array())
-  {
-    $this->_authorize('user_list');
-    return User::search((array)$query);
-  }
 
   /**
    * Gets the user after authenticating provided credentials
    *
    * @noAuth
-   * @url POST /users/authenticate
+   * @url POST /authenticate
    */
-  public function authenticate($data = array())
+  public function create($data = array())
   {
     // no _authorize needed
-    if (!empty($data['username'])) {
+
+    $user_id = null;
+    if (isset($data['email'])) {
+      $user_id = $data['email'];
+    } else if (isset($data['username'])) {
+      $user_id = $data['username'];
+    } else if (isset($data['user_id'])) {
+      $user_id = $data['user_id'];
+    } else {
       throw new CoreException(401, 'No valid username found');
     }
 
@@ -73,7 +49,8 @@ class UserApi extends Api
       $data['host'] = $_SERVER['REMOTE_ADDR'];
     }
     if (!empty($key_type)) {
-      $oUser = new User($data['username']);
+      $oUser = new User($user_id);
+      $oUser->token = $oUser->email;
       if ($oUser->authenticate($data[$key_type], $key_type)) {
         return $oUser;
       }
@@ -83,122 +60,15 @@ class UserApi extends Api
   }
 
   /**
-   * Gets the user by id
+   * Cancel current authentication token
    *
-   * @url GET /users/$user_id
+   * @noAuth
+   * @url POST /authenticate/cancel
    */
-  public function read($user_id)
+  public function cancel($data = array())
   {
-    $this->_authorize('user_read');
-
-    $oUser = new User($user_id);
-    return $oUser;
-  }
-
-  /**
-   * Update existing user
-   *
-   * @url PUT /users/$user_id
-   */
-  public function update($user_id, $data = array())
-  {
-    $this->_authorize('user_update');
-
-    $oUser = new User($user_id);
-    $this->set($oUser, $data);
-
-    if ($oUser->save()) {
-      return $oUser;
-    } else {
-      throw new CoreException(417, 'User update failed');
-    }
-  }
-
-  /**
-   * Create a new user
-   *
-   * @url DELETE /users/$user_id
-   */
-  public function remove($user_id)
-  {
-    $this->_authorize('user_delete');
-
-    $oUser = new User($user_id);
-
-    $result = $oUser->delete();
-    if ($result) {
-      return $result;
-    } else {
-      throw new CoreException(417, 'User delete failed');
-    }
-  }
-
-  /**
-   * Allow / authorize user for a certain permission
-   *
-   * @url PUT /users/$user_id/permissions/$permission_id
-   */
-  public function allow($user_id, $permission_id)
-  {
-    $this->_authorize('user_update');
-    $this->_authorize('permission_update');
-
-    $oUser = new User($user_id);
-    $oPermission = new Permission($permission_id);
-    $oUser->permission_assign($oPermission);
-    return $oUser->save();
-  }
-
-  /**
-   * Disallow / prevent a user form using a certain permission
-   *
-   * @url DELETE /users/$user_id/permissions/$permission_id
-   */
-  public function disallow($user_id, $permission_id)
-  {
-    $this->_authorize('user_update');
-    $this->_authorize('permission_update');
-
-    $oUser = new User($user_id);
-    $oPermission = new Permission($permission_id);
-    $oUser->permission_unassign($oPermission);
-    return $oUser->save();
-  }
-
-  /**
-   * Assign a role to user
-   *
-   * @url PUT /users/$user_id/roles/$role_id
-   */
-  public function assign($user_id, $role_id)
-  {
-    $this->_authorize('user_update');
-    $this->_authorize('role_update');
-
-    $oUser = new User($user_id);
-    $oRole = new Role($role_id);
-    $oUser->role_assign($oRole);
-    return $oUser->save();
-  }
-
-  /**
-   * Remove certain role from user
-   *
-   * @url DELETE /users/$user_id/roles/$role_id
-   */
-  public function unassign($user_id, $role_id)
-  {
-    $this->_authorize('user_update');
-    $this->_authorize('role_update');
-
-    $oUser = new User($user_id);
-    $oRole = new Role($role_id);
-    $oUser->role_unassign($oRole);
-    return $oUser->save();
-  }
-
-  protected static function rest_include()
-  {
-    return 'Api/User';
+    file_put_contents('/tmp/authenticate_cancel.data', $data);
+    // no _authorize needed
+    return true;
   }
 }

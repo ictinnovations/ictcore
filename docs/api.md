@@ -1,6 +1,11 @@
 ICTCore REST APIs Guide
 =======================
 
+Authentication
+--------------
+* POST authenticate
+* POST authenticate/cancel
+
 Contact / pre defined destination number
 ----------------------------------------
 * POST contacts
@@ -18,7 +23,8 @@ Message / pre defined information to be send
 * GET messages/documents/{document_id}
 * PUT messages/documents/{document_id}
 * DELETE messages/documents/{document_id}
-* GET messages/documents/{document_id}/download
+* PUT messages/documents/{document_id}/media
+* GET messages/documents/{document_id}/media
 
 ### Voice Recordings
 * POST messages/recordings
@@ -26,7 +32,8 @@ Message / pre defined information to be send
 * GET messages/recordings/{recording_id}
 * PUT messages/recordings/{recording_id}
 * DELETE messages/recordings/{recording_id}
-* GET messages/recordings/{recording_id}/download
+* PUT messages/recordings/{recording_id}/media
+* GET messages/recordings/{recording_id}/media
 
 ### Email templates
 * POST messages/templates
@@ -34,7 +41,8 @@ Message / pre defined information to be send
 * GET messages/templates/{template_id}
 * PUT messages/templates/{template_id}
 * DELETE messages/templates/{template_id}
-* GET messages/templates/{template_id}/download
+* POST messages/templates/{template_id}/media
+* GET messages/templates/{template_id}/media
 
 ### SMS Text Message
 * POST messages/texts
@@ -127,7 +135,6 @@ User Management
 * DELETE users/{user_id}/permissions/{permission\_id}
 * PUT users/{user_id}/roles/{role\_id}
 * DELETE users/{user_id}/roles/{role\_id}
-* POST users/authenticate
 
 Trunk / Termination Providers APIs
 ----------------------------------

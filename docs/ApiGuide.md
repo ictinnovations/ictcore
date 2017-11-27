@@ -112,6 +112,24 @@ curl -user myuser:mysecret -H "Content-Type: application/json" -X POST -d @data.
 ```
 
 
+Authentication
+==============
+### POST authenticate
+Create and return authentication token / session key.
+
+* __Parameters__  
+An associative array containing key and value pairs based on following fields
+```json
+{
+    "username": "__String__",
+    "password": "__String__"
+}
+
+Note: Unlike other APIs this API does not require separate authentication in header
+
+### POST authenticate/cancel
+Cancel an existing authentications token / session
+
 Contact / pre defined destination number
 ========================================
 ### POST contacts
