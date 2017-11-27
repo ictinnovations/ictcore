@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\Message\Recording;
+use SplFileInfo;
 
 class RecordingApi extends Api
 {
@@ -28,6 +29,7 @@ class RecordingApi extends Api
     $this->_authorize('recording_create');
 
     $oRecording = new Recording();
+    unset($data['file_name']);
     $this->set($oRecording, $data);
 
     if ($oRecording->save()) {
@@ -69,25 +71,27 @@ class RecordingApi extends Api
    * @url PUT /recordings/$recording_id/media
    * @url PUT /messages/recordings/$recording_id/media
    */
-  public function upload($recording_id, $data = array())
+  public function upload($recording_id, $data = null, $mime = 'audio/wav')
   {
     $this->_authorize('recording_create');
 
     $oRecording = new Recording($recording_id);
-    global $_FILES;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oRecording->type = $type;
-      $oRecording->file_name = $file['tmp_name'];
-
-      if ($oRecording->save()) {
-        return $oRecording->recording_id;
+    if (!empty($data)) {
+      if (in_array($mime, Recording::$media_supported)) {
+        $extension = array_search($mime, Recording::$media_supported);
+        $filename = tempnam('/tmp', 'recording') . ".$extension";
+        file_put_contents($filename, $data);
+        $oRecording->file_name = $filename;
+        if ($oRecording->save()) {
+          return $oRecording->recording_id;
+        } else {
+          throw new CoreException(417, 'Recording media upload failed');
+        }
       } else {
-        throw new CoreException(417, 'Recording media upload failed');
+        throw new CoreException(415, 'Recording media upload failed, invalid file type');
       }
     } else {
-      throw new CoreException(417, 'Recording media upload failed, no file uploaded');
+      throw new CoreException(411, 'Recording media upload failed, no file uploaded');
     }
   }
 
@@ -103,23 +107,13 @@ class RecordingApi extends Api
 
     $oRecording = new Recording($recording_id);
     Corelog::log("Recording media / download requested :$oRecording->file_name", Corelog::CRUD);
-
-    $quoted = sprintf('"%s"', addcslashes(basename($oRecording->file_name), '"\\'));
-    $size = filesize($oRecording->file_name);
-
-    header('Content-Description: File Transfer');
-    header('Content-Type: audio/wav');
-    header('Content-Disposition: attachment; filename=' . $quoted);
-    header('Content-Transfer-Encoding: binary');
-    header('Connection: Keep-Alive');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Content-Length: ' . $size);
-
-    readfile($oRecording->file_name);
-
-    return true;
+    if (file_exists($oRecording->file_name)) {
+      $oFile = new SplFileInfo($oRecording->file_name);
+      return $oFile;
+    } else {
+      throw new CoreException(404, 'Recording media not found');
+    }
+    return $oFile;
   }
 
   /**
@@ -133,6 +127,7 @@ class RecordingApi extends Api
     $this->_authorize('recording_update');
 
     $oRecording = new Recording($recording_id);
+    unset($data['file_name']);
     $this->set($oRecording, $data);
 
     if ($oRecording->save()) {

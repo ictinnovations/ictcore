@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\Message\Document;
+use SplFileInfo;
 
 class DocumentApi extends Api
 {
@@ -28,6 +29,7 @@ class DocumentApi extends Api
     $this->_authorize('document_create');
 
     $oDocument = new Document();
+    unset($data['file_name']);
     $this->set($oDocument, $data);
 
     if ($oDocument->save()) {
@@ -69,25 +71,27 @@ class DocumentApi extends Api
    * @url PUT /documents/$document_id/media
    * @url PUT /messages/documents/$document_id/media
    */
-  public function upload($document_id, $data = array())
+  public function upload($document_id, $data = null, $mime = 'application/pdf')
   {
     $this->_authorize('document_create');
 
     $oDocument = new Document($document_id);
-    global $_FILES;
-    if (!empty($_FILES)) {
-      $file = array_shift(array_values($_FILES));
-      $type = strtolower(end(explode('.', $file['name'])));
-      $oDocument->type = $type;
-      $oDocument->file_name = $file['tmp_name'];
-
-      if ($oDocument->save()) {
-        return $oDocument->document_id;
+    if (!empty($data)) {
+      if (in_array($mime, Document::$media_supported)) {
+        $extension = array_search($mime, Document::$media_supported);
+        $filename = tempnam('/tmp', 'document') . ".$extension";
+        file_put_contents($filename, $data);
+        $oDocument->file_name = $filename;
+        if ($oDocument->save()) {
+          return $oDocument->document_id;
+        } else {
+          throw new CoreException(417, 'Document media upload failed');
+        }
       } else {
-        throw new CoreException(417, 'Document media upload failed');
+        throw new CoreException(415, 'Document media upload failed, invalid file type');
       }
     } else {
-      throw new CoreException(417, 'Document media upload failed, no file uploaded');
+      throw new CoreException(411, 'Document media upload failed, no file uploaded');
     }
   }
 
@@ -104,23 +108,12 @@ class DocumentApi extends Api
     $oDocument = new Document($document_id);
     Corelog::log("Document media / download requested :$oDocument->file_name", Corelog::CRUD);
     $pdf_file = $oDocument->create_pdf($oDocument->file_name, 'tif');
-
-    $quoted = sprintf('"%s"', addcslashes(basename($pdf_file), '"\\'));
-    $size = filesize($pdf_file);
-
-    header('Content-Description: File Transfer');
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename=' . $quoted);
-    header('Content-Transfer-Encoding: binary');
-    header('Connection: Keep-Alive');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Content-Length: ' . $size);
-
-    readfile($pdf_file);
-
-    return true;
+    if (file_exists($pdf_file)) {
+      $oFile = new SplFileInfo($pdf_file);
+      return $oFile;
+    } else {
+      throw new CoreException(404, 'Document media not found');
+    }
   }
 
   /**
@@ -134,6 +127,7 @@ class DocumentApi extends Api
     $this->_authorize('document_update');
 
     $oDocument = new Document($document_id);
+    unset($data['file_name']);
     $this->set($oDocument, $data);
 
     if ($oDocument->save()) {

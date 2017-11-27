@@ -75,6 +75,22 @@ class Template extends Message
    */
   protected $length = NULL;
 
+  /**
+   * Default mime type for this message type, when no type is available
+   * @var string
+   */
+  public static $media_default = 'text/html';
+
+  /**
+   * Array of all supported file extensions along with mime types as keys
+   * @var array $media_supported
+   */
+  public static $media_supported = array(
+      'txt' => 'text/plain',
+      'html' => 'text/html',
+      'xml' => 'application/xml'
+  );
+
   public function __construct($template_id = NULL)
   {
     $this->template_id = $template_id;
@@ -157,7 +173,7 @@ class Template extends Message
       $oSession = Session::get_instance();
       $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
       $raw_type = strtolower(end(explode('.', $file_path)));
-      $file_type = empty($file_type) ? 'pdf' : $raw_type;
+      $file_type = empty($file_type) ? 'html' : $raw_type;
       $file_name = 'attachment_' . $user_id . '_';
       $file_name .= DB::next_record_id($file_name);
       $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;

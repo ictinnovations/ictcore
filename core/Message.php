@@ -29,6 +29,20 @@ class Message
   /** @var string */
   public $data = NULL;
 
+  /**
+   * Default mime type for this message type, when no type is available
+   * @var string
+   */
+  public static $media_default = 'application/octet-stream';
+
+  /**
+   * Array of all supported file extensions along with mime types as keys
+   * @var array $media_supported
+   */
+  public static $media_supported = array(
+      'dat' => 'application/octet-stream'
+  );
+
   public function __construct($message_id = NULL)
   {
     if (!empty($message_id)) {

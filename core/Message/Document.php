@@ -113,6 +113,22 @@ class Document extends Message
    */
   protected $resolution_y = 98;
 
+  /**
+   * Default mime type for this message type, when no type is available
+   * @var string
+   */
+  public static $media_default = 'application/pdf';
+
+  /**
+   * Array of all supported file extensions along with mime types as keys
+   * @var array $media_supported
+   */
+  public static $media_supported = array(
+      'pdf'  => 'application/pdf',
+      'tif'  => 'image/tiff',
+      'tiff' => 'image/x-tiff'
+  );
+
   public function __construct($document_id = NULL)
   {
     $this->document_id = $document_id;
