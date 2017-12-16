@@ -106,6 +106,7 @@ class Data implements ArrayAccess, Iterator, Countable
         $data[$index] = &$new_value;
         $data = &$data[$index];
       } else if (is_object($data) && isset($data->{$index})) {
+        $data->{$index} = null; // required to resolve: Cannot assign by reference to overloaded object
         $data->{$index} = &$new_value;
         $data = &$data->{$index};
       }

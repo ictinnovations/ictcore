@@ -65,14 +65,14 @@ class Session extends Data
     return self::$_instance;
   }
 
-  public static function set($name, $value)
+  public function set($name, $value)
   {
-    $this->data->__set($name, $value);
+    $this->__set($name, $value);
   }
 
-  public static function &get($name, $default = NULL)
+  public function &get($name, $default = NULL)
   {
-    $value = &$this->data->__get($name);
+    $value = &$this->__get($name);
     if (NULL === $value) {
       return $default;
     }
@@ -104,7 +104,7 @@ class Session extends Data
       $row = mysql_fetch_assoc($result);
       $data = unserialize($row["data"]);
       if ($data instanceof Data) {
-        $this->data = $data;
+        $this->merge($data);
       }
       return $data;
     } else {
@@ -117,7 +117,7 @@ class Session extends Data
   {
     Corelog::log("Session write requested with id: $id", Corelog::DEBUG, $data);
     if (!($data instanceof Data)) {
-      $data = $this->data;
+      $data = $this;
     }
     $values = array(
       '%id%'   => mysql_real_escape_string($id, $this->_db_link),

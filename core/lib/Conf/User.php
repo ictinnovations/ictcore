@@ -22,7 +22,8 @@ class User extends Conf
   {
     $filter = array();
     if (empty($user_id)) {
-      $user_id = Session::get('user:user_id', null);
+      $oSession = Session::get_instance();
+      $user_id = $oSession->get('user:user_id', null);
     }
     Corelog::log("configuration requested for user: $user_id", Corelog::DEBUG);
 
