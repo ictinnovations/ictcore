@@ -483,6 +483,7 @@ class Program
   /**
    * Function: transmission_instant
    * Wrapper function to transmission_create, in addition it will also prepare Program from scratch
+   * @return Transmission return instance of newly created transmission
    */
   public static function transmission_instant($aProgram, $aTransmission)
   {

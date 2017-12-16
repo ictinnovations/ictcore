@@ -30,7 +30,7 @@ class Sip extends Provider
 
   public function save()
   {
-    parent::save();
+    $result = parent::save();
 
     $oToken = new Token();
     $oToken->add('provider', $this);
@@ -41,6 +41,8 @@ class Sip extends Provider
     $oVoice->config_delete('sip', $this->name);
     $oVoice->config_save('sip', $this->name, $aSetting);
     $oVoice->config_reload();
+
+    return $result;
   }
 
   public function delete()

@@ -30,7 +30,7 @@ class Smpp extends Provider
 
   public function save()
   {
-    parent::save();
+    $result = parent::save();
 
     $oToken = new Token();
     $oToken->add('provider', $this);
@@ -41,6 +41,8 @@ class Smpp extends Provider
     $oVoice->config_delete('smpp', $this->name);
     $oVoice->config_save('smpp', $this->name, $aSetting);
     $oVoice->config_reload();
+
+    return $result;
   }
 
   public function delete()

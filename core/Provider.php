@@ -268,6 +268,8 @@ class Provider
       $this->provider_id = $data['provider_id'];
       Corelog::log("New Provider created: $this->provider_id", Corelog::CRUD);
     }
+
+    return $result;
   }
 
 }

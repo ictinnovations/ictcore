@@ -153,11 +153,11 @@ class Role
       $query = 'DELETE FROM ' . self::$link_permission . ' WHERE role_id=%role_id%';
       DB::query(self::$link_permission, $query, array('role_id' => $this->role_id));
       // update existing record
-      DB::update(self::$table, $data, 'role_id');
+      $result = DB::update(self::$table, $data, 'role_id');
       Corelog::log("Role updated: $this->role_id", Corelog::CRUD);
     } else {
       // add new
-      DB::update(self::$table, $data, false);
+      $result = DB::update(self::$table, $data, false);
       $this->role_id = $data['role_id'];
       Corelog::log("New role created: $this->role_id", Corelog::CRUD);
     }
@@ -167,6 +167,7 @@ class Role
       $query = "INSERT INTO " . self::$link_permission . " (role_id, permission_id) VALUES (%role_id%, %permission_id%)";
       DB::query(self::$link_permission, $query, array('role_id' => $this->role_id, 'permission_id' => $permission_id));
     }
+    return $result;
   }
 
   public function authorize($permission)
