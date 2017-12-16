@@ -565,9 +565,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
-    },
+    "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
 }
 ```
 * __Response__  
@@ -583,9 +581,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
-    },
+    "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
 }
 ```
 * __Response__  
@@ -601,9 +597,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
-    },
+    "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
 }
 ```
 * __Response__  
@@ -619,9 +613,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
-    },
+    "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
 }
 ```
 * __Response__  
@@ -637,9 +629,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
-    },
+    "account_id": "__Numeric_ID__, account_id of account for which this program is being created"
 }
 ```
 * __Response__  
@@ -655,9 +645,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "template_id": "__Numeric_ID__, template_id of email template for which this program is being created",
-    },
+    "template_id": "__Numeric_ID__, template_id of email template for which this program is being created",
 }
 ```
 * __Response__  
@@ -673,9 +661,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "document_id": "__Numeric_ID__, document_id of fax document for which this program is being created",
-    },
+    "document_id": "__Numeric_ID__, document_id of fax document for which this program is being created",
 }
 ```
 * __Response__  
@@ -691,9 +677,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "text_id": "__Numeric_ID__, text_id of SMS text for which this program is being created",
-    },
+    "text_id": "__Numeric_ID__, text_id of SMS text for which this program is being created",
 }
 ```
 * __Response__  
@@ -709,9 +693,7 @@ A json encoded associative array containing key and value pairs based on followi
 ```json
 {
     "name": "__String__",
-    "data": {
-        "recording_id": "__Numeric_ID__, recording_id of voice recording for which this program is being created",
-    },
+    "recording_id": "__Numeric_ID__, recording_id of voice recording for which this program is being created",
 }
 ```
 * __Response__  

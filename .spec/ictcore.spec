@@ -12,13 +12,18 @@ Vendor:   ICT Innovations
 Group:    ict
 Packager: Nasir Iqbal <nasir@ictinnovations.com> 
 License:  MPLv2
-URL:      http://www.ictinnovations.com/ictcore
+URL:      https://ictcore.org/
 
 Source0:  %{name}-%{version}.tar.gz
+Source1:  composer
 
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%if %{rhel} < 7
 BuildRequires: php subversion
+%else
+BuildRequires: php subversion composer
+%endif
 
 Provides: ictcore
 
@@ -116,6 +121,9 @@ add email related services support in ICTCore
 %{__rm} -rf %{buildroot}
 %{__install} -d %{buildroot}%{core_home}
 %{__cp} -pr * %{buildroot}%{core_home}
+
+# install composer based dependencies
+php %SOURCE1 update -d %{buildroot}%{core_home}
 
 # basic configuration in system
 %{__mkdir} -p %{buildroot}/etc

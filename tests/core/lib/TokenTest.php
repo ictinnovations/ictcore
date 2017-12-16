@@ -46,7 +46,8 @@ Regards
   protected function setUp()
   {
     $oUser = new User(User::GUEST);
-    Session::set('user', $oUser);
+    $oSession = Session::get_instance();
+    $oSession->set('user', $oUser);
     $aWebsite = array(
         'url' => 'http://www.ictinnovations.com/',
         'live' => true,

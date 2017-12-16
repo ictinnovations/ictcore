@@ -60,9 +60,7 @@ class SessionTest extends PHPUnit_Framework_TestCase
    */
   public function testSet()
   {
-    // first test as static
-    Session::set('hello:world', 'testworld');
-    $this->assertSame('testworld', Session::get('hello:world'));
+    // static Session is not supported
     // and then with instance
     $oSession = Session::get_instance();
     $oSession->set('hello:moon', 'beautiful');
@@ -74,15 +72,14 @@ class SessionTest extends PHPUnit_Framework_TestCase
    */
   public function testGet()
   {
-    // first test as static
-    Session::set('array1', $this->data['array1']);
-    $this->assertSame('jack', Session::get('array1:child3:dog2'));
+    // static Session is not supported
     // and then with instance
     $oSession = Session::get_instance();
+    $oSession->set('array1', $this->data['array1']);
     $this->assertSame('jack', $oSession['array1:child3:dog2']);
     $this->assertSame('jack', $oSession->{'array1:child3:dog2'});
     // and test for default
-    $this->assertSame('defaultValue', Session::get('none_existing:one', 'defaultValue'));
+    $this->assertSame('defaultValue', $oSession->get('none_existing:one', 'defaultValue'));
   }
 
   /**
