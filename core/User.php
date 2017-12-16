@@ -9,13 +9,19 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-use ICT\Core\User\Role;
+use Firebase\JWT\JWT;
 use ICT\Core\User\Permission;
+use ICT\Core\User\Role;
 
 class User
 {
 
   const GUEST = -1;
+
+  const AUTH_TYPE_BASIC = 'basic';
+  const AUTH_TYPE_DIGEST = 'digest';
+  const AUTH_TYPE_BEARER = 'bearer';
+  const AUTH_TYPE_NETWORK = 'network';
 
   private static $table = 'usr';
   private static $link_role = 'user_role';
@@ -282,7 +288,7 @@ class User
     $query = 'DELETE FROM ' . self::$link_permission . ' WHERE usr_id=%user_id%';
     DB::query(self::$link_permission, $query, array('user_id' => $this->user_id), true);
     // now delete user
-    return DB::delete(self::$table, 'user_id', $this->user_id, true);
+    return DB::delete(self::$table, 'usr_id', $this->user_id, true);
   }
 
   public function __isset($field)
@@ -392,11 +398,11 @@ class User
       $query = 'DELETE FROM ' . self::$link_permission . ' WHERE usr_id=%user_id%';
       DB::query(self::$link_permission, $query, array('user_id' => $this->user_id), true);
       // update existing record
-      DB::update(self::$table, $data, 'user_id', true);
+      $result = DB::update(self::$table, $data, 'usr_id', true);
       Corelog::log("User updated: $this->user_id", Corelog::CRUD);
     } else {
       // add new
-      DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false, true);
       $data['user_id'] = $data['usr_id']; // mapping
       $this->user_id = $data['user_id'];
       Corelog::log("New user created: $this->user_id", Corelog::CRUD);
@@ -405,7 +411,7 @@ class User
     // save roles for current user
     foreach ($this->aRole as $oRole) {
       $query = "INSERT INTO " . self::$link_role . " (usr_id, role_id) VALUES (%user_id%, %role_id%)";
-      DB::query(self::$link_role, $query, array('user_id' => $this->user_id, 'role_id' => $oRole->role_id), true);
+      $result = DB::query(self::$link_role, $query, array('user_id' => $this->user_id, 'role_id' => $oRole->role_id), true);
     }
 
     // save permissions for current user
@@ -417,31 +423,56 @@ class User
     return $result;
   }
 
-  public function authenticate($access_key, $key_type = 'password')
+  public function generate_token()
   {
-    // treat guest user as authenticated
-    if ($this->user_id == User::GUEST) {
-      return true;
-    }
+    $key_file = Conf::get('security:private_key', '/usr/ictbroadcast/etc/ssh/ib_node');
+    $private_key = file_get_contents($key_file);
+
+    $token = array(
+        "iss" => Conf::get('website:url'),
+        "iat" => time(),
+        "nbf" => time(),
+        "exp" => time() + Conf::get('security:token_expiry', (60 * 60 * 24 * 30 * 12 * 1)), // valid for one year
+        "user_id" => $this->user_id
+    );
+
+    return JWT::encode($token, $private_key, Conf::get('security:hash_type', 'RS256'));
+  }
+
+  public static function authenticate($access_key, $key_type = User::AUTH_TYPE_BASIC)
+  {
+    $oUser = null;
     switch ($key_type) {
-      case 'password': // plain password
-        if (md5($access_key) == $this->password_hash) {
-          return true;
+      case User::AUTH_TYPE_BEARER:
+        $key_file = Conf::get('security:public_key', '/usr/ictcore/etc/ssh/ib_node.pub');
+        $hash_type = Conf::get('security:hash_type', 'RS256');
+        $public_key = file_get_contents($key_file);
+        $token = JWT::decode($access_key, $public_key, array($hash_type));
+        if ($token && !empty($token->user_id)) {
+          $oUser = new self($token->user_id);
+          return $oUser;
         }
-        break;
-      case 'password_hash':
-        if ($access_key == $this->password_hash) {
-          return true;
+        return false;
+      case User::AUTH_TYPE_NETWORK:
+        return false; // TODO
+      case User::AUTH_TYPE_DIGEST:
+        if (!empty($access_key['username'])) {
+          $oUser = new self($access_key['username']);
+          if ($oUser->get_password_hash() == $access_key['password']) {
+            return $oUser;
+          }
         }
-        break;
-      case 'certificate':
-        // TODO
-        break;
-      case 'host':
-        // TODO
-        break;
+        return false;
+      case User::AUTH_TYPE_BASIC:
+      default:
+        if (!empty($access_key['username'])) {
+          $oUser = new self($access_key['username']);
+          if ($oUser->get_password_hash() == md5($access_key['password'])) {
+            return $oUser;
+          }
+        }
+        return false;
     }
-    return false;
   }
 
   public function authorize($permission)

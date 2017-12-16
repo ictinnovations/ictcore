@@ -1,0 +1,19 @@
+Host api.node
+    HostName localhost
+    User ictcore
+    IdentityFile /usr/ictcore/etc/ssh/ib_node
+
+Host db.node
+    HostName localhost
+    User ictcore
+    IdentityFile /usr/ictcore/etc/ssh/ib_node
+
+Host file.node
+    HostName localhost
+    User ictcore
+    IdentityFile /usr/ictcore/etc/ssh/ib_node
+
+Host gateway.node
+    HostName localhost
+    User ictcore
+    IdentityFile /usr/ictcore/etc/ssh/ib_node

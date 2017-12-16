@@ -24,39 +24,37 @@ class AuthenticateApi extends Api
    */
   public function create($data = array())
   {
-    // no _authorize needed
+    $key_type = null;
+    $credentials = null;
 
-    $user_id = null;
+    if (isset($data['hash'])) {
+      $key_type = User::AUTH_TYPE_DIGEST;
+      $credentials = array('username' => null, 'password' => $data['hash']);
+    } else if (isset($data['password_hash'])) {
+      $key_type = User::AUTH_TYPE_DIGEST;
+      $credentials = array('username' => null, 'password' => $data['password_hash']);
+    } else {
+      $key_type = User::AUTH_TYPE_BASIC;
+      $credentials = array('username' => null, 'password' => $data['password']);
+    }
+
     if (isset($data['email'])) {
-      $user_id = $data['email'];
+      $credentials['username'] = $data['email'];
     } else if (isset($data['username'])) {
-      $user_id = $data['username'];
+      $credentials['username'] = $data['username'];
     } else if (isset($data['user_id'])) {
-      $user_id = $data['user_id'];
+      $credentials['username'] = $data['user_id'];
     } else {
       throw new CoreException(401, 'No valid username found');
     }
 
-    $key_type = null;
-    if (isset($data['password'])) {
-      $key_type = 'password';
-    } else if (isset($data['hash']) || isset($data['password_hash'])) {
-      $key_type = 'password_hash';
-    } else if (isset($data['cert']) || isset($data['certificate'])) {
-      $key_type = 'certificate';
-    } else if (!empty($_SERVER['REMOTE_ADDR'])) {
-      $key_type = 'host';
-      $data['host'] = $_SERVER['REMOTE_ADDR'];
+    try {
+      $oUser = User::authenticate($credentials, $key_type);
+      $oUser->token = $oUser->generate_token();
+      return $oUser;
+    } catch (CoreException $ex) {
+      throw new CoreException(401, 'Invalid user name and password: '.$ex->getMessage());
     }
-    if (!empty($key_type)) {
-      $oUser = new User($user_id);
-      $oUser->token = $oUser->email;
-      if ($oUser->authenticate($data[$key_type], $key_type)) {
-        return $oUser;
-      }
-    }
-
-    throw new CoreException(401, 'Invalid user name and password');
   }
 
   /**
@@ -65,10 +63,10 @@ class AuthenticateApi extends Api
    * @noAuth
    * @url POST /authenticate/cancel
    */
-  public function cancel($data = array())
+  public function cancel()
   {
-    file_put_contents('/tmp/authenticate_cancel.data', $data);
     // no _authorize needed
+    // and nothing to do
     return true;
   }
 }

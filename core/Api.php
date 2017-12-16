@@ -20,6 +20,21 @@ class Api
   /** @var RestServer $oInterface */
   private $oInterface = null;
 
+  public function authenticate($credentials, $auth_type)
+  {
+    try {
+      $oUser = User::authenticate($credentials, $auth_type);
+      if ($oUser instanceof User) {
+        do_login($oUser);
+        return true;
+      }
+      return false;
+    } catch (CoreException $e) {
+      Corelog::log($e->getMessage(), Corelog::ERROR);
+      return false;
+    }
+  }
+
   protected function _authorize($permission)
   {
     if (empty($permission) || can_access($permission) == false) {

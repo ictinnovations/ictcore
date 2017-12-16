@@ -351,19 +351,29 @@ setfacl -d -m g::rw %{core_home}/cache
 # enable event support in mysql
 grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-scheduler=ON/" /etc/my.cnf
 # enable and start cron service
+%if %{rhel} < 7
 /sbin/chkconfig crond on
 /sbin/service crond restart
+%else
+/usr/bin/systemctl enable crond.service
+/usr/bin/systemctl restart crond.service
+%endif
 # enable and start mysql or mariadb server
 %if %{rhel} < 7
 /sbin/chkconfig mysqld on
 /sbin/service mysqld start
 %else
-/bin/systemctl enable mariadb.service
-/bin/systemctl start mariadb.service
+/usr/bin/systemctl enable mariadb.service
+/usr/bin/systemctl start mariadb.service
 %endif
 # enable and start apache server
+%if %{rhel} < 7
 /sbin/chkconfig httpd on
 /sbin/service httpd restart
+%else
+/usr/bin/systemctl enable httpd.service
+/usr/bin/systemctl restart httpd.service
+%endif
 # configure firewall for web
 %if %{rhel} < 7
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT    # web
@@ -374,6 +384,8 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 /bin/firewall-cmd --zone=public --add-port=443/tcp --permanent   # ssl web
 /bin/firewall-cmd --reload
 %endif
+# Finally generate security keys for ictcore
+bash /usr/ictcore/bin/keygen
 
 %post voice
 # all new data files must be writable for group users
@@ -398,8 +410,13 @@ setfacl -d -m g::rw %{core_home}/etc/freeswitch/sip_profiles/provider
 sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /etc/freeswitch/autoload_configs/modules.conf.xml
 # enable and start freeswitch server
+%if %{rhel} < 7
 /sbin/chkconfig freeswitch on
 /sbin/service freeswitch restart
+%else
+/usr/bin/systemctl enable freeswitch.service
+/usr/bin/systemctl restart freeswitch.service
+%endif
 # alter firewall for sip
 %if %{rhel} < 7
 # sip internal profile
@@ -458,8 +475,13 @@ fi
 /bin/firewall-cmd --zone=public --add-port=2775/tcp --permanent  # smpp
 /bin/firewall-cmd --reload
 %endif
+%if %{rhel} < 7
 /sbin/chkconfig kannel on
 /sbin/service kannel restart
+%else
+/usr/bin/systemctl enable kannel.service
+/usr/bin/systemctl restart kannel.service
+%endif
 
 %post sendmail
 # enable sendmail on public ip address
@@ -474,8 +496,13 @@ echo "apache" >> /etc/mail/trusted-users
 # apply configuration
 /etc/mail/make
 # enable and start sendmail server
+%if %{rhel} < 7
 /sbin/chkconfig sendmail on
 /sbin/service sendmail restart
+%else
+/usr/bin/systemctl enable sendmail.service
+/usr/bin/systemctl restart sendmail.service
+%endif
 # alter firewall for smtp
 %if %{rhel} < 7
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 25 -j ACCEPT    # smtp

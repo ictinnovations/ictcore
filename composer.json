@@ -11,7 +11,8 @@
     "nategood/httpful": "^0.2.20",
     "aza/thread": "^1.1",
     "twig/twig": "^1.35",
-    "jacwright/restserver": "dev-master"
+    "jacwright/restserver": "dev-master",
+    "firebase/php-jwt": "^5.0"
   },
   "autoload": {
     "psr-4": {

@@ -74,35 +74,90 @@ class Http extends Data implements AuthServer
     return self::get("server:$name", $default);
   }
 
-  public function isAuthorized($classObj) {
-    if (method_exists($classObj, 'authorize')) {
-      return $classObj->authorize();
-		}
+  public function isAuthenticated($classObj)
+  {
+    $auth_headers = $this->getAuthHeaders();
 
-    // select authentication method
-    if (!empty($_SERVER['PHP_AUTH_USER'])) {
-      $username = $_SERVER['PHP_AUTH_USER'];
-      $password = $_SERVER['PHP_AUTH_PW'];
-    } else {
-      return false;
+    // Try to use bearer token as default
+    $auth_method = User::AUTH_TYPE_BEARER;
+    $credentials = $this->getBearer($auth_headers);
+
+    // In case bearer token is not present switch back to Basic autentication
+    if (empty($credentials)) {
+      $auth_method = User::AUTH_TYPE_BASIC;
+      $credentials = $this->getBasic($auth_headers);
     }
 
-    // authenticate using username and password method
-    try {
-      $oUser = new User($username);
-      if (empty($oUser->user_id) || $oUser->authenticate($password) == false) {
-        return false;
-      }
-      do_login($oUser);
-    } catch (CoreException $e) {
-      return false;
+    if (method_exists($classObj, 'authenticate')) {
+      return $classObj->authenticate($credentials, $auth_method);
     }
 
     return true;
   }
 
-  public function unauthorized($classObj) {
+  public function unauthenticated($path) {
     header("WWW-Authenticate: Basic realm=\"$this->realm\"");
-    throw new RestException(401, "You are not authorized to access this resource.");
+    throw new RestException(401, "Invalid credentials, access is denied to $path.");
   }
+
+  public function isAuthorized($classObj, $method) {
+    if (method_exists($classObj, 'authorize')) {
+      return $classObj->authorize($method);
+    }
+
+    return true;
+  }
+
+  public function unauthorized($path) {
+    throw new RestException(403, "You are not authorized to access $path.");
+  }
+
+  /**
+   * Get username and password from header
+   */
+  protected function getBasic($headers) {
+    // mod_php
+    if ($this->server_get('PHP_AUTH_USER', null)) {
+        return array($this->server_get('PHP_AUTH_USER'), $this->server_get('PHP_AUTH_USER'));
+    } else { // most other servers
+      if (!empty($headers)) {
+        list ($username, $password) = explode(':',base64_decode(substr($headers, 6)));
+        return array('username' => $username, 'password' => $password);
+      }
+    }
+    return array('username' => null, 'password' => null);
+  }
+
+  /**
+   * Get access token from header
+   */
+  protected function getBearer($headers) {
+    $matches = array();
+    if (!empty($headers)) {
+      if (preg_match('/Bearer\s(\S+)/', $headers, $matches)) {
+        return $matches[1];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get authorization header
+   */
+  protected function getAuthHeaders() {
+    $headers = null;
+    if ($this->server_get('Authorization', null)) {
+      $headers = trim($this->server_get('Authorization'));
+    } else if ($this->server_get('HTTP_AUTHORIZATION', null)) { //Nginx or fast CGI
+      $headers = trim($this->server_get('HTTP_AUTHORIZATION'));
+    } else if (function_exists('apache_request_headers')) {
+      $requestheaders = apache_request_headers();
+      $RequestHeaders = array_combine(array_map('ucwords', array_keys($requestheaders)), array_values($requestheaders));
+      if (isset($RequestHeaders['Authorization'])) {
+        $headers = trim($RequestHeaders['Authorization']);
+      }
+    }
+    return $headers;
+  }
+
 }

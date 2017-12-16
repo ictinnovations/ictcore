@@ -9,4 +9,5 @@ return array(
     'Twig\\' => array($vendorDir . '/twig/twig/src'),
     'ICT\\Core\\Test\\' => array($baseDir . '/tests/core', $baseDir . '/tests/core/lib'),
     'ICT\\Core\\' => array($baseDir . '/core', $baseDir . '/core/lib'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
 );

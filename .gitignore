@@ -1,0 +1,14 @@
+# personal notes
+/WORKLOG.md
+/TODO.md
+
+# dependencies
+/vendor
+
+# IDEs and editors
+/.idea
+/.vscode
+
+# System Files
+.DS_Store
+Thumbs.db

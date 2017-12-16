@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+
+#** Configure Internal security keys                      *
+#**********************************************************
+
+# generate a security key pair for internal use (between nodes)
+cd /usr/ictcore/etc/ssh
+if [ -f ib_node ]; then
+  echo "ICTCore security keys already exist! skipping."
+  exit 0
+fi
+# rm -rf ib_node ib_node.pub ib_node.crt ib_node.pem
+
+#** Load configurations for ICTCore                       *
+#**********************************************************
+source ../../bin/bash-ini-parser
+cfg_parser ../ictcore.conf
+cfg_section_company
+company_name=$name
+cfg_section_website
+company_host=$host
+
+cat > ib_node.cfg <<EOF
+[req]
+distinguished_name = req_distinguished_name
+prompt = no
+
+[req_distinguished_name]
+CN=$company_host
+O=$company_name
+[ext]
+basicConstraints=CA:TRUE
+EOF
+
+openssl genrsa -out ib_node 1024 > /dev/null
+openssl rsa -in ib_node -pubout -out ib_node.pub >> /dev/null
+openssl req -batch -new -config ib_node.cfg -key ib_node -out ib_node.csr > /dev/null
+openssl x509 -req -days 365 -in ib_node.csr -signkey ib_node -out ib_node.crt > /dev/null
+cat ib_node > ib_node.pem
+cat ib_node.crt >> ib_node.pem
+rm -rf ib_node.csr ib_node.cfg
+
+# repeat next command for each available node to store ssh identity of all nodes into known_hosts
+ssh-keyscan -H localhost >> known_hosts
+chown -R ictcore:ictcore /usr/ictcore/etc/ssh
+chmod 700 /usr/ictcore/etc/ssh
+chmod 600 /usr/ictcore/etc/ssh/*
