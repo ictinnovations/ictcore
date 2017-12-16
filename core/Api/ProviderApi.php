@@ -25,7 +25,10 @@ class ProviderApi extends Api
   {
     $this->_authorize('provider_create');
 
-    $oProvider = new Provider();
+    $type = $data['type'];
+    unset($data['type']);
+
+    $oProvider = Provider::load($type);
     $this->set($oProvider, $data);
 
     if ($oProvider->save()) {
@@ -55,7 +58,7 @@ class ProviderApi extends Api
   {
     $this->_authorize('provider_read');
 
-    $oProvider = new Provider($provider_id);
+    $oProvider = Provider::load($provider_id);
     return $oProvider;
   }
 
@@ -68,7 +71,7 @@ class ProviderApi extends Api
   {
     $this->_authorize('provider_update');
 
-    $oProvider = new Provider($provider_id);
+    $oProvider = Provider::load($provider_id);
     $this->set($oProvider, $data);
 
     if ($oProvider->save()) {
@@ -87,7 +90,7 @@ class ProviderApi extends Api
   {
     $this->_authorize('provider_delete');
 
-    $oProvider = new Provider($provider_id);
+    $oProvider = Provider::load($provider_id);
 
     $result = $oProvider->delete();
     if ($result) {
