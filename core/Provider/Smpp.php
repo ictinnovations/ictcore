@@ -11,7 +11,6 @@ namespace ICT\Core\Provider;
 
 use ICT\Core\Provider;
 use ICT\Core\Service\Sms;
-use ICT\Core\Token;
 
 class Smpp extends Provider
 {
@@ -32,25 +31,22 @@ class Smpp extends Provider
   {
     $result = parent::save();
 
-    $oToken = new Token();
-    $oToken->add('provider', $this);
-
-    $oVoice = new Sms();
-    $template = $oVoice->template_path('smpp');
-    $aSetting = $oToken->render_template($template);
-    $oVoice->config_delete('smpp', $this->name);
-    $oVoice->config_save('smpp', $this->name, $aSetting);
-    $oVoice->config_reload();
+    // configuration update is required for providers
+    $oSms = new Sms();
+    $oSms->config_update_provider($this);
 
     return $result;
   }
 
   public function delete()
   {
-    $oVoice = new Sms();
-    $oVoice->config_delete('smpp', $this->username);
+    // configuration update is required for providers
+    $this->active = 0; // disable to delete, no save needed
+    $oSms = new Sms();
+    $oSms->config_update_provider($this);
+
+    // now it is safe to delete
     parent::delete();
-    $oVoice->config_reload();
   }
 
 }

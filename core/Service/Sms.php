@@ -42,6 +42,10 @@ class Sms extends Service
     return $capabilities;
   }
 
+  /**
+   * ******************************************* Default Gateway for service **
+   */
+
   public static function get_gateway()
   {
     static $oGateway = NULL;
@@ -51,6 +55,10 @@ class Sms extends Service
     return $oGateway;
   }
 
+  /**
+   * ******************************************* Default message for service **
+   */
+
   public static function get_message()
   {
     static $oMessage = NULL;
@@ -59,6 +67,10 @@ class Sms extends Service
     }
     return $oMessage;
   }
+
+  /**
+   * ***************************************** Application related functions **
+   */
 
   public static function template_path($template_name = '')
   {
@@ -108,4 +120,25 @@ class Sms extends Service
         break;
     }
   }
+
+  /**
+   * *************************************** Configuration related functions **
+   */
+
+  // no exention or DIDs are supported
+
+  // no private accounts for user
+
+  public function config_update_provider(Proivder $oProvider)
+  {
+    if ($oProvider->active) {
+      $oToken = new Token();
+      $oToken->add('provider', $oProvider);
+      $this->config_save($oProvider->type, $oToken, $oProvider->name);
+    } else {
+      $this->config_delete($oProvider->type, $oProvider->name);
+    }
+    Sms::config_status(Sms::STATUS_NEED_RELOAD);
+  }
+
 }

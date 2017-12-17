@@ -11,7 +11,6 @@ namespace ICT\Core\Provider;
 
 use ICT\Core\Provider;
 use ICT\Core\Service\Voice;
-use ICT\Core\Token;
 
 class Sip extends Provider
 {
@@ -32,25 +31,22 @@ class Sip extends Provider
   {
     $result = parent::save();
 
-    $oToken = new Token();
-    $oToken->add('provider', $this);
-
+    // configuration update is required for providers
     $oVoice = new Voice();
-    $template = $oVoice->template_path('sip');
-    $aSetting = $oToken->render_template($template);
-    $oVoice->config_delete('sip', $this->name);
-    $oVoice->config_save('sip', $this->name, $aSetting);
-    $oVoice->config_reload();
+    $oVoice->config_update_provider($this);
 
     return $result;
   }
 
   public function delete()
   {
+    // configuration update is required for providers
+    $this->active = 0; // disable to delete, no save needed
     $oVoice = new Voice();
-    $oVoice->config_delete('sip', $this->username);
+    $oVoice->config_update_provider($this);
+
+    // now it is safe to delete
     parent::delete();
-    $oVoice->config_reload();
   }
 
 }

@@ -9,11 +9,14 @@ namespace ICT\Core\Service;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Account;
 use ICT\Core\Application;
 use ICT\Core\Gateway\Freeswitch;
 use ICT\Core\Message\Document;
+use ICT\Core\Provider;
 use ICT\Core\Service;
 use ICT\Core\Token;
+use ICT\Core\User;
 
 class Fax extends Service
 {
@@ -47,6 +50,10 @@ class Fax extends Service
     return $capabilities;
   }
 
+  /**
+   * ******************************************* Default Gateway for service **
+   */
+
   public static function get_gateway() {
     static $oGateway = NULL;
     if (empty($oGateway)) {
@@ -55,6 +62,10 @@ class Fax extends Service
     return $oGateway;
   }
 
+  /**
+   * ******************************************* Default message for service **
+   */
+
   public static function get_message() {
     static $oMessage = NULL;
     if (empty($oMessage)) {
@@ -62,6 +73,10 @@ class Fax extends Service
     }
     return $oMessage;
   }
+
+  /**
+   * ***************************************** Application related functions **
+   */
 
   public static function template_path($template_name = '')
   {
@@ -133,4 +148,49 @@ class Fax extends Service
         break;
     }
   }
+
+  /**
+   * *************************************** Configuration related functions **
+   */
+
+  public function config_update_account(Account $oAccount)
+  {
+    if ($oAccount->active) {
+      $oToken = new Token();
+      $oToken->add('account', $oAccount);
+      $this->config_save($oAccount->type, $oToken, $oAccount->username);
+    } else {
+      $this->config_delete($oAccount->type, $oAccount->username);
+    }
+    $oUser = new User($oAccount->user_id);
+    $this->config_update_user($oUser);
+  }
+
+  public function config_update_user(User $oUser)
+  {
+    if ($oUser->active) {
+      $account_filter = array('created_by' => $oUser->user_id, 'active' => 1);
+      $listAccount = Account::search($account_filter);
+      $oToken = new Token();
+      $oToken->add('user', $oUser);
+      $oToken->add('user_accounts', $listAccount);
+      $this->config_save('user', $oToken, $oUser->username);
+    } else {
+      $this->config_delete('user', $oUser->username);
+    }
+    Fax::config_status(Fax::STATUS_NEED_RELOAD);
+  }
+
+  public function config_update_provider(Provider $oProvider)
+  {
+    if ($oProvider->active) {
+      $oToken = new Token();
+      $oToken->add('provider', $oProvider);
+      $this->config_save($oProvider->type, $oToken, $oProvider->name);
+    } else {
+      $this->config_delete($oProvider->type, $oProvider->name);
+    }
+    Fax::config_status(Fax::STATUS_NEED_RELOAD);
+  }
+
 }

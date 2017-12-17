@@ -46,20 +46,16 @@ class Email extends Service
     return $capabilities;
   }
 
+  /**
+   * ******************************************* Default Gateway for service **
+   */
+
   public static function get_gateway() {
     static $oGateway = NULL;
     if (empty($oGateway)) {
       $oGateway = new Sendmail();
     }
     return $oGateway;
-  }
-
-  public static function get_message() {
-    static $oMessage = NULL;
-    if (empty($oMessage)) {
-      $oMessage = new Template();
-    }
-    return $oMessage;
   }
 
   public static function get_route()
@@ -74,6 +70,22 @@ class Email extends Service
       return $oProvider;
     }
   }
+
+  /**
+   * ******************************************* Default message for service **
+   */
+
+  public static function get_message() {
+    static $oMessage = NULL;
+    if (empty($oMessage)) {
+      $oMessage = new Template();
+    }
+    return $oMessage;
+  }
+
+  /**
+   * ***************************************** Application related functions **
+   */
 
   public static function template_path($template_name = '')
   {
@@ -115,4 +127,15 @@ class Email extends Service
         break;
     }
   }
+
+  /**
+   * *************************************** Configuration related functions **
+   */
+
+  // no configuration file needed for accounts
+
+  // no private accounts for user
+
+  // no configuration file needed for providers
+
 }

@@ -11,14 +11,13 @@ namespace ICT\Core\Account;
 
 use ICT\Core\Account;
 use ICT\Core\Service\Voice;
-use ICT\Core\Token;
 
 class Extension extends Account
 {
 
   /**
    * @property-read string $type
-   * @var string 
+   * @var string
    */
   protected $type = 'extension';
 
@@ -30,22 +29,39 @@ class Extension extends Account
 
   public function save()
   {
-    parent::save();
+    $result = parent::save();
 
-    $oToken = new Token();
-    $oToken->add('account', $this);
-
+    // configuration update is required for accounts
     $oVoice = new Voice();
-    $template = $oVoice->template_path($this->type);
-    $extension = $oToken->render_template($template);
-    $oVoice->config_save('extension', $this->username, $extension);
+    $oVoice->config_update_account($this);
+
+    return $result;
   }
 
   public function delete()
   {
+    // configuration update is required for accounts
+    $this->active = 0; // disable to delete, no save needed
     $oVoice = new Voice();
-    $oVoice->config_delete('extension', $this->username);
+    $oVoice->config_update_account($this);
+
+    // now it is safe to delete
     parent::delete();
   }
 
+  public function associate($user_id, $aUser = array())
+  {
+    parent::associate($user_id, $aUser);
+    // configuration update is required for accounts
+    $oVoice = new Voice();
+    $oVoice->config_update_account($this);
+  }
+
+  public function dissociate()
+  {
+    parent::dissociate();
+    // configuration update is required for accounts
+    $oVoice = new Voice();
+    $oVoice->config_update_account($this);
+  }
 }
