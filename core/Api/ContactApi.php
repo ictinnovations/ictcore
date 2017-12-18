@@ -97,4 +97,43 @@ class ContactApi extends Api
     }
   }
 
+  /**
+   * Create a new contact group link
+   * 
+   * @url PUT /contacts/$contact_id/link/$group_id
+   */
+  public function join($contact_id, $group_id)
+  {
+    $this->_authorize('contact_create');
+    $this->_authorize('group_create');
+
+    $oContact = new Contact($contact_id);
+
+    if ($oContact->link($group_id)) {
+      return $oContact;
+    } else {
+      throw new CoreException(417, 'Contact and group join failed');
+    }
+  }
+
+  /**
+   * Delete an existing contact and group Link
+   * 
+   * @url DELETE /contacts/$contact_id/link/$group_id
+   */
+  public function leave($contact_id, $group_id)
+  {
+    $this->_authorize('contact_delete');
+    $this->_authorize('group_delete');
+
+    $oContact = new Contact($contact_id);
+
+    $result = $oContact->link_delete($group_id);
+    if ($result) {
+      return $result;
+    } else {
+      throw new CoreException(417, 'Contact delete failed');
+    }
+  }
+
 }

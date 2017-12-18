@@ -1,0 +1,90 @@
+#!/usr/bin/php
+<?php
+namespace ICT\Core;
+
+use \ICT\Core\Campaign;
+use \ICT\Core\Transmission;
+
+require dirname(__DIR__).'/vendor/autoload.php'; // composer
+declare(ticks=1);
+
+/* forking */
+$daemon = new Daemon();
+$daemon->setPidFileLocation('/tmp/coreCampaign_td1.pid');
+$daemon->setProcessName('coreCampaign');
+$daemon->autoRun();
+
+// parent close database conection that y i put here
+require_once dirname(__FILE__).'/../core/core.php';
+
+$campaign_id = $argv[1];
+
+/* Campaing start */
+$oCampaign = new Campaign($campaign_id);
+$group_id = $oCampaign->group_id;
+$user_id = $oCampaign->created_by;
+$delay = $oCampaign->delay;
+
+do_login($user_id);
+
+//transmission create 
+$query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id,cl.contact_id ,cl.group_id ".
+         "FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id ".
+         "WHERE cl.group_id=".$group_id." GROUP BY cl.contact_id";
+$result_contacts = mysql_query($query);
+while ($datacontact = mysql_fetch_assoc($result_contacts)) {
+  $data_transmission = array(
+    'title' => 'bulk system',
+    'account_id' => $user_id,
+    'contact_id' => $datacontact['contact_id'],
+    'origin' => '',
+    'direction' => ''
+  );
+
+  $chk_transmission = mysql_query("SELECT *  from transmission where contact_id=".$datacontact['contact_id']." AND program_id=".$oCampaign->program_id);
+  if(mysql_num_rows($chk_transmission)==0) {
+    $oProgram = Program::load($oCampaign->program_id);
+    $direction = empty($data_transmission['direction']) ? Transmission::OUTBOUND : $data_transmission['direction'];
+    $oTransmission = $oProgram->transmission_create($datacontact['contact_id'], $user_id, $direction);
+    if ($oTransmission->save()) {
+      $trans_id =  $oTransmission->transmission_id;
+    } else {
+      throw new CoreException(417, 'Transmission creation failed');
+    }
+  }
+}
+
+// Get tranmisions according to group
+$query = "SELECT c.transmission_id, c.program_id, c.contact_id, c.status, cl.contact_id, cl.group_id ".
+         "FROM transmission c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id ".
+         "WHERE cl.group_id=".$group_id." AND c.program_id=".$oCampaign->program_id.
+         " AND c.created_by=".$user_id." AND c.status !='processing' GROUP BY cl.contact_id";
+$result = mysql_query($query);
+
+$contact_processed=0;
+if (mysql_num_rows($result)>0) {
+  // Transmissions loop
+  while ($data = mysql_fetch_assoc($result)) {
+    if (is_numeric($delay)){
+      usleep($delay);
+    }
+    try {
+      $oTransmission = new Transmission($data['transmission_id']);
+      $oTransmission->send();
+    } catch (Exception $e) {
+      ini_set("error_log", "/tmp/transmission_error.log");
+      error_log( "Transmission not found:".$e->getMessage());
+    }
+    $contact_processed++;
+  }
+
+  $query_campaign = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " ,status='completed' where campaign_id =".$campaign_id;
+  $res = mysql_query($query_campaign);
+  if (mysql_errno()) {
+    Corelog::log("Campaign update failed", Corelog::CRUD);
+  }
+
+} else {
+  ini_set("error_log", "/tmp/transmission_error.log");
+  error_log( "Transmission not found" );
+}

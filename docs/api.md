@@ -13,6 +13,19 @@ Contact / pre defined destination number
 * GET contacts/{contact_id}
 * PUT contacts/{contact_id}
 * DELETE contacts/{contact_id}
+* PUT contacts/{contact_id}/link/{group_id}
+* DELETE contacts/{contact_id}/link/{group_id}
+
+### Contact Group
+* POST groups
+* GET groups
+* GET groups/{group_id}
+* GET groups/{group_id}/contacts
+* PUT groups/{group_id}
+* DELETE groups/{group_id}
+* POST groups/{group_id}/csv
+* GET groups/{group_id}/csv
+* GET groups/sample/csv
 
 Message / pre defined information to be send
 --------------------------------------------
@@ -110,6 +123,22 @@ Transmission - the actual call or action
 * GET transmissions/{transmission_id}/result
 * GET spools/{spool_id}/status
 * GET spools/{spool_id}/result
+
+Campaigns : Communication in bulk
+---------------------------------
+
+### Campaigns
+* POST campaigns
+* GET campaigns
+* PUT campaigns/{campaign_id}
+* DELETE campaigns/{campaign_id}
+* PUT campaigns/{campaign_id}/start
+* PUT campaigns/{campaign_id}/stop
+* PUT campaigns/{campaign_id}/start/schedule
+* PUT campaigns/{campaign_id}/stop/schedule
+* DELETE campaigns/{campaign_id}/start/schedule
+* DELETE campaigns/{campaign_id}/stop/schedule
+* DELETE campaigns/{campaign_id}/schedule
 
 Account / Email / DID / Extension
 ---------------------------------

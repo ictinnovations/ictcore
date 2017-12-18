@@ -1,0 +1,33 @@
+#!/usr/bin/php  
+<?php
+
+namespace ICT\Core;
+
+use Firehed\ProcessControl\Daemon;
+
+require dirname(__DIR__).'/vendor/autoload.php'; // composer
+declare(ticks=1);
+
+/* forking */
+$daemon = new Daemon();
+$daemon->setPidFileLocation('/tmp/coreCampaign_td1.pid');
+$daemon->setProcessName('coreCampaign');
+$daemon->autoRun();
+
+// parent close database conection that y i put here
+require_once dirname(__FILE__).'/../core/core.php';
+
+$file_tmpname = $argv[1];
+$group_id = $argv[2];
+
+/* inserting import file contacts */
+$file_tm = fopen($file_tmpname, "r");
+while (($value = fgetcsv($file_tm, 10000, ",")) !== FALSE) {
+	if(!empty($value)) {
+    mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) ".
+                "VALUES ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".
+                            $value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
+    $result = mysql_insert_id();
+    mysql_query("INSERT INTO contact_link(group_id,contact_id) value (".$group_id.",$result )");
+	}
+}

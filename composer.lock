@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "33ff7a1b4a0224f5575e4170f795c130",
+    "content-hash": "531a9c2867c7fdd110028ce6ef0d5df7",
     "packages": [
         {
             "name": "aza/clibase",
@@ -305,6 +305,39 @@
             "time": "2017-06-27T22:17:23+00:00"
         },
         {
+            "name": "firehed/processmanager",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Firehed/ProcessManager.git",
+                "reference": "a6feb8c216d6db6460fbd65e0ac5e5c767e94358"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Firehed/ProcessManager/zipball/a6feb8c216d6db6460fbd65e0ac5e5c767e94358",
+                "reference": "a6feb8c216d6db6460fbd65e0ac5e5c767e94358",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcntl": "*",
+                "ext-posix": "*",
+                "php": ">=5.4.0",
+                "psr/log": ">=1.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Firehed\\ProcessControl\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Simple base for daemonized wokers",
+            "time": "2016-02-27T01:29:32+00:00"
+        },
+        {
             "name": "jacwright/restserver",
             "version": "dev-master",
             "source": {
@@ -403,6 +436,53 @@
                 "restful"
             ],
             "time": "2015-10-26T16:11:30+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -528,7 +608,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "jacwright/restserver": 20
+        "jacwright/restserver": 20,
+        "firehed/processmanager": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

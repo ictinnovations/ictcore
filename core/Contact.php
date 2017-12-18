@@ -16,6 +16,7 @@ class Contact
   const COMPANY = -2;
 
   private static $table = 'contact';
+  private static $table_link = 'contact_link';
   private static $primary_key = 'contact_id';
   private static $fields = array(
       'contact_id',
@@ -92,25 +93,28 @@ class Contact
     return $oContact;
   }
 
-  public static function search($aFilter = array())
+  public static function search($aFilter = array(), $full = false)
   {
     $aContact = array();
-    $from_str = self::$table;
+    $from_str = self::$table." c JOIN ".self::$table_link." l ON c.contact_id=l.contact_id";
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
+        case 'group_id':
+          $aWhere[] = "l.$search_field = $search_value";
+          break;
         case 'contact_id':
-          $aWhere[] = "$search_field = $search_value";
+          $aWhere[] = "c.$search_field = $search_value";
           break;
         case 'phone':
-          $aWhere[] = "$search_field LIKE '%$search_value'";
+          $aWhere[] = "c.$search_field LIKE '%$search_value'";
           break;
         case 'email':
-          $aWhere[] = "$search_field = '$search_value'";
+          $aWhere[] = "c.$search_field = '$search_value'";
           break;
         case 'first_name':
         case 'last_name':
-          $aWhere[] = "$search_field LIKE '%$search_value%'";
+          $aWhere[] = "c.$search_field LIKE '%$search_value%'";
           break;
       }
     }
@@ -118,7 +122,12 @@ class Contact
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT contact_id, first_name, last_name, phone, email FROM " . $from_str;
+    if ($full) {
+      $query = "SELECT c.contact_id, c.first_name, c.last_name, c.phone, c.email, c.address, "
+              ."c.custom1, c.custom2, c.custom3, c.description FROM " . $from_str;
+    } else {
+      $query = "SELECT c.contact_id, c.first_name, c.last_name, c.phone, c.email FROM " . $from_str;
+    }
     Corelog::log("contact search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('contact', $query);
     while ($data = mysql_fetch_assoc($result)) {
@@ -128,13 +137,19 @@ class Contact
     // if no contact found, check for special contacts
     if (empty($aContact) && isset($aFilter['contact_id']) && $aFilter['contact_id'] == Contact::COMPANY) {
       $oContact = new Contact($aFilter['contact_id']);
-      $aContact[$oContact->contact_id] = array(
-          'contact_id' => $oContact->contact_id,
-          'first_name' => $oContact->first_name,
-          'last_name' => $oContact->last_name,
-          'phone' => $oContact->phone,
-          'email' => $oContact->email
-      );
+      $singleContact['contact_id'] = $oContact->contact_id;
+      $singleContact['first_name'] = $oContact->first_name;
+      $singleContact['last_name'] = $oContact->last_name;
+      $singleContact['phone'] = $oContact->phone;
+      $singleContact['email'] = $oContact->email;
+      if ($full) {
+        $singleContact['address'] = '';
+        $singleContact['custom1'] = '';
+        $singleContact['custom2'] = '';
+        $singleContact['custom3'] = '';
+        $singleContact['descritpion'] = '';
+      }
+      $aContact = $singleContact;
     }
 
     return $aContact;
@@ -165,6 +180,8 @@ class Contact
   public function delete()
   {
     Corelog::log("Contact delete", Corelog::CRUD);
+    mysql_query("DELETE from contact_link where contact_id=".$this->contact_id);
+    DB::delete(self::$table_link, 'contact_id', $this->contact_id);
     return DB::delete(self::$table, 'contact_id', $this->contact_id, true);
   }
 
@@ -247,6 +264,35 @@ class Contact
       Corelog::log("New Contact created: $this->contact_id", Corelog::CRUD);
     }
     return $result;
+  }
+
+
+  public function link($group_id)
+  {
+    // add new
+    $link = array(
+        'contact_id' => $this->contact_id,
+        'group_id' => $group_id
+    );
+    return DB::update(self::$table_link, $link);
+  }
+
+  public function link_delete($group_id = null)
+  {
+    if ($group_id == null) {
+      $link_delete_query = "DELECT FROM ".self::$table_link." WHERE contact_id=%contact_id%";
+    } else {
+      $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id=%contact_id% AND group_id=%grooup_id%";
+    }
+    DB::query(self::$table, $req_query, array('contact_id' => $this->contact_id, 'group_id' => $group_id));
+    $get_link_count = mysql_query("SELECT * from contact_link");
+    $result_add = mysql_query("DELETE from contact_link where contact_id=".$this->contact_id." AND group_id=".$group_id);
+    $result = mysql_num_rows($get_link_count)-1;
+    //$count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
+    //$cont_result =  mysql_num_rows($count_contact);
+    //$udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
+    Corelog::log("group contacts Deleted: ", Corelog::CRUD);
+    return $result ;
   }
 
 }

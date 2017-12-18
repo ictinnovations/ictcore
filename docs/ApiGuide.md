@@ -189,6 +189,107 @@ Delete an existing contact
 * __Parameters__  
 Replace {contact_id} in url with valid contact_id
 
+### PUT contacts/{contact_id}/link/{group_id}
+Add selected contact into provide contact group
+
+* __Parameters__  
+Replace {contact_id} and {group_id} in url with valid contact_id and group_id
+
+* __Response__  
+Contact details in associative array
+ 
+### DELETE contacts/{contact_id}/link/{group_id}
+remove selected contact from provide contact group
+
+* __Parameters__  
+Replace {contact_id} and {group_id} in url with valid contact_id and group_id
+
+* __Response__ 
+Contact details in associative array
+
+Contact Group
+-------------
+
+### POST groups
+Create new contact group
+
+* __Parameters__  
+An associative array containing key and value pairs based on following fields
+```json
+{
+    "name": "__String__",
+    "description": "__Optional_String__",
+}
+```
+
+* __Response__  
+__group_id__ of created group record
+
+### GET groups/{group_id}
+Read / view complete group data
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id
+
+* __Response__  
+group details in associative array
+
+### GET groups/{group_id/contacts
+list all contacts from selected group, optionally client can filter contacts using query string (key value pair) in url, while using any of following fields
+```
+  first_name: __String__
+  last_name: __String__
+  phone: __Digits__
+  email: __Email__
+```
+
+* __Response__  
+an array of contacts
+
+### PUT groups/{group_id}
+Update an existing group
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id, fields require modifications will be POSTed in same way as `groups`
+
+* __Response__  
+Return updated group data as an associative array
+
+### DELETE groups/{group_id}
+Delete an existing group
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id
+ 
+### POST groups/{group_id}/csv
+Import contact from csv file into selected group
+
+* __Parameters__  
+An associative array containing csv file pairs based on following fields
+```json
+{
+    "attachment": "__File__, upload a csv file",
+}
+```
+
+* __Response__  
+Boolean true on success
+
+### GET  groups/{group_id}/csv 
+Download complete all contacts from selected contact group as csv file
+
+* __Parameters__  
+Replace {group_id} in url with valid group_id
+
+* __Response__  
+contact list in csv file 
+
+### GET groups/sample/csv
+Download a sample csv file
+
+* __Response__  
+sample csv file 
+
 Message / pre defined information to be send
 ============================================
 
@@ -790,6 +891,92 @@ Replace {transmission_id} in url with valid transmission_id
 * __Response__  
 transmission details in associative array
 
+Campaign - the actual bulk system 
+========================================
+Create campaign for message delivery / calling bulk contacts
+
+Campaign
+--------
+
+### POST campaigns
+Create new campaign
+* __Parameters__  
+  * A json encoded associative array containing key and value pairs based on following fields
+```json
+{
+    "program_id": "__Numeric_ID__, program_id of selected program",
+    "group_id": "__Numeric_ID__, group_id of selected group",
+    "delay": "__Numeric__, pause between transmissions (milliseconds)",
+    "try_allowed": "__Numeric__ ",
+    "account_id": "__Numeric_ID__, account_id of associated account",
+    "status": "__String__",
+}
+```
+* __Response__  
+__campaign_id__ of recently created campaign record
+
+### GET campaigns
+Read / view complete campaign data
+
+* __Response__  
+campaign details in associative array
+
+### PUT campaigns/{campaign_id}
+Update an existing group
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id, fields require modifications will be POSTed in same way as `campaigns`
+
+* __Response__  
+Return updated campaign data as an associative array
+
+### DELETE campaigns/{campaign_id}
+Delete an existing campaign
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+ 
+### PUT campaigns/{campaign_id}/start
+Start contact processing / calling in selected campaign
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+
+* __Response__  
+Boolean true on success
+
+### PUT  campaigns/{campaign_id}/stop
+Stop contact processing / calling in selected campaign
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+
+* __Response__  
+Boolean true on success
+
+### POST campaigns/{campaign_id}/start/schedule
+Instead of processing campaign contacts instantly, schedule their processing / calling in near future.
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+
+* __Response__  
+__schedule_id__ of recently created schedule record
+
+### POST campaigns/{campaign_id}/start/schedule
+Instead manually stopping a campaign, we can schedule it.
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
+
+* __Response__  
+__schedule_id__ of recently created schedule record
+
+### DELETE campaigns/{campaign_id}/schedule
+Cancel any schedule associated with given campaign
+
+* __Parameters__  
+Replace {campaign_id} in url with valid campaign_id
 
 Reports
 -------

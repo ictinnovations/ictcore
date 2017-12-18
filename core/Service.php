@@ -76,7 +76,7 @@ class Service
 
     return $serviceMap;
   }
-  
+
   /**
    * Get all available services
    * 
