@@ -38,7 +38,7 @@ class Contact
    * @property-read integer $contact_id
    * @var integer
    */
-  private $contact_id = NULL;
+  public $contact_id = NULL;
 
   /** @var string */
   public $first_name = NULL;

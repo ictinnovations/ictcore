@@ -47,7 +47,7 @@ class Document extends Message
    * @property-read integer $document_id
    * @var integer
    */
-  protected $document_id = NULL;
+  public $document_id = NULL;
 
   /** @var string */
   public $name = NULL;

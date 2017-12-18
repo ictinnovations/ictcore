@@ -46,7 +46,7 @@ class Sip extends Provider
     $oVoice->config_update_provider($this);
 
     // now it is safe to delete
-    parent::delete();
+    return parent::delete();
   }
 
 }

@@ -30,7 +30,7 @@ class Permission
    * @property-read integer $permission_id
    * @var integer
    */
-  private $permission_id = NULL;
+  public $permission_id = NULL;
 
   /** @var string */
   private $name = NULL;

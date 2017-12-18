@@ -46,7 +46,7 @@ class Recording extends Message
    * @property-read integer $recording_id
    * @var integer
    */
-  protected $recording_id = NULL;
+  public $recording_id = NULL;
 
   /** @var string */
   public $name = NULL;

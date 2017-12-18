@@ -21,7 +21,7 @@ class Message
    * @property-read integer $message_id 
    * @var integer
    */
-  protected $message_id = NULL;
+  public $message_id = NULL;
 
   /** @var string */
   public $name = NULL;

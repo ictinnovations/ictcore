@@ -35,7 +35,7 @@ class Program
    * @property-read integer $program_id
    * @var integer 
    */
-  protected $program_id = null;
+  public $program_id = null;
 
   /** @var string */
   public $name = 'unknown';

@@ -31,7 +31,7 @@ class Action
    * @property-read integer $action_id
    * @var integer
    */
-  private $action_id = NULL;
+  public $action_id = NULL;
 
   /**
    * @property-read string $type

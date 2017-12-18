@@ -43,7 +43,7 @@ class Account
    * @property-read integer $account_id
    * @var integer
    */
-  protected $account_id = NULL;
+  public $account_id = NULL;
 
   /**
    * @property-read string $type

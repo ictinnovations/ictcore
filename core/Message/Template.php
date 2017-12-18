@@ -42,7 +42,7 @@ class Template extends Message
    * @property-read integer $template_id
    * @var integer 
    */
-  protected $template_id = NULL;
+  public $template_id = NULL;
 
   /** @var string */
   public $name = NULL;

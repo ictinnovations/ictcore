@@ -46,7 +46,7 @@ class Application
    * @property-read integer $application_id
    * @var integer
    */
-  protected $application_id = NULL;
+  public $application_id = NULL;
 
   /** @var string */
   public $name = 'unknown';

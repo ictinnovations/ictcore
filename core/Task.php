@@ -47,7 +47,7 @@ class Task
    * @property-read integer $task_id 
    * @var integer 
    */
-  protected $task_id = NULL;
+  public $task_id = NULL;
 
   /** @var string */
   public $type = NULL;

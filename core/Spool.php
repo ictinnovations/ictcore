@@ -56,7 +56,7 @@ class Spool
    * @property-read integer $spool_id
    * @var integer
    */
-  private $spool_id = NULL;
+  public $spool_id = NULL;
 
   /**
    * @property-read integer $time_spool

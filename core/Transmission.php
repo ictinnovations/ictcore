@@ -68,7 +68,7 @@ class Transmission
    * @property-read integer $transmission_id
    * @var integer
    */
-  private $transmission_id = NULL;
+  public $transmission_id = NULL;
 
   /** @var string */
   public $title = 'Unknown';

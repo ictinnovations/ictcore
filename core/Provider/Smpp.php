@@ -46,7 +46,7 @@ class Smpp extends Provider
     $oSms->config_update_provider($this);
 
     // now it is safe to delete
-    parent::delete();
+    return parent::delete();
   }
 
 }

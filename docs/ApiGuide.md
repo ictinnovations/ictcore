@@ -163,7 +163,7 @@ list all exiting contacts, optionally client can filter contacts using query str
 ```
 
 * __Response__  
-an array of contacts indexed on contact_id
+an array of contacts
 
 ### GET contacts/{contact_id}
 Read / view complete contact data
@@ -321,7 +321,7 @@ list all exiting documents, optionally client can filter documents using query s
 ```
 
 * __Response__  
-an array of documents indexed on document_id
+an array of documents
 
 * __Note__  
 Media / document can be downloaded separately using GET messages/documents/{document_id}/media
@@ -399,7 +399,7 @@ list all exiting recordings, optionally client can filter recordings using query
 ```
 
 * __Response__  
-an array of recordings indexed on recording_id
+an array of recordings
 
 * __Note__  
 Media / recording can be downloaded separately using GET messages/recordings/{recording_id}/media
@@ -484,7 +484,7 @@ list all exiting templates, optionally client can filter templates using query s
 ```
 
 * __Response__  
-an array of templates indexed on template_id
+an array of templates
 
 * __Note__  
 Media / attachment can be downloaded separately using GET messages/templates/{template_id}/media
@@ -562,7 +562,7 @@ list all exiting texts, optionally client can filter texts using query string (k
 ```
 
 * __Response__  
-an array of texts indexed on text_id
+an array of texts
 
 ### GET messages/texts/{text_id}
 Read / view complete text data
@@ -605,7 +605,7 @@ list all exiting programs, optionally client can filter programs using query str
 ```
 
 * __Response__  
-an array of programs indexed on program_id
+an array of programs
 
 ### GET programs/{program_id}
 Read / view complete program data
@@ -654,7 +654,7 @@ list all transmissions created using certain program which id is given in url, o
 Replace {program_id} in url with any valid program_id or program type (as listed below), i.e `programs/emailtofax`
 
 * __Response__  
-an array of transmissions indexed on transmission_id
+an array of transmissions
 
 Email to Fax program
 --------------------
@@ -840,7 +840,7 @@ list all exiting transmissions, optionally client can filter transmissions using
 ```
 
 * __Response__  
-an array of transmissions indexed on transmission_id
+an array of transmissions
 
 ### GET transmissions/{transmission_id}/send ( or /call or /dial )
 Trigger already prepared transmission to dial / connect assigned contact and deliver desired message.  
@@ -996,7 +996,7 @@ A list of attempts (spool) with their detail, which system has made to deliver t
 Replace {transmission_id} in url with valid transmission_id
 
 * __Response__  
-Will return an array of spool record indexed on spool_id
+Will return an array of spool records
 
 ### GET transmissions/{transmission_id}/result
 Complete details of each step along with remote side responses, for requested transmission
@@ -1062,7 +1062,7 @@ list all exiting accounts, optionally client can filter accounts using query str
 ```
 
 * __Response__  
-an array of accounts indexed on account_id
+an array of accounts
 
 ### GET accounts/{account_id}
 Read / view complete account data
@@ -1158,7 +1158,7 @@ list all exiting users, optionally client can filter users using query string (k
 ```
 
 * __Response__  
-an array of users indexed on user_id
+an array of users
 
 ### GET users/{user_id}
 Read / view complete user data
@@ -1263,7 +1263,7 @@ list all exiting providers, optionally client can filter providers using query s
 ```
 
 * __Response__  
-an array of providers indexed on provider_id
+an array of providers
 
 ### GET providers/{provider_id}
 Read / view complete provider data

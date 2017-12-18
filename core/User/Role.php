@@ -33,7 +33,7 @@ class Role
    * @property-read integer $role_id
    * @var integer
    */
-  private $role_id = NULL;
+  public $role_id = NULL;
 
   /** @var string */
   public $name = NULL;

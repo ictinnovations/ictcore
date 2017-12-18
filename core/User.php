@@ -56,7 +56,7 @@ class User
    * @property-read integer $user_id
    * @var integer
    */
-  private $user_id = NULL;
+  public $user_id = NULL;
 
   /**
    * @property-read integer $role_id

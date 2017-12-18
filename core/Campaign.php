@@ -37,7 +37,7 @@ class Campaign
    * @property-read integer $campaign_id
    * @var integer
    */
-  private $campaign_id = NULL;
+  public $campaign_id = NULL;
 
   /** @var integer */
   public $program_id = NULL;

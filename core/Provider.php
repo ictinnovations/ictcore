@@ -41,7 +41,7 @@ class Provider
    * @property-read integer $provider_id
    * @var integer
    */
-  protected $provider_id = NULL;
+  public $provider_id = NULL;
 
   /** @var string */
   public $name = NULL;

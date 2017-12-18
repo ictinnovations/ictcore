@@ -38,7 +38,7 @@ class Result
    * @property-read integer $spool_result_id
    * @var integer 
    */
-  private $spool_result_id = NULL;
+  public $spool_result_id = NULL;
 
   /** @var integer */
   public $application_id = NULL;

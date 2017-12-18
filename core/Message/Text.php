@@ -51,7 +51,7 @@ class Text extends Message
    * @property-read integer $text_id
    * @var integer
    */
-  protected $text_id = NULL;
+  public $text_id = NULL;
 
   /** @var string */
   public $name = NULL;

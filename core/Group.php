@@ -25,7 +25,7 @@ class Group
    * @property-read integer $group_id
    * @var integer
    */
-  private $group_id = NULL;
+  public $group_id = NULL;
 
   /** @var string */
   public $name = NULL;

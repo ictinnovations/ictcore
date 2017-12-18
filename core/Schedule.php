@@ -32,7 +32,7 @@ class Schedule extends Task
    * @property-read integer $schedule_id 
    * @var integer 
    */
-  private $schedule_id = NULL;
+  public $schedule_id = NULL;
 
   /** @var integer */
   public $year = '*';
