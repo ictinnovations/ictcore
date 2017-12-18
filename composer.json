@@ -4,6 +4,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/ictinnovations/RestServer"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ictinnovations/ProcessManager"
     }
   ],
   "require": {
