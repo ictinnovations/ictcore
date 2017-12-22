@@ -12,6 +12,7 @@ namespace ICT\Core\Application;
 use ICT\Core\Application;
 use ICT\Core\Service\Fax;
 use ICT\Core\Service\Voice;
+use ICT\Core\Spool;
 
 class Originate extends Application
 {
@@ -69,6 +70,15 @@ class Originate extends Application
     }
     $template_path = $oService->template_path('originate');
     $oService->application_execute($this, $template_path, 'template');
+  }
+
+  public function process()
+  {
+    if (!empty($this->result['result']) && $this->result['result'] == 'success') {
+      return Spool::STATUS_CONNECTED;
+    } else {
+      return Spool::STATUS_FAILED;
+    }
   }
 
 }

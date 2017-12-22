@@ -32,6 +32,7 @@ class Conf extends Data
   // system = 170 = GLOBAL_READ | NODE_READ | ADMIN_READ | USER_READ
   // admin  = 186 = system | ADMIN_WRITE
   // user   = 250 = admin | USER_WRITE
+  // node   = 254 = user | NODE_WRITE
 
   /**
    * @var Conf
@@ -52,10 +53,14 @@ class Conf extends Data
     return self::$oConf;
   }
 
-  public static function set($name, $value)
+  public static function set($name, $value, $permanent = FALSE, $reference = array(), $permission = Conf::PERMISSION_NODE_WRITE)
   {
     $oConf = self::get_instance();
     $oConf->__set($name, $value);
+    if ($permanent) {
+      list($type, $conf_name) = explode(':', $name, 2);
+      static::database_conf_set($type, $conf_name, $value, $reference, $permission);
+    }
   }
 
   public static function &get($name, $default = NULL)
@@ -81,7 +86,7 @@ class Conf extends Data
     return true;
   }
 
-  protected static function database_conf_get($filter = array(), $type = null)
+  protected static function database_conf_load($filter = array(), $type = null)
   {
     $configuration = array();
 
@@ -111,34 +116,47 @@ class Conf extends Data
     return $configuration;
   }
 
-  public static function database_conf_save($aConf = null, $field = array())
+  public static function database_conf_save($aConf = null, $reference = array(), $permission = Conf::PERMISSION_NODE_WRITE)
   {
-    Corelog::log("configuration save request", Corelog::COMMON, array($aConf, $field));
-
-    $permission = can_access('configuration_admin') ? Conf::PERMISSION_ADMIN_WRITE : Conf::PERMISSION_USER_WRITE;
-    $update_field = implode(', ', $field);
-    $search_field = implode(' AND ', $field);
-
+    Corelog::log("configuration save request", Corelog::COMMON, array($aConf, $reference));
     foreach ($aConf as $type => $conf) {
       foreach ($conf as $name => $data) {
-        $query = "SELECT configuration_id FROM configuration 
-                   WHERE (permission_flag & $permission)=$permission AND type='$type' AND name='$name'";
-        $result = DB::query('configuration', $query);
-        if (mysql_num_rows($result)) {
-          $configuration_id = mysql_result($result, 0, 0);
-          if ($data == '[default]') {
-            DB::query('configuration_data', "DELETE FROM configuration_data WHERE configuration_id=$configuration_id AND $search_field");
-          } else {
-            $query = "INSERT INTO configuration_data SET configuration_id='$configuration_id', $update_field, 
-                                                          data='$data', date_created=UNIX_TIMESTAMP() 
-                       ON DUPLICATE KEY UPDATE data='$data', last_updated=UNIX_TIMESTAMP()";
-            $result = DB::query('configuration', $query);
-          }
-        }
+        static::database_conf_set($type, $name, $data, $reference, $permission);
       }
     }
-
-    return $result;
   }
 
+  public static function database_conf_set($type, $name, $data, $reference = array(), $permission = Conf::PERMISSION_NODE_WRITE)
+  {
+    $query = "SELECT configuration_id FROM configuration
+               WHERE (permission_flag & $permission)=$permission AND type='$type' AND name='$name'";
+    $result = DB::query('configuration', $query);
+    if (mysql_num_rows($result)) {
+      $configuration_id = mysql_result($result, 0, 0);
+    } else {
+      Corelog::log("Unable to save configuration. type:$type, name:$name", Corelog::ERROR);
+      return;
+    }
+
+    $update_query = '';
+    $search_query = '';
+    if (!empty($reference)) {
+      $reference_pair = array();
+      foreach ($reference as $key => $value) {
+        $reference_pair[] = "$key=$value";
+      }
+      $update_query = ', ' . implode(', ', $reference_pair);
+      $search_query = ' AND ' . implode(' AND ', $reference_pair);
+    }
+
+    if ($data == '[default]') {
+      DB::query('configuration_data', "DELETE FROM configuration_data WHERE configuration_id=$configuration_id $search_query");
+    } else {
+      $query = "INSERT INTO configuration_data SET configuration_id='$configuration_id', data='$data',
+                                                   date_created=UNIX_TIMESTAMP() $update_query
+                 ON DUPLICATE KEY UPDATE data='$data', last_updated=UNIX_TIMESTAMP()";
+                 Corelog::log($query, Corelog::INFO);
+      DB::query('configuration', $query);
+    }
+  }
 }

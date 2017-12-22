@@ -29,6 +29,12 @@ CREATE TABLE template
 CREATE INDEX template_created_by ON template (created_by);
 
 /*==============================================================*/
+/* Desc: Dumping Default System configurations                  */
+/*==============================================================*/
+-- service
+INSERT INTO configuration VALUES (NULL,'service','email_status','0',254); --ready
+
+/*==============================================================*/
 /* Table: insert email module permissions                       */
 /*==============================================================*/
 -- Template permissions

@@ -68,7 +68,6 @@ class Template extends Message
    * @var string 
    */
   protected $attachment = NULL;
-  protected $attachment_alt = NULL; // @todo remove this if possible
 
   /**
    * @property-read integer $length
@@ -188,12 +187,8 @@ class Template extends Message
 
   public function save()
   {
-    if (!empty($this->attachment_alt)) {
-      rename($this->attachment, $this->attachment_alt);
-      $this->attachment = $this->attachment_alt;
-    }
     $attachment_data = '';
-    if (!empty($this->attachment)) {
+    if (file_exists($this->attachment)) {
       $attachment_data = file_get_contents($this->attachment);
     }
     $this->length = strlen($this->body . $this->body_alt . $this->subject . $attachment_data);
@@ -228,12 +223,7 @@ class Template extends Message
     $this->subject = $oToken->render_variable($this->subject, $default_value);
     $this->body = $oToken->render_variable($this->body, $default_value);
     $this->body_alt = $oToken->render_variable($this->body_alt, $default_value);
-    if (file_exists($this->attachment)) {
-      $attachment_content = $oToken->render_template($this->attachment, $default_value);
-      $this->attachment_alt = $this->attachment;
-      $this->attachment = tempnam('/tmp', 'temp_template');
-      file_put_contents($this->attachment, $attachment_content);
-    }
+    $this->attachment = $oToken->render_variable($this->attachment, $default_value);
   }
 
 }

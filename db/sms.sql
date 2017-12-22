@@ -26,6 +26,12 @@ CREATE TABLE text
 ) ENGINE = InnoDB;
 
 /*==============================================================*/
+/* Desc: Dumping Default System configurations                  */
+/*==============================================================*/
+-- service
+INSERT INTO configuration VALUES (NULL,'service','sms_status','0',254); --ready
+
+/*==============================================================*/
 /* Table: insert sms module permissions                         */
 /*==============================================================*/
 -- Text permissions

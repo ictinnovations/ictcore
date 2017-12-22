@@ -77,7 +77,8 @@ class TemplateApi extends Api
 
     $oTemplate = new Template($template_id);
     if (!empty($data)) {
-      if (in_array($mime, Template::$media_supported)) {
+      /* All media type are allowed for attachment
+      if (in_array($mime, Template::$media_supported)) { */
         $extension = array_search($mime, Template::$media_supported);
         $filename = tempnam('/tmp', 'template') . ".$extension";
         file_put_contents($filename, $data);
@@ -87,9 +88,9 @@ class TemplateApi extends Api
         } else {
           throw new CoreException(417, 'Template media upload failed');
         }
-      } else {
+      /* } else {
         throw new CoreException(415, 'Template media upload failed, invalid file type');
-      }
+      } */
     } else {
       throw new CoreException(411, 'Template media upload failed, no file uploaded');
     }

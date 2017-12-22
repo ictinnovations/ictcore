@@ -121,7 +121,7 @@ class Token
             // 'cache' => $path_cache,
     ));
     $twig->getExtension('core')->setEscaper('json', function($twigEnv, $string, $charset) {
-        return addcslashes(string_replace("\r", '', $string), "\"\n\r");
+        return addcslashes(str_replace("\r", '', $string), "\"\n\r");
     });
 
     /* ------------------------------------------------------ RENDER TEMPLATE */

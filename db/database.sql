@@ -216,6 +216,7 @@ INSERT INTO permission VALUES (NULL, 'permission', '');
 INSERT INTO permission VALUES (NULL, 'permission_create', '');
 INSERT INTO permission VALUES (NULL, 'permission_read', '');
 INSERT INTO permission VALUES (NULL, 'permission_list', '');
+INSERT INTO permission VALUES (NULL, 'permission_delete', '');
 -- Campaign permissions
 INSERT INTO permission VALUES (NULL, 'campaign', '');
 INSERT INTO permission VALUES (NULL, 'campaign_create', '');
@@ -342,7 +343,7 @@ CREATE TABLE configuration
 /* Desc: Dumping Default System configurations                  */
 /*==============================================================*/
 -- website
--- for ICTCore it is better to have more configurations in database
+-- for ICTCore it is better to have less configurations in database
 
 /*==============================================================*/
 /* Table: configuration_data (will store configuration data)    */
@@ -637,6 +638,7 @@ CREATE TABLE contact_link
 /*==============================================================*/
 /* Table: ivr                                                   */
 /*==============================================================*/
+
 CREATE TABLE ivr
 (
    ivr_id               int(11) unsigned       NOT NULL auto_increment,

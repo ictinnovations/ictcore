@@ -75,7 +75,7 @@ function application_Hangup(s, status, arg)
 
   -- if hangup application is set then also include hangup application results as extra
   if hangupApplicationID ~= nil then
-    if app_id ~= nil then
+    if (app_id ~= nil and app_id ~= hangupApplicationID) then
       -- collect data for hangup application
       extra_hangup_request = ictcore_access   -- include default parameters
       extra_hangup_request['spool_id']         = spool_id

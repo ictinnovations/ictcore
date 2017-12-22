@@ -35,7 +35,7 @@ class User extends Conf
       return false; // can do nothing
     }
 
-    $configuration = self::database_conf_get($filter);
+    $configuration = self::database_conf_load($filter);
     self::$user_id = $user_id;
     parent::merge_array($configuration);
   }

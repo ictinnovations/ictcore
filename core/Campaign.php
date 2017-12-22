@@ -71,28 +71,28 @@ class Campaign
   public static function search($aFilter = array())
   {
     $aCampaign = array();
-    $from_str = self::$table;
+    $from_str = self::$table . " c LEFT JOIN program p ON c.program_id=p.program_id";
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
         case 'campaign_id':
-          $aWhere[] = "$search_field = $search_value";
+          $aWhere[] = "c.$search_field = $search_value";
           break;
         case 'program_id':
-          $aWhere[] = "$search_field LIKE '%$search_value'";
+          $aWhere[] = "c.$search_field LIKE '%$search_value'";
           break;
         case 'group_id':
-          $aWhere[] = "$search_field = '$search_value'";
+          $aWhere[] = "c.$search_field = '$search_value'";
           break;
         case 'status':
-          $aWhere[] = "$search_field LIKE '%$search_value%'";
+          $aWhere[] = "c.$search_field LIKE '%$search_value%'";
           break;
       }
     }
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
-    $query = "SELECT * FROM " . $from_str;
+    $query = "SELECT c.*, p.type AS program_type FROM " . $from_str;
     Corelog::log("Campaign search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('Campaign', $query);
     while ($data = mysql_fetch_assoc($result)) {

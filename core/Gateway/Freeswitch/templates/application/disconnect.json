@@ -1,7 +1,6 @@
 {
   "application_id": "{{ application.application_id }}",
   "input": {
-    "disconnect_application_id": "",
     "application_result": "success"
   },
   "output": {

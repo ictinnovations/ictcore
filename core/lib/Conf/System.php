@@ -25,7 +25,9 @@ class System extends Conf
     }
     Corelog::log("configuration requested for node: $node_id", Corelog::DEBUG);
 
-    $filter[] = '(c.permission_flag & ' . Conf::PERMISSION_GLOBAL_READ . ')=' . Conf::PERMISSION_GLOBAL_READ;
+    $can_read_global = '(c.permission_flag & ' . Conf::PERMISSION_GLOBAL_READ . ')=' . Conf::PERMISSION_GLOBAL_READ;
+    $can_read_node = '(c.permission_flag & ' . Conf::PERMISSION_NODE_READ . ')=' . Conf::PERMISSION_NODE_READ;
+    $filter[] = '(' . $can_read_global . ' OR ' . $can_read_node . ')';
     $filter[] = 'cd.class=' . Conf::SYSTEM;
     if (!empty($node_id)) {
       $filter[] = "(cd.node_id=$node_id OR cd.node_id=" . Conf::NODE_ALL . ")";
@@ -33,7 +35,7 @@ class System extends Conf
       $filter[] = "cd.node_id=" . Conf::NODE_ALL;
     }
 
-    $configuration = self::database_conf_get($filter);
+    $configuration = self::database_conf_load($filter);
     self::$node_id = $node_id;
     parent::merge_array($configuration);
   }

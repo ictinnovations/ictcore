@@ -106,7 +106,7 @@ class RoleApi extends Api
   public function allow($role_id, $permission_id)
   {
     $this->_authorize('role_update');
-    $this->_authorize('permission_update');
+    $this->_authorize('permission_create');
 
     $oRole = new Role($role_id);
     $oPermission = new Permission($permission_id);
@@ -122,7 +122,7 @@ class RoleApi extends Api
   public function disallow($role_id, $permission_id)
   {
     $this->_authorize('role_update');
-    $this->_authorize('permission_update');
+    $this->_authorize('permission_delete');
 
     $oRole = new Role($role_id);
     $oPermission = new Permission($permission_id);

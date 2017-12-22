@@ -20,15 +20,15 @@ Source1:  composer
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %if %{rhel} < 7
-BuildRequires: php subversion
+BuildRequires: php php-process php-cli subversion
 %else
-BuildRequires: php subversion composer
+BuildRequires: php php-process php-cli subversion composer
 %endif
 
 Provides: ictcore
 
 # ICTCore developed in php
-Requires: php php-cli php-curl php-mcrypt php-mbstring php-xmlrpc php-posix php-mysql php-xml
+Requires: php php-cli php-curl php-mcrypt php-mbstring php-xmlrpc php-process php-mysql php-xml
 Requires: php-pear php-pear-Pager php-pear-SOAP php-pear-HTTP-Request
 Requires: php-pecl-imagick php-pecl-json php-pecl-libevent
 # ICTCore use mysql as database in centos 6 or mariadb in centos 7
@@ -49,7 +49,7 @@ ICTCore is backend library for voice, fax, sms and email related services, it pr
 %package freeswitch
 Group: ict
 Summary: Freeswitch addon for ICTCore
-Requires: ictcore freeswitch freeswitch-config-vanilla freeswitch-lua freeswitch-application-curl curl
+Requires: ictcore freeswitch freeswitch-config-vanilla freeswitch-lua freeswitch-application-curl curl sed
 Provides: ictcore-freeswitch ictcore-gateway-voice ictcore-gateway-fax
 
 %description freeswitch
@@ -422,6 +422,8 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /sbin/chkconfig freeswitch on
 /sbin/service freeswitch restart
 %else
+# fix pid file path for freeswitch service
+sed -i 's/pidfile: \/usr\/local\/freeswitch\/run/pidfile: \/run\/freeswitch/g' /etc/rc.d/init.d/freeswitch
 /usr/bin/systemctl enable freeswitch.service
 /usr/bin/systemctl restart freeswitch.service
 %endif
@@ -521,6 +523,16 @@ echo "apache" >> /etc/mail/trusted-users
 %endif
 
 %changelog
+* Thu Dec 21 2017 Nasir Iqbal <nasir@ictinnovations.com> - 0.8.0
+- Campaign support and APIs added
+- Extension support added for accounts
+- Sip, SMTP and SMPP added as provider sub-type
+- Authentication improved, JWT support added
+- Media related APIs improved for file upload / download support
+- Rest URL structure improved as per REST standards / recommendations
+- CORS (cross origin) support added
+- Twig based template added for gateway configurations and Application data
+
 * Tue Sep 20 2016 Nasir Iqbal <nasir@ictinnovations.com> - 0.7.0
 - Refactoring, logic and flow and api refactoring (third release)
 

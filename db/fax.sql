@@ -30,6 +30,12 @@ CREATE TABLE document
 CREATE INDEX document_created_by ON document (created_by);
 
 /*==============================================================*/
+/* Desc: Dumping Default System configurations                  */
+/*==============================================================*/
+-- service
+INSERT INTO configuration VALUES (NULL,'service','fax_status','0',254); --ready
+
+/*==============================================================*/
 /* Table: insert fax module permissions                         */
 /*==============================================================*/
 -- Document permissions

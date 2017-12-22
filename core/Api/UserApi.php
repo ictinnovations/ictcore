@@ -107,7 +107,7 @@ class UserApi extends Api
   public function allow($user_id, $permission_id)
   {
     $this->_authorize('user_update');
-    $this->_authorize('permission_update');
+    $this->_authorize('permission_create');
 
     $oUser = new User($user_id);
     $oPermission = new Permission($permission_id);
@@ -123,7 +123,7 @@ class UserApi extends Api
   public function disallow($user_id, $permission_id)
   {
     $this->_authorize('user_update');
-    $this->_authorize('permission_update');
+    $this->_authorize('permission_delete');
 
     $oUser = new User($user_id);
     $oPermission = new Permission($permission_id);

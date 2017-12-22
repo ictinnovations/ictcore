@@ -1,3 +1,14 @@
+ICTCore 0.8.0
+-------------
+
+Dated: 21-December-2017
+
+* Campaign support and APIs added
+* Authentication improved, JWT support added
+* Media related APIs improved for file upload / download support.
+* Rest URL structure improved as per REST standards / recommendations
+* CORS (cross origin) support added
+
 ICTCore 0.7.6
 --------------
 

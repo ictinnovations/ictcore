@@ -43,31 +43,31 @@ Install
 -------
 Currently ICTCore binaries are available for CentOs 6 and 7, To install ICTCore you need a freshly installed server and then you can follow the instructions mentioned in following. If you are looking for source code you can find it at github [ICTCore: Open Source Unified Communications Framework](https://github.com/ictinnovations/ictcore)
 
-First of all we need to install ict and epel repositories
-#### for centos 7
+1. First of all we need to install ict and epel repositories  
+for CentOs 7  
 
     rpm -Uvh 'https://service.ictinnovations.com/repo/7/ict-release-7-4.el7.centos.noarch.rpm'  
+    rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'  
     yum install epel-release  
 
-#### for CentOs 6 also install Freeswitch repository
+for CentOs 6  
 
     rpm -Uvh 'http://service.ictinnovations.com/repo/6/ict-release-6-2.noarch.rpm'  
     rpm -Uvh 'http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'  
     rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'  
 
-1. Install ICTCore  
-    `
+2. Install ICTCore  
+
     yum update  
     yum install ictcore ictcore-voice ictcore-fax ictcore-email  
-    `
 
-2. Create a new database and database user for ictcore
+3. Create a new database and database user for ictcore
 
-3. Initiate / populate newly created database using scripts from /usr/ictcore/db/*
+4. Initiate / populate newly created database using scripts from `/usr/ictcore/db/*`
 
-4. Update /etc/ictcore.conf and /etc/odbc.ini for database access
+5. Update `/etc/ictcore.conf` and `/etc/odbc.ini` for database access
 
-5. Restart HTTP / Apache server
+6. Restart HTTP / Apache server
 
 Getting started
 ---------------

@@ -177,24 +177,27 @@ class Service
 
   public static function config_status($new_status = null)
   {
-    $status_variable = 'service_' . static::SERVICE_TYPE . '_status';
+    $status_variable = 'service:' . static::SERVICE_TYPE . '_status';
     $current_status = Conf::get($status_variable, static::STATUS_READY);
     if ($new_status === null) {
       return $current_status;
     }
 
-    Conf::set($status_variable, $new_status);
-    return $current_status;
+    $reference = array(
+      'class' => Conf::SYSTEM,
+      'node_id' => Conf::get('node:node_id', null)
+    );
+    Conf::set($status_variable, $new_status, true, $reference, Conf::PERMISSION_NODE_WRITE);
+    return Conf::get($status_variable, static::STATUS_READY);
   }
   
 
   public function config_update()
   {
     $status = $this->config_status();
-    if (($status | static::STATUS_NEED_RELOAD) == static::STATUS_NEED_RELOAD) {
-      if ($this->config_reload()) {
-        $this->config_status(static::STATUS_READY);
-      }
+    if (($status & static::STATUS_NEED_RELOAD) == static::STATUS_NEED_RELOAD) {
+      $this->config_update_reload();
+      $this->config_status(static::STATUS_READY);
     }
   }
 

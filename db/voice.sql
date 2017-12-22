@@ -30,6 +30,12 @@ CREATE TABLE recording
 CREATE INDEX recording_created_by ON recording (created_by);
 
 /*==============================================================*/
+/* Desc: Dumping Default System configurations                  */
+/*==============================================================*/
+-- service
+INSERT INTO configuration VALUES (NULL,'service','voice_status','0',254); --ready
+
+/*==============================================================*/
 /* Table: insert voice module permissions                       */
 /*==============================================================*/
 -- Recording permissions
