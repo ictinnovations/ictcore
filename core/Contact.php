@@ -96,7 +96,7 @@ class Contact
   public static function search($aFilter = array(), $full = false)
   {
     $aContact = array();
-    $from_str = self::$table." c JOIN ".self::$table_link." l ON c.contact_id=l.contact_id";
+    $from_str = self::$table." c LEFT JOIN ".self::$table_link." l ON c.contact_id=l.contact_id";
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {

@@ -40,7 +40,7 @@ Requires: mariadb mariadb-server mysql-connector-odbc
 # ICTCore exposse its services via apache web server
 Requires: httpd
 # Other dependencies
-Requires: coreutils acl sudo tzdata ntp cronie dos2unix
+Requires: coreutils acl sudo tzdata ntp cronie dos2unix shadow-utils
 
 
 %description
@@ -422,8 +422,6 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /sbin/chkconfig freeswitch on
 /sbin/service freeswitch restart
 %else
-# fix pid file path for freeswitch service
-sed -i 's/pidfile: \/usr\/local\/freeswitch\/run/pidfile: \/run\/freeswitch/g' /etc/rc.d/init.d/freeswitch
 /usr/bin/systemctl enable freeswitch.service
 /usr/bin/systemctl restart freeswitch.service
 %endif
@@ -525,6 +523,7 @@ echo "apache" >> /etc/mail/trusted-users
 %changelog
 * Thu Dec 21 2017 Nasir Iqbal <nasir@ictinnovations.com> - 0.8.0
 - Campaign support and APIs added
+- Call Transfer application and Agent program added
 - Extension support added for accounts
 - Sip, SMTP and SMPP added as provider sub-type
 - Authentication improved, JWT support added

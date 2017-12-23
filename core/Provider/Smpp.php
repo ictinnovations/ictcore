@@ -21,6 +21,12 @@ class Smpp extends Provider
    */
   protected $type = 'smpp';
 
+  /**
+   * @property integer $service_flag
+   * @var integer
+   */
+  public $service_flag = Sms::SERVICE_FLAG;
+
   public static function search($aFilter = array())
   {
     $aFilter['type'] = 'smpp';

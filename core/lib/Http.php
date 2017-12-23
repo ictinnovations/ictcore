@@ -118,7 +118,10 @@ class Http extends Data implements AuthServer
   protected function getBasic($headers) {
     // mod_php
     if ($this->server_get('PHP_AUTH_USER', null)) {
-        return array($this->server_get('PHP_AUTH_USER'), $this->server_get('PHP_AUTH_USER'));
+        return array(
+          'username' => $this->server_get('PHP_AUTH_USER'),
+          'password' => $this->server_get('PHP_AUTH_PW')
+        );
     } else { // most other servers
       if (!empty($headers)) {
         list ($username, $password) = explode(':',base64_decode(substr($headers, 6)));

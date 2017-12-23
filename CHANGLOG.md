@@ -4,6 +4,7 @@ ICTCore 0.8.0
 Dated: 21-December-2017
 
 * Campaign support and APIs added
+* Call Transfer application and Agent program added
 * Authentication improved, JWT support added
 * Media related APIs improved for file upload / download support.
 * Rest URL structure improved as per REST standards / recommendations

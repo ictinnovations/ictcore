@@ -78,10 +78,7 @@ class Api
 
   public function send_error($code, $message)
   {
-    if ($this->interface_type == 'rest') {
-      $error = array('error' => array('code' => $code, 'message' => $message));
-      $this->oInterface->sendData($error);
-    }
+    $this->oInterface->handleError($code, $message);
   }
 
   protected static function rest_include()

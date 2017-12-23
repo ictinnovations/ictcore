@@ -842,7 +842,7 @@ list all exiting transmissions, optionally client can filter transmissions using
 * __Response__  
 an array of transmissions
 
-### GET transmissions/{transmission_id}/send ( or /call or /dial )
+### GET transmissions/{transmission_id}/send
 Trigger already prepared transmission to dial / connect assigned contact and deliver desired message.  
 __Note:__ call or dial synonymous can also be used in place of send
 

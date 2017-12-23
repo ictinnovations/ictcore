@@ -31,6 +31,9 @@ try {
 } catch (CoreException $e) {
   // send error
   $oApi->send_error($e->getCode(), $e->getMessage());
+} catch (Exception $e) {
+  // send error
+  $oApi->send_error($e->getCode(), $e->getMessage());
 }
 
 exit();

@@ -10,6 +10,7 @@ namespace ICT\Core\Provider;
  * *************************************************************** */
 
 use ICT\Core\Provider;
+use ICT\Core\Service\Fax;
 use ICT\Core\Service\Voice;
 
 class Sip extends Provider
@@ -20,6 +21,12 @@ class Sip extends Provider
    * @var string 
    */
   protected $type = 'sip';
+
+  /**
+   * @property integer $service_flag
+   * @var integer
+   */
+  public $service_flag = 3; // i.e (Voice::SERVICE_FLAG | Fax::SERVICE_FLAG);
 
   public static function search($aFilter = array())
   {

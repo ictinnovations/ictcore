@@ -10,6 +10,7 @@ namespace ICT\Core\Provider;
  * *************************************************************** */
 
 use ICT\Core\Provider;
+use ICT\Core\Service\Email;
 
 class Smtp extends Provider
 {
@@ -19,6 +20,12 @@ class Smtp extends Provider
    * @var string 
    */
   protected $type = 'smtp';
+
+  /**
+   * @property integer $service_flag
+   * @var integer
+   */
+  public $service_flag = Email::SERVICE_FLAG;
 
   public static function search($aFilter = array())
   {

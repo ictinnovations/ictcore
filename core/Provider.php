@@ -114,7 +114,7 @@ class Provider
           $aWhere[] = "$search_field = '$search_value'";
           break;
         case 'service_flag':
-          $aWhere[] = "($search_field | $search_value) = $search_value";
+          $aWhere[] = "($search_field & $search_value) = $search_value";
           break;
       }
     }

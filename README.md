@@ -44,22 +44,29 @@ Install
 Currently ICTCore binaries are available for CentOs 6 and 7, To install ICTCore you need a freshly installed server and then you can follow the instructions mentioned in following. If you are looking for source code you can find it at github [ICTCore: Open Source Unified Communications Framework](https://github.com/ictinnovations/ictcore)
 
 1. First of all we need to install ict and epel repositories  
+
 for CentOs 7  
 
-    rpm -Uvh 'https://service.ictinnovations.com/repo/7/ict-release-7-4.el7.centos.noarch.rpm'  
-    rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'  
-    yum install epel-release  
+```
+    yum install -y https://service.ictinnovations.com/repo/7/ict-release-7-4.el7.centos.noarch.rpm  
+    yum install -y http://files.freeswitch.org/freeswitch-release-1-6.noarch.rpm  
+    yum install -y epel-release  
+```
 
 for CentOs 6  
 
+```
     rpm -Uvh 'http://service.ictinnovations.com/repo/6/ict-release-6-2.noarch.rpm'  
     rpm -Uvh 'http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'  
     rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'  
+```
 
 2. Install ICTCore  
 
+```
     yum update  
     yum install ictcore ictcore-voice ictcore-fax ictcore-email  
+```
 
 3. Create a new database and database user for ictcore
 
@@ -73,6 +80,7 @@ Getting started
 ---------------
 Following is an example about sending fax by using ICTCore
 
+```
     // prepare a program with fax document
     $faxProgram = new Sendfax();
     $faxProgram->file_name = '/some/pdf/file.pdf';
@@ -89,6 +97,7 @@ Following is an example about sending fax by using ICTCore
 
     // or dispatch immediately
     $faxTransmission->send();
+```
 
 Get involved!
 -------------

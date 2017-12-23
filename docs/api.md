@@ -111,7 +111,7 @@ Transmission - the actual call or action
 * GET transmissions
 * GET transmissions/{transmission_id}
 * DELETE transmissions/{transmission_id}
-* GET transmissions/{transmission_id}/send ( or /call or /dial )
+* GET transmissions/{transmission_id}/send
 * GET transmissions/{transmission_id}/retry
 * GET transmissions/{transmission_id}/clone
 * PUT transmissions/{transmission_id}/schedule

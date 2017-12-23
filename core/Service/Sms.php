@@ -12,6 +12,7 @@ namespace ICT\Core\Service;
 use ICT\Core\Application;
 use ICT\Core\Gateway\Kannel;
 use ICT\Core\Message\Text;
+use ICT\Core\Provider;
 use ICT\Core\Service;
 use ICT\Core\Token;
 
@@ -129,7 +130,7 @@ class Sms extends Service
 
   // no private accounts for user
 
-  public function config_update_provider(Proivder $oProvider)
+  public function config_update_provider(Provider $oProvider)
   {
     if ($oProvider->active) {
       $oToken = new Token();

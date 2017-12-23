@@ -37,6 +37,7 @@ class Voice extends Service
         'connect',
         'disconnect',
         'voice_play',
+        'transfer',
         'log'
     );
     $capabilities['account'] = array(
@@ -104,7 +105,8 @@ class Voice extends Service
       case 'inbound':
       case 'connect':
       case 'disconnect':
-      case 'play_voice':
+      case 'voice_play':
+      case 'transfer':
       case 'log':
         $template_path = "application/$template_name.json";
         break;

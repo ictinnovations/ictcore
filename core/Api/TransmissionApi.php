@@ -125,10 +125,6 @@ class TransmissionApi extends Api
    * Gets the transmission by id
    *
    * @url GET /transmissions/$transmission_id
-   * @url GET /calls/$transmission_id
-   * @url GET /faxes/$transmission_id
-   * @url GET /smses/$transmission_id
-   * @url GET /emails/$transmission_id
    */
   public function read($transmission_id)
   {
@@ -148,10 +144,6 @@ class TransmissionApi extends Api
    * Delete a transmission
    *
    * @url DELETE /transmissions/$transmission_id
-   * @url DELETE /calls/$transmission_id
-   * @url DELETE /faxes/$transmission_id
-   * @url DELETE /smses/$transmission_id
-   * @url DELETE /emails/$transmission_id
    */
   public function remove($transmission_id)
   {
@@ -170,16 +162,8 @@ class TransmissionApi extends Api
   /**
    * Send already saved transmission
    *
-   * @url GET /transmissions/$transmission_id/send
-   * @url GET /calls/$transmission_id/dial
-   * @url GET /faxes/$transmission_id/send
-   * @url GET /smses/$transmission_id/send
-   * @url GET /emails/$transmission_id/send
-   * @url GET /transmissions/$transmission_id/retry
-   * @url GET /calls/$transmission_id/retry
-   * @url GET /faxes/$transmission_id/retry
-   * @url GET /smses/$transmission_id/retry
-   * @url GET /emails/$transmission_id/retry
+   * @url POST /transmissions/$transmission_id/send
+   * @url POST /transmissions/$transmission_id/retry
    * 
    * TODO / TBD: Replace it with POST or PUT as GET is not allowed to modify data
    */
@@ -195,10 +179,6 @@ class TransmissionApi extends Api
    * Schedule transmission 
    *
    * @url PUT /transmissions/$transmission_id/schedule
-   * @url PUT /calls/$transmission_id/schedule
-   * @url PUT /faxes/$transmission_id/schedule
-   * @url PUT /smses/$transmission_id/schedule
-   * @url PUT /emails/$transmission_id/schedule
    */
   public function schedule_create($transmission_id, $data = array())
   {
@@ -222,10 +202,6 @@ class TransmissionApi extends Api
    * Cancel transmission schedule
    *
    * @url DELETE /transmissions/$transmission_id/schedule
-   * @url DELETE /calls/$transmission_id/schedule
-   * @url DELETE /faxes/$transmission_id/schedule
-   * @url DELETE /smses/$transmission_id/schedule
-   * @url DELETE /emails/$transmission_id/schedule
    */
   public function schedule_cancel($transmission_id)
   {
@@ -240,10 +216,6 @@ class TransmissionApi extends Api
    * Create new transmission by cloning existing one
    *
    * @url GET /transmissions/$transmission_id/clone
-   * @url GET /calls/$transmission_id/clone
-   * @url GET /faxes/$transmission_id/clone
-   * @url GET /smses/$transmission_id/clone
-   * @url GET /emails/$transmission_id/clone
    * 
    * TBD / TODO: replace GET method with POST, as it voilate REST GET no data change rule
    */
@@ -265,10 +237,6 @@ class TransmissionApi extends Api
    * Get transmission status
    *
    * @url GET /transmissions/$transmission_id/status
-   * @url GET /calls/$transmission_id/status
-   * @url GET /faxes/$transmission_id/status
-   * @url GET /smses/$transmission_id/status
-   * @url GET /emails/$transmission_id/status
    */
   public function status($transmission_id)
   {
@@ -282,10 +250,6 @@ class TransmissionApi extends Api
    * Get transmission details
    *
    * @url GET /transmissions/$transmission_id/detail
-   * @url GET /calls/$transmission_id/detail
-   * @url GET /faxes/$transmission_id/detail
-   * @url GET /smses/$transmission_id/detail
-   * @url GET /emails/$transmission_id/detail
    */
   public function detail($transmission_id)
   {
@@ -299,10 +263,6 @@ class TransmissionApi extends Api
    * Get transmission details
    *
    * @url GET /transmissions/$transmission_id/result
-   * @url GET /calls/$transmission_id/result
-   * @url GET /faxes/$transmission_id/result
-   * @url GET /smses/$transmission_id/result
-   * @url GET /emails/$transmission_id/result
    */
   public function result($transmission_id)
   {
