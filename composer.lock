@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "531a9c2867c7fdd110028ce6ef0d5df7",
+    "content-hash": "9adc79f9ac83b570181bce4808149ec9",
     "packages": [
         {
             "name": "aza/clibase",
@@ -309,19 +309,19 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Firehed/ProcessManager.git",
-                "reference": "a6feb8c216d6db6460fbd65e0ac5e5c767e94358"
+                "url": "https://github.com/ictinnovations/ProcessManager.git",
+                "reference": "8c6b261365457b83d7ef4fc70f3bce5c1347ba4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Firehed/ProcessManager/zipball/a6feb8c216d6db6460fbd65e0ac5e5c767e94358",
-                "reference": "a6feb8c216d6db6460fbd65e0ac5e5c767e94358",
+                "url": "https://api.github.com/repos/ictinnovations/ProcessManager/zipball/8c6b261365457b83d7ef4fc70f3bce5c1347ba4b",
+                "reference": "8c6b261365457b83d7ef4fc70f3bce5c1347ba4b",
                 "shasum": ""
             },
             "require": {
                 "ext-pcntl": "*",
                 "ext-posix": "*",
-                "php": ">=5.4.0",
+                "php": ">=5.3.0",
                 "psr/log": ">=1.0.0"
             },
             "type": "library",
@@ -330,12 +330,14 @@
                     "Firehed\\ProcessControl\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "description": "Simple base for daemonized wokers",
-            "time": "2016-02-27T01:29:32+00:00"
+            "support": {
+                "source": "https://github.com/ictinnovations/ProcessManager/tree/master"
+            },
+            "time": "2017-12-18T16:12:24+00:00"
         },
         {
             "name": "jacwright/restserver",
@@ -343,12 +345,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ictinnovations/RestServer.git",
-                "reference": "b816e32291f0e5329e84a1ede8b1ef3114eb101a"
+                "reference": "2b99afbd9702795fea78eeb0ce7797df6bd8b8bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ictinnovations/RestServer/zipball/b816e32291f0e5329e84a1ede8b1ef3114eb101a",
-                "reference": "b816e32291f0e5329e84a1ede8b1ef3114eb101a",
+                "url": "https://api.github.com/repos/ictinnovations/RestServer/zipball/2b99afbd9702795fea78eeb0ce7797df6bd8b8bf",
+                "reference": "2b99afbd9702795fea78eeb0ce7797df6bd8b8bf",
                 "shasum": ""
             },
             "require": {
@@ -385,7 +387,7 @@
             "support": {
                 "source": "https://github.com/ictinnovations/RestServer/tree/master"
             },
-            "time": "2017-10-11T14:13:33+00:00"
+            "time": "2017-12-23T13:24:13+00:00"
         },
         {
             "name": "nategood/httpful",

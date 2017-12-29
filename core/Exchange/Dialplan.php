@@ -56,28 +56,28 @@ class Dialplan
 
   /**
    * @property string $source 
-   * @see function Dialplan::set_source()
+   * @see void function Dialplan::set_source()
    * @var string
    */
   private $source = '%';
 
   /**
    * @property string $destination 
-   * @see function Dialplan::set_destination()
+   * @see void function Dialplan::set_destination()
    * @var string
    */
   private $destination = '%';
 
   /**
    * @property string $context 
-   * @see function Dialplan::set_context()
+   * @see void function Dialplan::set_context()
    * @var string
    */
   private $context = '%';
 
   /**
    * @property integer $weight
-   * @see function Dialplan::set_weight()
+   * @see void function Dialplan::set_weight()
    * @var integer
    */
   private $weight = 0;

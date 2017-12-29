@@ -95,8 +95,8 @@ class CampaignApi extends Api
   /**
    * Start campaign
    *
-   * @url GET /campaign/$campaign_id/start
-   * @url PUT /campaign/$campaign_id/start
+   * @url GET /campaigns/$campaign_id/start
+   * @url PUT /campaigns/$campaign_id/start
    */
   public function start_campaign($campaign_id)
   {
@@ -109,8 +109,8 @@ class CampaignApi extends Api
   /**
    * stop campaign
    *
-   * @url GET /campaign/$campaign_id/stop
-   * @url PUT /campaign/$campaign_id/stop
+   * @url GET /campaigns/$campaign_id/stop
+   * @url PUT /campaigns/$campaign_id/stop
    */
   public function stop_campaign($campaign_id)
   {
@@ -123,8 +123,8 @@ class CampaignApi extends Api
   /**
    * Schedule Campaign 
    *
-   * @url PUT /campaign/$campaign_id/$action/schedule
-   * @url POST /campaign/$campaign_id/$action/schedule
+   * @url PUT /campaigns/$campaign_id/$action/schedule
+   * @url POST /campaigns/$campaign_id/$action/schedule
    */
   public function schedule_create($campaign_id, $action, $data = array())
   {
@@ -146,7 +146,7 @@ class CampaignApi extends Api
   /**
    * Cancel campaign schedule
    *
-   * @url DELETE /campaign/$campaign_id/schedule
+   * @url DELETE /campaigns/$campaign_id/schedule
    */
   public function schedule_cancel($campaign_id)
   {

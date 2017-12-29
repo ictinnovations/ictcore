@@ -292,7 +292,7 @@ class Document extends Message
     return $this->pages;
   }
 
-  public function create_pdf($sourceFile, $type = '')
+  public static function create_pdf($sourceFile, $type = '')
   {
     switch ($type) {
       case 'tif':

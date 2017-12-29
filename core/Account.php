@@ -53,7 +53,7 @@ class Account
 
   /**
    * @property string $username
-   * @see function Account::set_username()
+   * @see void function Account::set_username()
    * @var string 
    */
   protected $username = NULL;
@@ -84,7 +84,7 @@ class Account
 
   /**
    * @property-read integer $user_id
-   * @see function Account::associate()
+   * @see void function Account::associate()
    * @var integer
    */
   protected $user_id = NULL;

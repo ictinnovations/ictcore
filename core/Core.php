@@ -54,6 +54,8 @@ class Core
     // update all status just before dying
     self::wrapup($oSession->transmission);
     Corelog::log('Transmission execution completed', Corelog::FLOW);
+
+    return $oTransmission->oSpool->spool_id;
   }
 
   /**

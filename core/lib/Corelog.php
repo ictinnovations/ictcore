@@ -34,6 +34,7 @@ class Corelog
   const AUTH = 2048;
 
   public static $process_id = NULL;
+  public static $log_file = 'ictcore.log';
 
   public static function error_handler($error_no, $error_string, $error_file, $error_line, $error_context) {
     $message = "$error_string in $error_file on line $error_line";
@@ -49,6 +50,11 @@ class Corelog
         $class = Corelog::NOTICE;
     }
     Corelog::log($message, $class, $error_context);
+  }
+
+  public static function set_file($filename)
+  {
+    Corelog::$log_file = $filename;
   }
 
   public static function log($message, $class = Corelog::INFO, $extra = null)
@@ -78,7 +84,7 @@ class Corelog
         }
         $message .= "\n=== backtrace end ===\n";
       }
-      return error_log($message, 3, $path_log . '/ictcore.log');
+      return error_log($message, 3, $path_log . DIRECTORY_SEPARATOR . Corelog::$log_file);
     }
     return false;
   }

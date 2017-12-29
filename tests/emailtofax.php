@@ -6,9 +6,7 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-use ICT\Core\Conf;
 use ICT\Core\Core;
-use ICT\Core\Corelog;
 use ICT\Core\Gateway\Sendmail;
 use ICT\Core\Request;
 

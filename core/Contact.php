@@ -282,7 +282,7 @@ class Contact
     if ($group_id == null) {
       $link_delete_query = "DELECT FROM ".self::$table_link." WHERE contact_id=%contact_id%";
     } else {
-      $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id=%contact_id% AND group_id=%grooup_id%";
+      $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id=%contact_id% AND group_id=%group_id%";
     }
     DB::query(self::$table, $req_query, array('contact_id' => $this->contact_id, 'group_id' => $group_id));
     $get_link_count = mysql_query("SELECT * from contact_link");

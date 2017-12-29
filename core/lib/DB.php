@@ -293,7 +293,7 @@ class DB
     $query_data = implode($data, ', ');
     $query_full = "$query_start $query_data $query_end";
     $qry_result = mysql_query($query_full, DB::$link);
-    Corelog::log("DB:update query executed on table: $table", Corelog::DEBUG);
+    Corelog::log("DB:update query executed on table: $table", Corelog::DEBUG, $query_full);
     if ($qry_result === FALSE) {
       Corelog::log("DB:update error table: $table error: " . mysql_error(DB::$link), Corelog::WARNING);
       return FALSE;

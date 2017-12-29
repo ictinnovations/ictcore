@@ -2,7 +2,7 @@
 $template = array();
 
 $template['subject'] = "You have received a Fax";
-$template['attachment'] = "[fax:document:pdf_file]";
+$template['attachment'] = "[fax:document:file_name]";
 $template['body'] = <<<EOS
 <p>
 Dear [transmission:account:first_name] [transmission:account:last_name],

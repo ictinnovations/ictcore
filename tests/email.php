@@ -6,50 +6,9 @@
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-use ICT\Core\Conf;
 use ICT\Core\Core;
-use ICT\Core\Corelog;
 use ICT\Core\Gateway\Sendmail;
 use ICT\Core\Request;
-
-
-
-  "to": "nasir@ictinnovations.com",
-  "from": "12132942943@localhost",
-  "subject": "Fax delivery failed",
-  "body": "<p>
-Dear  , 
-</p>
-
-<p>
-We have tried to send your fax to 12132942943 but unfortunately it failed.
-</p>
-Error: 
-<p>
-Please try again later.
-</p>
-
-<p>
-Thanks<br/>
------------------------<br />
-The   Team
-</p>",
-  "body_alt": "Dear  , 
-
-We have tried to send your fax to 12132942943 but unfortunately it failed.
-
-Error: 
-
-Please try again later.
-
-Thanks
------------------------
-The   Team",
-  "attachment": "",
-  "spool_id": "727",
-  "application_id": "326"
-
-
 
 // remove sendmail and bin parent by .. / ..
 chdir(dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'core');

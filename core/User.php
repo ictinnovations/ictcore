@@ -9,6 +9,7 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use Exception;
 use Firebase\JWT\JWT;
 use ICT\Core\User\Permission;
 use ICT\Core\User\Role;
@@ -433,7 +434,8 @@ class User
         "iat" => time(),
         "nbf" => time(),
         "exp" => time() + Conf::get('security:token_expiry', (60 * 60 * 24 * 30 * 12 * 1)), // valid for one year
-        "user_id" => $this->user_id
+        "user_id" => $this->user_id,
+        "username" => $this->username
     );
 
     return JWT::encode($token, $private_key, Conf::get('security:hash_type', 'RS256'));
@@ -444,15 +446,21 @@ class User
     $oUser = null;
     switch ($key_type) {
       case User::AUTH_TYPE_BEARER:
-        $key_file = Conf::get('security:public_key', '/usr/ictcore/etc/ssh/ib_node.pub');
-        $hash_type = Conf::get('security:hash_type', 'RS256');
-        $public_key = file_get_contents($key_file);
-        $token = JWT::decode($access_key, $public_key, array($hash_type));
-        if ($token && !empty($token->user_id)) {
-          $oUser = new self($token->user_id);
-          return $oUser;
+        try {
+          $key_file = Conf::get('security:public_key', '/usr/ictcore/etc/ssh/ib_node.pub');
+          $hash_type = Conf::get('security:hash_type', 'RS256');
+          $public_key = file_get_contents($key_file);
+          $token = JWT::decode($access_key, $public_key, array($hash_type));
+          if ($token && !empty($token->user_id)) {
+            $oUser = new self($token->user_id);
+            return $oUser;
+          }
+        } catch (Exception $e) {
+          Corelog::log('Unable to parse bearer token. error: ' . $e->getMessage(), Corelog::ERROR);
         }
+        Corelog::log('Bearer authentication failed', Corelog::ERROR);
         return false;
+
       case User::AUTH_TYPE_NETWORK:
         return false; // TODO
       case User::AUTH_TYPE_DIGEST:
@@ -462,7 +470,9 @@ class User
             return $oUser;
           }
         }
+        Corelog::log('Basic authentication failed', Corelog::ERROR);
         return false;
+
       case User::AUTH_TYPE_BASIC:
       default:
         if (!empty($access_key['username'])) {
@@ -471,6 +481,7 @@ class User
             return $oUser;
           }
         }
+        Corelog::log('Network authentication failed', Corelog::ERROR);
         return false;
     }
   }

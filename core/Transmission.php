@@ -55,7 +55,8 @@ class Transmission
       'try_allowed',
       'try_done',
       'last_run',
-      'is_deleted'
+      'is_deleted',
+      'campaign_id'
   );
   private static $read_only = array(
       'transmission_id',
@@ -143,6 +144,12 @@ class Transmission
   private $is_deleted = 0;
 
   /**
+   * $property-read integer $campaign_id
+   * @var integer
+   */
+  public $campaign_id = NULL;
+
+  /**
    * ***************************************************** Runtime Variables **
    * all runtime variable for transmission are public
    */
@@ -193,6 +200,7 @@ class Transmission
         case 'program_id':
         case 'account_id':
         case 'contact_id':
+        case 'campaign_id':
           $aWhere[] = "$search_field = $search_value";
           break;
         case 'service_flag':
@@ -241,6 +249,7 @@ class Transmission
       $this->try_done = $data['try_done'];
       $this->last_run = $data['last_run'];
       $this->is_deleted = $data['is_deleted'];
+      $this->campaign_id = $data['campaign_id'];
 
       $this->oAccount = new Account($this->account_id);
       $this->oContact = new Contact($this->contact_id);
@@ -390,7 +399,8 @@ class Transmission
         'try_allowed' => $this->try_allowed,
         'try_done' => $this->try_done,
         'last_run' => $this->last_run,
-        'is_deleted' => $this->is_deleted
+        'is_deleted' => $this->is_deleted,
+        'campaign_id' => $this->campaign_id
     );
 
     if (isset($data['transmission_id']) && !empty($data['transmission_id'])) {

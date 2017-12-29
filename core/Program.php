@@ -359,8 +359,8 @@ class Program
 
   /**
    * Search for programs which are dependents on given resource / object
-   * @param type $resource_type
-   * @param type $resource_id
+   * @param string $resource_type
+   * @param int $resource_id
    * @return array return program list which depends on provided resource / object
    */
   public static function resource_search($resource_type, $resource_id)

@@ -131,7 +131,7 @@ php %SOURCE1 update -d %{buildroot}%{core_home}
 # cronjob configuration in system
 %{__mkdir} -p %{buildroot}/etc/cron.d
 %{__cp} %{buildroot}%{core_home}/etc/ictcore.cron %{buildroot}/etc/cron.d/ictcore.cron
-# install ictcore configuration for php
+# install ictcore configuration for apache
 %{__mkdir} -p %{buildroot}/etc/httpd/conf.d/
 %{__cp} %{buildroot}%{core_home}/etc/http/ictcore.conf %{buildroot}/etc/httpd/conf.d/ictcore.conf
 

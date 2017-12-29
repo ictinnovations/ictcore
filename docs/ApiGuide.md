@@ -850,7 +850,7 @@ __Note:__ call or dial synonymous can also be used in place of send
 Replace {transmission_id} in url with valid transmission_id
 
 * __Response__  
-transmission details in associative array
+Spool ID of resulted attempt
 
 ### PUT transmissions/{transmission_id}/schedule
 Instead of delivering message instantly, schedule its delivery in near future.

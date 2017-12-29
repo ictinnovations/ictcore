@@ -33,6 +33,9 @@ class Group
   /** @var string */
   public $description = '';
 
+  /** @var integer */
+  public $created_by = NULL;
+
   public function __construct($group_id = NULL)
   {
     if (!empty($group_id) && $group_id > 0) {
@@ -86,6 +89,7 @@ class Group
       $this->group_id = $data['group_id'];
       $this->name = $data['name'];
       $this->description = $data['description'];
+      $this->created_by = $data['created_by'];
       Corelog::log("group loaded name: $this->name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Group not found');
@@ -151,7 +155,7 @@ class Group
     } else {
       // add new
       $result = DB::update(self::$table, $data, false, true);
-      $this->group_id = $data['group_id'];
+      $this->group_id = $data['contact_group_id']; // NOTE: DB::update using table name suffixed with _id as primary key
       Corelog::log("New group created: $this->group_id", Corelog::CRUD);
     }
     return $result;

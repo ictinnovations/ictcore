@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE profile>
 <profile name="ictcore">
   <gateways>
     <X-PRE-PROCESS cmd="include" data="/usr/ictcore/etc/freeswitch/sip_profiles/provider/*.xml"/>

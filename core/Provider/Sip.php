@@ -10,7 +10,6 @@ namespace ICT\Core\Provider;
  * *************************************************************** */
 
 use ICT\Core\Provider;
-use ICT\Core\Service\Fax;
 use ICT\Core\Service\Voice;
 
 class Sip extends Provider

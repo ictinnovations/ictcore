@@ -1,33 +1,129 @@
 #!/usr/bin/php  
 <?php
 
-namespace ICT\Core;
+namespace ICT\Core\Cli;
 
 use Firehed\ProcessControl\Daemon;
+use ICT\Core\Contact;
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\Group;
 
 require dirname(__DIR__).'/vendor/autoload.php'; // composer
 declare(ticks=1);
 
+$group_id = $argv[1];
+$file_name = $argv[2];
+
 /* forking */
+chdir(__DIR__);
 $daemon = new Daemon();
-$daemon->setPidFileLocation('/tmp/coreCampaign_td1.pid');
-$daemon->setProcessName('coreCampaign');
+$daemon->setPidFileLocation("../cache/coreGroup_$group_id.pid");
+$daemon->setProcessName("coreGroup_$group_id");
+$daemon->setStderrFileLocation("../log/group_$group_id.log");
+$daemon->setStdoutFileLocation("../log/group_$group_id.log");
 $daemon->autoRun();
 
 // parent close database conection that y i put here
 require_once dirname(__FILE__).'/../core/core.php';
 
-$file_tmpname = $argv[1];
-$group_id = $argv[2];
+// Set group_1.log as target logfile
+Corelog::set_file("group_$group_id.log");
 
-/* inserting import file contacts */
-$file_tm = fopen($file_tmpname, "r");
-while (($value = fgetcsv($file_tm, 10000, ",")) !== FALSE) {
-	if(!empty($value)) {
-    mysql_query("INSERT INTO contact(first_name,last_name,phone,email,address,custom1,custom2,custom3,description) ".
-                "VALUES ('".$value[1]."','".$value[2]."','".$value[0]."','".$value[3]."','".$value[4]."','".
-                            $value[5]."','".$value[6]."','".$value[7]."','".$value[8]."')");
-    $result = mysql_insert_id();
-    mysql_query("INSERT INTO contact_link(group_id,contact_id) value (".$group_id.",$result )");
-	}
+try {
+  $csvContact = new ContactCli($group_id, $file_name);
+  $count = $csvContact->import();
+  Corelog::log('Total imported contacts: ' . $count, Corelog::INFO);
+
+} catch (CoreException $e) {
+  Corelog::log('Contact import failed. Error: ' . $e->getMessage(), Corelog::ERROR);
+  exit($e->getMessage());
+}
+
+Corelog::log('All Done', Corelog::INFO);
+exit(0);
+
+/**
+ * ******************************************************* CampaignCli class **
+ */
+
+class ContactCli
+{
+  private $group_id = null;
+
+  /** @var Group $oGroup  */
+  private $oGroup = null;
+
+  private $csv_file = null;
+  private $csv_columns = array(
+    'phone',
+    'first_name',
+    'last_name',
+    'email',
+    'address',
+    'custom1',
+    'custom2',
+    'custom3',
+    'description'
+  );
+
+  public function __construct($group_id, $filename)
+  {
+    if (file_exists($filename)) {
+      $this->csv_file = $filename;
+    } else {
+      throw CoreException(404, 'File not found');
+    }
+    if (!empty($group_id)) {
+      $this->group_id = $group_id;
+      $this->load();
+    } else {
+      throw CoreException(404, 'Group not found');
+    }
+  }
+
+  public function load()
+  {
+    $this->oGroup = new Group($this->group_id);
+    \ICT\Core\do_login($this->oGroup->created_by);
+  }
+
+  /**
+   * Parse CSV file to import contacts
+   */
+  public function import()
+  {
+    $count = 0;
+
+    /* parsing csv file */
+    $csv_data = array_map("str_getcsv", file($this->csv_file, FILE_SKIP_EMPTY_LINES));
+    if (empty($csv_data)) {
+      throw CoreException(412, 'Invalid file');
+    }
+
+    // adding contact
+    foreach ($csv_data as $csv_values) {
+      try {
+        $aContact = array_combine($this->csv_columns, $csv_values);
+        $this->add_contact($aContact);
+        $count++;
+      } catch (CoreException $e) {
+        Corelog('Unable to add contact. error: ' . $e->getMessage(), Corelog::WARNING, $csv_values);
+      }
+    }
+
+    return $count;
+  }
+
+  /**
+   * Build and save contact
+   * then link it with group
+   */
+  private function add_contact($aContact)
+  {
+    $oContact = Contact::construct_from_array($aContact);
+    $oContact->save();
+    $oContact->link($this->oGroup->group_id);
+    return $oContact->contact_id;
+  }
 }

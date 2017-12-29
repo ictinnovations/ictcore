@@ -504,6 +504,7 @@ CREATE TABLE transmission (
    try_done                    int(2)                   NOT NULL default 0,
    last_run                    int(11)                  default NULL,
    is_deleted                  int(1)                   not NULL default 0,
+   campaign_id                 int(11)                  default NULL,
    date_created                int(11)                  default NULL,
    created_by                  int(11) unsigned         default NULL,
    last_updated                int(11)                  default NULL,
@@ -520,16 +521,47 @@ CREATE TABLE campaign
    campaign_id               int(11) unsigned       NOT NULL auto_increment,
    program_id                int(11)                NOT NULL,
    group_id                  int(11)                NOT NULL ,
+   account_id                int(11)                default NULL,
    delay                     varchar(128)           NOT NULL default '',
    try_allowed               varchar(128)           NOT NULL default '',
-   account_id                int(11)                NOT NULL ,
+   contact_total             int(11)                NOT NULL default 0,
+   contact_done              int(11)                NOT NULL default 0,
    status                    varchar(128)           NOT NULL default '',
-   created_by                int(11)                default NULL,
    pid                       varchar(128)           NOT NULL default '',
-   last_run                   int(11)                default NULL,
+   last_run                  int(11)                default NULL,
+   date_created              int(11)                default NULL,
+   created_by                int(11)                default NULL,
+   last_updated              int(11)                default NULL,
+   updated_by                int(11) unsigned       default NULL,
    PRIMARY KEY (campaign_id)
 ) ENGINE = InnoDB;
 CREATE INDEX campaign_created_by ON campaign (created_by);
+
+DELIMITER |
+CREATE TRIGGER transmission_insert AFTER INSERT
+  ON transmission FOR EACH ROW BEGIN
+    IF (NEW.campaign_id IS NOT NULL) THEN
+     UPDATE campaign SET contact_total = (contact_total + 1) WHERE campaign_id = NEW.campaign_id;
+    END IF;
+  END;
+|
+CREATE TRIGGER transmission_update AFTER UPDATE
+  ON transmission FOR EACH ROW BEGIN
+    IF (OLD.status = 'pending' AND NEW.status != 'pending') THEN
+      UPDATE campaign SET contact_done = (contact_done + 1) WHERE campaign_id = OLD.campaign_id;
+    END IF;
+  END;
+|
+CREATE TRIGGER transmission_delete AFTER DELETE
+  ON transmission FOR EACH ROW BEGIN
+    IF (OLD.status = 'pending') THEN
+      UPDATE campaign SET contact_total = (contact_total - 1) WHERE campaign_id = OLD.campaign_id;
+    ELSE
+      UPDATE campaign SET contact_total = (contact_total - 1), contact_done = (contact_done - 1) WHERE campaign_id = OLD.campaign_id;
+    END IF;
+  END;
+|
+DELIMITER ;
 
 /*==============================================================*/
 /* Table: session                                               */
@@ -620,7 +652,11 @@ CREATE TABLE contact_group
    group_id                      int(11) unsigned       NOT NULL auto_increment,
    name                          varchar(128)           NOT NULL,
    description                   varchar(255)           NOT NULL default '',
-   contact_count                 varchar(128)           NOT NULL default '0',
+   contact_total                 int(11)                NOT NULL default 0,
+   date_created                  int(11)                default NULL,
+   created_by                    int(11)                default NULL,
+   last_updated                  int(11)                default NULL,
+   updated_by                    int(11) unsigned       default NULL,
    PRIMARY KEY (group_id)
 ) ENGINE = InnoDB;
 
@@ -634,6 +670,19 @@ CREATE TABLE contact_link
    contact_id                    int(11)                NOT NULL,
    PRIMARY KEY (group_id, contact_id)
 ) ENGINE = InnoDB;
+
+DELIMITER |
+CREATE TRIGGER contact_link_insert AFTER INSERT
+  ON contact_link FOR EACH ROW BEGIN
+    UPDATE contact_group SET contact_total = (contact_total + 1) WHERE group_id = NEW.group_id;
+  END;
+|
+CREATE TRIGGER contact_link_delete AFTER DELETE
+  ON contact_link FOR EACH ROW BEGIN
+    UPDATE contact_group SET contact_total = (contact_total - 1) WHERE group_id = OLD.group_id;
+  END;
+|
+DELIMITER ;
 
 /*==============================================================*/
 /* Table: ivr                                                   */

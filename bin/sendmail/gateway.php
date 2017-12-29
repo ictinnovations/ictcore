@@ -111,8 +111,9 @@ if (!empty($emails)) {
         /* prefix the email number to the filename in case two emails
          * have the attachment with the same file name.
          */
-        $filename = tempnam(sys_get_temp_dir(), 'ictcore_') . $filename;
-        $fp = fopen($filename, "w+");
+        global $path_cache;
+        $filename = tempnam($path_cache, 'ictcore_') . $filename;
+        $fp = fopen($filename, "w");
         fwrite($fp, $attachment['attachment']);
         fclose($fp);
       }

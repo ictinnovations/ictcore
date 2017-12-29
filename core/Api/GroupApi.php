@@ -110,48 +110,33 @@ class GroupApi extends Api
    * @url GET /groups/$group_id/csv
    * 
    */
-   public function export_csv($group_id, $query)
-   {
-     $oGroup = new Group($group_id);
-     $listContact = $oGroup->search_contact((array)$query, true);
-
-     $file_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'group_'.$group_id.'.csv';
-     $handle = fopen($file_path, 'a');
-     if (!$handle) {
-       throw new CoreException(500, "Unable to open file");
-     }
-     foreach($listContact as $aValue) {
-       $contact_row = $aValue['phone'].','.$aValue['first_name'].','.$aValue['last_name'].','.$aValue['email'].','.$aValue['address'].','.
-                      $aValue['custom1'].','.$aValue['custom2'].','.$aValue['custom3'].','.$aValue['description']."\n";
-       fwrite($handle, $contact_row);
-     }
-     fclose($handle);
-
-     return new SplFileInfo($file_path);
-   }
-
-  /**
-   * Import Contact by group id
-   *
-   * @url POST /groups/$group_id/csv
-   */
-  public function import_csv($group_id, $data = array(), $mime = 'text/csv')
+  public function export_csv($group_id, $query)
   {
-    global $path_root;
-    $allowedTypes = array('csv' => 'text/csv');
-    if (in_array($mime, $allowedTypes)) {
-      if (!empty($data)) {
-        $file_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'group_'.$group_id.'.csv';
-        file_put_contents($file_path, $data);
-        $contact_daemon = $path_root . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'contact';
-        $output = array();
-        exec("$contact_daemon '$file_path' $this->group_id start", $output);
-        return $output[0];
-      } else {
-        throw new CoreException(411, "Empty file");
+    if ($group_id == 'sample') {
+      return $this->sample_csv();
+    }
+
+    $oGroup = new Group($group_id);
+    if ($oGroup) {
+      $aFilter = (array)$query;
+      $listContact = $oGroup->search_contact($aFilter, true);
+
+      $file_path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'group_'.$group_id.'.csv';
+      $handle = fopen($file_path, 'w');
+      if (!$handle) {
+        throw new CoreException(500, "Unable to open file");
       }
+      foreach($listContact as $aValue) {
+        $contact_row = '"'.$aValue['phone'].'","'.$aValue['first_name'].'","'.$aValue['last_name'].'","'.$aValue['email'].'",'.
+                       '"'.$aValue['address'].'","'.$aValue['custom1'].'","'.$aValue['custom2'].'","'.$aValue['custom3'].'",'.
+                       '"'.$aValue['description'].'"'."\n";
+        fwrite($handle, $contact_row);
+      }
+      fclose($handle);
+
+      return new SplFileInfo($file_path);
     } else {
-      throw new CoreException(415, "Unsupported File Type");
+      throw new CoreException(404, "Group not found");
     }
   }
 
@@ -163,11 +148,46 @@ class GroupApi extends Api
   public function sample_csv()
   {
     global $path_data;
-    $sample_contact = $path_data . DIRECTORY_SEPARATOR . 'sample_contact.csv';
+    $sample_contact = $path_data . DIRECTORY_SEPARATOR . 'contact_sample.csv';
     if (file_exists($sample_contact)) {
-      return SplFileInfo($sample_contact);
+      return new SplFileInfo($sample_contact);
     } else {
       throw new CoreException(404, "File not found");
+    }
+  }
+
+  /**
+   * Import Contact by group id
+   *
+   * @url POST /groups/$group_id/csv
+   */
+  public function import_csv($group_id, $data = array(), $mime = 'text/csv')
+  {
+    global $path_root, $path_cache;
+    $allowedTypes = array('csv' => 'text/csv', 'txt' => 'text/plain');
+    if (in_array($mime, $allowedTypes)) {
+      if (!empty($data)) {
+        $file_path = $path_cache . DIRECTORY_SEPARATOR . 'group_'.$group_id.'.csv';
+        file_put_contents($file_path, $data);
+        $oGroup = new Group($group_id);
+        if ($oGroup) {
+          $contact_daemon = $path_root . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'contact';
+          $output = array();
+          $result = false;
+          exec("$contact_daemon $oGroup->group_id '$file_path' start", $output, $result);
+          if ($result != 0) {
+            return false;
+          } else {
+            return $group_id;
+          }
+        } else {
+          throw new CoreException(404, "Group not found");
+        }
+      } else {
+        throw new CoreException(411, "Empty file");
+      }
+    } else {
+      throw new CoreException(415, "Unsupported File Type");
     }
   }
 

@@ -12,9 +12,14 @@ namespace ICT\Core;
 class Campaign
 {
   /** @const */
-  const COMPANY = -2;
+  const STATUS_NEW = 'new';
+  const STATUS_READY = 'ready';
+  const STATUS_RUNNING = 'running';
+  const STATUS_PAUSED = 'paused';
+  const STATUS_COMPLETED = 'completed';
+  const STATUS_BROKEN = 'broken';
+
   private static $table = 'campaign';
-  private static  $trans_table = 'transmission';
   private static $primary_key = 'campaign_id';
   private static $fields = array(
       'campaign_id ',
@@ -55,7 +60,7 @@ class Campaign
   public $account_id = NULL;
 
   /** @var string */
-  public $status = NULL;
+  public $status = Campaign::STATUS_NEW;
 
   /** @var integer */
   public $created_by = NULL;
@@ -115,7 +120,7 @@ class Campaign
       $this->try_allowed = $data['try_allowed'];
       $this->account_id  = $data['account_id'];
       $this->status      = $data['status'];
-      $this->created_by      = $data['created_by'];
+      $this->created_by  = $data['created_by'];
       Corelog::log("Campaign loaded id: $this->campaign_id $this->status", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Campaign not found');
@@ -169,6 +174,10 @@ class Campaign
 
   public function save()
   {
+    if ($this->account_id < 1) {
+      $oAccount = new Account(Account::USER_DEFAULT);
+      $this->account_id = $oAccount->account_id;
+    }
     $data = array(
         'campaign_id' => $this->campaign_id,
         'program_id' => $this->program_id,
@@ -178,6 +187,7 @@ class Campaign
         'account_id' => $this->account_id,
         'status' => $this->status
     );
+
     if (isset($data['campaign_id']) && !empty($data['campaign_id'])) {
       // update existing record
       $result = DB::update(self::$table, $data, 'campaign_id', true);
@@ -206,9 +216,14 @@ class Campaign
     global $path_root;
     $daemon = $path_root . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'campaign';
     /* Excutable file start / stop deamon */
-    $output = null;
-    exec("$daemon $this->campaign_id  $action", $output);
-    return $output[0];
+    $output = array();
+    $result = false;
+    exec("$daemon $this->campaign_id  $action", $output, $result);
+    if ($result != 0) {
+      return false;
+    } else {
+      return $this->campaign_id;
+    }
   }
 
   public function task_cancel()

@@ -44,5 +44,5 @@ rm -rf ib_node.csr ib_node.cfg
 # repeat next command for each available node to store ssh identity of all nodes into known_hosts
 ssh-keyscan -H localhost >> known_hosts
 chown -R ictcore:ictcore /usr/ictcore/etc/ssh
-chmod 700 /usr/ictcore/etc/ssh
-chmod 600 /usr/ictcore/etc/ssh/*
+chmod 750 /usr/ictcore/etc/ssh
+chmod 640 /usr/ictcore/etc/ssh/*

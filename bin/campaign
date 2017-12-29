@@ -1,90 +1,210 @@
 #!/usr/bin/php
 <?php
-namespace ICT\Core;
+namespace ICT\Core\Cli;
 
-use \ICT\Core\Campaign;
-use \ICT\Core\Transmission;
+use Firehed\ProcessControl\Daemon;
+use ICT\Core\Campaign;
+use ICT\Core\CoreException;
+use ICT\Core\Corelog;
+use ICT\Core\Group;
+use ICT\Core\Program;
+use ICT\Core\Transmission;
 
 require dirname(__DIR__).'/vendor/autoload.php'; // composer
 declare(ticks=1);
 
+$campaign_id = $argv[1];
+$action = $argv[2];
+
 /* forking */
+chdir(__DIR__);
 $daemon = new Daemon();
-$daemon->setPidFileLocation('/tmp/coreCampaign_td1.pid');
-$daemon->setProcessName('coreCampaign');
+$daemon->setPidFileLocation("../cache/coreCampaign_$campaign_id.pid");
+$daemon->setProcessName("coreCampaign_$campaign_id");
+$daemon->setStderrFileLocation("../log/campaign_$campaign_id.log");
+$daemon->setStdoutFileLocation("../log/campaign_$campaign_id.log");
 $daemon->autoRun();
 
 // parent close database conection that y i put here
 require_once dirname(__FILE__).'/../core/core.php';
 
-$campaign_id = $argv[1];
+// Set campaign_1.log as target logfile
+Corelog::set_file("campaign_$campaign_id.log");
 
-/* Campaing start */
-$oCampaign = new Campaign($campaign_id);
-$group_id = $oCampaign->group_id;
-$user_id = $oCampaign->created_by;
-$delay = $oCampaign->delay;
 
-do_login($user_id);
+try {
+  $campaignDaemon = new CampaignCli($campaign_id);
+  switch ($action) {
+    case 'start':
+      $campaignDaemon->start();
+      break;
+    case 'stop':
+      $campaignDaemon->signal_stop(0);
+      break;
+    case 'reload':
+    default:
+      $campaignDaemon->signal_reload(0);
+  }
 
-//transmission create 
-$query = "SELECT c.first_name,c.last_name,c.phone,c.email,c.contact_id,cl.contact_id ,cl.group_id ".
-         "FROM contact c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id ".
-         "WHERE cl.group_id=".$group_id." GROUP BY cl.contact_id";
-$result_contacts = mysql_query($query);
-while ($datacontact = mysql_fetch_assoc($result_contacts)) {
-  $data_transmission = array(
-    'title' => 'bulk system',
-    'account_id' => $user_id,
-    'contact_id' => $datacontact['contact_id'],
-    'origin' => '',
-    'direction' => ''
-  );
+  Corelog::log('Campaign processing completed', Corelog::INFO);
 
-  $chk_transmission = mysql_query("SELECT *  from transmission where contact_id=".$datacontact['contact_id']." AND program_id=".$oCampaign->program_id);
-  if(mysql_num_rows($chk_transmission)==0) {
-    $oProgram = Program::load($oCampaign->program_id);
-    $direction = empty($data_transmission['direction']) ? Transmission::OUTBOUND : $data_transmission['direction'];
-    $oTransmission = $oProgram->transmission_create($datacontact['contact_id'], $user_id, $direction);
+} catch (CoreException $e) {
+  Corelog::log('Campaign failed. Error: ' . $e->getMessage(), Corelog::ERROR);
+  exit($e->getMessage());
+}
+
+Corelog::log('All Done', Corelog::INFO);
+exit(0);
+
+/**
+ * ******************************************************* CampaignCli class **
+ */
+
+class CampaignCli
+{
+  /**
+   * @var int $campaign_id
+   */
+  private $campaign_id = null;
+
+  /**
+   * @var Campaign $oCampaign
+   */
+  private $oCampaign = null;
+
+  /**
+   * @var boolean $is_active
+   */
+  private $is_active = false;
+
+  public function __construct($campaign_id)
+  {
+    $this->campaign_id = $campaign_id;
+    $this->load();
+
+    // set stop signal handler
+    pcntl_signal(SIGQUIT, array($this, "signal_stop"));
+    pcntl_signal(SIGABRT, array($this, "signal_stop"));
+    pcntl_signal(SIGKILL, array($this, "signal_stop"));
+    pcntl_signal(SIGTERM, array($this, "signal_stop"));
+
+    // set reload signal handler
+    pcntl_signal(SIGHUP, array($this, "signal_reload"));
+    pcntl_signal(SIGINT, array($this, "signal_reload"));
+    pcntl_signal(SIGUSR1, array($this, "signal_reload"));
+    pcntl_signal(SIGUSR2, array($this, "signal_reload"));
+  }
+
+  public function signal_reload($signo, $signinfo = null)
+  {
+    Corelog::log('Reload signal received. signal no: ' . $signo, Corelog::INFO, $signinfo);
+    $this->load();
+  }
+
+  public function signal_stop($signo, $signinfo = null)
+  {
+    Corelog::log('Stop signal received. signal no: ' . $signo, Corelog::INFO, $signinfo);
+    $this->is_active = false;
+  }
+
+  public function load()
+  {
+    $this->oCampaign = new Campaign($this->campaign_id);
+    if (Campaign::STATUS_BROKEN == $this->oCampaign->status) {
+      throw new CoreException(423, 'Broken / invalid campaign');
+    } else if (Campaign::STATUS_COMPLETED == $this->oCampaign->status) {
+      throw new CoreException(423, 'Campaign already completed');
+    }
+    \ICT\Core\do_login($this->oCampaign->created_by);
+  }
+
+  public function prepare()
+  {
+    $oProgram = Program::load($this->oCampaign->program_id);
+    $oGroup = new Group($this->oCampaign->group_id);
+    $listContact = $oGroup->search_contact();
+    $count = 0;
+    foreach ($listContact as $aContact) {
+      try {
+        $this->prepare_transmission($oProgram, $aContact['contact_id']);
+        $count++;
+      } catch (CoreException $e) {
+        Corelog::log('Unable to create transmission skipping. error:' . $e->getMessage, Corelog::WARNING);
+      }
+    }
+
+    $this->oCampaign->status = Campaign::STATUS_READY;
+    $this->oCampaign->save();
+
+    return $count;
+  }
+
+  private function prepare_transmission(Program $oProgram, $contact_id)
+  {
+    $oTransmission = $oProgram->transmission_create($contact_id, $this->oCampaign->account_id, Transmission::OUTBOUND);
+    $oTransmission->campaign_id = $this->oCampaign->campaign_id;
     if ($oTransmission->save()) {
-      $trans_id =  $oTransmission->transmission_id;
+      return $oTransmission->transmission_id;
     } else {
       throw new CoreException(417, 'Transmission creation failed');
     }
   }
-}
 
-// Get tranmisions according to group
-$query = "SELECT c.transmission_id, c.program_id, c.contact_id, c.status, cl.contact_id, cl.group_id ".
-         "FROM transmission c INNER JOIN contact_link cl ON c.contact_id = cl.contact_id ".
-         "WHERE cl.group_id=".$group_id." AND c.program_id=".$oCampaign->program_id.
-         " AND c.created_by=".$user_id." AND c.status !='processing' GROUP BY cl.contact_id";
-$result = mysql_query($query);
+  public function start()
+  {
+    if (Campaign::STATUS_RUNNING == $this->oCampaign->status) {
+      throw new CoreException(423, 'Campaign already running');
+    }
 
-$contact_processed=0;
-if (mysql_num_rows($result)>0) {
-  // Transmissions loop
-  while ($data = mysql_fetch_assoc($result)) {
-    if (is_numeric($delay)){
-      usleep($delay);
+    // set campaign in running mode
+    $this->is_active = true;
+
+    if (Campaign::STATUS_NEW == $this->oCampaign->status) {
+      $this->prepare();
     }
-    try {
-      $oTransmission = new Transmission($data['transmission_id']);
-      $oTransmission->send();
-    } catch (Exception $e) {
-      ini_set("error_log", "/tmp/transmission_error.log");
-      error_log( "Transmission not found:".$e->getMessage());
-    }
-    $contact_processed++;
+
+    // also update campaign status
+    $this->oCampaign->status = Campaign::STATUS_RUNNING;
+    $this->oCampaign->save();
+
+    // search and process all associated transmissions
+    $aFilter = array(
+        'campaign_id' => $this->oCampaign->campaign_id,
+        'status' => Transmission::STATUS_PENDING
+    );
+    $listTransmission = Transmission::search($aFilter);
+    $final_status = $this->process($listTransmission);
+
+    // Campaign stopped, now update campaign status
+    $this->oCampaign->status = $final_status;
+    $this->oCampaign->save();
   }
 
-  $query_campaign = "UPDATE campaign set pid=".posix_getpid() .",last_run=" .time(). " ,status='completed' where campaign_id =".$campaign_id;
-  $res = mysql_query($query_campaign);
-  if (mysql_errno()) {
-    Corelog::log("Campaign update failed", Corelog::CRUD);
+  private function process($listTransmission = array())
+  {
+    foreach ($listTransmission as $aTransmission) {
+
+      // Stop processing if campaign is not active
+      if ($this->is_active == false) {
+        return Campaign::STATUS_PAUSED;
+      }
+
+      // delay is required for system stability
+      usleep($this->oCampaign->delay);
+
+      try { // now send the transmission, in case of error simply skip that transmission
+        $this->transmission_send($aTransmission['transmission_id']);
+      } catch (CoreException $e) {
+        Corelog::log('Unable to send transmission skipping. error:' . $e->getMessage, Corelog::WARNING);
+      }
+    }
+
+    return Campaign::STATUS_COMPLETED;
   }
 
-} else {
-  ini_set("error_log", "/tmp/transmission_error.log");
-  error_log( "Transmission not found" );
+  private function transmission_send($transmission_id)
+  {
+    $oTransmission = new Transmission($transmission_id);
+    return $oTransmission->send();
+  }
 }
