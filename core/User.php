@@ -435,7 +435,8 @@ class User
         "nbf" => time(),
         "exp" => time() + Conf::get('security:token_expiry', (60 * 60 * 24 * 30 * 12 * 1)), // valid for one year
         "user_id" => $this->user_id,
-        "username" => $this->username
+        "username" => $this->username,
+        "api-version" => "1.0"
     );
 
     return JWT::encode($token, $private_key, Conf::get('security:hash_type', 'RS256'));
@@ -451,9 +452,12 @@ class User
           $hash_type = Conf::get('security:hash_type', 'RS256');
           $public_key = file_get_contents($key_file);
           $token = JWT::decode($access_key, $public_key, array($hash_type));
-          if ($token && !empty($token->user_id)) {
-            $oUser = new self($token->user_id);
-            return $oUser;
+          if ($token) {
+            // TODO check api-version
+            if (!empty($token->user_id)) {
+              $oUser = new self($token->user_id);
+              return $oUser;
+            }
           }
         } catch (Exception $e) {
           Corelog::log('Unable to parse bearer token. error: ' . $e->getMessage(), Corelog::ERROR);

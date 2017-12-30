@@ -14,7 +14,7 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     # Turn Rewrite Engine on
     RewriteEngine On
-    RewriteBase /ictcore/
+    RewriteBase /ictcore/api/
 
     ## To allow Cross-origin access enable following code
     # For cors preflight options request
