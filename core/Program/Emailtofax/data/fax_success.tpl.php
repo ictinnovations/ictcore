@@ -7,11 +7,6 @@ $template['body'] = <<<EOS
 <table style="margin:0px auto;border-spacing:0px;width:52%">
 <tbody>
 <tr>
-<td align="center">
-<a href="http://ictfax.org"><img src="http://ictfax.org/sites/default/files/ictfax_0.png" style="color:rgb(0,153,153);" height="60"></a><br>
-</td>
-</tr>
-<tr>
 <td style="padding:20px 0px 17px 50px;" bgcolor="#333333"></td>
 </tr>
 <tr>
@@ -31,8 +26,8 @@ Did you know that you can view your faxes online at [company:name]. Need Help? V
 <b>Best Regards</b></p>
 <p style="color:#666"><b>[company:name] Team</b></p>
 <p style="color:#666">[company:name] - Online Faxing </p>
-<p style="color:#666">Site : <a href="http://ictfax.org">www.ictfax.org</a></p>
-<br><p style="text-align:center;color:#666">ICTFAX is developed by <a href="http://ictinnovations.com/">ICT Innovations</a></p>
+<p style="color:#666">Site : <a href="http://ictcore.org">ictcore.org</a></p>
+<br><p style="text-align:center;color:#666">ICTCore is developed by <a href="http://ictinnovations.com/">ICT Innovations</a></p>
 </td>
 </tr>
 <tr>
