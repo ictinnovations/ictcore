@@ -18,6 +18,22 @@ require_once dirname(__FILE__) . "/lib/init.php";
 class Core
 {
 
+  public static function statistic()
+  {
+    $aStatistic = array(
+        'campaign_total' => DB::query_result('campaign', "SELECT COUNT(*) FROM campaign"),
+        'campaign_active' => DB::query_result('campaign', "SELECT COUNT(*) FROM campaign WHERE status='".Campaign::STATUS_RUNNING."'"),
+        'group_total' => DB::query_result('contact_group', "SELECT COUNT(*) FROM contact_group"),
+        'contact_total' => DB::query_result('contact', "SELECT COUNT(*) FROM contact"),
+        'transmission_total' => DB::query_result('transmission', "SELECT COUNT(*) FROM transmission"),
+        'transmission_active' => DB::query_result('transmission', "SELECT COUNT(*) FROM transmission WHERE status='".Transmission::STATUS_PROCESSING."'"),
+        'spool_total' => DB::query_result('spool', "SELECT COUNT(*) FROM spool"),
+        'spool_success' => DB::query_result('spool', "SELECT COUNT(*) FROM spool wHERE status='".Spool::STATUS_COMPLETED."'"),
+        'spool_failed' => DB::query_result('spool', "SELECT COUNT(*) FROM spool wHERE status='".Spool::STATUS_FAILED."'"),
+    );
+    return $aStatistic;
+  }
+
   /**
    * Initiate delivery / sending proces for a previously created transmission
    * @param Transmission $oTransmission

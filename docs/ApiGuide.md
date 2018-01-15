@@ -130,6 +130,14 @@ Note: Unlike other APIs this API does not require separate authentication in hea
 ### POST authenticate/cancel
 Cancel an existing authentications token / session
 
+System Statistics
+=================
+### GET statistics
+Get system statistics, like total and active campaigns, total contacts, total number of calls made etc ...
+
+* __Response__  
+an array of variables
+
 Contact / pre defined destination number
 ========================================
 ### POST contacts
@@ -842,7 +850,8 @@ list all exiting transmissions, optionally client can filter transmissions using
 * __Response__  
 an array of transmissions
 
-### GET transmissions/{transmission_id}/send
+### POST transmissions/{transmission_id}/send
+### POST transmissions/{transmission_id}/retry
 Trigger already prepared transmission to dial / connect assigned contact and deliver desired message.  
 __Note:__ call or dial synonymous can also be used in place of send
 
@@ -863,12 +872,6 @@ __schedule_id__ of recently created schedule record
 
 ### DELETE transmissions/{transmission_id}/schedule
 Cancel any schedule associated with given transmission
-
-* __Parameters__  
-Replace {transmission_id} in url with valid transmission_id
-
-### GET transmissions/{transmission_id}/retry
-In case earlier transmission attempt failed, give it another try
 
 * __Parameters__  
 Replace {transmission_id} in url with valid transmission_id

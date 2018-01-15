@@ -25,7 +25,8 @@ CREATE TABLE account
    created_by                     int(11)                default NULL,
    last_updated                   int(11)                default NULL,
    updated_by                     int(11) unsigned       default NULL,
-   PRIMARY KEY  (account_id)
+   PRIMARY KEY  (account_id),
+   UNIQUE KEY username (type, username)
 ) ENGINE = InnoDB;
 
 /*==============================================================*/
@@ -52,7 +53,9 @@ CREATE TABLE usr
    created_by                     int(11)                default NULL,
    last_updated                   int(11)                default NULL,
    updated_by                     int(11) unsigned       default NULL,
-   PRIMARY KEY  (usr_id)
+   PRIMARY KEY  (usr_id),
+   UNIQUE KEY username (username),
+   UNIQUE KEY email (email)
 ) ENGINE = InnoDB;
 
 DELIMITER |
@@ -60,7 +63,7 @@ CREATE TRIGGER usr_insert AFTER INSERT
   ON usr FOR EACH ROW BEGIN
     INSERT INTO account (account_id, type, username, passwd, passwd_pin, first_name, last_name, phone, email, address,
                          active, date_created, created_by, last_updated, updated_by)
-    SELECT NULL, 'extension', NEW.username, NEW.passwd, LEFT(RAND()*999999, 4), NEW.first_name, NEW.last_name, NEW.phone,
+    SELECT NULL, 'account', NEW.username, NEW.passwd, LEFT(RAND()*999999, 4), NEW.first_name, NEW.last_name, NEW.phone,
            NEW.email, NEW.address, NEW.active, NEW.date_created, NEW.usr_id, NULL, NULL;
   END;
 |

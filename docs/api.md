@@ -6,6 +6,10 @@ Authentication
 * POST authenticate
 * POST authenticate/cancel
 
+System Statistics
+-----------------
+* GET statistics
+
 Contact / pre defined destination number
 ----------------------------------------
 * POST contacts
@@ -111,8 +115,8 @@ Transmission - the actual call or action
 * GET transmissions
 * GET transmissions/{transmission_id}
 * DELETE transmissions/{transmission_id}
-* GET transmissions/{transmission_id}/send
-* GET transmissions/{transmission_id}/retry
+* POST transmissions/{transmission_id}/send
+* POST transmissions/{transmission_id}/retry
 * GET transmissions/{transmission_id}/clone
 * PUT transmissions/{transmission_id}/schedule
 * DELETE transmissions/{transmission_id}/schedule

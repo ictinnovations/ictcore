@@ -38,7 +38,11 @@ Requires: mysql mysql-server mysql-connector-odbc
 Requires: mariadb mariadb-server mysql-connector-odbc
 %endif
 # ICTCore exposse its services via apache web server
+%if %{rhel} < 7
 Requires: httpd
+%else
+Requires: httpd certbot python2-certbot-apache
+%endif
 # Other dependencies
 Requires: coreutils acl sudo tzdata ntp cronie dos2unix shadow-utils
 
@@ -49,7 +53,8 @@ ICTCore is backend library for voice, fax, sms and email related services, it pr
 %package freeswitch
 Group: ict
 Summary: Freeswitch addon for ICTCore
-Requires: ictcore freeswitch freeswitch-config-vanilla freeswitch-lua freeswitch-application-curl curl sed
+Requires: ictcore curl sed
+Requires: freeswitch freeswitch-config-vanilla freeswitch-lua freeswitch-application-curl freeswitch-sounds-en-us-callie-8000
 Provides: ictcore-freeswitch ictcore-gateway-voice ictcore-gateway-fax
 
 %description freeswitch
@@ -140,8 +145,10 @@ php %SOURCE1 update -d %{buildroot}%{core_home}
 %{__cp} %{buildroot}%{core_home}/etc/php/ictcore.ini %{buildroot}/etc/php.d/ictcore.ini
 
 # Freeswitch related configuration installation
+%{__mkdir} -p %{buildroot}/etc/freeswitch/directory
 %{__mkdir} -p %{buildroot}/etc/freeswitch/sip_profiles
 %{__mkdir} -p %{buildroot}/etc/freeswitch/dialplan
+%{__ln_s} /usr/ictcore/etc/freeswitch/directory/ictcore.xml %{buildroot}/etc/freeswitch/directory
 %{__ln_s} /usr/ictcore/etc/freeswitch/sip_profiles/ictcore.xml %{buildroot}/etc/freeswitch/sip_profiles
 %{__ln_s} /usr/ictcore/etc/freeswitch/dialplan/ictcore.xml %{buildroot}/etc/freeswitch/dialplan
 
@@ -183,6 +190,7 @@ touch %{buildroot}/var/spool/mail/ictcore
 
 # write-able directories and files
 %defattr(664,ictcore,ictcore,775)
+%{core_home}/etc/freeswitch/directory/account
 %{core_home}/etc/freeswitch/sip_profiles/provider
 %{core_home}/etc/kannel/provider
 %{core_home}/log
@@ -390,6 +398,7 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 %else
 /bin/firewall-cmd --zone=public --add-port=80/tcp --permanent    # web
 /bin/firewall-cmd --zone=public --add-port=443/tcp --permanent   # ssl web
+/bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
 %endif
 # Finally generate security keys for ictcore
@@ -412,6 +421,8 @@ setfacl -d -m g::rw %{core_home}/data/template
 
 %post freeswitch
 # all new configuration files must be writable for group users
+chmod g+rws %{core_home}/etc/freeswitch/directory/account
+setfacl -d -m g::rw %{core_home}/etc/freeswitch/directory/account
 chmod g+rws %{core_home}/etc/freeswitch/sip_profiles/provider
 setfacl -d -m g::rw %{core_home}/etc/freeswitch/sip_profiles/provider
 # enable curl module in freeswitch module configuration
@@ -435,13 +446,15 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 # sip external profile
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8060 -j ACCEPT    # tcp
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 8060 -j ACCEPT    # udp
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8060 -j ACCEPT    # tls
-/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 8060 -j ACCEPT    # dtls
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 8061 -j ACCEPT    # tls
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 8061 -j ACCEPT    # dtls
 # sip ictcore profile
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5070 -j ACCEPT    # tcp
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m udp --dport 5070 -j ACCEPT    # udp
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 5071 -j ACCEPT    # tls
 /sbin/iptables -I INPUT -p udp -m state --state NEW -m udp --dport 5071 -j ACCEPT    # dtls
+# WebRTC ports
+/sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7443 -j ACCEPT    # wss
 # media ports
 /sbin/iptables -I INPUT -p udp --dport 10000:20000 -j ACCEPT     # rtp
 /etc/init.d/iptables save
@@ -461,8 +474,11 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /bin/firewall-cmd --zone=public --add-port=5070/tcp --permanent  # tcp
 /bin/firewall-cmd --zone=public --add-port=5071/udp --permanent  # tls
 /bin/firewall-cmd --zone=public --add-port=5071/tcp --permanent  # dtls
+# WebRTC ports
+/bin/firewall-cmd --zone=public --add-port=7443/tcp --permanent  # wss
 # media ports
 /bin/firewall-cmd --zone=public --add-port=10000-20000/udp --permanent # rtp
+/bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
 %endif
 
@@ -481,6 +497,7 @@ fi
 /etc/init.d/iptables save
 %else
 /bin/firewall-cmd --zone=public --add-port=2775/tcp --permanent  # smpp
+/bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
 %endif
 %if %{rhel} < 7
@@ -517,6 +534,7 @@ echo "apache" >> /etc/mail/trusted-users
 /etc/init.d/iptables save
 %else
 /bin/firewall-cmd --zone=public --add-port=25/tcp --permanent  # smtp
+/bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
 %endif
 

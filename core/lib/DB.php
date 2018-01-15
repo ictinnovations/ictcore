@@ -305,6 +305,15 @@ class DB
     return $qry_result;
   }
 
+  public static function query_result($table, $query, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
+  {
+    $result = self::query($table, $query, $aValues , $check_auth, $foreign_table, $foreign_key);
+    if (is_resource($result)) {
+      return mysql_result($result, 0);
+    }
+    return null;
+  }
+
   static function query($table, $req_query, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
   {
     $values = array();
