@@ -145,10 +145,10 @@ php %SOURCE1 update -d %{buildroot}%{core_home}
 %{__cp} %{buildroot}%{core_home}/etc/php/ictcore.ini %{buildroot}/etc/php.d/ictcore.ini
 
 # Freeswitch related configuration installation
-%{__mkdir} -p %{buildroot}/etc/freeswitch/directory
+%{__mkdir} -p %{buildroot}/etc/freeswitch/directory/default
 %{__mkdir} -p %{buildroot}/etc/freeswitch/sip_profiles
 %{__mkdir} -p %{buildroot}/etc/freeswitch/dialplan
-%{__ln_s} /usr/ictcore/etc/freeswitch/directory/ictcore.xml %{buildroot}/etc/freeswitch/directory
+%{__ln_s} /usr/ictcore/etc/freeswitch/directory/ictcore.xml %{buildroot}/etc/freeswitch/directory/default
 %{__ln_s} /usr/ictcore/etc/freeswitch/sip_profiles/ictcore.xml %{buildroot}/etc/freeswitch/sip_profiles
 %{__ln_s} /usr/ictcore/etc/freeswitch/dialplan/ictcore.xml %{buildroot}/etc/freeswitch/dialplan
 

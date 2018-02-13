@@ -5,6 +5,10 @@ SELECT @roleId := role_id FROM role WHERE name='user';
 -- provider permissions
 SELECT @permissionId := permission_id FROM permission WHERE name='api';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* api */
+SELECT @permissionId := permission_id FROM permission WHERE name='statistic_read';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* statistic_read */
+SELECT @permissionId := permission_id FROM permission WHERE name='configuration_read';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* configuration_read */
 SELECT @permissionId := permission_id FROM permission WHERE name='contact';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* contact */
 SELECT @permissionId := permission_id FROM permission WHERE name='document';

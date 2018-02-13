@@ -1076,6 +1076,15 @@ Replace {account_id} in url with valid account_id
 * __Response__  
 account details in associative array
 
+### GET accounts/{account_id}/provisioning
+Retrieve account configuration for softphone / web phones
+
+* __Parameters__  
+Replace {account_id} in url with valid account_id
+
+* __Response__  
+An associative array consisting username, password, host and ports for softphone plus account details as member array
+
 ### PUT accounts/{account_id}
 Update an existing account
 

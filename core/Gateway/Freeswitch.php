@@ -156,6 +156,8 @@ class Freeswitch extends Gateway
   {
     global $path_etc;
     switch ($type) {
+      case 'user':
+        return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/dialplan/user/$name.xml";
       case 'account':
       case 'extension':
         return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/directory/account/$name.xml";

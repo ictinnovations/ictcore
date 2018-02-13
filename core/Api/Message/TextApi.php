@@ -40,7 +40,7 @@ class TextApi extends Api
    * List all available texts
    *
    * @url GET /texts
-   * @url GET /message/texts
+   * @url GET /messages/texts
    */
   public function list_view($query = array())
   {

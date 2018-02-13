@@ -11,9 +11,11 @@ namespace ICT\Core\Api;
 
 use ICT\Core\Account;
 use ICT\Core\Api;
+use ICT\Core\Conf;
 use ICT\Core\CoreException;
 use ICT\Core\Program;
 use ICT\Core\User;
+use stdClass;
 
 class AccountApi extends Api
 {
@@ -59,6 +61,34 @@ class AccountApi extends Api
 
     $oAccount = new Account($account_id);
     return $oAccount;
+  }
+
+  /**
+   * Gets the provisioning information by account id
+   *
+   * @url GET /accounts/$account_id/provisioning
+   */
+  public function provisioning($account_id)
+  {
+    $this->_authorize('account_read');
+
+    $oAccount = $this->read($account_id);
+
+    $oProvisioning = new stdClass();
+    $oProvisioning->username = $oAccount->username;
+    $oProvisioning->password = $oAccount->passwd;
+    $oProvisioning->callerid = $oAccount->phone;
+    $aProvisioning = Conf::get('provisioning');
+    foreach ($aProvisioning as $field => $value) {
+      $oProvisioning->{$field} = $value;
+    }
+    $oProvisioning->dialplan = array(
+      'agent_login' => '*'.$oAccount->phone,
+      'voicemail' => '*78',
+    );
+    $oProvisioning->account = $oAccount; // all other account informations
+
+    return $oProvisioning;
   }
 
   /**

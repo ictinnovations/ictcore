@@ -10,6 +10,7 @@ namespace ICT\Core\Api;
  * *************************************************************** */
 
 use ICT\Core\Api;
+use ICT\Core\Conf;
 use ICT\Core\Core;
 use ICT\Core\Gateway\Freeswitch;
 use ICT\Core\Request;
@@ -24,6 +25,7 @@ class CoreApi extends Api
    */
   public function statistics()
   {
+    $this->_authorize('statistic_read');
     return Core::statistic();
   }
 
@@ -34,6 +36,9 @@ class CoreApi extends Api
    */
   public function process($gateway_flag, $spool_id, $application_id, $data = array())
   {
+    $this->_authorize('transmission_create');
+    $this->_authorize('transmission_update');
+
     // now process the main request
     $oResponse = $this->process_response($spool_id, $application_id, $data, $gateway_flag);
     // and publish output

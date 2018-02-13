@@ -56,7 +56,7 @@ class Account
    * @see void function Account::set_username()
    * @var string 
    */
-  protected $username = NULL;
+  public $username = NULL;
 
   /** @var string */
   public $passwd = NULL;

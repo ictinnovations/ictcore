@@ -137,6 +137,9 @@ CREATE TABLE role_permission
 -- Common permissions
 INSERT INTO permission VALUES (NULL, 'api', '');
 INSERT INTO permission VALUES (NULL, 'api_access', '');
+INSERT INTO permission VALUES (NULL, 'statistic_read', '');
+INSERT INTO permission VALUES (NULL, 'configuration_read', '');
+INSERT INTO permission VALUES (NULL, 'configuration_write', '');
 -- Program permissions
 INSERT INTO permission VALUES (NULL, 'program', '');
 INSERT INTO permission VALUES (NULL, 'program_create', '');

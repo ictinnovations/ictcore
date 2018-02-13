@@ -149,6 +149,7 @@ Account / Email / DID / Extension
 * POST accounts
 * GET accounts
 * GET accounts/{account_id}
+* GET accounts/{account_id}/provisioning
 * PUT accounts/{account_id}
 * DELETE accounts/{account_id}
 * PUT /accounts/{account_id}/programs/{program\_name}
