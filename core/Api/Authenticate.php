@@ -51,6 +51,11 @@ class AuthenticateApi extends Api
     try {
       $oUser = User::authenticate($credentials, $key_type);
       $oUser->token = $oUser->generate_token();
+      $oUser->access_token = $oUser->token;
+      $oUser->expires_in = (60 * 60 * 24 * 30 * 12 * 1); // valid for one year
+      $oUser->token_type = 'Bearer';
+      $oUser->scope = 'All';
+
       return $oUser;
     } catch (CoreException $ex) {
       throw new CoreException(401, 'Invalid user name and password: '.$ex->getMessage());
