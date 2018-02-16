@@ -172,8 +172,9 @@ class Template extends Message
     if (file_exists($file_path)) {
       $oSession = Session::get_instance();
       $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
-      $raw_type = strtolower(end(explode('.', $file_path)));
-      $file_type = empty($file_type) ? 'html' : $raw_type;
+      $file_parts = explode('.', $file_path);
+      $raw_type = strtolower(end($file_parts));
+      $file_type = empty($raw_type) ? 'html' : $raw_type;
       $file_name = 'attachment_' . $user_id . '_';
       $file_name .= DB::next_record_id($file_name);
       $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;

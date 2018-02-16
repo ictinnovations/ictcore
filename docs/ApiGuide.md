@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://ictcore.example.com/
+HOST: http://ictcore.example.com
 
 # ICTCore REST APIs Guide
 
@@ -167,6 +167,23 @@ HOST: http://ictcore.example.com/
 + account_id: 1 (number) - account_id of associated account
 + status: active (string) - current status of campaign
 
+## Spool (object)
++ spool_id: 1 (number)
++ time_spool: 1518705479 (number)
++ time_start: 1518705479 (number)
++ time_connect: 1518705479 (number)
++ time_end: 1518705479 (number)
++ status: completed (string)
++ response: busy (string)
++ transmission_id: 1 (number)
+
+## Result (object)
++ spool_result_id: 1 (number)
++ spool_id: 1 (number)
++ type: dtmf (string) - type of result
++ name: age (string) - result id / name
++ data: 22 (string) - actual result
+
 # Group Authentication
 
 ## Authentication [/authentication]
@@ -179,16 +196,16 @@ __Note:__ Unlike other APIs this API does not require separate authentication in
 
 + Request (application/json)
 
-        {
-            "username": "Enter user name",
-            "password":"Enter user password",
-        }
+    + Attributes
+
+        + username: admin (string) - api username for authentication
+        + passowrd: mysecret (string) - api password for authentication
 
 + Response 200 (application/json)
     
     + Attributes 
         
-        + toke : token (string) 
+        + token : token (string) 
 
 # Group System Statistics
 
@@ -197,6 +214,12 @@ __Note:__ Unlike other APIs this API does not require separate authentication in
 Get system statistics, like total and active campaigns, total contacts, total number of calls made etc
 
 ### Get System Statistics [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -211,6 +234,10 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Contact)
 
 + Response 200 (application/json)
@@ -222,6 +249,12 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 
 ### Get All Contacts [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
   + Attributes (array[Contact])
@@ -229,10 +262,17 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 ## Single Contact [/contacts/{contact_id}]
 
 + Parameters
+
     + contact_id (number) - ID of the contact in the form of an integer
 
 
 ### View a Contact Detail [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -242,6 +282,10 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Contact)
 
 + Response 200 (application/json)
@@ -250,17 +294,28 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 
 ### Delete Contact [DELETE]
 
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
 ## Contact association with group [/contacts/{contact_id}/link/{group_id}]
 
 + Parameters
+
     + contact_id (number) - ID of the contact in the form of an integer
     + group_id (number) - ID of the group in the form of an integer
 
 ### Create association [PUT]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -269,6 +324,12 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 ### Delete association [DELETE]
 
 remove selected contact from provided contact group
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -283,6 +344,10 @@ remove selected contact from provided contact group
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Group)
 
 + Response 200 (application/json)
@@ -294,6 +359,12 @@ remove selected contact from provided contact group
 
 ### Get All Groups [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
   + Attributes (array[Group])
@@ -301,9 +372,16 @@ remove selected contact from provided contact group
 ## Single Group [/groups/{group_id}]
 
 + Parameters
+
     + group_id (number) - ID of the group in the form of an integer
 
 ### View a Group Detail [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -313,6 +391,10 @@ remove selected contact from provided contact group
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Group)
 
 + Response 200 (application/json)
@@ -321,14 +403,27 @@ remove selected contact from provided contact group
 
 ### Delete Group [DELETE]
 
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200
 
 ## Group's Contacts collection [/groups/{group_id}/contacts]
 
 + Parameters
+
     + group_id (number) - ID of the group in the form of an integer
 
 ### Get all Contacts from Group [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -337,15 +432,20 @@ remove selected contact from provided contact group
 ## CSV Contact Import / Export for Group [/groups/{group_id}/csv]
 
 + Parameters
+
     + group_id (number) - ID of the group in the form of an integer
 
 ### Import Contacts into Group [POST]
 
 + Request (text/csv)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Body
 
-             Csv file content here
+            "CSV file contents"
 
 + Response 200
 
@@ -353,11 +453,17 @@ remove selected contact from provided contact group
 
 Download complete contacts from selected contact group as csv file
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (text/csv)
 
     + Body
 
-            contact list in csv file
+            "CSV file contents"
 
 ## Sample Csv File [/groups/sample/csv]
 
@@ -365,11 +471,17 @@ Download a sample csv file
 
 ### Get Sample csv file [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (text/csv)
 
     + Body
 
-            sample contact list in csv file
+            "CSV Sample file contents"
 
 
 # Group Message
@@ -382,6 +494,10 @@ There are different kinds of messages like fax,voice,sms and email
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (DocumentPost)
 
 + Response 200 (application/json)
@@ -392,6 +508,12 @@ There are different kinds of messages like fax,voice,sms and email
 
 
 ### Get all Documnets [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -407,6 +529,12 @@ Note: Media / document can be downloaded separately using GET messages/documents
 
 ### View a Document Detail [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Document)
@@ -415,6 +543,10 @@ Note: Media / document can be downloaded separately using GET messages/documents
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Document)
 
 + Response 200 (application/json)
@@ -422,6 +554,12 @@ Note: Media / document can be downloaded separately using GET messages/documents
     + Attributes (Document)
 
 ### Delete Document [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -437,26 +575,35 @@ Upload media / pdf file for an existing document, this method should be called f
 
 + Request (application/pdf)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Body
 
-            Pdf file content here
+            "Pdf file contents"
 
 + Response 200 (application/json)
 
-    + Body
+    + Attributes
 
-            document_id of updated record
+        + document_id: 1 (number) - document id of updated record
 
 ### Get Document [GET]
 
 Download Documen file
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/pdf)
 
     + Body
 
-
-                Download pdf file
+            "Pdf file contents"
 
 # Group Voice Recordings
 
@@ -465,6 +612,10 @@ Download Documen file
 ### Create New Recording [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Document)
 
@@ -477,21 +628,31 @@ Download Documen file
 
 ### Get all Recording [GET]
 
+Note: Media / recording can be downloaded separately using GET messages/recording/{recording_id}/media
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (array[Document])
 
-    + Body
-
-            Note: Media / recording can be downloaded separately using GET messages/recording
-            /{recording_id}/media
-
 ## Single Recording [/messages/recordings/{recording_id}]
+
 + Parameters
 
     + recording_id (number) - ID of the recording in the form of an integer
 
 ### View a Recording Detail [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -501,6 +662,10 @@ Download Documen file
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Document)
 
 + Response 200 (application/json)
@@ -509,6 +674,12 @@ Download Documen file
 
 
 ### Delete Recording [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -524,25 +695,35 @@ Upload media / wav file for an existing recording, this method should be called 
 
 + Request (audio/wav)
 
-     + Body
+    + Headers
 
-            Wav file content here
-
-+ Response 200 (application/json)
+            Authentication: Bearer JWT
 
     + Body
 
-            recording_id of updated record
+            "Recording file contents"
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + recording_id: 1 (number) - recording id of updated record
 
 ### Get Recording [GET]
 
 Download wav file
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (audio/wav)
 
     + Body
 
-            Download wav file
+            "Recording file contents"
 
 # Group Email templates
 
@@ -551,6 +732,10 @@ Download wav file
 ### Create New Template [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Template)
 
@@ -563,21 +748,31 @@ Download wav file
 
 ### Get all Templates [GET]
 
+Note: Media / attachment can be downloaded separately using GET messages/templates/{template_id}/media
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (array[Template])
 
-    + Body
-
-            Note: Media / attachment can be downloaded separately using GET messages/templates
-            /{template_id}/media
-
 ## Single Template [/messages/templates/{template_id}]
+
 + Parameters
 
     + template_id (number) - ID of the template in the form of an integer
 
 ### View a Template Detail [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -587,14 +782,23 @@ Download wav file
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Template)
 
 + Response 200 (application/json)
 
     + Attributes (Template)
 
-
 ### Delete Template [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -610,25 +814,35 @@ Upload media / attachment for an existing template, this method should be called
 
 + Request (text/plain)
 
-     + Body
+    + Headers
 
-            file content here
-
-+ Response 200 (application/json)
+            Authentication: Bearer JWT
 
     + Body
 
-            template_id of updated record
+            "Email template contents"
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + template_id: 1 (number) - template id of updated record
 
 ### Get Template file [GET]
 
 Download file
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (text/html)
 
     + Body
 
-            Download  file
+            "Email template contents"
 
 # Group SMS Text Message
 
@@ -637,6 +851,10 @@ Download file
 ### Create New Texts [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Text)
 
@@ -648,6 +866,12 @@ Download file
 
 
 ### Get all Text Messages [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -661,6 +885,12 @@ Download file
 
 ### View a Text Detail [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Text)
@@ -668,6 +898,10 @@ Download file
 ### Update Text [PUT]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Text)
 
@@ -677,6 +911,12 @@ Download file
 
 
 ### Delete Text [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -688,22 +928,41 @@ To create program please use respective APIs separately designed for each type o
 
 ### Get all Programs [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (array[Program])
 
 ## Single Program [/programs/{program_id}]
+
 + Parameters
 
     + program_id (number) - ID of the program in the form of an integer
 
 ### View a Program Detail [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Program)
 
 ### Delete Program [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -718,17 +977,25 @@ To create program please use respective APIs separately designed for each type o
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Transmission)
 
 + Response 200 (application/json)
 
-    + Body
+    + Attributes
 
-            {
-                transmission_id: 1 (number) - transmission id of recently created transmission
-            }
+        + transmission_id: 1 (number) - transmission id of recently created transmission
 
 ### Get Transmistion [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -742,6 +1009,10 @@ To create program please use respective APIs separately designed for each type o
 ### Create New Email to Fax program [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (ProgramEmailtofax)
 
@@ -760,6 +1031,10 @@ To create program please use respective APIs separately designed for each type o
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (ProgramFaxtoemail)
 
 + Response 200 (application/json)
@@ -775,6 +1050,10 @@ To create program please use respective APIs separately designed for each type o
 ### Create New  Receive Email program [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (ProgramReceiveemail)
 
@@ -793,6 +1072,10 @@ To create program please use respective APIs separately designed for each type o
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (ProgramReceivefax)
 
 + Response 200 (application/json)
@@ -809,6 +1092,10 @@ To create program please use respective APIs separately designed for each type o
 ### Create New  Receive SMS program [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (ProgramReceivesms)
 
@@ -827,6 +1114,10 @@ To create program please use respective APIs separately designed for each type o
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (ProgramSendemail)
 
 + Response 200 (application/json)
@@ -834,7 +1125,6 @@ To create program please use respective APIs separately designed for each type o
     + Attributes
 
         + program_id : 1 (number) - program id  of recently created program
-
 
 # Group Send FAX program
 
@@ -845,6 +1135,10 @@ Prepare given fax document for provided account, and make it ready to be sent
 ### Create New  Send FAX program [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (ProgramSendfax)
 
@@ -864,6 +1158,10 @@ Prepare given SMS for provided account, and make it ready to be sent
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (ProgramSendsms)
 
 + Response 200 (application/json)
@@ -881,6 +1179,10 @@ Prepare given voice recording for provided account, and make it ready to be play
 ### Create New  Voice Message program [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (ProgramVoicemessage)
 
@@ -901,6 +1203,10 @@ create call request / dial / send message
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Transmission)
 
 + Response 200 (application/json)
@@ -911,11 +1217,18 @@ create call request / dial / send message
 
 ### Get all Transmissions [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Transmission)
 
 ## Transmition Send [/transmissions/{transmission_id}/send]
+
 + Parameters
 
     + transmission_id (number) - ID of the transmission in the form of an integer
@@ -923,6 +1236,10 @@ create call request / dial / send message
 ### Send Transmition [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -932,6 +1249,7 @@ create call request / dial / send message
             
 
 ## Transmition Retry [/transmissions/{transmission_id}/retry]
+
 + Parameters
 
     + transmission_id (number) - ID of the transmission in the form of an integer
@@ -939,6 +1257,10 @@ create call request / dial / send message
 ### Retry Transmition [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -948,6 +1270,7 @@ create call request / dial / send message
             
 
 ## Transmission Schdule [/transmissions/{transmission_id}/schedule]
+
 + Parameters
 
     + transmission_id (number) - ID of the transmission in the form of an integer
@@ -958,6 +1281,10 @@ Instead of delivering message instantly, schedule its delivery in near future.
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes
@@ -966,6 +1293,12 @@ Instead of delivering message instantly, schedule its delivery in near future.
 
 
 ### Delete Text [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -978,6 +1311,12 @@ Instead of delivering message instantly, schedule its delivery in near future.
 ### Get Transmission Clone [GET]
 
 Want to resend an already completed transmission, copy it (Note: after copying, client still need to request send method for message delivery)
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -994,6 +1333,12 @@ Want to resend an already completed transmission, copy it (Note: after copying, 
 
 ### Get a Transmission [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Transmission)
@@ -1008,6 +1353,10 @@ Create campaign for message delivery / calling bulk contacts
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Campaign)
 
 + Response 200 (application/json)
@@ -1018,6 +1367,12 @@ Create campaign for message delivery / calling bulk contacts
 
 
 ### Get all Campaign [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1033,6 +1388,10 @@ Create campaign for message delivery / calling bulk contacts
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Campaign)
 
 + Response 200 (application/json)
@@ -1041,11 +1400,23 @@ Create campaign for message delivery / calling bulk contacts
 
 ### Get a Campaign [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Campaign)
 
 ### Delete Campaign [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -1061,6 +1432,9 @@ Start contact processing / calling in selected campaign
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1081,6 +1455,9 @@ Stop contact processing / calling in selected campaign
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1100,6 +1477,10 @@ Stop contact processing / calling in selected campaign
 Instead of processing campaign contacts instantly, schedule their processing / calling in near future.
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1121,6 +1502,10 @@ Instead manually stopping a campaign, we can schedule it.
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes
@@ -1138,11 +1523,18 @@ Instead manually stopping a campaign, we can schedule it.
 
 Cancel any schedule associated with given campaign
 
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200
 
 # Group Reports
 
 ## Get Transmission Status Report [/transmissions/{transmission_id}/status]
+
 + Parameters
 
     + transmission_id (number) - ID of the transmission in the form of an integer
@@ -1150,6 +1542,12 @@ Cancel any schedule associated with given campaign
 ### Transmission Status [GET]
 
 Get current status of an existing transmission
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1159,6 +1557,7 @@ Get current status of an existing transmission
 
 
 ## Get Transmission detail Report [/transmissions/{transmission_id}/detail]
+
 + Parameters
 
     + transmission_id (number) - ID of the transmission in the form of an integer
@@ -1167,15 +1566,18 @@ Get current status of an existing transmission
 
 A list of attempts (spool) with their detail, which system has made to deliver that transmission
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
-    + Body
-
-            {
-                Will return an array of spool records
-            }
+    + Attributes (array[Spool])
 
 ## Get Transmission result Report [/transmissions/{transmission_id}/result]
+
 + Parameters
 
     + transmission_id (number) - ID of the transmission in the form of an integer
@@ -1184,15 +1586,18 @@ A list of attempts (spool) with their detail, which system has made to deliver t
 
 Complete details of each step along with remote side responses, for requested transmission
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
-    + Body
-
-            {
-                 Will return a array of application results
-            }
+    + Attributes (array[Result])
 
 ## Get Spool result status [/spools/{spool_id}/status]
+
 + Parameters
 
     + spool_id (number) - ID of the spool in the form of an integer
@@ -1200,6 +1605,12 @@ Complete details of each step along with remote side responses, for requested tr
 ### Spool Status [GET]
 
 Get current status of an existing transmission attempt (spool)
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1218,13 +1629,15 @@ Get current status of an existing transmission attempt (spool)
 
 Complete details of each step along with remote side responses, for requested transmission attempt `spool_id`
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
-    + Body
-
-            {
-                  Will return a array of application results against given transmission attempt spool id
-            }
+    + Attributes (array[Result])
 
 # Group User account / Email / DID / Extension
 
@@ -1233,6 +1646,10 @@ Complete details of each step along with remote side responses, for requested tr
 ### Create Account [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Account)
 
@@ -1243,6 +1660,12 @@ Complete details of each step along with remote side responses, for requested tr
          + account_id: 1 (number) - account id of recently created account record
 
 ### Get All Accounts [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1259,6 +1682,12 @@ Complete details of each step along with remote side responses, for requested tr
 
 Read / view complete account data
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Account)
@@ -1269,6 +1698,10 @@ Update an existing account
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (Account)
 
 + Response 200 (application/json)
@@ -1278,6 +1711,12 @@ Update an existing account
 ### Delete Account [DELETE]
 
 Delete an existing account
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -1292,22 +1731,39 @@ Delete an existing account
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Account)
 
 ### Unsubscribe an account from given program [DELETE]
 
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Account)
 
 ## Clear an account from all subscribed programs [/accounts/{account_id}/programs]
+
 + Parameters
 
     + account_id (number) - ID of the account in the form of an integer
 
 ### Clear an account all subscribed program [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1324,6 +1780,10 @@ Delete an existing account
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Account)
@@ -1335,6 +1795,12 @@ Delete an existing account
     + account_id (number) - ID of the account in the form of an integer
 
 ### Dissociate a account from any user, make it free to assign [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1348,6 +1814,10 @@ Delete an existing account
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (User)
 
 + Response 200 (application/json)
@@ -1359,6 +1829,12 @@ Delete an existing account
 ### Get All Users [GET]
 
 list all exiting users, optionally client can filter users using query string (key value pair) in url, while using any of following fields
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200 (application/json)
 
@@ -1372,6 +1848,12 @@ list all exiting users, optionally client can filter users using query string (k
 
 ### View a User Detail [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (User)
@@ -1380,6 +1862,10 @@ list all exiting users, optionally client can filter users using query string (k
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
     + Attributes (User)
 
 + Response 200 (application/json)
@@ -1387,6 +1873,12 @@ list all exiting users, optionally client can filter users using query string (k
     + Attributes (User)
 
 ### Delete User [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -1401,11 +1893,21 @@ list all exiting users, optionally client can filter users using query string (k
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (User)
 
 ### Delete User Role [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -1420,11 +1922,21 @@ list all exiting users, optionally client can filter users using query string (k
 
 + Request (application/json)
 
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (User)
 
 ### Delete User Permissions [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
 + Response 200
 
@@ -1435,6 +1947,10 @@ list all exiting users, optionally client can filter users using query string (k
 ### Create Provider [POST]
 
 + Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Provider)
 
@@ -1447,6 +1963,12 @@ list all exiting users, optionally client can filter users using query string (k
 
 ### Get All Providers [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (array[Provider])
@@ -1455,7 +1977,11 @@ list all exiting users, optionally client can filter users using query string (k
 
 ### Update Provider [PUT]
 
-+ Request (application/josn)
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
 
     + Attributes (Provider)
 
@@ -1465,11 +1991,23 @@ list all exiting users, optionally client can filter users using query string (k
 
 ### View a Provider Detail [GET]
 
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200 (application/json)
 
     + Attributes (Provider)
 
 ### Delete Providers [DELETE]
 
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
 + Response 200
-     
+

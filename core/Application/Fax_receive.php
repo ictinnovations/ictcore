@@ -60,8 +60,9 @@ class Fax_receive extends Application
 
   public function __construct($application_id = null, $aParameter = null)
   {
+    global $path_cache;
     parent::__construct($application_id, $aParameter);
-    $this->fax_file = tempnam('/tmp', 'fax_') . '.tif';
+    $this->fax_file = tempnam($path_cache, 'fax_') . '.tif';
   }
 
   public function execute()
