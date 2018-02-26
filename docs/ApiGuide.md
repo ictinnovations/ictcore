@@ -184,13 +184,13 @@ HOST: http://ictcore.example.com
 + name: age (string) - result id / name
 + data: 22 (string) - actual result
 
-# Group Authentication
+# Group Authenticate
 
-## Authentication [/authentication]
+## Authentication [/authenticate]
 
 Create and return authentication token / session key.
 
-### Authentication parameter [POST]
+### Authenticate parameter [POST]
 
 __Note:__ Unlike other APIs this API does not require separate authentication in header
 
@@ -591,7 +591,7 @@ Upload media / pdf file for an existing document, this method should be called f
 
 ### Get Document [GET]
 
-Download Documen file
+Download Document file
 
 + Request
 
@@ -989,7 +989,7 @@ To create program please use respective APIs separately designed for each type o
 
         + transmission_id: 1 (number) - transmission id of recently created transmission
 
-### Get Transmistion [GET]
+### Get Transmission [GET]
 
 + Request
 
@@ -1974,6 +1974,10 @@ list all exiting users, optionally client can filter users using query string (k
     + Attributes (array[Provider])
 
 ## Single Provider Action [/providers/{provider_id}]
+
++ Parameters
+
+    + provider_id (number) - ID of the user in the form of an integer
 
 ### Update Provider [PUT]
 
