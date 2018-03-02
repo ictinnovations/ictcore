@@ -69,6 +69,9 @@ class CampaignApi extends Api
     $this->set($oCampaign, $data);
 
     if ($oCampaign->save()) {
+      if ($oCampaign->status == Campaign::STATUS_RUNNING) {
+        $oCampaign->reload();
+      }
       return $oCampaign;
     } else {
       throw new CoreException(417, 'Campaign update failed');

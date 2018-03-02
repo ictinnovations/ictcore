@@ -77,6 +77,12 @@ class CampaignCli
    */
   private $is_active = false;
 
+  /**
+   * Delay between each transmission
+   * @var integer $delay
+   */
+  private $delay = 1000000; // one second
+
   public function __construct($campaign_id)
   {
     $this->campaign_id = $campaign_id;
@@ -85,7 +91,7 @@ class CampaignCli
     // set stop signal handler
     pcntl_signal(SIGQUIT, array($this, "signal_stop"));
     pcntl_signal(SIGABRT, array($this, "signal_stop"));
-    pcntl_signal(SIGKILL, array($this, "signal_stop"));
+    /* produce error  pcntl_signal(SIGKILL, array($this, "signal_stop")); */
     pcntl_signal(SIGTERM, array($this, "signal_stop"));
 
     // set reload signal handler
@@ -116,6 +122,9 @@ class CampaignCli
       throw new CoreException(423, 'Campaign already completed');
     }
     \ICT\Core\do_login($this->oCampaign->created_by);
+
+    $cpm = empty($this->oCampaign->cpm) ? 2 : $this->oCampaign->cpm;
+    $this->delay = (1000000 * 60) / $cpm;
   }
 
   public function prepare()
@@ -129,7 +138,7 @@ class CampaignCli
         $this->prepare_transmission($oProgram, $aContact['contact_id']);
         $count++;
       } catch (CoreException $e) {
-        Corelog::log('Unable to create transmission skipping. error:' . $e->getMessage, Corelog::WARNING);
+        Corelog::log('Unable to create transmission skipping. error:' . $e->getMessage(), Corelog::WARNING);
       }
     }
 
@@ -182,6 +191,8 @@ class CampaignCli
 
   private function process($listTransmission = array())
   {
+    $recent_attempt = round(microtime(true) * 1000);
+
     foreach ($listTransmission as $aTransmission) {
 
       // Stop processing if campaign is not active
@@ -190,12 +201,15 @@ class CampaignCli
       }
 
       // delay is required for system stability
-      usleep($this->oCampaign->delay);
+      $current_time = round(microtime(true) * 1000);
+      usleep($this->delay - ($current_time - $recent_attempt));
+      $recent_attempt = $current_time;
 
       try { // now send the transmission, in case of error simply skip that transmission
+        Corelog::log('Sending transmission with id: ' . $aTransmission['transmission_id'], Corelog::INFO);
         $this->transmission_send($aTransmission['transmission_id']);
       } catch (CoreException $e) {
-        Corelog::log('Unable to send transmission skipping. error:' . $e->getMessage, Corelog::WARNING);
+        Corelog::log('Unable to send transmission skipping. error:' . $e->getMessage(), Corelog::WARNING);
       }
     }
 

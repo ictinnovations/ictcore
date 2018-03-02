@@ -25,7 +25,7 @@ class Campaign
       'campaign_id ',
       'program_id',
       'group_id',
-      'delay',
+      'cpm',
       'try_allowed',
       'account_id',
       'created_by',
@@ -51,7 +51,7 @@ class Campaign
   public $group_id = NULL;
 
   /** @var string */
-  public $delay = NULL;
+  public $cpm = NULL;
 
   /** @var string */
   public $try_allowed = NULL;
@@ -116,7 +116,7 @@ class Campaign
       $this->campaign_id = $data['campaign_id'];
       $this->program_id  = $data['program_id'];
       $this->group_id    = $data['group_id'];
-      $this->delay       = $data['delay'];
+      $this->cpm         = $data['cpm'];
       $this->try_allowed = $data['try_allowed'];
       $this->account_id  = $data['account_id'];
       $this->status      = $data['status'];
@@ -167,6 +167,16 @@ class Campaign
     }
   }
 
+  public function set_delay($delay)
+  {
+    $this->cpm = $delay;
+  }
+
+  public function get_delay()
+  {
+    return $this->delay;
+  }
+
   public function get_id()
   {
     return $this->campaign_id;
@@ -182,7 +192,7 @@ class Campaign
         'campaign_id' => $this->campaign_id,
         'program_id' => $this->program_id,
         'group_id' => $this->group_id,
-        'delay' => $this->delay,
+        'cpm' => $this->cpm,
         'try_allowed' => $this->try_allowed,
         'account_id' => $this->account_id,
         'status' => $this->status
@@ -211,6 +221,11 @@ class Campaign
     return $this->daemon('stop');
   }
 
+  public function reload()
+  {
+    return $this->daemon('reload');
+  }
+
   public function daemon($action = 'start')
   {
     global $path_root;
@@ -218,7 +233,7 @@ class Campaign
     /* Excutable file start / stop deamon */
     $output = array();
     $result = false;
-    exec("$daemon $this->campaign_id  $action", $output, $result);
+    exec("$daemon $this->campaign_id $action", $output, $result);
     if ($result != 0) {
       return false;
     } else {

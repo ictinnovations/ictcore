@@ -162,7 +162,7 @@ HOST: http://ictcore.example.com
 ## Campaign (object)
 + program_id: 1 (number)
 + group_id: 2 (number)
-+ delay: 2 (number) - pause between transmissions `milliseconds`
++ cpm: 2 (number) - transmissions / cycles per second
 + try_allowed: 2 (number)
 + account_id: 1 (number) - account_id of associated account
 + status: active (string) - current status of campaign

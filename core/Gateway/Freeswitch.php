@@ -49,19 +49,43 @@ class Freeswitch extends Gateway
 
   protected function connect()
   {
+    static $fs_conn = NULL;
+    static $last_check = NULL;
 
-    $this->conn = fsockopen($this->host, $this->port);
-    socket_set_blocking($this->conn, false);
+    if (empty($this->conn) && $fs_conn !== NULL) {
+      $this->conn = $fs_conn;
+    }
+
+    // try to use existing connection
     if ($this->conn) {
-      while (!feof($this->conn)) {
-        $buffer = fgets($this->conn, 1024);
+      if (($last_check + 300) > time()) {
+        return $this->conn;
+      } else {
+        $status = socket_get_status($this->conn);
+        $last_check = time();
+        if ($status['timed_out'] == false && $status['blocked'] == false) {
+          return $this->conn;
+        }
+      }
+    }
+
+    $fs_socket = "tcp://$this->host:$this->port";
+    $error_no  = 0;
+    $error_msg = '';
+    if ($socket = stream_socket_client($fs_socket, $error_no, $error_msg)) {
+      stream_set_blocking($socket, false); // none blocking
+      stream_set_timeout($socket, 3);
+      while (!feof($socket)) {
+        $buffer = fgets($socket, 1024);
         usleep(100); //allow time for reponse
         if (trim($buffer) == "Content-Type: auth/request") {
-          fputs($this->conn, "auth $this->password\n\n");
+          fputs($socket, "auth $this->password\n\n");
           break;
         }
       }
       Corelog::log("Freeswitch connected successfully", Corelog::DEBUG);
+      $fs_conn = $socket;
+      $this->conn = $socket;
       return $this->conn;
     } else {
       Corelog::log("Freeswitch connection failed", Corelog::ERROR);
@@ -106,7 +130,7 @@ class Freeswitch extends Gateway
       fputs($this->conn, $command . "\n\n");
     }
 
-    $this->dissconnect();
+    //$this->dissconnect();
   }
 
   private function _read() {
