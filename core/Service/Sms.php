@@ -135,9 +135,9 @@ class Sms extends Service
     if ($oProvider->active) {
       $oToken = new Token();
       $oToken->add('provider', $oProvider);
-      $this->config_save($oProvider->type, $oToken, $oProvider->name);
+      $this->config_save($oProvider->type, $oToken, 'provider_' . $oProvider->provider_id);
     } else {
-      $this->config_delete($oProvider->type, $oProvider->name);
+      $this->config_delete($oProvider->type, 'provider_' . $oProvider->provider_id);
     }
     Sms::config_status(Sms::STATUS_NEED_RELOAD);
   }

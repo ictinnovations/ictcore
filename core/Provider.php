@@ -50,7 +50,7 @@ class Provider
    * @property-read string $type
    * @var string
    */
-  protected $type = 'provider';
+  public $type = 'provider';
 
   /**
    * @property integer $service_flag 
@@ -260,6 +260,7 @@ class Provider
 
     if (isset($data['provider_id']) && !empty($data['provider_id'])) {
       // update existing record
+      unset($data['type']); // don't allow to change type
       $result = DB::update(self::$table, $data, 'provider_id', true);
       Corelog::log("Provider updated: $this->provider_id", Corelog::CRUD);
     } else {

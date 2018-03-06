@@ -158,9 +158,9 @@ class Fax extends Service
     if ($oAccount->active) {
       $oToken = new Token();
       $oToken->add('account', $oAccount);
-      $this->config_save($oAccount->type, $oToken, $oAccount->username);
+      $this->config_save($oAccount->type, $oToken, 'account_' . $oAccount->account_id);
     } else {
-      $this->config_delete($oAccount->type, $oAccount->username);
+      $this->config_delete($oAccount->type, 'account_' . $oAccount->account_id);
     }
     $oUser = new User($oAccount->user_id);
     $this->config_update_user($oUser);
@@ -174,9 +174,9 @@ class Fax extends Service
       $oToken = new Token();
       $oToken->add('user', $oUser);
       $oToken->add('user_accounts', $listAccount);
-      $this->config_save('user', $oToken, $oUser->username);
+      $this->config_save('user', $oToken, 'user_' . $oUser->user_id);
     } else {
-      $this->config_delete('user', $oUser->username);
+      $this->config_delete('user', 'user_' . $oUser->user_id);
     }
     Fax::config_status(Fax::STATUS_NEED_RELOAD);
   }
@@ -186,9 +186,9 @@ class Fax extends Service
     if ($oProvider->active) {
       $oToken = new Token();
       $oToken->add('provider', $oProvider);
-      $this->config_save($oProvider->type, $oToken, $oProvider->name);
+      $this->config_save($oProvider->type, $oToken, 'provider_' . $oProvider->provider_id);
     } else {
-      $this->config_delete($oProvider->type, $oProvider->name);
+      $this->config_delete($oProvider->type, 'provider_' . $oProvider->provider_id);
     }
     Fax::config_status(Fax::STATUS_NEED_RELOAD);
   }

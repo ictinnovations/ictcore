@@ -19,7 +19,7 @@ class Smtp extends Provider
    * @property-read string $type
    * @var string 
    */
-  protected $type = 'smtp';
+  public $type = 'smtp';
 
   /**
    * @property integer $service_flag

@@ -38,7 +38,15 @@ class TransmissionApi extends Api
       throw new CoreException(412, 'program_id is missing');
     }
     if (empty($data['contact_id'])) {
-      throw new CoreException(412, 'contact_id is missing');
+      if (!empty($data['phone']) || !empty($data['email'])) {
+        $oContact = new Contact();
+        $oContact->phone = empty($data['phone']) ? null : $data['phone'];
+        $oContact->email = empty($data['email']) ? null : $data['email'];
+        $oContact->save();
+        $contact_id = $oContact->contact_id;
+      } else {
+        throw new CoreException(412, 'contact is missing');
+      }
     } else {
       $contact_id = $data['contact_id'];
     }

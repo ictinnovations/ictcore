@@ -19,7 +19,7 @@ class Smpp extends Provider
    * @property-read string $type
    * @var string 
    */
-  protected $type = 'smpp';
+  public $type = 'smpp';
 
   /**
    * @property integer $service_flag

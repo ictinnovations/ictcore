@@ -208,12 +208,12 @@ class Service
 
   public function config_update_user(User $oUser)
   {
-    Corelog::log("Service->config_update_user demo. username: " . $oUser->username, Corelog::WARNING);
+    Corelog::log("Service->config_update_user demo. user_id: " . $oUser->user_id, Corelog::WARNING);
   }
 
   public function config_update_provider(Provider $oProvider)
   {
-    Corelog::log("Service->config_update_provider demo. name: " . $oProvider->name, Corelog::WARNING);
+    Corelog::log("Service->config_update_provider demo. provider_id: " . $oProvider->provider_id, Corelog::WARNING);
   }
 
   public function config_update_reload()

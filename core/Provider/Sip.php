@@ -19,7 +19,7 @@ class Sip extends Provider
    * @property-read string $type
    * @var string 
    */
-  protected $type = 'sip';
+  public $type = 'sip';
 
   /**
    * @property integer $service_flag

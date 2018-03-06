@@ -15,10 +15,12 @@ class Group
   private static $fields = array(
       'group_id',
       'name',
+      'contact_total',
       'description'
   );
   private static $read_only = array(
-      'group_id'
+      'group_id',
+      'contact_total'
   );
 
   /**
@@ -29,6 +31,9 @@ class Group
 
   /** @var string */
   public $name = NULL;
+
+  /** @var integer */
+  private $contact_total = 0;
 
   /** @var string */
   public $description = '';
@@ -63,7 +68,7 @@ class Group
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT group_id, name FROM " . $from_str;
+    $query = "SELECT group_id, name, contact_total FROM " . $from_str;
     Corelog::log("group search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('group', $query);
     while ($data = mysql_fetch_assoc($result)) {
@@ -88,6 +93,7 @@ class Group
     if ($data) {
       $this->group_id = $data['group_id'];
       $this->name = $data['name'];
+      $this->contact_total = $data['contact_total'];
       $this->description = $data['description'];
       $this->created_by = $data['created_by'];
       Corelog::log("group loaded name: $this->name", Corelog::CRUD);
@@ -145,6 +151,7 @@ class Group
     $data = array(
         'group_id' => $this->group_id,
         'name' => $this->name,
+        // read only 'contact_total' => $this->contact_total,
         'description' => $this->description
     );
 
