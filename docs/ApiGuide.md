@@ -23,167 +23,6 @@ HOST: http://ictcore.example.com
 * __500__ Internal server error. Try again at a later time.
 * __501__ Feature not implemented.
 
-# Data Structures
-
-## Statistics (object)
-+ campaign_total: 1 (number) - total number of campaign
-+ campaign_active: 0 (number) -total number of active campaign
-+ group_total: 12 (number) - number of groups
-+ contact_total: 5 (number) - number of contacts
-+ transmission_total: 1 (number) - number of transmistions
-+ transmission_active: 1 (number) - number of active transmission
-+ spool_total: 1 (number) - number of spools
-+ spool_success: 1 (number) - number of success spools
-+ spool_failed: 1 (number) - number of unsuccessed spools
-
-## Contact (object)
-+ first_name: first name (string, required)
-+ last_name: last name (string, optional)
-+ phone:   03001234567 (number, required)
-+ email:  email (string, optional)
-+ address: address (string, optional)
-+ custom1: custom1 (string, optional)
-+ custom2: custom 2 (string, optional)
-+ custom3: custom 3 (string, optional)
-+ description: description (string, optional)
-
-## Group (object)
-+ id: 1 (number, default) - id is auto increment
-+ name: group name (string,required)
-+ description: Description (string, optional)
-
-## DocumentPost (object)
-+ name: group name (string,required)
-+ description: Description (string, optional)
-
-## Document (DocumentPost)
-+ type: type (string) - three digit file extension representing file type
-
-## Template (object)
-+ name: name (string, required)
-+ description: Description (string, optional)
-+ subject: Subject (string, required)
-+ body:  body (string, required) - HTML Message
-+ body_alt: body alt (string, optional) - Plain Message
-+ type: upload file (string, optional) - three digit file extension representing file type
-
-## Text (object)
-+ name: name (string, required)
-+ data: Data (string, required) - Actual message
-+ type: type (string, optional) - unicode or plain or binary
-+ description: Description (string, optional)
-
-## Program (object)
-+ name: name (string, required)
-+ type: type (string, optional) - program type
-+ parent_id: 1 (number, optional) - program id of parent program
-
-## TransmissionPost (object)
-+ title: title (string)
-+ origin:  origin (string) -  reference to function / program which is responsible creation of this transmission
-+ contact_id:  1 (number, required) - contact id to contact where to transmit message
-+ account_id:  1 (number) -  account id of associated account
-+ service_flag:  1 (number) - Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG
-+ program_id:  1 (number, required) - program id of program which will be used with this transmission
-+ direction:  direction (string) - either can be outbound or inbound
-
-## Transmission (TransmissionPost)
-+ status:  status (string) - if complete or failed
-+ response: response (string) - the cause of error, transmission failure
-
-## ProgramEmailtofax (Program)
-+ account_id: 1 (number) - account id of account for which this program is being created
-
-## ProgramFaxtoemail (Program)
-+ account_id: 1 (number) - account id of account for which this program is being created
-
-## ProgramReceivefax (Program)
-+ account_id: 1 (number) - account id of account for which this program is being created
-
-## ProgramSendfax (Program)
-+ document_id: 1 (number) - document id of fax document for which this program is being created
-
-## ProgramReceiveemail (Program)
-+ account_id: 1 (number) - account id of account for which this program is being created
-
-## ProgramSendemail (Program)
-+ template_id: 1 (number) - template id of email template for which this program is being created
-
-## ProgramReceivesms (Program)
-+ account_id: 1 (number) - account id of account for which this program is being created
-
-## ProgramSendsms (Program)
-+ text_id: 1 (number) - text id of SMS text for which this program is being created
-
-## ProgramVoicemessage (Program)
-+ recording_id: 1 (number) - recording id of voice recording for which this program is being created
-
-## Account (object)
-+ username: username (string)
-+ passwd: password (string)
-+ passwd_pin: password pin (string)
-+ first_name: first name (string)
-+ last_name: last name (string)
-+ phone: 03001234567 (number)
-+ email: email (string)
-+ address: address (string)
-+ active: 1 (number) - 1 for active, 0 for disabled
-
-## User (object)
-+ username: username (string)
-+ passwd: password (string)
-+ first_name: first name (string)
-+ last_name: last name (string)
-+ phone: 03001234567 (number)
-+ email: email (string)
-+ address: address (string)
-+ company: company name (string)
-+ country_id: 1 (number) - see country table
-+ timezone_id: 1 (number) - see timezone table
-+ active: 1 (number) - 1 for active, 0 for disabled
-
-## Provider (object)
-+ name: name (string)
-+ gateway_flag: 1 (number) - Type of gateway i.e Freeswitch::GATEWAY_FLAG or Kannel::GATEWAY_FLAG
-+ service_flag: 1 (number) - Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG
-+ node_id: 1 (number, optional) - see node table
-+ host: ipaddress (string) - ip address to termination server
-+ port: 8080 (number, optional)
-+ username: username (string,required)
-+ password: password (string, optional)
-+ dialstring: dailstring (string, optional)
-+ prefix: 12 (number, optional) -number which is required to be dialed before actual phone number
-+ settings: settings (string, optional) - any additional configuration required by this provider
-+ register: 1 (number, optional) 1 for yes, 0 for no
-+ weight: 10 (number) provider having lighter weight will be used more frequently
-+ type: type (string)
-+ active: 1 (number) 1 for active, 0 for disabled
-
-## Campaign (object)
-+ program_id: 1 (number)
-+ group_id: 2 (number)
-+ cpm: 2 (number) - transmissions / cycles per second
-+ try_allowed: 2 (number)
-+ account_id: 1 (number) - account_id of associated account
-+ status: active (string) - current status of campaign
-
-## Spool (object)
-+ spool_id: 1 (number)
-+ time_spool: 1518705479 (number)
-+ time_start: 1518705479 (number)
-+ time_connect: 1518705479 (number)
-+ time_end: 1518705479 (number)
-+ status: completed (string)
-+ response: busy (string)
-+ transmission_id: 1 (number)
-
-## Result (object)
-+ spool_result_id: 1 (number)
-+ spool_id: 1 (number)
-+ type: dtmf (string) - type of result
-+ name: age (string) - result id / name
-+ data: 22 (string) - actual result
-
 # Group Authenticate
 
 ## Authentication [/authenticate]
@@ -224,6 +63,439 @@ Get system statistics, like total and active campaigns, total contacts, total nu
 + Response 200 (application/json)
 
      + Attributes (Statistics)
+
+
+# Group Program
+
+## General program related function [/programs]
+
+To create program please use respective APIs separately designed for each type of program.
+
+### Get all Programs [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (array[Program])
+
+## Single Program [/programs/{program_id}]
+
++ Parameters
+
+    + program_id (number) - ID of the program in the form of an integer
+
+### View a Program Detail [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (Program)
+
+### Delete Program [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200
+
+## Shortcut way to create new Transmissions [/programs/{program_id}/transmissions]
+
++ Parameters
+
+    + program_id (number) - ID of the program in the form of an Intiger
+
+
+### New Transmission [PUT]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (Transmission)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + transmission_id: 1 (number) - transmission id of recently created transmission
+
+### Get Transmission [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (Transmission)
+
+
+# Group Email to Fax program
+
+##  Email to Fax program [/programs/emailtofax]
+
+### Create New Email to Fax program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramEmailtofax)
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + program_id : 1 (number) - program id  of recently created program
+            
+
+# Group Fax to Email program
+
+##  Fax to Email program [/programs/faxtoemail]
+
+### Create New  Fax to Email program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramFaxtoemail)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+# Group Receive Email program
+
+##  Receive Email program [/programs/receiveemail]
+
+### Create New  Receive Email program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramReceiveemail)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+
+# Group Receive FAX program
+
+##  Receive FAX program [/programs/receivefax]
+
+### Create New  Receive FAX program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramReceivefax)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+
+# Group Receive SMS program
+
+##  Receive SMS program [/programs/receivesms]
+
+### Create New  Receive SMS program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramReceivesms)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+
+# Group Send Email program
+
+## Send Email program [/programs/sendemail]
+
+### Create New  Send Email program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramSendemail)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+# Group Send FAX program
+
+## Send FAX program [/programs/sendfax]
+
+Prepare given fax document for provided account, and make it ready to be sent
+
+### Create New  Send FAX program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramSendfax)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+# Group Send SMS program
+
+## Send SMS program [/programs/sendsms]
+
+Prepare given SMS for provided account, and make it ready to be sent
+
+### Create New  Send SMS program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramSendsms)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program
+
+# Group Voice Call with pre recorded message
+
+## Voice Message program [/programs/voicemessage]
+
+Prepare given voice recording for provided account, and make it ready to be played during call
+
+### Create New  Voice Message program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramVoicemessage)
+
++ Response 200 (application/json)
+
+    + Attributes
+              
+        + program_id : 1 (number) - program id  of recently created program
+            
+
+# Group Transmission - the actual call or action
+
+create call request / dial / send message
+
+## Collection of Transmission [/transmissions]
+
+### Create New Transmission [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (Transmission)
+
++ Response 200 (application/json)
+
+    + Attributes
+            
+        + text_id: 1 (number) - text id of recently created template
+
+### Get all Transmissions [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (Transmission)
+
+## single Transmission  [/transmissions/{transmission_id}]
+
++ Parameters
+
+    + transmission_id (number) - ID of the transmission in the form of an integer
+
+### Get a Transmission [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (Transmission)
+
+### Delete Transmission [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200
+
+## Transmition Send [/transmissions/{transmission_id}/send]
+
++ Parameters
+
+    + transmission_id (number) - ID of the transmission in the form of an integer
+
+### Send Transmition [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + spool_id: 1 (number) - Spool ID of resulted attempt
+            
+
+## Transmition Retry [/transmissions/{transmission_id}/retry]
+
++ Parameters
+
+    + transmission_id (number) - ID of the transmission in the form of an integer
+
+### Retry Transmition [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + spool_id: 1 (number) - Spool ID of resulted attempt
+            
+
+## Transmission Schdule [/transmissions/{transmission_id}/schedule]
+
++ Parameters
+
+    + transmission_id (number) - ID of the transmission in the form of an integer
+
+### Schdule Transmission [PUT]
+
+Instead of delivering message instantly, schedule its delivery in near future.
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + schedule_id: 1 (number) - schedule id of recently created schedule record
+
+
+### Delete Transmission schedule [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200
+
+## Transmission Clone [/transmissions/{transmission_id}/clone]
+
++ Parameters
+
+    + transmission_id (number) - ID of the transmission in the form of an integer
+
+### Create Transmission Clone [GET]
+
+Want to resend an already completed transmission, copy it (Note: after copying, client still need to request send method for message delivery)
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + transmission_id: 1 (number) - transmission id of newly created transmission
 
 
 # Group Contact
@@ -483,6 +755,194 @@ Download a sample csv file
 
             "CSV Sample file contents"
 
+
+# Group Campaign - the actual bulk system
+
+Create campaign for message delivery / calling bulk contacts
+
+## Campaign collection [/campaigns]
+
+### Create New Campaign [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (Campaign)
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + campaign_id: 1 (number) - campaign id of recently created campaign record
+
+
+### Get all Campaign [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (array[Campaign])
+
+## Single Campaign Action [/campaigns/{campaign_id}]
+
++ Parameters
+
+    + campaign_id (number) - ID of the campaign in the form of an integer
+
+### Update Campaign [PUT]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (Campaign)
+
++ Response 200 (application/json)
+
+    + Attributes (Campaign)
+
+### Get a Campaign [GET]
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes (Campaign)
+
+### Delete Campaign [DELETE]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200
+
+## Campaign Start [/campaigns/{campaign_id}/start]
+
++ Parameters
+
+    + campaign_id (number) - ID of the campaign in the form of an integer
+
+### Campaign Start [PUT]
+
+Start contact processing / calling in selected campaign
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + Boolean: true on success (string) - Boolean: true on success
+
+
+## Campaign Stop [/campaigns/{campaign_id}/stop]
+
++ Parameters
+
+    + campaign_id (number) - ID of the campaign in the form of an integer
+
+### Campaign Stop [PUT]
+
+Stop contact processing / calling in selected campaign
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + Boolean: true on success (string) - Boolean: true on success
+
+## Campaign schedule [/campaigns/{campaign_id}/start/schedule]
+
++ Parameters
+
+    + campaign_id (number) - ID of the campaign in the form of an integer
+
+
+### Start Campaign Schedule [POST]
+
+Instead of processing campaign contacts instantly, schedule their processing / calling in near future.
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+               
+        + schedule_id: 1 (number) - schedule id of recently created schedule record
+            
+
+## Campaign schedule [/campaigns/{campaign_id}/stop/schedule]
+
++ Parameters
+
+    + campaign_id (number) - ID of the campaign in the form of an integer
+
+
+### Stop Campaign Schedule [POST]
+
+Instead manually stopping a campaign, we can schedule it.
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+        
+        + schedule_id: 1 (number) - schedule id of recently created schedule record
+
+## Delete Campaign schedule [/campaigns/{campaign_id}/schedule]
+
++ Parameters
+
+    + campaign_id (number) - ID of the campaign in the form of an integer
+
+
+### Stop Campaign Schedule [POST]
+
+Cancel any schedule associated with given campaign
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200
 
 # Group Message
 
@@ -920,616 +1380,6 @@ Download file
 
 + Response 200
 
-# Group Program
-
-## General program related function [/programs]
-
-To create program please use respective APIs separately designed for each type of program.
-
-### Get all Programs [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (array[Program])
-
-## Single Program [/programs/{program_id}]
-
-+ Parameters
-
-    + program_id (number) - ID of the program in the form of an integer
-
-### View a Program Detail [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (Program)
-
-### Delete Program [DELETE]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200
-
-## Shortcut way to create new Transmissions [/programs/{program_id}/transmissions]
-
-+ Parameters
-
-    + program_id (number) - ID of the program in the form of an Intiger
-
-
-### New Transmission [PUT]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (Transmission)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + transmission_id: 1 (number) - transmission id of recently created transmission
-
-### Get Transmission [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (Transmission)
-
-
-# Group Email to Fax program
-
-##  Email to Fax program [/programs/emailtofax]
-
-### Create New Email to Fax program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramEmailtofax)
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + program_id : 1 (number) - program id  of recently created program
-            
-
-# Group Fax to Email program
-
-##  Fax to Email program [/programs/faxtoemail]
-
-### Create New  Fax to Email program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramFaxtoemail)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-# Group Receive Email program
-
-##  Receive Email program [/programs/receiveemail]
-
-### Create New  Receive Email program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramReceiveemail)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-
-# Group Receive FAX program
-
-##  Receive FAX program [/programs/receivefax]
-
-### Create New  Receive FAX program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramReceivefax)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-
-# Group Receive SMS program
-
-##  Receive SMS program [/programs/receivesms]
-
-### Create New  Receive SMS program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramReceivesms)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-
-# Group Send Email program
-
-## Send Email program [/programs/sendemail]
-
-### Create New  Send Email program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramSendemail)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-# Group Send FAX program
-
-## Send FAX program [/programs/sendfax]
-
-Prepare given fax document for provided account, and make it ready to be sent
-
-### Create New  Send FAX program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramSendfax)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-# Group Send SMS program
-
-## Send SMS program [/programs/sendsms]
-
-Prepare given SMS for provided account, and make it ready to be sent
-
-### Create New  Send SMS program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramSendsms)
-
-+ Response 200 (application/json)
-
-    + Attributes
-
-        + program_id : 1 (number) - program id  of recently created program
-
-# Group Voice Call with pre recorded message
-
-## Voice Message program [/programs/voicemessage]
-
-Prepare given voice recording for provided account, and make it ready to be played during call
-
-### Create New  Voice Message program [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (ProgramVoicemessage)
-
-+ Response 200 (application/json)
-
-    + Attributes
-              
-        + program_id : 1 (number) - program id  of recently created program
-            
-
-# Group Transmission - the actual call or action
-
-create call request / dial / send message
-
-## Collection of Transmission [/transmissions]
-
-### Create New Transmission [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (Transmission)
-
-+ Response 200 (application/json)
-
-    + Attributes
-            
-        + text_id: 1 (number) - text id of recently created template
-
-### Get all Transmissions [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (Transmission)
-
-## Transmition Send [/transmissions/{transmission_id}/send]
-
-+ Parameters
-
-    + transmission_id (number) - ID of the transmission in the form of an integer
-
-### Send Transmition [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + spool_id: 1 (number) - Spool ID of resulted attempt
-            
-
-## Transmition Retry [/transmissions/{transmission_id}/retry]
-
-+ Parameters
-
-    + transmission_id (number) - ID of the transmission in the form of an integer
-
-### Retry Transmition [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + spool_id: 1 (number) - Spool ID of resulted attempt
-            
-
-## Transmission Schdule [/transmissions/{transmission_id}/schedule]
-
-+ Parameters
-
-    + transmission_id (number) - ID of the transmission in the form of an integer
-
-### Schdule Transmission [PUT]
-
-Instead of delivering message instantly, schedule its delivery in near future.
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + schedule_id: 1 (number) - schedule id of recently created schedule record
-
-
-### Delete Text [DELETE]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200
-
-## Transmission Clone [/transmissions/{transmission_id}/clone]
-
-+ Parameters
-
-    + transmission_id (number) - ID of the transmission in the form of an integer
-
-### Get Transmission Clone [GET]
-
-Want to resend an already completed transmission, copy it (Note: after copying, client still need to request send method for message delivery)
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + transmission_id: 1 (number) - transmission id of newly created transmission
-
-
-## single Transmission  [/transmissions/{transmission_id}]
-
-+ Parameters
-
-    + transmission_id (number) - ID of the transmission in the form of an integer
-
-### Get a Transmission [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (Transmission)
-
-# Group Campaign - the actual bulk system
-
-Create campaign for message delivery / calling bulk contacts
-
-## Campaign collection [/campaigns]
-
-### Create New Campaign [POST]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (Campaign)
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + campaign_id: 1 (number) - campaign id of recently created campaign record
-
-
-### Get all Campaign [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (array[Campaign])
-
-## Single Campaign Action [/campaigns/{campaign_id}]
-
-+ Parameters
-
-    + campaign_id (number) - ID of the campaign in the form of an integer
-
-### Update Campaign [PUT]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-    + Attributes (Campaign)
-
-+ Response 200 (application/json)
-
-    + Attributes (Campaign)
-
-### Get a Campaign [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes (Campaign)
-
-### Delete Campaign [DELETE]
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200
-
-## Campaign Start [/campaigns/{campaign_id}/start]
-
-+ Parameters
-
-    + campaign_id (number) - ID of the campaign in the form of an integer
-
-### Campaign Start [PUT]
-
-Start contact processing / calling in selected campaign
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + Boolean: true on success (string) - Boolean: true on success
-
-
-## Campaign Stop [/campaigns/{campaign_id}/stop]
-
-+ Parameters
-
-    + campaign_id (number) - ID of the campaign in the form of an integer
-
-### Campaign Stop [PUT]
-
-Stop contact processing / calling in selected campaign
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + Boolean: true on success (string) - Boolean: true on success
-
-## Campaign schedule [/campaigns/{campaign_id}/start/schedule]
-
-+ Parameters
-
-    + campaign_id (number) - ID of the campaign in the form of an integer
-
-
-### Start Campaign Schedule [POST]
-
-Instead of processing campaign contacts instantly, schedule their processing / calling in near future.
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-               
-        + schedule_id: 1 (number) - schedule id of recently created schedule record
-            
-
-## Campaign schedule [/campaigns/{campaign_id}/stop/schedule]
-
-+ Parameters
-
-    + campaign_id (number) - ID of the campaign in the form of an integer
-
-
-### Stop Campaign Schedule [POST]
-
-Instead manually stopping a campaign, we can schedule it.
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-    + Attributes
-        
-        + schedule_id: 1 (number) - schedule id of recently created schedule record
-
-## Delete Campaign schedule [/campaigns/{campaign_id}/schedule]
-
-+ Parameters
-
-    + campaign_id (number) - ID of the campaign in the form of an integer
-
-
-### Stop Campaign Schedule [POST]
-
-Cancel any schedule associated with given campaign
-
-+ Request (application/json)
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200
 
 # Group Reports
 
@@ -2014,4 +1864,166 @@ list all exiting users, optionally client can filter users using query string (k
             Authentication: Bearer JWT
 
 + Response 200
+
+
+# Data Structures
+
+## Statistics (object)
++ campaign_total: 1 (number) - total number of campaign
++ campaign_active: 0 (number) -total number of active campaign
++ group_total: 12 (number) - number of groups
++ contact_total: 5 (number) - number of contacts
++ transmission_total: 1 (number) - number of transmistions
++ transmission_active: 1 (number) - number of active transmission
++ spool_total: 1 (number) - number of spools
++ spool_success: 1 (number) - number of success spools
++ spool_failed: 1 (number) - number of unsuccessed spools
+
+## Contact (object)
++ first_name: first name (string, required)
++ last_name: last name (string, optional)
++ phone:   03001234567 (number, required)
++ email:  email (string, optional)
++ address: address (string, optional)
++ custom1: custom1 (string, optional)
++ custom2: custom 2 (string, optional)
++ custom3: custom 3 (string, optional)
++ description: description (string, optional)
+
+## Group (object)
++ id: 1 (number, default) - id is auto increment
++ name: group name (string,required)
++ description: Description (string, optional)
+
+## DocumentPost (object)
++ name: group name (string,required)
++ description: Description (string, optional)
+
+## Document (DocumentPost)
++ type: type (string) - three digit file extension representing file type
+
+## Template (object)
++ name: name (string, required)
++ description: Description (string, optional)
++ subject: Subject (string, required)
++ body:  body (string, required) - HTML Message
++ body_alt: body alt (string, optional) - Plain Message
++ type: upload file (string, optional) - three digit file extension representing file type
+
+## Text (object)
++ name: name (string, required)
++ data: Data (string, required) - Actual message
++ type: type (string, optional) - unicode or plain or binary
++ description: Description (string, optional)
+
+## Program (object)
++ name: name (string, required)
++ type: type (string, optional) - program type
++ parent_id: 1 (number, optional) - program id of parent program
+
+## TransmissionPost (object)
++ title: title (string)
++ origin:  origin (string) -  reference to function / program which is responsible creation of this transmission
++ contact_id:  1 (number, required) - contact id to contact where to transmit message
++ account_id:  1 (number) -  account id of associated account
++ service_flag:  1 (number) - Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG
++ program_id:  1 (number, required) - program id of program which will be used with this transmission
++ direction:  direction (string) - either can be outbound or inbound
+
+## Transmission (TransmissionPost)
++ status:  status (string) - if complete or failed
++ response: response (string) - the cause of error, transmission failure
+
+## ProgramEmailtofax (Program)
++ account_id: 1 (number) - account id of account for which this program is being created
+
+## ProgramFaxtoemail (Program)
++ account_id: 1 (number) - account id of account for which this program is being created
+
+## ProgramReceivefax (Program)
++ account_id: 1 (number) - account id of account for which this program is being created
+
+## ProgramSendfax (Program)
++ document_id: 1 (number) - document id of fax document for which this program is being created
+
+## ProgramReceiveemail (Program)
++ account_id: 1 (number) - account id of account for which this program is being created
+
+## ProgramSendemail (Program)
++ template_id: 1 (number) - template id of email template for which this program is being created
+
+## ProgramReceivesms (Program)
++ account_id: 1 (number) - account id of account for which this program is being created
+
+## ProgramSendsms (Program)
++ text_id: 1 (number) - text id of SMS text for which this program is being created
+
+## ProgramVoicemessage (Program)
++ recording_id: 1 (number) - recording id of voice recording for which this program is being created
+
+## Account (object)
++ username: username (string)
++ passwd: password (string)
++ passwd_pin: password pin (string)
++ first_name: first name (string)
++ last_name: last name (string)
++ phone: 03001234567 (number)
++ email: email (string)
++ address: address (string)
++ active: 1 (number) - 1 for active, 0 for disabled
+
+## User (object)
++ username: username (string)
++ passwd: password (string)
++ first_name: first name (string)
++ last_name: last name (string)
++ phone: 03001234567 (number)
++ email: email (string)
++ address: address (string)
++ company: company name (string)
++ country_id: 1 (number) - see country table
++ timezone_id: 1 (number) - see timezone table
++ active: 1 (number) - 1 for active, 0 for disabled
+
+## Provider (object)
++ name: name (string)
++ gateway_flag: 1 (number) - Type of gateway i.e Freeswitch::GATEWAY_FLAG or Kannel::GATEWAY_FLAG
++ service_flag: 1 (number) - Type of transmission service i.e Email::SERVICE_FLAG or Voice::SERVICE_FLAG
++ node_id: 1 (number, optional) - see node table
++ host: ipaddress (string) - ip address to termination server
++ port: 8080 (number, optional)
++ username: username (string,required)
++ password: password (string, optional)
++ dialstring: dailstring (string, optional)
++ prefix: 12 (number, optional) -number which is required to be dialed before actual phone number
++ settings: settings (string, optional) - any additional configuration required by this provider
++ register: 1 (number, optional) 1 for yes, 0 for no
++ weight: 10 (number) provider having lighter weight will be used more frequently
++ type: type (string)
++ active: 1 (number) 1 for active, 0 for disabled
+
+## Campaign (object)
++ program_id: 1 (number)
++ group_id: 2 (number)
++ cpm: 2 (number) - transmissions / cycles per second
++ try_allowed: 2 (number)
++ account_id: 1 (number) - account_id of associated account
++ status: active (string) - current status of campaign
+
+## Spool (object)
++ spool_id: 1 (number)
++ time_spool: 1518705479 (number)
++ time_start: 1518705479 (number)
++ time_connect: 1518705479 (number)
++ time_end: 1518705479 (number)
++ status: completed (string)
++ response: busy (string)
++ transmission_id: 1 (number)
+
+## Result (object)
++ spool_result_id: 1 (number)
++ spool_id: 1 (number)
++ type: dtmf (string) - type of result
++ name: age (string) - result id / name
++ data: 22 (string) - actual result
 

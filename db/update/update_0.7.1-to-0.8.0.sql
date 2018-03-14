@@ -103,4 +103,3 @@ INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* group */
 SELECT @permissionId := permission_id FROM permission WHERE name='campaign';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* campaign */
 
-INSERT INTO permission VALUES (NULL, 'permission_delete', '');
