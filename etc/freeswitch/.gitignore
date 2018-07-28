@@ -1,0 +1,5 @@
+# Ignore everything in following directories
+directory/account/*
+sip_profiles/provider/*
+# Except this file
+!.gitignore

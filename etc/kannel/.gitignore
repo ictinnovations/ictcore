@@ -1,0 +1,4 @@
+# Ignore everything in following directory
+provider/*
+# Except this file
+!.gitignore
