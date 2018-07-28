@@ -99,10 +99,14 @@ class Kannel extends Gateway
         16: Non-Delivered to SMSC.
        */
       $spool_id = $data['spool_id'];
+      $application_id = $data['application_id'];
       $dlrMask = 1 | 2 | 4 | 8 | 16;
-      $rsp_url = Conf::get('website:url', 'http://localhost/ictcore') . '/gateway.php';
-      $dlrUrl = "$rsp_url?spool_id=$spool_id&gateway_flag=" . Kannel::GATEWAY_FLAG;
-      $dlrUrl .= "&application_data[result]=%d&application_data[error]=%A";
+      $dlrUser = Conf::get('gatewayhub:username', 'myuser');
+      $dlrPass = Conf::get('gatewayhub:password', 'mypass');
+      $dlrUrl  = Conf::get('gatewayhub:url', 'http://localhost/api/gateway.php'); // main url
+      $dlrUrl .= "?username=$dlrUser&password=$dlrPass"; // authentication
+      $dlrUrl .= "&spool_id=$spool_id&gateway_flag=" . Kannel::GATEWAY_FLAG; // target
+      $dlrUrl .= "&application_id=$application_id&application_data[result]=%d&application_data[error]=%A"; // response with variables
 
       $queryString['dlr-mask'] = $dlrMask;
       $queryString['dlr-url'] = $dlrUrl;
@@ -111,17 +115,18 @@ class Kannel extends Gateway
     foreach ($data as $variable => $value) {
       switch ($variable) {
         case 'dlr-url':
-          $queryString[] = "dlr-url=" . rawurlencode($value);
+          $queryString['dlr-url'] = $value;
           break;
         case 'message':
-          $queryString[] = "text=" . rawurlencode($value);
+        case 'data':
+          $queryString['text'] = $value;
           break;
         default:
-          $queryString[] = "$variable=" . urlencode($value);
+          $queryString[$variable] = $value;
           break;
       }
     }
-    $URL = $this->path . '?' . implode('&', $queryString);
+    $URL = $this->path . '?' . http_build_query($queryString);
 
     $this->connect();
 

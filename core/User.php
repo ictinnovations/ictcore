@@ -426,7 +426,7 @@ class User
 
   public function generate_token()
   {
-    $key_file = Conf::get('security:private_key', '/usr/ictbroadcast/etc/ssh/ib_node');
+    $key_file = Conf::get('security:private_key', '/usr/ictcore/etc/ssh/ib_node');
     $private_key = file_get_contents($key_file);
 
     $token = array(
