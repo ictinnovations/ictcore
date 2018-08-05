@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+#** Load configurations for ICTCore                       *
+#**********************************************************
+source /usr/ictcore/bin/bash-ini-parser
+cfg_parser /usr/ictcore/etc/ictcore.conf
+cfg_section_website
+company_host=$host
+
+#** Generate certificates                                 *
+#**********************************************************
+
+echo '' > /etc/freeswitch/tls/wss.pem 
+cat /etc/letsencrypt/live/$host/cert.pem >> /etc/freeswitch/tls/wss.pem
+cat /etc/letsencrypt/live/$host/privkey.pem >> /etc/freeswitch/tls/wss.pem
+cat /etc/letsencrypt/live/$host/chain.pem >> /etc/freeswitch/tls/wss.pem
+
+#** Restart Apache and Freeswitch                         *
+#**********************************************************
+systemctl restart httpd.service
+systemctl restart freeswitch.service
+

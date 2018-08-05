@@ -36,7 +36,7 @@ EOF
 openssl genrsa -out ib_node 1024 > /dev/null
 openssl rsa -in ib_node -pubout -out ib_node.pub >> /dev/null
 openssl req -batch -new -config ib_node.cfg -key ib_node -out ib_node.csr > /dev/null
-openssl x509 -req -days 365 -in ib_node.csr -signkey ib_node -out ib_node.crt > /dev/null
+openssl x509 -req -days 3650 -in ib_node.csr -signkey ib_node -out ib_node.crt > /dev/null
 cat ib_node > ib_node.pem
 cat ib_node.crt >> ib_node.pem
 rm -rf ib_node.csr ib_node.cfg

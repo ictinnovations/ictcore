@@ -84,5 +84,6 @@ INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* statisti
 SELECT @permissionId := permission_id FROM permission WHERE name='configuration_read'; 
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* configuration_read */
 
+-- version 0.8.0.8
 ALTER TABLE campaign CHANGE delay cpm                       int(11)                NOT NULL default 2;
 ALTER TABLE campaign CHANGE try_allowed try_allowed               int(11)                NOT NULL default 1;
