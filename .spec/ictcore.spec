@@ -261,10 +261,10 @@ touch %{buildroot}/var/spool/mail/ictcore
 
 %files freeswitch
 # freeswitch configuration files
-%defattr(640,freeswitch,daemon,750)
+%defattr(644,freeswitch,daemon,755)
 /etc/freeswitch
 # other freeswitch related files
-%defattr(660,ictcore,ictcore,770)
+%defattr(664,ictcore,ictcore,775)
 %{core_home}/etc/freeswitch
 %defattr(644,ictcore,ictcore,755)
 %{core_home}/bin/freeswitch
@@ -272,9 +272,9 @@ touch %{buildroot}/var/spool/mail/ictcore
 
 %files kannel
 # kannel related files
-%defattr(640,ictcore,ictcore,750)
+%defattr(644,ictcore,ictcore,755)
 %{core_home}/etc/kannel
-%defattr(660,ictcore,ictcore,770)
+%defattr(664,ictcore,ictcore,775)
 %{core_home}/etc/kannel/provider
 %defattr(644,ictcore,ictcore,755)
 %{core_home}/core/Gateway/Kannel.php

@@ -34,4 +34,9 @@ Cronjob to keep certificates upto date
 --------------------------------------
 Letsencrypt expire free certficates after three months, we can override this issue by a simple cronjob
 
-echo "30 2 * * * root /usr/bin/certbot renew >> /var/log/le-renew.log" > /etc/cron.d/letsencrypt.conf
+    echo "30 2 * * * root /usr/bin/certbot renew >> /var/log/le-renew.log" > /etc/cron.d/letsencrypt.conf
+
+also add cron job to update wss.pem file from Freeswitch
+
+    echo "30 2 * * * root /usr/ictcore/bin/freeswitch/certupdate" > /etc/cron.d/letsencrypt.conf
+
