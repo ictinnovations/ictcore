@@ -106,7 +106,7 @@ class Kannel extends Gateway
       $dlrUrl  = Conf::get('gatewayhub:url', 'http://localhost/api/gateway.php'); // main url
       $dlrUrl .= "?username=$dlrUser&password=$dlrPass"; // authentication
       $dlrUrl .= "&spool_id=$spool_id&gateway_flag=" . Kannel::GATEWAY_FLAG; // target
-      $dlrUrl .= "&application_id=$application_id&application_data[result]=%d&application_data[error]=%A"; // response with variables
+      $dlrUrl .= "&application_id=$application_id&application_data={\"result\":\"%d\",\"error\":\"%A\"}"; // response with json encoded data
 
       $queryString['dlr-mask'] = $dlrMask;
       $queryString['dlr-url'] = $dlrUrl;

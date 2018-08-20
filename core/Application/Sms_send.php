@@ -36,6 +36,18 @@ class Sms_send extends Application
    */
 
   /**
+   * callerid / phone number of sending party
+   * @var string $source
+   */
+  public $source = '[transmission:source:phone]';
+
+  /**
+   * mobile / phone number of remote party
+   * @var int $destination
+   */
+  public $destination = '[transmission:destination:phone]';
+
+  /**
    * message body / data for sms
    * @var string $data
    */
@@ -85,6 +97,8 @@ class Sms_send extends Application
   public function parameter_save()
   {
     $aParameters = array(
+        'source' => $this->source,
+        'destination' => $this->destination,
         'message' => $this->message,
         'encoding' => $this->encoding,
         'class' => $this->class,

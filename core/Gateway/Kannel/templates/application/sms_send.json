@@ -1,7 +1,7 @@
 {
   "smsc": "{{ provider.name }}",
-  "to": "{{ transmission.destination.phone }}",
-  "from": "{{ transmission.source.phone }}",
+  "to": "{{ provider.prefix }}{{ application.destination }}",
+  "from": "{{ application.source }}",
   "data": "{{ application.message|escape('json') }}",
   "mclass": "{{ application.class }}",
   "coding": "{{ application.encoding }}",

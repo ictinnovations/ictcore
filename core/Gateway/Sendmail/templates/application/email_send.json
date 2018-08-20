@@ -1,6 +1,6 @@
 {
-  "to": "{{ transmission.destination.email }}",
-  "from": "{{ transmission.source.email }}",
+  "to": "{{ application.destination }}",
+  "from": "{{ application.source }}",
   "subject": "{{ application.subject }}",
   "body": "{{ application.body|escape('json') }}",
   "body_alt": "{{ application.body_alt|escape('json') }}",

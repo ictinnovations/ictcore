@@ -36,6 +36,18 @@ class Email_send extends Application
    */
 
   /**
+   * Email address of sending party
+   * @var string $source
+   */
+  public $source = '[transmission:source:email]';
+
+  /**
+   * Email address of remote party
+   * @var int $destination
+   */
+  public $destination = '[transmission:destination:email]';
+
+  /**
    * email subject
    * @var string $subject
    */
@@ -66,6 +78,8 @@ class Email_send extends Application
   public function parameter_save()
   {
     $aParameters = array(
+        'source' => $this->source,
+        'destination' => $this->destination,
         'subject' => $this->subject,
         'body' => $this->body,
         'body_alt' => $this->body_alt,
