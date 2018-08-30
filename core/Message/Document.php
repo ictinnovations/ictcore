@@ -15,6 +15,7 @@ use ICT\Core\DB;
 use ICT\Core\Message;
 use ICT\Core\Session;
 use ICT\Core\User;
+use NcJoes\OfficeConverter\OfficeConverter;
 
 class Document extends Message
 {
@@ -336,6 +337,19 @@ class Document extends Message
         $cmd = \ICT\Core\sys_which('convert', '/usr/bin') . " $sourceFile -type Bilevel -monochrome $pdfFile";
         exec($cmd);
         //exec("rm -rf '$sourceFile'");
+        break;
+      case 'pptx':
+      case 'ppt':
+      case 'docx':
+      case 'doc':
+      case 'xlsx':
+      case 'xls':
+        global $path_cache;
+        Corelog::log("Converting office document into pdf", Corelog::CRUD);
+        $office_binary = \ICT\Core\which('libreoffice', '/usr/bin');
+        $pdfFile = "$sourceFile.pdf";
+        $oConverter = new OfficeConverter($sourceFile, $office_binary, $path_cache);
+        $oConverter->convertTo($pdfFile);
         break;
       default:
         Corelog::log("Unknown file type assume it as pdf", Corelog::CRUD);
