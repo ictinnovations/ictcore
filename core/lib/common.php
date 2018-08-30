@@ -58,6 +58,14 @@ function path_to_namespace($path)
   return $namespace;
 }
 
+function path_array_to_string($aFile) {
+  return implode(',', $aFile);
+}
+
+function path_string_to_array($path) {
+  return explode(',', $path);
+}
+
 /**
  * Return an array from given bitmask
  * @param    integer    $mask Integer of the bit

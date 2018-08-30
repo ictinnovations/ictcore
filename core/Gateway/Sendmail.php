@@ -135,11 +135,16 @@ class Sendmail extends Gateway
       if (!empty($data['body_alt'])) {
         $mailMsg->addPart($data['body_alt'], 'text/plain');
       }
-      if (!empty($data['attachment']) && is_file($data['attachment'])) {
-        // Optionally add any attachments
-        $attachment = Swift_Attachment::fromPath($data['attachment']);
-        // $attachment->setFilename($data['file_title']);
-        $mailMsg->attach($attachment);
+      // Optionally add attachments
+      if (!empty($data['attachment'])) {
+        $aAttachment = \ICT\Core\path_string_to_array($data['attachment']);
+        foreach($aAttachment as $attachment) {
+          if (is_file($attachment)) {
+            $oAttachment = Swift_Attachment::fromPath($attachment);
+            // $oAttachment->setFilename($data['file_title']);
+            $mailMsg->attach($oAttachment);
+          }
+        }
       }
     } catch (Exception $msg_error) {
       throw new CoreException("500", "error while preparing email message", $msg_error);

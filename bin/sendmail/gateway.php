@@ -96,6 +96,7 @@ if (!empty($emails)) {
       } // foreach part
     } // if attachment
 
+    $aAttachment = array();
     $filename = NULL;
 
     /* iterate through each attachment and save it */
@@ -116,6 +117,7 @@ if (!empty($emails)) {
         $fp = fopen($filename, "w");
         fwrite($fp, $attachment['attachment']);
         fclose($fp);
+        $aAttachment[] = $filename;
       }
     }
 
@@ -126,7 +128,7 @@ if (!empty($emails)) {
     $from = isset($header->from) ? $header->from[0] : $header->sender[0];
     $date = $header->date;
     $to = isset($header->to) ? $header->to[0] : $header->reply_to[0];
-    $attachment = $filename;
+    $attachment = \ICT\Core\path_array_to_string($aAttachment);
 
     $status = imap_setflag_full($conn, $email_number, "\\Seen");
     try {

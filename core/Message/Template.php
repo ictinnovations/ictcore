@@ -19,6 +19,7 @@ use ICT\Core\User;
 
 class Template extends Message
 {
+  const ATTACHMENT_MAXIMUM = 10;
 
   protected static $table = 'template';
   protected static $primary_key = 'template_id';
@@ -68,6 +69,7 @@ class Template extends Message
    * @var string 
    */
   protected $attachment = NULL;
+  protected $aAttachment = array();
 
   /**
    * @property-read integer $length
@@ -151,7 +153,7 @@ class Template extends Message
       $this->subject = $data['subject'];
       $this->body = $data['body'];
       $this->body_alt = $data['body_alt'];
-      $this->attachment = $data['attachment'];
+      $this->attachment = json_decode($data['attachment']);
       $this->type = $data['type'];
       $this->length = $data['length'];
       Corelog::log("Template loaded name: $this->name", Corelog::CRUD);
@@ -166,33 +168,45 @@ class Template extends Message
     return DB::delete(self::$table, 'template_id', $this->template_id, true);
   }
 
+  protected function get_attachment() {
+    return \ICT\Core\path_array_to_string($this->aAttachment);
+  }
+
   protected function set_attachment($file_path)
   {
     global $path_data;
-    if (file_exists($file_path)) {
-      $oSession = Session::get_instance();
-      $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
-      $file_parts = explode('.', $file_path);
-      $raw_type = strtolower(end($file_parts));
-      $file_type = empty($raw_type) ? 'html' : $raw_type;
-      $file_name = 'attachment_' . $user_id . '_';
-      $file_name .= DB::next_record_id($file_name);
-      $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;
-      rename($file_path, $dst_file);
-      $this->attachment = $dst_file;
+    $oSession = Session::get_instance();
+    $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
+
+    if ($file_path === NULL) {
+      $this->aAttachment = array();
     } else {
-      $this->attachment = NULL;
-      return; // invalid file
+      $aAttachment = \ICT\Core\path_string_to_array($file_path);
+      foreach($aAttachment as $attachment) {
+        if (file_exists($attachment)) {
+          $file_parts = explode('.', $attachment);
+          $raw_type = strtolower(end($file_parts));
+          $file_type = empty($raw_type) ? 'html' : $raw_type;
+          $file_name = 'attachment_' . $user_id . '_';
+          $file_name .= DB::next_record_id($file_name);
+          $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;
+          rename($file_path, $dst_file);
+          $this->aAttachment[] = $dst_file;
+        }
+      }
     }
+    $this->attachment = \ICT\Core\path_array_to_string($this->aAttachment);
   }
 
   public function save()
   {
-    $attachment_data = '';
-    if (file_exists($this->attachment)) {
-      $attachment_data = file_get_contents($this->attachment);
+    $this->length = strlen($this->body . $this->body_alt . $this->subject);
+    foreach($this->aAttachment as $attachment) {
+      if (file_exists($attachment)) {
+        $attachment_data = file_get_contents($attachment);
+        $this->length += strlen($attachment_data);
+      }
     }
-    $this->length = strlen($this->body . $this->body_alt . $this->subject . $attachment_data);
 
     $data = array(
         'template_id' => $this->template_id,
@@ -202,7 +216,7 @@ class Template extends Message
         'subject' => $this->subject,
         'body' => $this->body,
         'body_alt' => $this->body_alt,
-        'attachment' => $this->attachment,
+        'attachment' => json_encode($this->aAttachment),
         'length' => $this->length
     );
 

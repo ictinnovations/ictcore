@@ -18,7 +18,7 @@ CREATE TABLE template
    subject                  varchar(255)           NOT NULL default '',
    body                     text,
    body_alt                 text,
-   attachment               varchar(255)           NOT NULL default '',
+   attachment               text,                  NOT NULL default '',
    length                   int(11)                NOT NULL default 0,
    date_created             int(11)                default NULL,
    created_by               int(11) unsigned       default NULL,

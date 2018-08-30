@@ -198,19 +198,24 @@ class Document extends Message
   protected function set_file_name($file_path)
   {
     global $path_data;
-    if (!empty($this->type)) {
-      $file_type = $this->type;
-    } else {
-      $aType = explode('.', $file_path);
-      $file_type = end($aType);
-      $this->type = strtolower($file_type);
-    }
     $oSession = Session::get_instance();
     $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
     $file_name = 'document_' . $user_id . '_';
     $file_name .= DB::next_record_id($file_name);
     $tiff_file = $path_data . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . $file_name . '.tif';
-    $this->create_tiff($file_path, $file_type, $tiff_file);
+
+    if (!empty($this->type)) {
+      $file_type = $this->type;
+    }
+
+    $aFile = \ICT\Core\path_string_to_array($file_path);
+    foreach($aFile as $file) {
+      $aType = explode('.', $file);
+      $file_type = isset($this->type) ? $this->type : end($aType);
+      $file_type = strtolower($file_type);
+      $this->create_tiff($file, $file_type, $tiff_file); // it will append new tiff file into $tiff_file
+    }
+    $this->type = $file_type;
     $this->file_name = $tiff_file;
   }
 
@@ -284,10 +289,12 @@ class Document extends Message
     $resolution_string = $this->resolution_x . "x" . $this->resolution_y;
     //$cmd = "convert -quiet -density 150 $sourceFile -shave 65x65 -colorspace rgb -quality 100 -resample 320 $targetFile";
     //$cmd = "cat $sourceFile | gs -q -sDEVICE=tiffg3 -sPAPERSIZE=a4 -r204x196 -dNOPAUSE -sOutputFile=$targetFile"; // 
-    $cmd = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -r$resolution_string -sOutputFile='$targetFile' -dFIXEDMEDIA -dDEVICEWIDTHPOINTS=$this->size_y -dDEVICEHEIGHTPOINTS=$this->size_x -f '$pdfFile.ps'";
+    $cmd = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -r$resolution_string -sOutputFile='$targetFile.tmp' -dFIXEDMEDIA -dDEVICEWIDTHPOINTS=$this->size_y -dDEVICEHEIGHTPOINTS=$this->size_x -f '$pdfFile.ps'";
     Corelog::log("Converting source image into fax support tiff", Corelog::CRUD, $cmd);
     exec($cmd);
     //exec("rm -rf '$sourceFile'");
+    $cmd = \ICT\Core\sys_which('tiffcp', '/usr/bin') . " -a '$targetFile.tmp' '$targetFile'"; // -a for append
+    exec("rm -rf '$targetFile.tmp'");
 
     return $this->pages;
   }
