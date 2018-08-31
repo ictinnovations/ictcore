@@ -87,3 +87,6 @@ INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* configur
 -- version 0.8.0.8
 ALTER TABLE campaign CHANGE delay cpm                       int(11)                NOT NULL default 2;
 ALTER TABLE campaign CHANGE try_allowed try_allowed               int(11)                NOT NULL default 1;
+
+-- version 0.8.1.0
+ALTER TABLE document CHANGE attachment attachment               text,                  NOT NULL default '';
