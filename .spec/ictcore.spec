@@ -2,6 +2,7 @@
 %define core_edition __CORE_EDITION__
 %define core_build   __CORE_BUILD__
 %define core_home    %{_prefix}/ictcore
+%define core_token   __CORE_TOKEN__
 
 Name:    ictcore
 Version: %{core_version}.%{core_build}
@@ -128,7 +129,9 @@ add email related services support in ICTCore
 %{__cp} -pr * %{buildroot}%{core_home}
 
 # install composer based dependencies
+php %SOURCE1 config --global github-oauth.github.com %{core_token}
 php %SOURCE1 update -d %{buildroot}%{core_home}
+php %SOURCE1 config --global --auth --unset github-oauth.github.com
 
 # basic configuration in system
 %{__mkdir} -p %{buildroot}/etc
