@@ -12,3 +12,8 @@
 # System Files
 .DS_Store
 Thumbs.db
+
+# IDEs
+.buildpath
+.project
+.settings/

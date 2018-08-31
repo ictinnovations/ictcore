@@ -1,5 +1,9 @@
 # Ignore everything in following directories
 directory/account/*
 sip_profiles/provider/*
+dialplan/user/*
 # Except this file
 !.gitignore
+!directory/account/.gitkeep
+!sip_profiles/provider/.gitkeep
+!dialplan/user/.gitkeep

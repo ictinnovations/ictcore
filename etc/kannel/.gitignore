@@ -2,3 +2,4 @@
 provider/*
 # Except this file
 !.gitignore
+!provider/.gitkeep
