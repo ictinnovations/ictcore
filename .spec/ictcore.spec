@@ -190,9 +190,6 @@ touch %{buildroot}/var/spool/mail/ictcore
 
 # write-able directories and files
 %defattr(664,ictcore,ictcore,775)
-%{core_home}/etc/freeswitch/directory/account
-%{core_home}/etc/freeswitch/sip_profiles/provider
-%{core_home}/etc/kannel/provider
 %{core_home}/log
 %{core_home}/data
 
