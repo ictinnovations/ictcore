@@ -89,4 +89,4 @@ ALTER TABLE campaign CHANGE delay cpm                       int(11)             
 ALTER TABLE campaign CHANGE try_allowed try_allowed               int(11)                NOT NULL default 1;
 
 -- version 0.8.1.0
-ALTER TABLE document CHANGE attachment attachment               text,                  NOT NULL default '';
+ALTER TABLE temeplate CHANGE attachment attachment               text;
