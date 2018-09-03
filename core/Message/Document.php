@@ -295,6 +295,7 @@ class Document extends Message
     exec($cmd);
     //exec("rm -rf '$sourceFile'");
     $cmd = \ICT\Core\sys_which('tiffcp', '/usr/bin') . " -a '$targetFile.tmp' '$targetFile'"; // -a for append
+    exec($cmd);
     exec("rm -rf '$targetFile.tmp'");
 
     return $this->pages;
