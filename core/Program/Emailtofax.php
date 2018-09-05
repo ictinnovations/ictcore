@@ -154,9 +154,12 @@ class Emailtofax extends Program
           break;
         case Result::TYPE_MESSAGE:
           $oTemplate = new Template($oResult->data);
-          if (!is_file($oTemplate->attachment)) {
-            $error = 'There is no attachment or invalid attachment';
-            break 2; // in case of error, also terminate foreach loop
+          $aAttachment = \ICT\Core\path_string_to_array($oTemplate->attachment);
+          foreach ($Attachment as $attachment) {
+            if (!is_file($attachment)) {
+              $error = 'There is no attachment or invalid attachment';
+              break 3; // in case of error, also terminate foreach loop
+            }
           }
           // save a refer
           $oSession = Session::get_instance();

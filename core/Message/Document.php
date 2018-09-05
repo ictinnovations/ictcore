@@ -345,12 +345,12 @@ class Document extends Message
       case 'doc':
       case 'xlsx':
       case 'xls':
-        global $path_cache;
         Corelog::log("Converting office document into pdf", Corelog::CRUD);
-        $office_binary = \ICT\Core\which('libreoffice', '/usr/bin');
-        $pdfFile = "$sourceFile.pdf";
-        $oConverter = new OfficeConverter($sourceFile, $office_binary, $path_cache);
-        $oConverter->convertTo($pdfFile);
+        $office_binary = \ICT\Core\sys_which('libreoffice', '/usr/bin');
+        $target_dir = dirname($sourceFile);
+        $target_file = basename($sourceFile).'.pdf';
+        $oConverter = new OfficeConverter($sourceFile, $target_dir, $office_binary);
+        $pdfFile = $oConverter->convertTo($target_file);
         break;
       default:
         Corelog::log("Unknown file type assume it as pdf", Corelog::CRUD);
