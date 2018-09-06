@@ -155,10 +155,14 @@ class Emailtofax extends Program
         case Result::TYPE_MESSAGE:
           $oTemplate = new Template($oResult->data);
           $aAttachment = \ICT\Core\path_string_to_array($oTemplate->attachment);
-          foreach ($Attachment as $attachment) {
+          if (empty($aAttachment)) {
+            $error = 'There is no attachment';
+            break 2; // in case of error, also terminate foreach loop
+          }
+          foreach ($aAttachment as $attachment) {
             if (!is_file($attachment)) {
-              $error = 'There is no attachment or invalid attachment';
-              break 3; // in case of error, also terminate foreach loop
+              $error = 'Invalid attachment';
+              break 3; // in case of error, also terminate main foreach loop
             }
           }
           // save a refer

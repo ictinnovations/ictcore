@@ -153,7 +153,8 @@ class Template extends Message
       $this->subject = $data['subject'];
       $this->body = $data['body'];
       $this->body_alt = $data['body_alt'];
-      $this->attachment = json_decode($data['attachment']);
+      $this->aAttachment = json_decode($data['attachment']);
+      $this->attachment = $this->get_attachment();
       $this->type = $data['type'];
       $this->length = $data['length'];
       Corelog::log("Template loaded name: $this->name", Corelog::CRUD);
