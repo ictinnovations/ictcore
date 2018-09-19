@@ -151,9 +151,9 @@ php %SOURCE1 config --global --auth --unset github-oauth.github.com
 %{__mkdir} -p %{buildroot}/etc/freeswitch/directory/default
 %{__mkdir} -p %{buildroot}/etc/freeswitch/sip_profiles
 %{__mkdir} -p %{buildroot}/etc/freeswitch/dialplan
-%{__ln_s} /usr/ictcore/etc/freeswitch/directory/ictcore.xml %{buildroot}/etc/freeswitch/directory/default
-%{__ln_s} /usr/ictcore/etc/freeswitch/sip_profiles/ictcore.xml %{buildroot}/etc/freeswitch/sip_profiles
-%{__ln_s} /usr/ictcore/etc/freeswitch/dialplan/ictcore.xml %{buildroot}/etc/freeswitch/dialplan
+%{__ln_s} /usr/ictcore/etc/freeswitch/directory/ictcore.xml %{buildroot}/etc/freeswitch/directory/default/ictcore.xml
+%{__ln_s} /usr/ictcore/etc/freeswitch/sip_profiles/ictcore.xml %{buildroot}/etc/freeswitch/sip_profiles/ictcore.xml
+%{__ln_s} /usr/ictcore/etc/freeswitch/dialplan/ictcore.xml %{buildroot}/etc/freeswitch/dialplan/ictcore.xml
 
 # Sendmail related configuration installation
 %{__mkdir} -p %{buildroot}/var/spool/mail
@@ -262,7 +262,11 @@ touch %{buildroot}/var/spool/mail/ictcore
 %files freeswitch
 # freeswitch configuration files
 %defattr(644,freeswitch,daemon,755)
-/etc/freeswitch
+# /etc/freeswitch # this directory will be provided by freeswitch package so avoid it
+/etc/freeswitch/directory/default/ictcore.xml
+/etc/freeswitch/sip_profiles/ictcore.xml
+/etc/freeswitch/dialplan/ictcore.xml
+
 # other freeswitch related files
 %defattr(664,ictcore,ictcore,775)
 %{core_home}/etc/freeswitch
@@ -273,7 +277,7 @@ touch %{buildroot}/var/spool/mail/ictcore
 %files kannel
 # kannel related files
 %defattr(644,ictcore,ictcore,755)
-%{core_home}/etc/kannel
+# %{core_home}/etc/kannel # this directory will be provided by kannel package, so avoid it
 %defattr(664,ictcore,ictcore,775)
 %{core_home}/etc/kannel/provider
 %defattr(644,ictcore,ictcore,755)
