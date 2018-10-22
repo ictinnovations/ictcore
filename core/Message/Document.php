@@ -75,7 +75,7 @@ class Document extends Message
    * @property-read integer $pages
    * @var integer
    */
-  protected $pages = NULL;
+  public $pages = NULL;
 
   /**
    * @property-read integer $size_x
@@ -158,7 +158,7 @@ class Document extends Message
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT document_id, name, file_name, type, description FROM " . $from_str;
+    $query = "SELECT document_id, name, file_name, type, pages, description FROM " . $from_str;
     Corelog::log("document search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('document', $query);
     while ($data = mysql_fetch_assoc($result)) {

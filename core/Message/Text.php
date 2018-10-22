@@ -72,7 +72,7 @@ class Text extends Message
    * @property-read integer $length
    * @var integer 
    */
-  protected $length = NULL;
+  public $length = NULL;
 
   /**
    * @property-read integer $length
@@ -114,7 +114,7 @@ class Text extends Message
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT text_id, name, type, description FROM " . $from_str;
+    $query = "SELECT text_id, name, type, length, description FROM " . $from_str;
     Corelog::log("text search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('text', $query);
     while ($data = mysql_fetch_assoc($result)) {

@@ -73,7 +73,7 @@ class Recording extends Message
    * @property-read integer $length
    * @var integer
    */
-  protected $length = NULL;
+  public $length = NULL;
 
   /**
    * @property-read string $codec
@@ -145,7 +145,7 @@ class Recording extends Message
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT recording_id, name, file_name, type, description FROM " . $from_str;
+    $query = "SELECT recording_id, name, file_name, type, length, description FROM " . $from_str;
     Corelog::log("recording search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('recording', $query);
     while ($data = mysql_fetch_assoc($result)) {

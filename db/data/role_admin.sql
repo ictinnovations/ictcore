@@ -11,6 +11,8 @@ SELECT @permissionId := permission_id FROM permission WHERE name='configuration'
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* configuration */
 SELECT @permissionId := permission_id FROM permission WHERE name='user';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* user */
+SELECT @permissionId := permission_id FROM permission WHERE name='usr';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr */
 SELECT @permissionId := permission_id FROM permission WHERE name='role';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* role */
 SELECT @permissionId := permission_id FROM permission WHERE name='permission';

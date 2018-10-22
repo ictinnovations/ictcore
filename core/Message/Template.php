@@ -75,7 +75,7 @@ class Template extends Message
    * @property-read integer $length
    * @var string 
    */
-  protected $length = NULL;
+  public $length = NULL;
 
   /**
    * Default mime type for this message type, when no type is available
@@ -131,7 +131,7 @@ class Template extends Message
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT template_id, name, subject, type, description FROM " . $from_str;
+    $query = "SELECT template_id, name, subject, type, length, description FROM " . $from_str;
     Corelog::log("template search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('template', $query);
     while ($data = mysql_fetch_assoc($result)) {
