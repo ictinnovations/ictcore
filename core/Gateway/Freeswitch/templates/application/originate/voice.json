@@ -1,3 +1,4 @@
+{% import 'Gateway/Freeswitch/templates/function.twig' as freeswitch %}
 {
   "application_id": "{{ application.application_id }}",
   "input": {
@@ -21,7 +22,7 @@
   "batch": [
     {
       "name": "bgapi originate",
-      "data": "sofia/gateway/{{ provider.name }}/{{ provider.prefix }}{{ application.destination }} '&lua(/usr/ictcore/bin/freeswitch/application.lua {{ transmission.spool.spool_id }} {{ application.application_id }} success)'"
+      "data": "sofia/gateway/{{ provider.name }}/{{ freeswitch.set_prefix(application.destination, provider.prefix) }} '&lua(/usr/ictcore/bin/freeswitch/application.lua {{ transmission.spool.spool_id }} {{ application.application_id }} success)'"
     }
   ]
 }

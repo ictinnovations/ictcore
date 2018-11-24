@@ -1,0 +1,19 @@
+{% macro set_prefix(in_phone, in_prefix) %}
+{% spaceless %}
+  {% set phone = in_phone %}
+  {% set listPrefix = in_prefix|split(',') %}
+  {% set prefix_matched = false %}
+  {% for prefix in listPrefix if not prefix_matched %}
+    {% set prefix_add = prefix|split('|', 2)[0] %}
+    {% set prefix_remove = prefix|split('|', 2)[1] %}
+    {% set phone = '#' ~ in_phone %}
+    {% set prefix_remove = '#' ~ prefix_remove %}
+    {% set phone = phone|replace({(prefix_remove): (prefix_add)}) %}
+    {% set phone = phone|replace({'#': ''}) %}
+    {% if in_phone is not same as(phone) %}
+      {% set prefix_matched = true %}
+    {% endif %}
+  {% endfor %}
+  {{ phone }}
+{% endspaceless %}
+{% endmacro %}
