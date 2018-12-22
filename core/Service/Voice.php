@@ -32,6 +32,18 @@ class Voice extends Service
   {
     $capabilities = array();
     $capabilities['application'] = array(
+        'amd',
+        'callerid_set',
+        'dnc',
+        'input',
+        'play_menu',
+        'record',
+        'say_alpha',
+        'say_date',
+        'say_digit',
+        'say_number',
+        'say_time',
+        'tts',
         'inbound',
         'originate',
         'connect',

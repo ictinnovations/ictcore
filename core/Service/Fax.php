@@ -38,6 +38,7 @@ class Fax extends Service
         'disconnect',
         'fax_receive',
         'fax_send',
+        'transfer',
         'log'
     );
     $capabilities['account'] = array(
@@ -107,6 +108,7 @@ class Fax extends Service
       case 'disconnect':
       case 'fax_send':
       case 'fax_receive':
+      case 'transfer':
       case 'log':
         $template_path = "application/$template_name.json";
         break;
