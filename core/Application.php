@@ -23,6 +23,11 @@ class Application
   const ORDER_END = 128; // Bye
   const ORDER_CLOSE = 256; // Hangup
 
+  /* Setting const */
+  const REQUIRE_GATEWAY = 1;
+  const REQUIRE_PROVIDER = 2;
+  const REQUIRE_END_APPLICATION = 4;
+
   /**
    * ********************************************** Application related data **
    */
@@ -86,6 +91,12 @@ class Application
   public static $supportedResult = array(
       'result' => array('success', 'error')
   );
+
+  /**
+   * If this application require any special dependency
+   * @var integer
+   */
+  public static $defaultSetting = 0; // no special settings
 
   /**
    * ***************************************************** Runtime Variables **

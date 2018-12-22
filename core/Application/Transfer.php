@@ -41,6 +41,16 @@ class Transfer extends Application
    */
   public $user_id = '[extension:user_id]';
 
+  /**
+   * ******************************************** Default Application Values **
+   */
+
+  /**
+   * If this application require any special dependency
+   * @var integer
+   */
+  public static $defaultSetting = Application::REQUIRE_PROVIDER;
+
   public function get_user_id()
   {
     if (empty($this->user_id) || $this->user_id == '[extension:user_id]') {

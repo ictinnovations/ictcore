@@ -104,30 +104,6 @@ class Email extends Service
     return "$template_dir/$template_path";
   }
 
-  public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
-  {
-    switch ($oApplication->type) {
-      case 'email_send': // execute send_email directly from gateway
-        // initilize token cache
-        $oToken = new Token(Token::SOURCE_ALL);
-        $oToken->add('application', $oApplication);
-
-        // load provider
-        $oProvider = $this->get_route();
-        $oToken->add('provider', $oProvider);
-
-        // send it via gateway
-        $oGateway = $this->get_gateway();
-        $command = $oToken->render($command, $command_type); // render tokens
-        $oGateway->send($command, $oProvider);
-        break;
-
-      default: // all other applications
-        parent::application_execute($oApplication, $command, $command_type);
-        break;
-    }
-  }
-
   /**
    * *************************************** Configuration related functions **
    */

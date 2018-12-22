@@ -158,11 +158,39 @@ class Service
 
   public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
   {
-    if (!empty($command)) {
-      // initilize token cache
-      $oToken = new Token(Token::SOURCE_ALL);
-      $oToken->add('application', $oApplication);
+    if (empty($command)) {
+      return;
+    }
 
+    // initilize token cache
+    $oToken = new Token(Token::SOURCE_ALL);
+    $oToken->add('application', $oApplication);
+
+    // some applications require to provide last / disconnect application id
+    // to collect call status
+    if (($oApplication::$defaultSetting & Application::REQUIRE_END_APPLICATION) = Application::REQUIRE_END_APPLICATION) {
+      // locate and assign end application id
+      $appList = $oApplication->search($oApplication->program_id, Application::ORDER_END);
+      foreach ($appList as $disconnectApp) {
+        $oApplication->disconnect_application_id = $disconnectApp['application_id'];
+        break; // only first
+      }
+    }
+
+    // Some application require active provider to access / dial external extensions
+    if (($oApplication::$defaultSetting & Application::REQUIRE_PROVIDER) = Application::REQUIRE_PROVIDER) {
+      // load provider
+      $oProvider = static::get_route();
+      $oToken->add('provider', $oProvider);
+    }
+
+    // Some application require immediate execution via gateway, instead of http response
+    if (($oApplication::$defaultSetting & Application::REQUIRE_GATEWAY) = Application::REQUIRE_GATEWAY) {
+      // send it via gateway
+      $oGateway = $this->get_gateway();
+      $command = $oToken->render($command, $command_type); // render tokens
+      $oGateway->send($command, $oProvider);
+    } else { // default method is http response
       // put it in response cache
       $oSession = Session::get_instance();
       $oSession->response->application_id = 'app_' . $oApplication->application_id;

@@ -115,40 +115,6 @@ class Fax extends Service
     return "$template_dir/$template_path";
   }
 
-  public function application_execute(Application $oApplication, $command = '', $command_type = 'string')
-  {
-    // originate and connect application require to provide last / disconnect application id
-    // to collect call status
-    if ($oApplication->type == 'originate' || $oApplication->type == 'connect') {
-      $appList = $oApplication->search($oApplication->program_id, Application::ORDER_END);
-      foreach ($appList as $disconnectApp) {
-        $oApplication->disconnect_application_id = $disconnectApp['application_id'];
-        break; // only first
-      }
-    }
-
-    switch ($oApplication->type) {
-      case 'originate': // execute originate directly from gateway
-        // initilize token cache
-        $oToken = new Token(Token::SOURCE_ALL);
-        $oToken->add('application', $oApplication);
-
-        // load provider
-        $oProvider = static::get_route();
-        $oToken->add('provider', $oProvider);
-
-        // send it via gateway
-        $oGateway = $this->get_gateway();
-        $command = $oToken->render($command, $command_type); // render tokens
-        $oGateway->send($command, $oProvider);
-        break;
-
-      default: // all other applications
-        parent::application_execute($oApplication, $command, $command_type);
-        break;
-    }
-  }
-
   /**
    * *************************************** Configuration related functions **
    */

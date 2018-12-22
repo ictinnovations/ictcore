@@ -49,6 +49,16 @@ class Originate extends Application
   public $destination = '[transmission:destination:phone]';
 
   /**
+   * ******************************************** Default Application Values **
+   */
+
+  /**
+   * If this application require any special dependency
+   * @var integer
+   */
+  public static $defaultSetting = (Application::REQUIRE_END_APPLICATION | Application::REQUIRE_GATEWAY | Application::REQUIRE_PROVIDER);
+
+  /**
    * return a name value pair of all aditional application parameters which we need to save
    * @return array
    */

@@ -91,6 +91,12 @@ class Sms_send extends Application
   );
 
   /**
+   * If this application require any special dependency
+   * @var integer
+   */
+  public static $defaultSetting = (Application::REQUIRE_GATEWAY | Application::REQUIRE_PROVIDER);
+
+  /**
    * return a name value pair of all aditional application parameters which we need to save
    * @return array
    */

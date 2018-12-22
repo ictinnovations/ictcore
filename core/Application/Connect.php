@@ -26,6 +26,16 @@ class Connect extends Application
    */
   protected $type = 'connect';
 
+  /**
+   * ******************************************** Default Application Values **
+   */
+
+  /**
+   * If this application require any special dependency
+   * @var integer
+   */
+  public static $defaultSetting = Application::REQUIRE_END_APPLICATION;
+
   public function execute()
   {
     if ($this->oTransmission->service_flag == Voice::SERVICE_FLAG) {
