@@ -108,6 +108,9 @@ Programs
 ### Voice Call with pre recorded message
 * POST programs/voicemessage
 
+### Custom Forward program
+* POST programs/forward
+
 Transmission - the actual call or action
 ----------------------------------------
 
@@ -147,10 +150,10 @@ Campaigns : Communication in bulk
 
 Account / Email / DID / Extension
 ---------------------------------
+
+### Accounts
 * POST accounts
-* POST extensions
 * GET accounts
-* GET extensions
 * GET accounts/{account_id}
 * GET accounts/{account_id}/provisioning
 * PUT accounts/{account_id}
@@ -160,6 +163,14 @@ Account / Email / DID / Extension
 * DELETE /accounts/{account_id}/programs/{program\_name}
 * PUT /accounts/{account_id}/users/{user\_id}
 * DELETE /accounts/{account_id}/users
+
+### DIDs
+* POST dids
+* GET dids
+
+### Extension
+* POST extensions
+* GET extensions
 
 User Management
 ---------------
