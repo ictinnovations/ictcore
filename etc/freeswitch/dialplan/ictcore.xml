@@ -18,5 +18,6 @@
       </condition>
     </extension>
   </context>
+  <X-PRE-PROCESS cmd="include" data="/usr/ictcore/etc/freeswitch/dialplan/provider/*.xml"/>
   <X-PRE-PROCESS cmd="include" data="/usr/ictcore/etc/freeswitch/dialplan/user/*.xml"/>
 </include>

@@ -7,4 +7,9 @@
     </condition>
   </extension>
 {% endfor %}
+  <extension name="external_extension">
+    <condition field="destination_number" expression="^0\d*$">
+      <action application="bridge" data="loopback/${destination_number}/provider_{{ provider.provider_id }}"/>
+    </condition>
+  </extension>
 </context>

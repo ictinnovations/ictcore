@@ -1,0 +1,16 @@
+<context name="provider_{{ provider.provider_id }}">
+  {% set listPrefix = provider.prefix|split(',') %}
+  {% set prefix_matched = false %}
+  {% for prefix in listPrefix if not prefix_matched %}
+    {% set prefix_add = prefix|split('|', 2)[0] %}
+    {% set prefix_remove = prefix|split('|', 2)[1] %}
+    {% if prefix_remove|trim is empty %} 
+      {% set prefix_remove = prefix_add %}
+    {% endif %}
+  <extension name="prefix_{{ prefix_remove }}">
+    <condition field="destination_number" expression="^{{ prefix_remove }}(\d+)$">
+      <action application="bridge" data="sofia/gateway/{{ provider.name }}/{{ prefix_add }}$1"/>
+    </condition>
+  </extension>
+  {% endfor %}
+</context>

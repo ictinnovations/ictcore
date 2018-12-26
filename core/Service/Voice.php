@@ -107,6 +107,8 @@ class Voice extends Service
         $template_path = 'account/extension.twig';
         break;
       case 'provider':
+        $template_path = 'provider.twig';
+        break;
       case 'sip':
         $template_path = 'provider/sip.twig';
         break;
@@ -180,8 +182,10 @@ class Voice extends Service
       $oToken = new Token();
       $oToken->add('provider', $oProvider);
       $this->config_save($oProvider->type, $oToken, 'provider_' . $oProvider->provider_id);
+      $this->config_save('provider', $oToken, 'provider_' . $oProvider->provider_id);
     } else {
       $this->config_delete($oProvider->type, 'provider_' . $oProvider->provider_id);
+      $this->config_delete('provider', 'provider_' . $oProvider->provider_id);
     }
     Voice::config_status(Voice::STATUS_NEED_RELOAD);
   }

@@ -186,6 +186,7 @@ class Freeswitch extends Gateway
       case 'extension':
         return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/directory/account/$name.xml";
       case 'provider':
+        return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/dialplan/provider/$name.xml";
       case 'sip':
         return $path_etc . DIRECTORY_SEPARATOR . "freeswitch/sip_profiles/provider/$name.xml";
     }
