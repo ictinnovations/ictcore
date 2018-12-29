@@ -8,8 +8,8 @@
   },
   "batch": [
     {
-      "name": "bridge",
-      "data": "loopback/{{ application.extension }}/user_{{ application.user_id }}/XML"
+      "name": "transfer",
+      "data": "{{ application.extension }} XML user_{{ application.user_id }}"
     }
   ]
 }

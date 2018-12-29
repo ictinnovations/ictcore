@@ -20,6 +20,9 @@ use stdClass;
 class AccountApi extends Api
 {
 
+  /** @var string #interface_type */
+  private $include_subfolder = true;
+
   /**
    * Create a new account
    *
@@ -192,6 +195,16 @@ class AccountApi extends Api
     $oAccount = Account::load($account_id);
 
     return $oAccount->dissociate();
+  }
+
+  // include classes from Account folder
+  protected static function rest_include()
+  {
+    if (property_exists (get_called_class(), 'include_subfolder')) {
+      return 'Api/Account'; // Api class return sub api folder
+    }
+    // in child class return null
+    return null;
   }
 
 }

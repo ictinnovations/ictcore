@@ -9,7 +9,13 @@
 {% endfor %}
   <extension name="external_extension">
     <condition field="destination_number" expression="^0\d*$">
-      <action application="bridge" data="loopback/${destination_number}/provider_{{ provider.provider_id }}"/>
+      <action application="transfer" data="${destination_number} XML ictcore_gateway"/>
+    </condition>
+  </extension>
+  <extension name="catch_invalid">
+    <condition field="destination_number" expression=".*">
+      <action application="playback" data="sounds/invalid_extension.wav"/>
+      <action application="hangup"/>
     </condition>
   </extension>
 </context>

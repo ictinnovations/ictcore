@@ -1,6 +1,6 @@
 <?php
 
-namespace ICT\Core\Api;
+namespace ICT\Core\Api\Account;
 
 /* * ***************************************************************
  * Copyright © 2016 ICT Innovations Pakistan All Rights Reserved   *

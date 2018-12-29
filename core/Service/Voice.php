@@ -164,7 +164,7 @@ class Voice extends Service
   public function config_update_user(User $oUser)
   {
     if ($oUser->active) {
-      $account_filter = array('created_by' => $oUser->user_id, 'acitve'=> 1, 'phone' => '%');
+      $account_filter = array('type' => 'extension', 'created_by' => $oUser->user_id, 'acitve'=> 1, 'phone' => '%');
       $listAccount = Account::search($account_filter);
       $oToken = new Token();
       $oToken->add('user', $oUser);

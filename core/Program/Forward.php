@@ -11,15 +11,17 @@ namespace ICT\Core\Program;
 
 use ICT\Core\Account\Did;
 use ICT\Core\Account\Extension;
+use ICT\Core\Application\Connect;
 use ICT\Core\Application\Disconnect;
-use ICT\Core\Application\Originate;
+use ICT\Core\Application\Inbound;
 use ICT\Core\Application\Transfer;
+use ICT\Core\Exchange\Dialplan;
 use ICT\Core\Program;
 use ICT\Core\Scheme;
 use ICT\Core\Service\Voice;
 use ICT\Core\Transmission;
 
-class Agent extends Program
+class Forward extends Program
 {
 
   /** @var string */

@@ -14,6 +14,9 @@ use Jacwright\RestServer\RestServer;
 class Api
 {
 
+  /** @var boolean include_subfolder */
+  private $include_subfolder = true;
+
   /** @var string #interface_type */
   private $interface_type = 'local';
 
@@ -83,7 +86,7 @@ class Api
 
   protected static function rest_include()
   {
-    if (property_exists (get_called_class(), 'interface_type')) {
+    if (property_exists (get_called_class(), 'include_subfolder')) {
       return 'Api'; // Api class return sub api folder
     }
     // in child class return null

@@ -406,6 +406,8 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 /bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
 %endif
+# Remove URL Cache
+%{__rm} -rf /usr/ictcore/cache/urlMap.cache
 # Finally generate security keys for ictcore
 bash /usr/ictcore/bin/keygen
 

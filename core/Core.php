@@ -205,7 +205,7 @@ class Core
     $listAccount = Account::search($accountFilter);
     if ($listAccount) {
       $aAccount = array_shift($listAccount);
-      return new Account($aAccount['account_id']);
+      return Account::load($aAccount['account_id']);
     }
     return false; // no account found
   }
