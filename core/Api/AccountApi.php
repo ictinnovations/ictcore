@@ -177,10 +177,8 @@ class AccountApi extends Api
     $this->_authorize('account_create'); // instead of updated association is more like account creation
     $this->_authorize('user_update');
     $oAccount = Account::load($account_id);
-    $oUser = new User($user_id);
-
     $oAccount->dissociate();
-    return $oAccount->associate($oUser);
+    return $oAccount->associate($user_id);
   }
 
   /**

@@ -9,6 +9,7 @@ namespace ICT\Core\Api;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use ICT\Core\Account;
 use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\User;
@@ -166,5 +167,20 @@ class UserApi extends Api
   protected static function rest_include()
   {
     return 'Api/User';
+  }
+
+  /**
+   * List all account assigned to this user
+   *
+   * @url GET /users/$user_id/accounts
+   */
+  public function account_list($user_id, $query = array())
+  {
+    $this->_authorize('user_read');
+    $this->_authorize('account_list');
+
+    $filter = (array)$query;
+    $filter['created_by'] = $user_id;
+    return Account::search($filter);
   }
 }
