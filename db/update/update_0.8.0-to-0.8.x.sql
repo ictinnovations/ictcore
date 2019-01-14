@@ -90,3 +90,27 @@ ALTER TABLE campaign CHANGE try_allowed try_allowed               int(11)       
 
 -- version 0.8.1.0
 ALTER TABLE temeplate CHANGE attachment attachment               text;
+
+-- version 0.8.4.0
+INSERT INTO permission VALUES (NULL, 'usr', '');
+INSERT INTO permission VALUES (NULL, 'usr_create', '');
+INSERT INTO permission VALUES (NULL, 'usr_list', '');
+INSERT INTO permission VALUES (NULL, 'usr_read', '');
+INSERT INTO permission VALUES (NULL, 'usr_update', '');
+INSERT INTO permission VALUES (NULL, 'usr_delete', '');
+
+SELECT @roleId := role_id FROM role WHERE name='admin';
+SELECT @permissionId := permission_id FROM permission WHERE name='usr';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr */
+
+SELECT @roleId := role_id FROM role WHERE name='user';
+SELECT @permissionId := permission_id FROM permission WHERE name='user_read';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* user_read */
+SELECT @permissionId := permission_id FROM permission WHERE name='usr_read';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr_read */
+SELECT @permissionId := permission_id FROM permission WHERE name='account_read';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account_read */
+SELECT @permissionId := permission_id FROM permission WHERE name='account_update';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account_update */
+SELECT @permissionId := permission_id FROM permission WHERE name='account_list';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account_list */

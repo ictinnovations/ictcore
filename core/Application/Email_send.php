@@ -79,7 +79,13 @@ class Email_send extends Application
    * If this application require any special dependency
    * @var integer
    */
-  public static $defaultSetting = (Application::REQUIRE_GATEWAY | Application::REQUIRE_PROVIDER);
+  public static $defaultSetting = Application::REQUIRE_GATEWAY;
+
+  public function __construct($application_id = null, $aParameter = null)
+  {
+    $this->defaultSetting = (Application::REQUIRE_GATEWAY | Application::REQUIRE_PROVIDER);
+    parent::__construct($application_id, $aParameter);
+  }
 
   /**
    * return a name value pair of all aditional application parameters which we need to save

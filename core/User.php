@@ -436,6 +436,7 @@ class User
         "exp" => time() + Conf::get('security:token_expiry', (60 * 60 * 24 * 30 * 12 * 1)), // valid for one year
         "user_id" => $this->user_id,
         "username" => $this->username,
+        "is_admin" => can_access('user_create', $this->user_id) ? "1" : "0",
         "api-version" => "1.0"
     );
 

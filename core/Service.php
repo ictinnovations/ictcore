@@ -168,7 +168,7 @@ class Service
 
     // some applications require to provide last / disconnect application id
     // to collect call status
-    if (($oApplication::$defaultSetting & Application::REQUIRE_END_APPLICATION) == Application::REQUIRE_END_APPLICATION) {
+    if (($oApplication->defaultSetting & Application::REQUIRE_END_APPLICATION) == Application::REQUIRE_END_APPLICATION) {
       // locate and assign end application id
       $appList = $oApplication->search($oApplication->program_id, Application::ORDER_END);
       foreach ($appList as $disconnectApp) {
@@ -178,14 +178,14 @@ class Service
     }
 
     // Some application require active provider to access / dial external extensions
-    if (($oApplication::$defaultSetting & Application::REQUIRE_PROVIDER) == Application::REQUIRE_PROVIDER) {
+    if (($oApplication->defaultSetting & Application::REQUIRE_PROVIDER) == Application::REQUIRE_PROVIDER) {
       // load provider
       $oProvider = static::get_route();
       $oToken->add('provider', $oProvider);
     }
 
     // Some application require immediate execution via gateway, instead of http response
-    if (($oApplication::$defaultSetting & Application::REQUIRE_GATEWAY) == Application::REQUIRE_GATEWAY) {
+    if (($oApplication->defaultSetting & Application::REQUIRE_GATEWAY) == Application::REQUIRE_GATEWAY) {
       // send it via gateway
       $oGateway = $this->get_gateway();
       $command = $oToken->render($command, $command_type); // render tokens

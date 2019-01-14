@@ -259,7 +259,7 @@ class Faxtoemail extends Program
     // Note: in template there is a attachment token, (see: token_create in transmission_done for oDocument)
     $oTemplate->token_apply($oToken, Token::KEEP_ORIGNAL);
     // Now convert tif file into pdf
-    $oTemplate->attachment = Document::create_pdf($oTemplate->attachment, 'tif');
+    $oTemplate->attachment = Document::create_pdf($oDocument->file_name, 'tif');
     $oTemplate->save();
 
     // prepare data for new program

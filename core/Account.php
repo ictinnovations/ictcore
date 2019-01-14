@@ -353,13 +353,15 @@ class Account
       }
       $this->save();
     }
+    return true;
   }
 
   public function dissociate()
   {
     // first remove all associated programs
     $this->remove_program('all');
-    $this->associate(0);
+    $this->associate('NULL');
+    return true;
   }
 
   /**
@@ -386,6 +388,9 @@ class Account
   {
     Corelog::log("Removing program from: $this->account_id Program: $program_name", Corelog::CRUD);
     $aProgram = Program::resource_search('account', $this->account_id);
+    if (empty($aProgram)) {
+      $aProgram = Program::resource_search($this->type, $this->account_id);
+    }
     if ($aProgram) { // no error / false
       foreach ($aProgram as $aProgram) {
         $program_id = $aProgram['program_id'];
@@ -400,6 +405,7 @@ class Account
         }
       }
     }
+    return true;
   }
 
 }
