@@ -17,6 +17,10 @@
     {
       "name": "waitforresult",
       "data": "silence_stream://1000"
+    },
+    {
+      "name": "voice_stop",
+      "data": ""
     }
   ]
 }

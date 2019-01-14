@@ -41,14 +41,15 @@ class Transfer extends Application
    */
   public $user_id = '[extension:user_id]';
 
-  public function token_load()
+  public function get_user_id()
   {
-    parent::token_load();
     if (empty($this->user_id) || $this->user_id == '[extension:user_id]') {
       $oSession = Session::get_instance();
       if (isset($oSession->user)) {
-        $this->user_id = $oSession->user->user_id;
+        return $oSession->user->user_id;
       }
+    } else {
+      return $this->user_id;
     }
   }
 
@@ -67,6 +68,8 @@ class Transfer extends Application
 
   public function execute()
   {
+    $this->user_id = $this->get_user_id();
+
     $oService = new Voice();
     $template_path = $oService->template_path('transfer');
     $oService->application_execute($this, $template_path, 'template');

@@ -46,25 +46,6 @@ __Note:__ Unlike other APIs this API does not require separate authentication in
         
         + token : token (string) 
 
-# Group System Statistics
-
-## System Statistics [/statistics]
-
-Get system statistics, like total and active campaigns, total contacts, total number of calls made etc
-
-### Get System Statistics [GET]
-
-+ Request
-
-    + Headers
-
-            Authentication: Bearer JWT
-
-+ Response 200 (application/json)
-
-     + Attributes (Statistics)
-
-
 # Group Program
 
 ## General program related function [/programs]

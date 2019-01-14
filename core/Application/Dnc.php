@@ -10,7 +10,9 @@ namespace ICT\Core\Application;
  * *************************************************************** */
 
 use ICT\Core\Application;
+use ICT\Core\Result;
 use ICT\Core\Service\Voice;
+use ICT\Core\Spool;
 
 class Dnc extends Application
 {
@@ -48,4 +50,5 @@ class Dnc extends Application
     $oService->application_execute($this, $template_path, 'template');
   }
 
+  return Spool::STATUS_CONNECTED;
 }

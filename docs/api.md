@@ -76,6 +76,7 @@ Programs
 * POST programs (dummy, instead use a relevant program)
 * GET programs
 * GET programs/{program_id}
+* PUT programs/{program_id}
 * DELETE programs/{program_id}
 * POST programs/{program_id}/transmissions
 * GET programs/{program_id}/transmissions
@@ -147,7 +148,9 @@ Campaigns : Communication in bulk
 Account / Email / DID / Extension
 ---------------------------------
 * POST accounts
+* POST extensions
 * GET accounts
+* GET extensions
 * GET accounts/{account_id}
 * GET accounts/{account_id}/provisioning
 * PUT accounts/{account_id}
@@ -177,18 +180,3 @@ Trunk / Termination Providers APIs
 * GET providers/{provider_id}
 * PUT providers/{provider_id}
 * DELETE providers/{provider_id}
-
-Permission Management
----------------------
-* POST permissions
-* GET permissions
-
-Role management
----------------
-* POST roles
-* GET roles
-* GET roles/{role_id}
-* PUT roles/{role_id}
-* DELETE roles/{role_id}
-* PUT roles/{role_id}/permissions/{permission_id}
-* DELETE roles/{role_id}/permissions/{permission_id}

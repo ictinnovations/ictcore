@@ -10,7 +10,9 @@ namespace ICT\Core\Application;
  * *************************************************************** */
 
 use ICT\Core\Application;
+use ICT\Core\Result;
 use ICT\Core\Service\Voice;
+use ICT\Core\Spool;
 
 class Play_menu extends Application
 {
@@ -39,6 +41,12 @@ class Play_menu extends Application
    * @var integer $key_timeout
    */
   public $key_timeout = 10;
+
+  /**
+   * allowed digits, application will play invalid message if user try to enter a non listed digit
+   * @var integer $valid_digit
+   */
+  public $valid_digit = '0-9'; // regular expersion are required in play_menu
 
   /**
    * ******************************************** Default Application Values **
@@ -73,6 +81,14 @@ class Play_menu extends Application
 
   public function execute()
   {
+    $valid_digit = '';
+    foreach($this->aAction as $oAction) {
+      $valid_digit .= $oAction->data['result'];
+    }
+    if (!empty($valid_digit)) {
+      $this->valid_digit = $valid_digit;
+    }
+
     $oService = new Voice();
     $template_path = $oService->template_path('play_menu');
     $oService->application_execute($this, $template_path, 'template');
@@ -80,14 +96,15 @@ class Play_menu extends Application
 
   public function process()
   {
-    $this->result['result'] = 'timeout'; // default result
+    $menu_result = 'timeout'; // default result
 
     // if we really have received an input from user
-    if (!empty($this->result['key']) && $this->result['error'] != 'timeout') {
+    if ($this->result['result'] != 'timeout') {
       // Save result
-      $this->result_create($this->result['key'], 'key', Result::TYPE_INFO);
-      $this->result['result'] = $this->result['key'];
+      $this->result_create($this->result['result'], 'key', Result::TYPE_INFO);
+      $menu_result = $this->result['result'];
     }
+    $this->result['result'] = $menu_result;
 
     return Spool::STATUS_CONNECTED;
   }

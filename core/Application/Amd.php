@@ -10,7 +10,9 @@ namespace ICT\Core\Application;
  * *************************************************************** */
 
 use ICT\Core\Application;
+use ICT\Core\Result;
 use ICT\Core\Service\Voice;
+use ICT\Core\Spool;
 
 class Amd extends Application
 {

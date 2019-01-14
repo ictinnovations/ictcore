@@ -102,6 +102,18 @@ class Voice extends Service
       case 'originate':
         $template_path = "application/originate/voice.json";
         break;
+      case 'amd':
+      case 'callerid_set':
+      case 'dnc':
+      case 'input':
+      case 'play_menu':
+      case 'record':
+      case 'say_alpha':
+      case 'say_date':
+      case 'say_digit':
+      case 'say_number':
+      case 'say_time':
+      case 'tts':
       case 'inbound':
       case 'connect':
       case 'disconnect':
@@ -110,6 +122,9 @@ class Voice extends Service
       case 'log':
         $template_path = "application/$template_name.json";
         break;
+      //default:
+      //   $template_path = "application/$template_name.json";
+      //   break;
     }
 
     return "$template_dir/$template_path";

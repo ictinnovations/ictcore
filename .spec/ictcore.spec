@@ -56,6 +56,7 @@ Group: ict
 Summary: Freeswitch addon for ICTCore
 Requires: ictcore curl sed
 Requires: freeswitch freeswitch-config-vanilla freeswitch-lua freeswitch-application-curl freeswitch-sounds-en-us-callie-8000
+Requires: freeswitch-asrtts-flite
 Provides: ictcore-freeswitch ictcore-gateway-voice ictcore-gateway-fax
 
 %description freeswitch
@@ -430,6 +431,8 @@ setfacl -d -m g::rw %{core_home}/etc/freeswitch/directory/account
 chmod g+rws %{core_home}/etc/freeswitch/sip_profiles/provider
 setfacl -d -m g::rw %{core_home}/etc/freeswitch/sip_profiles/provider
 # enable curl module in freeswitch module configuration
+sed -i 's/<!-- <load module="mod_flite"\/> -->/<load module="mod_flite"\/>/g' \
+/etc/freeswitch/autoload_configs/modules.conf.xml
 sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /etc/freeswitch/autoload_configs/modules.conf.xml
 # enable and start freeswitch server

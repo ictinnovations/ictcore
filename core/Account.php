@@ -87,7 +87,7 @@ class Account
    * @see void function Account::associate()
    * @var integer
    */
-  protected $user_id = NULL;
+  public $user_id = NULL;
 
   public function capabilities()
   {

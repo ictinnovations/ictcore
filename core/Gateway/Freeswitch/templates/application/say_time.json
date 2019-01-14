@@ -9,7 +9,7 @@
   "batch": [
     {
       "name": "say",
-      "data": "en CURRENT_TIME pronounced {{ application.time }}"
+      "data": "en CURRENT_TIME pronounced {{ application.time|date('U') }}"
     }
   ]
 }

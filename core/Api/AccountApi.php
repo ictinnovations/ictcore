@@ -29,7 +29,11 @@ class AccountApi extends Api
   {
     $this->_authorize('account_create');
 
-    $oAccount = new Account();
+    if (isset($data['type']) && !empty($data['type'])) {
+      $oAccount = Account::load($data['type']);
+    } else {
+      $oAccount = new Account();
+    }
     $this->set($oAccount, $data);
 
     if ($oAccount->save()) {
@@ -59,7 +63,7 @@ class AccountApi extends Api
   {
     $this->_authorize('account_read');
 
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
     return $oAccount;
   }
 
@@ -100,7 +104,7 @@ class AccountApi extends Api
   {
     $this->_authorize('account_update');
 
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
     $this->set($oAccount, $data);
 
     if ($oAccount->save()) {
@@ -119,7 +123,7 @@ class AccountApi extends Api
   {
     $this->_authorize('account_delete');
 
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
 
     $result = $oAccount->delete();
     if ($result) {
@@ -139,7 +143,7 @@ class AccountApi extends Api
     $this->_authorize('account_update');
     $this->_authorize('program_create');
     $this->_authorize('program_execute');
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
     $oProgram = Program::load($program_name);
 
     return $oAccount->install_program($oProgram);
@@ -155,7 +159,7 @@ class AccountApi extends Api
   {
     $this->_authorize('account_update');
     $this->_authorize('program_delete');
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
 
     return $oAccount->remove_program($program_name);
   }
@@ -169,7 +173,7 @@ class AccountApi extends Api
   {
     $this->_authorize('account_create'); // instead of updated association is more like account creation
     $this->_authorize('user_update');
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
     $oUser = new User($user_id);
 
     $oAccount->dissociate();
@@ -185,7 +189,7 @@ class AccountApi extends Api
   {
     $this->_authorize('account_delete');
     $this->_authorize('user_update');
-    $oAccount = new Account($account_id);
+    $oAccount = Account::load($account_id);
 
     return $oAccount->dissociate();
   }

@@ -77,6 +77,7 @@ class Agent extends Program
 
     $transfer = new Transfer();
     $transfer->extension = $this->aResource['extension']->phone;
+    $transfer->user_id = $this->aResource['extension']->user_id;
 
     $hangupCall = new Disconnect();
 

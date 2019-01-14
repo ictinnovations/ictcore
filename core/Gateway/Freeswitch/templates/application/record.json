@@ -2,9 +2,6 @@
   "application_id": "{{ application.application_id }}",
   "input": {
     "playback_terminators": "#",
-    "time_limit_secs": "{{ application.max_duration }}",
-    "silence_thresh": "200",
-    "silence_hits": "3",
     "recording_file": "{{ application.recording_file }}",
     "application_result": "success"
   },
@@ -21,7 +18,7 @@
     },
     {
       "name": "record",
-      "data": "{{ application.recording_file }}"
+      "data": "{{ application.recording_file }} {{ application.max_duration }} 200 3"
     }
   ]
 }
