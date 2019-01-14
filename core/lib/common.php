@@ -66,6 +66,12 @@ function path_string_to_array($path) {
   return explode(',', $path);
 }
 
+function path_append($path, $file) {
+  $aPath = path_string_to_array($path);
+  $aPath[] = $file;
+  return path_array_to_string($aPath);
+}
+
 /**
  * Return an array from given bitmask
  * @param    integer    $mask Integer of the bit
