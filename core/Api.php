@@ -79,6 +79,21 @@ class Api
     }
   }
 
+  public function get_request_url()
+  {
+    return $this->server->url;
+  }
+
+  public function get_request_method()
+  {
+    return $this->server->method;
+  }
+
+  public function get_request_format()
+  {
+    return $this->server->format;
+  }
+
   public function send_error($code, $message)
   {
     $this->oInterface->handleError($code, $message);

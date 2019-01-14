@@ -48,7 +48,7 @@ class Document extends Message
    * @property-read integer $document_id
    * @var integer
    */
-  public $document_id = NULL;
+  protected $document_id = NULL;
 
   /** @var string */
   public $name = NULL;
@@ -66,7 +66,7 @@ class Document extends Message
    */
 
   /** @var string */
-  public $type = NULL;
+  protected $type = NULL;
 
   /** @var string */
   public $description = NULL;
@@ -75,7 +75,7 @@ class Document extends Message
    * @property-read integer $pages
    * @var integer
    */
-  public $pages = NULL;
+  protected $pages = NULL;
 
   /**
    * @property-read integer $size_x
@@ -201,15 +201,20 @@ class Document extends Message
     global $path_data;
     $oSession = Session::get_instance();
     $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
-    $file_name = 'document_' . $user_id . '_';
-    $file_name .= DB::next_record_id($file_name);
-    $tiff_file = $path_data . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . $file_name . '.tif';
-
-    if (!empty($this->type)) {
-      $file_type = $this->type;
-    }
 
     $aFile = \ICT\Core\path_string_to_array($file_path);
+    if (!empty($this->file_name) && in_array($this->file_name, $aFile)) {
+      $file_type = $this->type;
+      $tiff_file = $this->file_name;
+      $pos = array_search($tiff_file, $aFile);
+      unset($aFile[$pos]);
+    } else {
+      $file_type = empty($this->type) ? 'wav' : $this->type;
+      $file_name = 'document_' . $user_id . '_';
+      $file_name .= DB::next_record_id($file_name);
+      $tiff_file = $path_data . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . $file_name . '.tif';
+    }
+
     foreach($aFile as $file) {
       $aType = explode('.', $file);
       $file_type = isset($this->type) ? $this->type : end($aType);
@@ -294,7 +299,8 @@ class Document extends Message
     Corelog::log("Converting source image into fax support tiff", Corelog::CRUD, $cmd);
     exec($cmd);
     //exec("rm -rf '$sourceFile'");
-    $cmd = \ICT\Core\sys_which('tiffcp', '/usr/bin') . " -a '$targetFile.tmp' '$targetFile'"; // -a for append
+    // -a for append and -t for tiles i.e pages in correct sequence like A1,A2,A3,B1,B2,C1,C2,C3
+    $cmd = \ICT\Core\sys_which('tiffcp', '/usr/bin') . " -x -a '$targetFile.tmp' '$targetFile'";
     exec($cmd);
     exec("rm -rf '$targetFile.tmp'");
 

@@ -39,14 +39,16 @@ class Recording extends Message
       'codec',
       'channel',
       'sample',
-      'bitrate'
+      'bitrate',
+      'link',
+      'message_id'
   );
 
   /**
    * @property-read integer $recording_id
    * @var integer
    */
-  public $recording_id = NULL;
+  protected $recording_id = NULL;
 
   /** @var string */
   public $name = NULL;
@@ -56,7 +58,7 @@ class Recording extends Message
    * @see Recording::set_file_name()
    * @var string 
    */
-  public $file_name = NULL;
+  protected $file_name = NULL;
 
   /**
    * @property-read string $link
@@ -64,7 +66,7 @@ class Recording extends Message
    */
 
   /** @var string */
-  public $type = NULL;
+  protected $type = NULL;
 
   /** @var string */
   public $description = NULL;
@@ -73,7 +75,7 @@ class Recording extends Message
    * @property-read integer $length
    * @var integer
    */
-  public $length = NULL;
+  protected $length = NULL;
 
   /**
    * @property-read string $codec
@@ -188,11 +190,33 @@ class Recording extends Message
     global $path_data;
     $oSession = Session::get_instance();
     $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
-    $file_type = empty($this->type) ? 'wav' : $this->type;
-    $file_name = 'recording_' . $user_id . '_';
-    $file_name .= DB::next_record_id($file_name);
-    $wav_file = $path_data . DIRECTORY_SEPARATOR . 'recording' . DIRECTORY_SEPARATOR . $file_name . '.wav';
-    $this->create_wav($file_path, $file_type, $wav_file);
+
+    $aFile = \ICT\Core\path_string_to_array($file_path);
+    $aRecording = array();
+    if (!empty($this->file_name) && in_array($this->file_name, $aFile)) {
+      $file_type = $this->type;
+      $wav_file = $this->file_name;
+      // rename exsting recording, to make $wav_file empty
+      $new_file = tempnam('/tmp', 'tmp_recording') . '.wav';
+      rename($wav_file, $new_file);
+      $pos = array_search($tiff_file, $aFile);
+      unset($aFile[$pos]);
+      // start aRecording with existing recording
+      $aRecording[] = $new_file;
+    } else {
+      $file_type = empty($this->type) ? 'wav' : $this->type;
+      $file_name = 'recording_' . $user_id . '_';
+      $file_name .= DB::next_record_id($file_name);
+      $wav_file = $path_data . DIRECTORY_SEPARATOR . 'recording' . DIRECTORY_SEPARATOR . $file_name . '.wav';
+    }
+
+    foreach($aFile as $file) {
+      $temporary_file = tempnam('/tmp', 'tmp_file') . '.wav';
+      $this->create_wav($file_path, $file_type, $temporary_file);
+      $aRecording[] = $temporary_file;
+    }
+
+    $this->concat_wav($aRecording, $wav_file);
     $this->file_name = $wav_file;
   }
 
@@ -222,6 +246,14 @@ class Recording extends Message
       Corelog::log("New Recording created: $this->recording_id", Corelog::CRUD);
     }
     return $result;
+  }
+
+  private function concat_wav($inputRecording, $output_recording) {
+    $sox_command = \ICT\Core\sys_which('sox', '/usr/bin');
+    $recording_list = "'" . implode("' '", $inputRecording) . "'";
+    $sox_cmd = $sox_command . " $recording_list '$output_recording'";
+    Corelog::log("Concatenating recording list into single file", Corelog::CRUD, $sox_cmd);
+    exec($sox_cmd);
   }
 
   private function create_wav($sourceFile, $type, $targetFile)

@@ -70,6 +70,10 @@ class TemplateApi extends Api
    *
    * @url PUT /templates/$template_id/media
    * @url PUT /messages/templates/$template_id/media
+   *
+   * Upload multiple (one by one) template files by id
+   * @url POST /templates/$template_id/media
+   * @url POST /messages/templates/$template_id/media
    */
   public function upload($template_id, $data = null, $mime = 'text/html')
   {
@@ -82,6 +86,9 @@ class TemplateApi extends Api
         $extension = array_search($mime, Template::$media_supported);
         $filename = tempnam('/tmp', 'template') . ".$extension";
         file_put_contents($filename, $data);
+        if ($this->get_request_method() == 'POST') { // if request is post then append, to support multiple files
+          $filename = \ICT\Core\path_append($oTemplate->attachment, $filename);
+        }
         $oTemplate->attachment = $filename;
         if ($oTemplate->save()) {
           return $oTemplate->template_id;

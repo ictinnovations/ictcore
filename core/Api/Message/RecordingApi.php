@@ -70,6 +70,10 @@ class RecordingApi extends Api
    *
    * @url PUT /recordings/$recording_id/media
    * @url PUT /messages/recordings/$recording_id/media
+   *
+   * Upload multiple (one by one) recording files by id
+   * @url POST /recordings/$recording_id/media
+   * @url POST /messages/recordings/$recording_id/media
    */
   public function upload($recording_id, $data = null, $mime = 'audio/wav')
   {
@@ -81,6 +85,9 @@ class RecordingApi extends Api
         $extension = array_search($mime, Recording::$media_supported);
         $filename = tempnam('/tmp', 'recording') . ".$extension";
         file_put_contents($filename, $data);
+        if ($this->get_request_method() == 'POST') { // if request is post then append, to support multiple files
+          $filename = \ICT\Core\path_append($oRecording->file_name, $filename);
+        }
         $oRecording->file_name = $filename;
         if ($oRecording->save()) {
           return $oRecording->recording_id;

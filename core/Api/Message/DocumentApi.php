@@ -70,6 +70,10 @@ class DocumentApi extends Api
    *
    * @url PUT /documents/$document_id/media
    * @url PUT /messages/documents/$document_id/media
+   *
+   * Upload multiple (one by one) document files by id
+   * @url POST /documents/$document_id/media
+   * @url POST /messages/documents/$document_id/media
    */
   public function upload($document_id, $data = null, $mime = 'application/pdf')
   {
@@ -81,6 +85,9 @@ class DocumentApi extends Api
         $extension = array_search($mime, Document::$media_supported);
         $filename = tempnam('/tmp', 'document') . ".$extension";
         file_put_contents($filename, $data);
+        if ($this->get_request_method() == 'POST') { // if request is post then append, to support multiple files
+          $filename = \ICT\Core\path_append($oDocument->file_name, $filename);
+        }
         $oDocument->file_name = $filename;
         if ($oDocument->save()) {
           return $oDocument->document_id;

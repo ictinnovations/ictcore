@@ -43,7 +43,7 @@ class Template extends Message
    * @property-read integer $template_id
    * @var integer 
    */
-  public $template_id = NULL;
+  protected $template_id = NULL;
 
   /** @var string */
   public $name = NULL;
@@ -75,7 +75,7 @@ class Template extends Message
    * @property-read integer $length
    * @var string 
    */
-  public $length = NULL;
+  protected $length = NULL;
 
   /**
    * Default mime type for this message type, when no type is available
@@ -179,23 +179,31 @@ class Template extends Message
     $oSession = Session::get_instance();
     $user_id = empty(User::$user) ? 0 : $oSession->user->user_id;
 
-    if ($file_path === NULL) {
-      $this->aAttachment = array();
-    } else {
-      $aAttachment = \ICT\Core\path_string_to_array($file_path);
-      foreach($aAttachment as $attachment) {
-        if (file_exists($attachment)) {
-          $file_parts = explode('.', $attachment);
-          $raw_type = strtolower(end($file_parts));
-          $file_type = empty($raw_type) ? 'html' : $raw_type;
-          $file_name = 'attachment_' . $user_id . '_';
-          $file_name .= DB::next_record_id($file_name);
-          $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;
-          rename($file_path, $dst_file);
-          $this->aAttachment[] = $dst_file;
-        }
+    $currentAttachment = \ICT\Core\path_string_to_array($this->attachment);
+    $newAttachment = \ICT\Core\path_string_to_array($file_path);
+    $deleteFile = array_diff($currentAttachment, $newAttachment);
+    $addFile = array_diff($newAttachment, $currentAttachment);
+
+    // remove unlisted attachments
+    foreach ($deleteFile as $attachment) {
+      $pos = array_search($attachment, $currentAttachment);
+      unset($currentAttachment[$pos]);
+    }
+    $this->aAttachment = $currentAttachment;
+
+    foreach($addFile as $attachment) {
+      if (file_exists($attachment)) {
+        $file_parts = explode('.', $attachment);
+        $raw_type = strtolower(end($file_parts));
+        $file_type = empty($raw_type) ? 'html' : $raw_type;
+        $file_name = 'attachment_' . $user_id . '_';
+        $file_name .= DB::next_record_id($file_name);
+        $dst_file = $path_data . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR . $file_name . '.' . $file_type;
+        rename($attachment, $dst_file);
+        $this->aAttachment[] = $dst_file;
       }
     }
+
     $this->attachment = \ICT\Core\path_array_to_string($this->aAttachment);
   }
 

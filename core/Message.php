@@ -9,11 +9,16 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-class Message
+use JsonSerializable;
+
+class Message implements JsonSerializable
 {
 
   protected static $table = 'message';
   protected static $fields = array(
+      'message_id'
+  );
+  protected static $read_only = array(
       'message_id'
   );
 
@@ -21,7 +26,7 @@ class Message
    * @property-read integer $message_id 
    * @var integer
    */
-  public $message_id = NULL;
+  protected $message_id = NULL;
 
   /** @var string */
   public $name = NULL;
@@ -83,6 +88,19 @@ class Message
     } else {
       return isset($this->$field);
     }
+  }
+
+  public function jsonSerialize()
+  {
+    $json = array();
+    foreach($this as $key => $value) {
+        $json[$key] = $value;
+    }
+    $extra_fields = array_diff(static::$read_only, array_keys($json));
+    foreach($extra_fields as $key) {
+      $json[$key] = $this->$key;
+    }
+    return $json;
   }
 
   public function __get($field)
