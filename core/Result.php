@@ -66,10 +66,32 @@ class Result
     }
   }
 
-  public static function search($spool_id)
+  public static function search($aFilter = array())
   {
     $aResult = array();
-    $query = "SELECT * FROM " . self::$table . " WHERE spool_id=%spool_id%";
+    $from_str = self::$table;
+    $aWhere = array();
+    foreach ($aFilter as $search_field => $search_value) {
+      switch ($search_field) {
+        case 'spool_result_id':
+        case 'spool_id':
+        case 'application_id':
+          $aWhere[] = "$search_field = $search_value";
+          break;
+        case 'type':
+        case 'name':
+          $aWhere[] = "$search_field = '$search_value'";
+          break;
+        case 'data':
+          $aWhere[] = "$search_field LIKE '%$search_value%'";
+          break;
+      }
+    }
+    if (!empty($aWhere)) {
+      $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+    }
+
+    $query = "SELECT * FROM " . $from_str;
     $result = DB::query(self::$table, $query, array('spool_id' => $spool_id));
     while ($data = mysql_fetch_assoc($result)) {
       $aResult[] = $data;

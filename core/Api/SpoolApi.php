@@ -33,13 +33,14 @@ class SpoolApi extends Api
    * Get spool details
    *
    * @url GET /spools/$spool_id/result
+   * @url GET /spools/$spool_id/results
    */
   public function result($spool_id)
   {
     $this->_authorize('spool_read');
     $this->_authorize('result_read');
 
-    return Result::search($spool_id);
+    return Result::search(array('spool_id' => $spool_id));
   }
 
 }

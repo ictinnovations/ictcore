@@ -256,30 +256,39 @@ class TransmissionApi extends Api
   }
 
   /**
-   * Get transmission details
+   * Get transmission results
    *
+   * @url GET /transmissions/$transmission_id/logs
    * @url GET /transmissions/$transmission_id/detail
+   * @url GET /transmissions/$transmission_id/spools
    */
-  public function detail($transmission_id)
+  public function detail($transmission_id, $query = array())
   {
     $this->_authorize('transmission_read');
     $this->_authorize('spool_read');
 
-    return Spool::search(array('transmission_id' => $transmission_id));
+    $filter  = (array)$query;
+    $filter += array('transmission_id' => $transmission_id);
+    return Spool::search($filter);
   }
 
   /**
    * Get transmission details
    *
    * @url GET /transmissions/$transmission_id/result
+   * @url GET /transmissions/$transmission_id/results
    */
-  public function result($transmission_id)
+  public function result_recent($transmission_id, $query = array())
   {
     $this->_authorize('result_read');
 
-    $aSpool = $this->detail($transmission_id);
-    $spool = end($aSpool);
-    return Result::search($spool['spool_id']);
+    $listSpool = $this->detail($transmission_id);
+    $aSpool    = end($listSpool);
+
+    $filter  = (array)$query;
+    $filter += array('spool_id' => $aSpool['spool_id']);
+
+    return Result::search($filter);
   }
 
 }
