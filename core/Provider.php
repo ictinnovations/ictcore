@@ -111,6 +111,7 @@ class Provider
         case 'node_id':
         case 'host':
         case 'type':
+        case 'active':
           $aWhere[] = "$search_field = '$search_value'";
           break;
         case 'service_flag':

@@ -56,7 +56,7 @@ class Recording extends Message
    * @see Recording::set_file_name()
    * @var string 
    */
-  protected $file_name = NULL;
+  public $file_name = NULL;
 
   /**
    * @property-read string $link

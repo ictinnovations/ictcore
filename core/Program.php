@@ -227,6 +227,10 @@ class Program
   {
     Corelog::log("Constructing porgram", Corelog::LOGIC);
 
+    if (!empty($this->program_id)) {
+      $this->remove();
+    }
+
     $this->resource_load();
 
     $oScheme = $this->scheme();
@@ -234,6 +238,29 @@ class Program
   }
 
   public function remove()
+  {
+    // first of all uninstall this program from dialplan
+    $this->remove_dialplan();
+
+    // then delete all application linked to this program
+    $listApplication = Application::search($this->program_id);
+    foreach ($listApplication as $aApplication) {
+      $oApplication = Application::load($aApplication['application_id']);
+      $oApplication->delete();
+    }
+
+    // then delete all child programs
+    $listChild = $this->search_child($this->program_id);
+    foreach ($listChild as $childProgram) {
+      $oProgram = Program::load($childProgram['program_id']);
+      $oProgram->delete();
+    }
+
+    // also delete all resources
+    DB::delete(self::$table . '_resource', 'program_id', $this->program_id);
+  }
+
+  public function remove_dialplan()
   {
     $filter = array('program_id' => $this->program_id);
     $listDialplan = Dialplan::search($filter);
@@ -386,23 +413,6 @@ class Program
 
     // first of all uninstall this program from dialplan
     $this->remove();
-
-    // then delete all application linked to this program
-    $listApplication = Application::search($this->program_id);
-    foreach ($listApplication as $aApplication) {
-      $oApplication = Application::load($aApplication['application_id']);
-      $oApplication->delete();
-    }
-
-    // then delete all child programs
-    $listChild = $this->search_child($this->program_id);
-    foreach ($listChild as $childProgram) {
-      $oProgram = Program::load($childProgram['program_id']);
-      $oProgram->delete();
-    }
-
-    // also delete all resources
-    DB::delete(self::$table . '_resource', 'program_id', $this->program_id);
 
     return DB::delete(self::$table, 'program_id', $this->program_id);
   }

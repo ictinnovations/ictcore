@@ -1,0 +1,21 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "tts_engine": "flite",
+    "tts_voice": "kal",
+    "application_result": "success"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "set_audio_level",
+      "data": "write 4"
+    },
+    {
+      "name": "speak",
+      "data": "{{ application.text }}"
+    }
+  ]
+}

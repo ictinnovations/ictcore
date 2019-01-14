@@ -11,56 +11,49 @@ namespace ICT\Core\Application;
 
 use ICT\Core\Application;
 use ICT\Core\Service\Voice;
-use ICT\Core\Session;
 
-class Transfer extends Application
+class Callerid_set extends Application
 {
 
   /** @var string */
-  public $name = 'transfer';
+  public $name = 'callerid_set';
 
   /**
    * @property-read string $type
    * @var string
    */
-  protected $type = 'transfer';
+  protected $type = 'callerid_set';
 
   /**
    * ************************************************ Application Parameters **
    */
 
   /**
-   * target extension to transfer
-   * @var string $extension
+   * new caller id
+   * @var string $message
    */
-  public $extension = '[extension:phone]';
+  public $callerid = '[account:phone]';
 
   /**
-   * user_id for the owner of extension
-   * @var int $user_id
+   * ******************************************** Default Application Values **
    */
-  public $user_id = '[extension:user_id]';
-
-  public function token_load()
-  {
-    parent::token_load();
-    if (empty($this->user_id) || $this->user_id == '[extension:user_id]') {
-      $oSession = Session::get_instance();
-      if (isset($oSession->user)) {
-        $this->user_id = $oSession->user->user_id;
-      }
-    }
-  }
 
   /**
-   * return a name value pair of all additional application parameters which we need to save
+   * All possible results to use 
+   * @var array 
+   */
+  public static $supportedResult = array(
+      'result' => array('success')
+  );
+
+  /**
+   * return a name value pair of all aditional application parameters which we need to save
    * @return array
    */
   public function parameter_save()
   {
     $aParameters = array(
-        'extension' => $this->extension,
-        'user_id' => $this->user_id
+        'callerid' => $this->callerid
     );
     return $aParameters;
   }
@@ -68,7 +61,7 @@ class Transfer extends Application
   public function execute()
   {
     $oService = new Voice();
-    $template_path = $oService->template_path('transfer');
+    $template_path = $oService->template_path('callerid_set');
     $oService->application_execute($this, $template_path, 'template');
   }
 

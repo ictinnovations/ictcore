@@ -1,0 +1,16 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "effective_caller_id_number": "{{ application.callerid }}",
+    "application_result": "success"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "log",
+      "data": "INFO CallerID has been chanaged, new callerid is: {{ application.callerid }}"
+    }
+  ]
+}

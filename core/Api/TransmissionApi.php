@@ -10,6 +10,7 @@ namespace ICT\Core\Api;
  * *************************************************************** */
 
 use ICT\Core\Account;
+use ICT\Core\Contact;
 use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Program;

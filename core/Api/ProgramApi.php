@@ -106,7 +106,25 @@ class ProgramApi extends Api
     return $oProgram;
   }
 
-  // can't update a program create new
+  /**
+   * Update existing program
+   *
+   * @url PUT /programs/$program_id
+   */
+  public function update($program_id, $data = array())
+  {
+    $this->_authorize('program_update');
+
+    $oProgram = Program::load($program_id);
+    $this->set($oProgram, $data);
+
+    if ($oProgram->save()) {
+      $oProgram->deploy();
+      return $oProgram;
+    } else {
+      throw new CoreException(417, 'Program update failed');
+    }
+  }
 
   /**
    * Remove a program

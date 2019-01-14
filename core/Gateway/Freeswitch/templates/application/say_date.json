@@ -1,0 +1,15 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "application_result": "success"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "say",
+      "data": "en CURRENT_DATE pronounced {{ application.date }}"
+    }
+  ]
+}

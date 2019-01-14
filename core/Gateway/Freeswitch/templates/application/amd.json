@@ -1,0 +1,22 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "application_result": "human",
+    "amd_execute_on_person": "set application_result=human",
+    "amd_execute_on_machine": "set application_result=machine",
+    "media_bug_answer_req": "true"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "voice_start",
+      "data": ""
+    },
+    {
+      "name": "waitforresult",
+      "data": "silence_stream://1000"
+    }
+  ]
+}

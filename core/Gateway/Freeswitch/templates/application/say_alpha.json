@@ -1,0 +1,15 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "application_result": "success"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "say",
+      "data": "en NAME_SPELLED iterated {{ application.alpha }}"
+    }
+  ]
+}

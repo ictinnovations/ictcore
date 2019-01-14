@@ -1,0 +1,16 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "application_result": "success"
+  },
+  "output": {
+    "key": "input_key",
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "read",
+      "data": "0 99 silence_stream://1000 input_key 10000 #"
+    }
+  ]
+}

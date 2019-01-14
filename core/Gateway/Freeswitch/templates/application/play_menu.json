@@ -1,0 +1,15 @@
+{
+  "application_id": "{{ application.application_id }}",
+  "input": {
+    "application_result": "timeout"
+  },
+  "output": {
+    "result": "application_result"
+  },
+  "batch": [
+    {
+      "name": "play_and_get_digits",
+      "data": "1 1 3 {{ application.message }} # {{ application.message }} /invalid.wav application_result [0-9]+"
+    }
+  ]
+}
