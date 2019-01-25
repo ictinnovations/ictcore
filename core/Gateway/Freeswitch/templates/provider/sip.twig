@@ -6,8 +6,8 @@
     <!-- <param name="extension" value="{{ provider.username }}"/> -->
     <param name="extension-in-contact" value="true"/>
     <param name="realm" value="{{ provider.host }}"/>
-    <param name="proxy" value="{{ provider.host }}"/>
-    <param name="register-proxy" value="{{ provider.host }}"/>
+    <param name="proxy" value="{{ provider.host }}:{{ provider.port }}"/>
+    <param name="outbound-proxy" value="{{ provider.host }}:{{ provider.port }}"/>
     <param name="expire-seconds" value="3600"/>
     <param name="register" value="{% if provider.register == 1 %}true{% else %}false{% endif %}"/>
     <param name="from-user" value="{{ provider.username }}"/>

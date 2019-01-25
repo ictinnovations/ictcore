@@ -17,6 +17,10 @@
     <param name="tls-sip-port" value="5071"/>
     <param name="context" value="ictcore"/>
 
+    <!-- which transport to use for register -->
+    <param name="bind-params" value="transport=udp,tcp"/>
+    <param name="register-transport" value="tcp"/>
+
     <!--
         ALL VALUES BELOW THEN THIS LINE ARE SAME AS IN EXTERNAL PROFILE
     -->

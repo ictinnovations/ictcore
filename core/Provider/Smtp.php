@@ -21,6 +21,9 @@ class Smtp extends Provider
    */
   public $type = 'smtp';
 
+  /** @var string */
+  public $port = '25';
+
   /**
    * @property integer $service_flag
    * @var integer

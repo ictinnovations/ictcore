@@ -21,6 +21,9 @@ class Smpp extends Provider
    */
   public $type = 'smpp';
 
+  /** @var string */
+  public $port = '2775';
+
   /**
    * @property integer $service_flag
    * @var integer

@@ -21,6 +21,9 @@ class Sip extends Provider
    */
   public $type = 'sip';
 
+  /** @var string */
+  public $port = '5060';
+
   /**
    * @property integer $service_flag
    * @var integer
