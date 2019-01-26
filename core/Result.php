@@ -92,11 +92,11 @@ class Result
     }
 
     $query = "SELECT * FROM " . $from_str;
-    $result = DB::query(self::$table, $query, array('spool_id' => $spool_id));
+    $result = DB::query(self::$table, $query);
     while ($data = mysql_fetch_assoc($result)) {
       $aResult[] = $data;
     }
-    Corelog::log("Result search for spool_id: $spool_id", Corelog::CRUD, $aResult);
+    Corelog::log("Result search for spool", Corelog::CRUD, $aResult);
     return $aResult;
   }
 

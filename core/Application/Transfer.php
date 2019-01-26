@@ -49,7 +49,7 @@ class Transfer extends Application
    * If this application require any special dependency
    * @var integer
    */
-  public static $defaultSetting = Application::REQUIRE_PROVIDER;
+  public $defaultSetting = Application::REQUIRE_PROVIDER;
 
   public function get_user_id()
   {

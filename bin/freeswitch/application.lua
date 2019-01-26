@@ -166,7 +166,9 @@ function application_execute(appData)
 
     if aBatch ~= nil then
       for cmd_id, aCommand in pairs(aBatch) do
-        oCall:execute(aCommand.name, aCommand.data)
+        if application_execute_internal(aCommand) == false then
+          oCall:execute(aCommand.name, aCommand.data)
+        end
       end
     end
 
@@ -189,6 +191,19 @@ function application_execute(appData)
 
 end
 
+function application_execute_internal(appData)
+  if appData.name == 'transfer' then
+    transferData = appData.data:gmatch("[^%s]+")
+    transferExtension = transferData()
+    transferSource = transferData()
+    transferContext = transferData()
+    oCall:transfer(transferExtension, transferSource, transferContext)
+    oCall:destroy() -- this statement can stop script execution, it will produce an error, ignore it
+    -- TODO: replace above "destroy" with return, i.e return to main and then return again to exit from script
+  end
+
+  return false
+end
 
 -- ====================================
 -- Program start here
@@ -226,6 +241,7 @@ end
 
 oCall:setVariable('api_hangup_hook', '')  -- cancel default hangup hook
 oCall:setHangupHook("application_Hangup") -- set hangup to a function
+-- oCall:setAutoHangup(false)                -- continue in the dialplan
 
 -- Main loop: Dialplan / application will be processed in this loop
 -- ----------------------------------------------------------------

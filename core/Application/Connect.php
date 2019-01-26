@@ -34,7 +34,7 @@ class Connect extends Application
    * If this application require any special dependency
    * @var integer
    */
-  public static $defaultSetting = Application::REQUIRE_END_APPLICATION;
+  public $defaultSetting = Application::REQUIRE_END_APPLICATION;
 
   public function execute()
   {

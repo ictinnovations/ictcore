@@ -162,10 +162,6 @@ class Service
       return;
     }
 
-    // initilize token cache
-    $oToken = new Token(Token::SOURCE_ALL);
-    $oToken->add('application', $oApplication);
-
     // some applications require to provide last / disconnect application id
     // to collect call status
     if (($oApplication->defaultSetting & Application::REQUIRE_END_APPLICATION) == Application::REQUIRE_END_APPLICATION) {
@@ -176,6 +172,10 @@ class Service
         break; // only first
       }
     }
+
+    // initilize token cache
+    $oToken = new Token(Token::SOURCE_ALL);
+    $oToken->add('application', $oApplication);
 
     // Some application require active provider to access / dial external extensions
     if (($oApplication->defaultSetting & Application::REQUIRE_PROVIDER) == Application::REQUIRE_PROVIDER) {

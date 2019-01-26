@@ -96,7 +96,7 @@ class Application
    * If this application require any special dependency
    * @var integer
    */
-  public static $defaultSetting = 0; // no special settings
+  public $defaultSetting = 0; // no special settings
 
   /**
    * ***************************************************** Runtime Variables **

@@ -1,7 +1,7 @@
+<include>
+{% spaceless %}
 {% set listPrefix = provider.prefix|split(',') %}
-{% set prefix_matched = false %}
-{% for prefix in listPrefix if not prefix_matched %}
-  {% spaceless %}
+{% for prefix in listPrefix %}
   {% set prefix_remove = prefix|split('|', 2)[0] %}
   {% set prefix_add = prefix|split('|', 2)[1] %}
   {% endspaceless %}
@@ -11,3 +11,4 @@
   </condition>
 </extension>
 {% endfor %}
+</include>
