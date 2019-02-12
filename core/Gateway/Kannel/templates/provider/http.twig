@@ -1,0 +1,4 @@
+{# get template_name from provider.name and then try to include it, in case of failur include default.twig #}
+{% set provider_template = provider.name|split('_')[0]|lower %}
+{% set template_path = '/Gateway/Kannel/templates/provider/http/' %}
+{% include [template_path ~ provider_template ~ '.twig', template_path ~ 'default.twig'] %}

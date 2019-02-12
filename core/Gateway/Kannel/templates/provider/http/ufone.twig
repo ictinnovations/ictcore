@@ -1,0 +1,17 @@
+
+group=smsc
+smsc=http
+smsc-id=MT2MO
+max-pending-submits=10
+system-type=kannel
+smsc-username={{ provider.username }}
+smsc-password={{ provider.password }}
+port={{ provider.port }}
+send-url="http://{{ provider.host }}/bsms_app5/sendapi-0.3.jsp?id={{ provider.port }}&mobilenum=%P&shortcode=%p&message=%a&lang=english&password={{ provider.password }}&username={{ provider.username }}"
+{% if provider.settings is iterable %}
+  {% for key, value in provider.settings %}
+    {% if key != 'name' %}
+{{ key }}={{ value }}
+    {% endif %}
+  {% endfor %}
+{% endif %}

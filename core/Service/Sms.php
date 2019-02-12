@@ -87,6 +87,9 @@ class Sms extends Service
       case 'smpp':
         $template_path = 'provider/smpp.twig';
         break;
+      case 'http':
+        $template_path = 'provider/http.twig';
+        break;
       // applications
       case 'sms_send':
       case 'sms_receive':
