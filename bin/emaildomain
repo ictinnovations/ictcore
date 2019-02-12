@@ -1,5 +1,0 @@
-#!/bin/bash
-echo "$1" >> /etc/mail/local-host-names
-echo "@$1 ictcore" >> /etc/mail/virtusertable
-/etc/mail/make
-/sbin/service sendmail restart
