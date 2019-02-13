@@ -99,7 +99,7 @@ Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hyla
 %endif
 
 %description fax
-add sms related services support in ICTCore
+add fax related services support in ICTCore
 
 %package sms
 Group: ict
@@ -208,14 +208,19 @@ touch %{buildroot}/var/spool/mail/ictcore
 # exclude freeswitch related files
 %exclude %{core_home}/etc/freeswitch
 %exclude %{core_home}/bin/freeswitch
+%exclude %{core_home}/core/Provider/Sip.php
 %exclude %{core_home}/core/Gateway/Freeswitch.php
 
 # exclude kannel related files
 %exclude %{core_home}/etc/kannel
+%exclude %{core_home}/core/Provider/Http
+%exclude %{core_home}/core/Provider/Http.php
+%exclude %{core_home}/core/Provider/Smpp.php
 %exclude %{core_home}/core/Gateway/Kannel.php
 
 # exclude sendmail related files
 # TODO: kannel configurations
+%exclude %{core_home}/core/Provider/Smtp.php
 %exclude %{core_home}/core/Gateway/Sendmail.php
 
 # exclude voice related files
@@ -223,7 +228,20 @@ touch %{buildroot}/var/spool/mail/ictcore
 %exclude %{core_home}/core/Service/Voice.php
 %exclude %{core_home}/core/Message/Recording.php
 %exclude %{core_home}/core/Api/Message/RecordingApi.php
+%exclude %{core_home}/core/Application/Amd.php
+%exclude %{core_home}/core/Application/Callerid_set.php
+%exclude %{core_home}/core/Application/Dnc.php
+%exclude %{core_home}/core/Application/Input.php
+%exclude %{core_home}/core/Application/Play_menu.php
+%exclude %{core_home}/core/Application/Record.php
+%exclude %{core_home}/core/Application/Say_alpha.php
+%exclude %{core_home}/core/Application/Say_date.php
+%exclude %{core_home}/core/Application/Say_digit.php
+%exclude %{core_home}/core/Application/Say_number.php
+%exclude %{core_home}/core/Application/Say_time.php
+%exclude %{core_home}/core/Application/Tts.php
 %exclude %{core_home}/core/Application/Voice_play.php
+%exclude %{core_home}/core/Program/Agent.php
 %exclude %{core_home}/core/Program/Voicemessage.php
 
 # exclude fax related files.
@@ -299,7 +317,20 @@ touch %{buildroot}/var/spool/mail/ictcore
 %{core_home}/core/Service/Voice.php
 %{core_home}/core/Message/Recording.php
 %{core_home}/core/Api/Message/RecordingApi.php
+%{core_home}/core/Application/Amd.php
+%{core_home}/core/Application/Callerid_set.php
+%{core_home}/core/Application/Dnc.php
+%{core_home}/core/Application/Input.php
+%{core_home}/core/Application/Play_menu.php
+%{core_home}/core/Application/Record.php
+%{core_home}/core/Application/Say_alpha.php
+%{core_home}/core/Application/Say_date.php
+%{core_home}/core/Application/Say_digit.php
+%{core_home}/core/Application/Say_number.php
+%{core_home}/core/Application/Say_time.php
+%{core_home}/core/Application/Tts.php
 %{core_home}/core/Application/Voice_play.php
+%{core_home}/core/Program/Agent.php
 %{core_home}/core/Program/Voicemessage.php
 
 %files fax

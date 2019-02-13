@@ -10,7 +10,6 @@ namespace ICT\Core\Account;
  * *************************************************************** */
 
 use ICT\Core\Account;
-use ICT\Core\Service\Voice;
 
 class Did extends Account
 {
