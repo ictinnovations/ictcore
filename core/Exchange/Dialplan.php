@@ -125,7 +125,7 @@ class Dialplan
   public static function search($aFilter = array())
   {
     $listDialplan = array();
-
+    $from_str = self::$table;
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
@@ -145,11 +145,13 @@ class Dialplan
           break;
       }
     }
-    $where_str = implode(' AND ', $aWhere);
+    if (!empty($aWhere)) {
+      $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+    }
 
     $query = "SELECT dialplan_id, gateway_flag, source, destination, context, 
                       weight, program_id, application_id, filter_flag
-               FROM dialplan WHERE $where_str
+               FROM $from_str
                ORDER BY filter_flag DESC, LENGTH(destination) DESC, LENGTH(source) DESC, LENGTH(context) DESC, 
                         weight ASC, gateway_flag ASC";
     Corelog::log("dialplan search with $query", Corelog::DEBUG);

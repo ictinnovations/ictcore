@@ -159,6 +159,7 @@ class Program
   public static function search($aFilter = array())
   {
     $aProgram = array();
+    $from_str = self::$table;
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
@@ -171,9 +172,11 @@ class Program
           break;
       }
     }
-    $where_str = implode(' AND ', $aWhere);
+    if (!empty($aWhere)) {
+      $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+    }
 
-    $query = "SELECT program_id, name, type, parent_id FROM " . self::$table . " WHERE $where_str";
+    $query = "SELECT program_id, name, type, parent_id FROM " . $from_str;
     Corelog::log("program search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('program', $query);
     while ($data = mysql_fetch_assoc($result)) {

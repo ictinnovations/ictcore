@@ -46,7 +46,7 @@ class Permission
   public static function search($aFilter = array())
   {
     $aPermission = array();
-
+    $from_str = self::$table;
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
@@ -60,9 +60,11 @@ class Permission
           $aWhere[] = "permission_id IN ($search_value)";
       }
     }
-    $where_str = implode(' AND ', $aWhere);
+    if (!empty($aWhere)) {
+      $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+    }
 
-    $query = "SELECT permission_id, name FROM " . self::$table . " WHERE $where_str";
+    $query = "SELECT permission_id, name FROM " . $from_str;
     Corelog::log("permission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('permission', $query);
     while ($data = mysql_fetch_assoc($result)) {

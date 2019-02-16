@@ -52,6 +52,37 @@ class Role
     }
   }
 
+  public static function search($aFilter = array())
+  {
+    $aRole = array();
+    $from_str = self::$table;
+    $aWhere = array();
+    foreach ($aFilter as $search_field => $search_value) {
+      switch ($search_field) {
+        case 'role_id':
+          $aWhere[] = "role_id = $search_value";
+          break;
+        case 'name':
+          $aWhere[] = "name LIKE '$search_value%'";
+          break;
+        case 'query':
+          $aWhere[] = "role_id IN ($search_value)";
+      }
+    }
+    if (!empty($aWhere)) {
+      $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+    }
+
+    $query = "SELECT role_id, name FROM " . $from_str;
+    Corelog::log("role search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
+    $result = DB::query('role', $query);
+    while ($data = mysql_fetch_assoc($result)) {
+      $aRole[] = $data;
+    }
+
+    return $aRole;
+  }
+
   private function load()
   {
     Corelog::log("Loading role: $this->role_id", Corelog::CRUD);

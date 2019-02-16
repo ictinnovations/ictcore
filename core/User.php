@@ -31,7 +31,6 @@ class User
   private static $fields = array(
       'user_id', // will be mapped to usr_id in database table
       'role_id',
-      'role_list', // dummy field to hold comma separated list of roles
       'username',
       'passwd',
       'password_hash', // will be mapped to passwd in database table
@@ -49,7 +48,6 @@ class User
   private static $read_only = array(
       'user_id',
       'role_id',
-      'role_list',
       'password_hash'
   );
 
@@ -65,14 +63,6 @@ class User
    * @var integer
    */
   private $role_id = NULL;
-
-  /**
-   * @property-read string $role_list
-   * comma separated list of role_id, to set role call role_assign
-   * @see User::role_assign() and User::role_unassign()
-   * @var string
-   */
-  private $role_list = NULL;
 
   /**
    * @property-read string $username
@@ -129,7 +119,12 @@ class User
    * ***************************************************** Runtime Variables **
    */
 
-  /** @var Role[] $aRole  */
+  /**
+   * @property-read string $aRole
+   * list of Roles, to set role call role_assign
+   * @see User::role_assign() and User::role_unassign()
+   * @var Role[] $aRole
+   */
   private $aRole = array();
 
   /** @var array $aPermission  */
@@ -211,6 +206,16 @@ class User
     return $aUser;
   }
 
+  public function search_role($aFilter = array()) {
+    $aFilter['query'] = "SELECT ur.role_id FROM " . self::$link_role . " ur WHERE ur.usr_id=" . $this->user_id;
+    return Role::search($aFilter);
+  }
+
+  public function search_permission($aFilter = array()) {
+    $aFilter['query'] = "SELECT up.permission_id FROM " . self::$link_permission . " up WHERE up.usr_id=" . $this->user_id;
+    return Permission::search($aFilter);
+  }
+
   private function load()
   {
     Corelog::log("Loading user with id:" . $this->user_id . ' name:' . $this->username, Corelog::CRUD);
@@ -224,16 +229,12 @@ class User
       $search_field = 'u.usr_id';
       $search_value = $this->user_id;
     }
-    $query = "SELECT u.*, GROUP_CONCAT(DISTINCT ur.role_id SEPARATOR ',') AS role_list
-              FROM " . self::$table . " u LEFT JOIN " . self::$link_role . " ur ON u.usr_id = ur.usr_id
-              WHERE %search_field%='%search_value%'
-              GROUP BY u.usr_id";
+    $query = "SELECT u.* FROM " . self::$table . " u WHERE %search_field%='%search_value%'";
     $result = DB::query(self::$table, $query, array('search_field' => $search_field, 'search_value' => $search_value));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->user_id = $data['usr_id'];
       $this->role_id = $data['role_id'];
-      $this->role_list = $data['role_list'];
       $this->username = $data['username'];
       $this->passwd = $data['passwd'];
       $this->first_name = $data['first_name'];
@@ -257,11 +258,9 @@ class User
   private function load_role()
   {
     $this->aRole = array();
-    $listRole = explode(',', $this->role_list);
-    foreach ($listRole as $role_id) {
-      if (empty($role_id)) {
-        continue;
-      }
+    $listRole = $this->search_role();
+    foreach ($listRole as $aRole) {
+      $role_id = $aRole['role_id'];
       $this->aRole[$role_id] = new Role($role_id);
     }
   }
@@ -269,10 +268,7 @@ class User
   private function load_permission()
   {
     $this->aPermission = array();
-
-    $query = "SELECT up.permission_id FROM " . self::$link_permission . " up WHERE up.usr_id=" . $this->user_id;
-    $filter = array('query' => $query);
-    $listPermission = Permission::search($filter);
+    $listPermission = $this->search_permission();
     foreach($listPermission as $aPermission) {
       $permission_id = $aPermission['permission_id'];
       $this->aPermission[$permission_id] = $aPermission['name'];
@@ -347,25 +343,26 @@ class User
     return $this->passwd;
   }
 
-  public function role_assign($oRole)
+  public function role_assign($role_id)
   {
+    $oRole = new Role($role_id);
     $this->aRole[$oRole->role_id] = $oRole;
-    $this->role_list = implode(',', array_keys($this->aRole));
   }
 
-  public function role_unassign($oRole)
+  public function role_unassign($role_id)
   {
-    unset($this->aRole[$oRole->role_id]);
+    unset($this->aRole[$role_id]);
   }
 
-  public function permission_assign($oPermission)
+  public function permission_assign($permission_id)
   {
+    $oPermission = new Permission($permission_id);
     $this->aPermission[$oPermission->permission_id] = $oPermission->name;
   }
 
-  public function permission_unassign($oPermission)
+  public function permission_unassign($permission_id)
   {
-    unset($this->aPermission[$oPermission->permission_id]);
+    unset($this->aPermission[$permission_id]);
   }
 
   public function save()

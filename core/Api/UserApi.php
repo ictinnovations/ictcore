@@ -14,7 +14,6 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\User;
 use ICT\Core\User\Permission;
-use ICT\Core\User\Role;
 
 class UserApi extends Api
 {
@@ -101,6 +100,20 @@ class UserApi extends Api
   }
 
   /**
+   * Permission list of user
+   *
+   * @url GET /users/$user_id/permissions
+   */
+  public function permission_list_view($user_id, $query = array())
+  {
+    $this->_authorize('user_list');
+    $this->_authorize('permission_list');
+
+    $oUser = new User($user_id);
+    return $oUser->search_permission((array)$query);
+  }
+
+  /**
    * Allow / authorize user for a certain permission
    *
    * @url PUT /users/$user_id/permissions/$permission_id
@@ -111,8 +124,7 @@ class UserApi extends Api
     $this->_authorize('permission_create');
 
     $oUser = new User($user_id);
-    $oPermission = new Permission($permission_id);
-    $oUser->permission_assign($oPermission);
+    $oUser->permission_assign($permission_id);
     return $oUser->save();
   }
 
@@ -127,9 +139,22 @@ class UserApi extends Api
     $this->_authorize('permission_delete');
 
     $oUser = new User($user_id);
-    $oPermission = new Permission($permission_id);
-    $oUser->permission_unassign($oPermission);
+    $oUser->permission_unassign($permission_id);
     return $oUser->save();
+  }
+
+  /**
+   * Role list of user
+   *
+   * @url GET /users/$user_id/roles
+   */
+  public function role_list_view($user_id, $query = array())
+  {
+    $this->_authorize('user_list');
+    $this->_authorize('role_list');
+
+    $oUser = new User($user_id);
+    return $oUser->search_role((array)$query);
   }
 
   /**
@@ -143,8 +168,7 @@ class UserApi extends Api
     $this->_authorize('role_update');
 
     $oUser = new User($user_id);
-    $oRole = new Role($role_id);
-    $oUser->role_assign($oRole);
+    $oUser->role_assign($role_id);
     return $oUser->save();
   }
 
@@ -159,8 +183,7 @@ class UserApi extends Api
     $this->_authorize('role_update');
 
     $oUser = new User($user_id);
-    $oRole = new Role($role_id);
-    $oUser->role_unassign($oRole);
+    $oUser->role_unassign($role_id);
     return $oUser->save();
   }
 
