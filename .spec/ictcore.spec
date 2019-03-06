@@ -219,7 +219,6 @@ touch %{buildroot}/var/spool/mail/ictcore
 %exclude %{core_home}/core/Gateway/Kannel.php
 
 # exclude sendmail related files
-# TODO: kannel configurations
 %exclude %{core_home}/core/Provider/Smtp.php
 %exclude %{core_home}/core/Gateway/Sendmail.php
 
@@ -292,6 +291,7 @@ touch %{buildroot}/var/spool/mail/ictcore
 %defattr(644,ictcore,ictcore,755)
 %{core_home}/bin/freeswitch
 %{core_home}/core/Gateway/Freeswitch.php
+%{core_home}/core/Provider/Sip.php
 
 %files kannel
 # kannel related files
@@ -301,6 +301,9 @@ touch %{buildroot}/var/spool/mail/ictcore
 %{core_home}/etc/kannel/provider
 %defattr(644,ictcore,ictcore,755)
 %{core_home}/core/Gateway/Kannel.php
+%{core_home}/core/Provider/Http
+%{core_home}/core/Provider/Http.php
+%{core_home}/core/Provider/Smpp.php
 
 %files sendmail
 # create inbox for incoming mails
@@ -309,6 +312,7 @@ touch %{buildroot}/var/spool/mail/ictcore
 # other sendmail related files
 %defattr(644,ictcore,ictcore,755)
 %{core_home}/core/Gateway/Sendmail.php
+%{core_home}/core/Provider/Smtp.php
 
 %files voice
 # voice related files
