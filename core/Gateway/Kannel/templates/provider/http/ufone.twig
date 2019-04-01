@@ -3,11 +3,14 @@ group=smsc
 smsc=http
 smsc-id=MT2MO
 max-pending-submits=10
-system-type=kannel
+system-type=generic
 smsc-username={{ provider.username }}
 smsc-password={{ provider.password }}
 port={{ provider.port }}
-send-url="http://{{ provider.host }}/bsms_app5/sendapi-0.3.jsp?id={{ provider.port }}&mobilenum=%P&shortcode=%p&message=%a&lang=english&password={{ provider.password }}&username={{ provider.username }}"
+send-url="http://{{ provider.host }}/bsms_v8_api/sendapi-0.3.jsp?id={{ provider.port }}&mobilenum=%p&shortcode=%p&message=%a&lang=English&password={{ provider.password }}&username={{ provider.username }}"
+status-success-regex="Successful"
+status-permfail-regex="Unsuccessful|Invalid|No Credit|Expired|Disabled|Exceeded"
+status-tempfail-regex="Later|later"
 {% if provider.settings is iterable %}
   {% for key, value in provider.settings %}
     {% if key != 'name' %}

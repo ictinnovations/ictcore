@@ -22,6 +22,14 @@ class Text extends Message
   const ENCODING_BINARY = 1;
   const ENCODING_UNICODE = 2;
   
+  const CHARSET_GSM = 'GSM';
+  const CHARSET_ASCII = 'ASCII';
+  const CHARSET_WINDOWS = 'windows-1252';
+  const CHARSET_ISO_1 = 'ISO-8859-1';
+  const CHARSET_ISO_7 = 'ISO-8859-7';
+  const CHARSET_UTF_8 = 'UTF-8';
+  const CHARSET_UTF_16 = 'UTF-16BE';
+
   const CLASS_DISABLE = 0;
   const CLASS_NORMAL = 1;
   const CLASS_SIM = 2;
@@ -63,7 +71,7 @@ class Text extends Message
   public $data = NULL;
 
   /** @var string */
-  public $type = 'UTF-8';
+  public $type = Text::CHARSET_UTF_8;
 
   /** @var string */
   public $description = NULL;
