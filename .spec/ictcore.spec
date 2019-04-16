@@ -213,7 +213,6 @@ touch %{buildroot}/var/spool/mail/ictcore
 
 # exclude kannel related files
 %exclude %{core_home}/etc/kannel
-%exclude %{core_home}/core/Provider/Http
 %exclude %{core_home}/core/Provider/Http.php
 %exclude %{core_home}/core/Provider/Smpp.php
 %exclude %{core_home}/core/Gateway/Kannel.php
