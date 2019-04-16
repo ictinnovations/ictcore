@@ -300,7 +300,6 @@ touch %{buildroot}/var/spool/mail/ictcore
 %{core_home}/etc/kannel/provider
 %defattr(644,ictcore,ictcore,755)
 %{core_home}/core/Gateway/Kannel.php
-%{core_home}/core/Provider/Http
 %{core_home}/core/Provider/Http.php
 %{core_home}/core/Provider/Smpp.php
 
