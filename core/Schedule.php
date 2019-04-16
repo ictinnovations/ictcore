@@ -87,12 +87,14 @@ class Schedule extends Task
       $minute[] = $data['minute'];
     }
 
-    $this->year = $this->merge($year);
-    $this->month = $this->merge($month);
-    $this->day = $this->merge($day);
-    $this->weekday = $this->merge($weekday);
-    $this->hour = $this->merge($hour);
-    $this->minute = $this->merge($minute);
+    if (!empty($minute)) {
+      $this->year = $this->merge($year);
+      $this->month = $this->merge($month);
+      $this->day = $this->merge($day);
+      $this->weekday = $this->merge($weekday);
+      $this->hour = $this->merge($hour);
+      $this->minute = $this->merge($minute);
+    }
 
     Corelog::log("Schedule loaded", Corelog::CRUD);
   }
@@ -112,7 +114,7 @@ class Schedule extends Task
   private function split($cron_field, $min = 0, $max = 59)
   {
     $cron_list = array();
-    if ($cron_field == '*') {
+    if ($cron_field === '*') {
       $cron_list = array('*');
     } else if (strstr($cron_field, ',')) {
       $temp_list = explode(',', $cron_field);
@@ -177,18 +179,21 @@ class Schedule extends Task
   public function set_datetime($date)
   {
     $aDate = date_parse($date);
-    if (!empty($aDate['month']) || $aDate['month'] === 0) {
+    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['year'] !== false) {
+      $this->year = $aDate['year'];
+    }
+    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['month'] !== false) {
       $this->month = $aDate['month'];
     }
-    if (!empty($aDate['day']) || $aDate['day'] === 0) {
+    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['day'] !== false) {
       $this->day = $aDate['day'];
       $this->weekday = '*'; // disable weekday based scheduling
     }
-    if (!empty($aDate['hour']) || $aDate['hour'] === 0) {
+    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['hour'] !== false) {
       $this->hour = $aDate['hour'];
     }
-    if (!empty($aDate['minute']) || $aDate['minute'] === 0) {
-      $this->month = $aDate['minute'];
+    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['minute'] !== false) {
+      $this->minute = $aDate['minute'];
     }
   }
 
