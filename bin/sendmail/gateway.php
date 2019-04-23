@@ -162,5 +162,9 @@ function process_email($from, $to, $subject, $body, $body_alt = '', $attachment 
       'result' => 'success'
   );
 
-  Core::process($oRequest);
+  try {
+    Core::process($oRequest);
+  } catch (Exception $ex) {
+    Corelog::log("Skipping current email: ".$ex->getMessage(), Corelog::WARNING);
+  }
 }

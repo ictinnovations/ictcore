@@ -179,17 +179,17 @@ class Schedule extends Task
   public function set_datetime($date)
   {
     $aDate = date_parse($date);
-    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['year'] !== false) {
+    if ($aDate['year'] !== '' && $aDate['year'] !== null && $aDate['year'] !== false) {
       $this->year = $aDate['year'];
     }
-    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['month'] !== false) {
+    if ($aDate['month'] !== '' && $aDate['month'] !== null && $aDate['month'] !== false) {
       $this->month = $aDate['month'];
     }
-    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['day'] !== false) {
+    if ($aDate['day'] !== '' && $aDate['day'] !== null && $aDate['day'] !== false) {
       $this->day = $aDate['day'];
       $this->weekday = '*'; // disable weekday based scheduling
     }
-    if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['hour'] !== false) {
+    if ($aDate['hour'] !== '' && $aDate['hour'] !== null && $aDate['hour'] !== false) {
       $this->hour = $aDate['hour'];
     }
     if ($aDate['minute'] !== '' && $aDate['minute'] !== null && $aDate['minute'] !== false) {
