@@ -125,6 +125,17 @@ class Template extends Message
         case 'body_alt':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -144,7 +155,7 @@ class Template extends Message
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE template_id='%template_id%' ";
-    $result = DB::query(self::$table, $query, array('template_id' => $this->template_id), true);
+    $result = DB::query(self::$table, $query, array('template_id' => $this->template_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->template_id = $data['template_id'];
@@ -157,6 +168,7 @@ class Template extends Message
       $this->attachment = $this->get_attachment();
       $this->type = $data['type'];
       $this->length = $data['length'];
+      $this->user_id = $data['created_by'];
       Corelog::log("Template loaded name: $this->name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Template not found');
@@ -166,7 +178,7 @@ class Template extends Message
   public function delete()
   {
     Corelog::log("Template delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'template_id', $this->template_id, true);
+    return DB::delete(self::$table, 'template_id', $this->template_id);
   }
 
   protected function get_attachment() {
@@ -231,11 +243,11 @@ class Template extends Message
 
     if (isset($data['template_id']) && !empty($data['template_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'template_id', true);
+      $result = DB::update(self::$table, $data, 'template_id');
       Corelog::log("Template updated: $this->template_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->template_id = $data['template_id'];
       Corelog::log("New Template created: $this->template_id", Corelog::CRUD);
     }

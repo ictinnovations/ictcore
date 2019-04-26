@@ -121,7 +121,7 @@ class CampaignCli
     } else if (Campaign::STATUS_COMPLETED == $this->oCampaign->status) {
       throw new CoreException(423, 'Campaign already completed');
     }
-    \ICT\Core\do_login($this->oCampaign->created_by);
+    \ICT\Core\do_login($this->oCampaign->user_id);
 
     $cpm = empty($this->oCampaign->cpm) ? 2 : $this->oCampaign->cpm;
     $this->delay = (1000000 * 60) / $cpm;

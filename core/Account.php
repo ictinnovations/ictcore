@@ -150,9 +150,6 @@ class Account
         case 'account_id':
           $aWhere[] = "$search_field = $search_value";
           break;
-        case 'created_by':
-          $aWhere[] = "created_by = $search_value";
-          break;
         case 'type':
         case 'username':
         case 'phone':
@@ -162,6 +159,17 @@ class Account
         case 'first_name':
         case 'last_name':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
+          break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
           break;
       }
     }
@@ -259,7 +267,7 @@ class Account
     // also delete all installed program
     $this->remove_program('all');
     // now delete account
-    return DB::delete(self::$table, 'account_id', $this->account_id, true);
+    return DB::delete(self::$table, 'account_id', $this->account_id);
   }
 
   public function __isset($field)
@@ -326,11 +334,11 @@ class Account
 
     if (isset($data['account_id']) && !empty($data['account_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'account_id', true);
+      $result = DB::update(self::$table, $data, 'account_id');
       Corelog::log("Account updated: $this->account_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->account_id = $data['account_id'];
       Corelog::log("New account created: $this->account_id", Corelog::CRUD);
     }

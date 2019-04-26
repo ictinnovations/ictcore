@@ -152,6 +152,17 @@ class Document extends Message
         case 'description':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -171,7 +182,7 @@ class Document extends Message
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE document_id='%document_id%' ";
-    $result = DB::query(self::$table, $query, array('document_id' => $this->document_id), true);
+    $result = DB::query(self::$table, $query, array('document_id' => $this->document_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->document_id = $data['document_id'];
@@ -184,6 +195,7 @@ class Document extends Message
       $this->size_y = $data['size_y'];
       $this->resolution_x = $data['resolution_x'];
       $this->resolution_y = $data['resolution_y'];
+      $this->user_id = $data['created_by'];
       Corelog::log("Document loaded name: $this->name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Document not found');
@@ -193,7 +205,7 @@ class Document extends Message
   public function delete()
   {
     Corelog::log("Document delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'document_id', $this->document_id, true);
+    return DB::delete(self::$table, 'document_id', $this->document_ids);
   }
 
   protected function set_file_name($file_path)
@@ -242,11 +254,11 @@ class Document extends Message
 
     if (isset($data['document_id']) && !empty($data['document_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'document_id', true);
+      $result = DB::update(self::$table, $data, 'document_id');
       Corelog::log("Document updated: $this->document_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->document_id = $data['document_id'];
       Corelog::log("New Document created: $this->document_id", Corelog::CRUD);
     }

@@ -67,6 +67,13 @@ class Contact
   /** @var string */
   public $description = '';
 
+  /**
+   * @property-read integer $user_id
+   * owner id of current record
+   * @var integer
+   */
+  public $user_id = NULL;
+
   public function __construct($contact_id = NULL)
   {
     if (!empty($contact_id) && $contact_id > 0) {
@@ -116,6 +123,17 @@ class Contact
         case 'last_name':
           $aWhere[] = "c.$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "c.created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "c.date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "c.date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -158,7 +176,7 @@ class Contact
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE contact_id='%contact_id%' ";
-    $result = DB::query(self::$table, $query, array('contact_id' => $this->contact_id), true);
+    $result = DB::query(self::$table, $query, array('contact_id' => $this->contact_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->contact_id = $data['contact_id'];
@@ -171,6 +189,7 @@ class Contact
       $this->custom2 = $data['custom2'];
       $this->custom3 = $data['custom3'];
       $this->description = $data['description'];
+      $this->user_id = $data['created_by'];
       Corelog::log("Contact loaded name: $this->first_name $this->last_name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Contact not found');
@@ -182,7 +201,7 @@ class Contact
     Corelog::log("Contact delete", Corelog::CRUD);
     mysql_query("DELETE from contact_link where contact_id=".$this->contact_id);
     DB::delete(self::$table_link, 'contact_id', $this->contact_id);
-    return DB::delete(self::$table, 'contact_id', $this->contact_id, true);
+    return DB::delete(self::$table, 'contact_id', $this->contact_id);
   }
 
   public function __isset($field)
@@ -255,11 +274,11 @@ class Contact
 
     if (isset($data['contact_id']) && !empty($data['contact_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'contact_id', true);
+      $result = DB::update(self::$table, $data, 'contact_id');
       Corelog::log("Contact updated: $this->contact_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->contact_id = $data['contact_id'];
       Corelog::log("New Contact created: $this->contact_id", Corelog::CRUD);
     }

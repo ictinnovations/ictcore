@@ -264,11 +264,6 @@ class DB
           $auth_filter = self::auth_filter($foreign_table, $foreign_key, $foreign_value);
         }
         if (is_bool($auth_filter)) {
-          if ($auth_filter == FALSE) {
-            // TODO: remove this code to enable multi user in update
-            Corelog::log("Proceeding without permission", Corelog::AUTH);
-            $auth_filter = TRUE;
-          }
           $auth_filter = ($auth_filter) ? 'TRUE' : 'FALSE';
         }
         $query_end = "WHERE $primary_key=$row_id AND $auth_filter";

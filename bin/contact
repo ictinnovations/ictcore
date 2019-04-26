@@ -85,7 +85,7 @@ class ContactCli
   public function load()
   {
     $this->oGroup = new Group($this->group_id);
-    \ICT\Core\do_login($this->oGroup->created_by);
+    \ICT\Core\do_login($this->oGroup->user_id);
   }
 
   /**

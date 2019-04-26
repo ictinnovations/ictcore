@@ -35,6 +35,13 @@ class Message implements JsonSerializable
   public $data = NULL;
 
   /**
+   * @property-read integer $user_id
+   * owner id of current record
+   * @var integer
+   */
+  public $user_id = NULL;
+
+  /**
    * Default mime type for this message type, when no type is available
    * @var string
    */

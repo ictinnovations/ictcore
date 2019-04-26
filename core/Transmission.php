@@ -131,10 +131,10 @@ class Transmission
   private $try_done = 0;
 
   /**
-   * @property-read integer $last_run
+   * @property integer $last_run
    * @var integer 
    */
-  private $last_run = NULL;
+  public $last_run = NULL;
 
   /**
    * @property-read integer $is_deleted
@@ -148,6 +148,13 @@ class Transmission
    * @var integer
    */
   public $campaign_id = NULL;
+
+  /**
+   * @property-read integer $user_id
+   * owner id of current record
+   * @var integer
+   */
+  public $user_id = NULL;
 
   /**
    * ***************************************************** Runtime Variables **
@@ -213,13 +220,24 @@ class Transmission
         case 'response':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT transmission_id, account_id, contact_id, status, response, direction FROM " . $from_str;
+    $query = "SELECT transmission_id, account_id, contact_id, status, response, direction, last_run FROM " . $from_str;
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
     while ($data = mysql_fetch_assoc($result)) {
@@ -232,7 +250,7 @@ class Transmission
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE transmission_id='%transmission_id%' ";
-    $result = DB::query(self::$table, $query, array('transmission_id' => $this->transmission_id), true);
+    $result = DB::query(self::$table, $query, array('transmission_id' => $this->transmission_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->transmission_id = $data['transmission_id'];
@@ -250,6 +268,7 @@ class Transmission
       $this->last_run = $data['last_run'];
       $this->is_deleted = $data['is_deleted'];
       $this->campaign_id = $data['campaign_id'];
+      $this->user_id = $data['created_by'];
 
       $this->oAccount = new Account($this->account_id);
       $this->oContact = new Contact($this->contact_id);
@@ -276,7 +295,7 @@ class Transmission
     // first delete all associated schedules
     $this->task_cancel();
     // TODO: Don't delete instead mark it as deleted or also delete related spool and result records
-    return DB::delete(self::$table, 'transmission_id', $this->transmission_id, true);
+    return DB::delete(self::$table, 'transmission_id', $this->transmission_id);
   }
 
   public function is_pending()
@@ -405,11 +424,11 @@ class Transmission
 
     if (isset($data['transmission_id']) && !empty($data['transmission_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'transmission_id', true);
+      $result = DB::update(self::$table, $data, 'transmission_id');
       Corelog::log("Transmission updated: $this->transmission_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->transmission_id = $data['transmission_id'];
       Corelog::log("New Transmission created: $this->transmission_id", Corelog::CRUD);
     }

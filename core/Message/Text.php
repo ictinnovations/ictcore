@@ -116,6 +116,17 @@ class Text extends Message
         case 'description':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -135,7 +146,7 @@ class Text extends Message
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE text_id='%text_id%' ";
-    $result = DB::query(self::$table, $query, array('text_id' => $this->text_id), true);
+    $result = DB::query(self::$table, $query, array('text_id' => $this->text_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->text_id = $data['text_id'];
@@ -146,6 +157,7 @@ class Text extends Message
       $this->length = $data['length'];
       $this->class = $data['class'];
       $this->encoding = $data['encoding'];
+      $this->user_id = $data['created_by'];
       Corelog::log("Text loaded name: $this->name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Transmission not found');
@@ -155,7 +167,7 @@ class Text extends Message
   public function delete()
   {
     Corelog::log("Text delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'text_id', $this->text_id, true);
+    return DB::delete(self::$table, 'text_id', $this->text_id);
   }
 
   protected function set_data($data)
@@ -179,11 +191,11 @@ class Text extends Message
 
     if (isset($data['text_id']) && !empty($data['text_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'text_id', true);
+      $result = DB::update(self::$table, $data, 'text_id');
       Corelog::log("Text updated: $this->text_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->text_id = $data['text_id'];
       Corelog::log("New Text created: $this->text_id", Corelog::CRUD);
     }

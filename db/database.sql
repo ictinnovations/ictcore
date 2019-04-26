@@ -721,6 +721,10 @@ CREATE TABLE program (
    type                        varchar(64)              NOT NULL default '',
    data                        text,
    parent_id                   int(11) unsigned         default NULL,
+   date_created                  int(11)                default NULL,
+   created_by                    int(11)                default NULL,
+   last_updated                  int(11)                default NULL,
+   updated_by                    int(11) unsigned       default NULL,
    PRIMARY KEY (program_id)
 ) ENGINE = InnoDB;
 

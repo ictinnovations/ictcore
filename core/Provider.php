@@ -198,7 +198,7 @@ class Provider
   public function delete()
   {
     Corelog::log("Provider delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'provider_id', $this->provider_id, true);
+    return DB::delete(self::$table, 'provider_id', $this->provider_id);
   }
 
   public function __isset($field)
@@ -262,11 +262,11 @@ class Provider
     if (isset($data['provider_id']) && !empty($data['provider_id'])) {
       // update existing record
       unset($data['type']); // don't allow to change type
-      $result = DB::update(self::$table, $data, 'provider_id', true);
+      $result = DB::update(self::$table, $data, 'provider_id');
       Corelog::log("Provider updated: $this->provider_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->provider_id = $data['provider_id'];
       Corelog::log("New Provider created: $this->provider_id", Corelog::CRUD);
     }

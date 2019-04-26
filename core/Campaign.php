@@ -28,7 +28,6 @@ class Campaign
       'cpm',
       'try_allowed',
       'account_id',
-      'created_by',
       'status',
       'pid',
       'last_run'
@@ -62,8 +61,12 @@ class Campaign
   /** @var string */
   public $status = Campaign::STATUS_NEW;
 
-  /** @var integer */
-  public $created_by = NULL;
+  /**
+   * @property-read integer $user_id
+   * owner id of current record
+   * @var integer
+   */
+  public $user_id = NULL;
   
   public function __construct($campaign_id = NULL)
   {
@@ -92,6 +95,17 @@ class Campaign
         case 'status':
           $aWhere[] = "c.$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "c.created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "c.date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "c.date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -110,7 +124,7 @@ class Campaign
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE campaign_id='%campaign_id%' ";
-    $result = DB::query(self::$table, $query, array('campaign_id' => $this->campaign_id), true);
+    $result = DB::query(self::$table, $query, array('campaign_id' => $this->campaign_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->campaign_id = $data['campaign_id'];
@@ -120,7 +134,7 @@ class Campaign
       $this->try_allowed = $data['try_allowed'];
       $this->account_id  = $data['account_id'];
       $this->status      = $data['status'];
-      $this->created_by  = $data['created_by'];
+      $this->user_id     = $data['created_by'];
       Corelog::log("Campaign loaded id: $this->campaign_id $this->status", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Campaign not found');
@@ -131,7 +145,7 @@ class Campaign
   {
     $this->task_cancel();
     Corelog::log("Campaign delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'campaign_id', $this->campaign_id, true);
+    return DB::delete(self::$table, 'campaign_id', $this->campaign_id);
   }
 
   public function __isset($field)
@@ -200,11 +214,11 @@ class Campaign
 
     if (isset($data['campaign_id']) && !empty($data['campaign_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'campaign_id', true);
+      $result = DB::update(self::$table, $data, 'campaign_id');
       Corelog::log("Campaign updated: $this->campaign_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->campaign_id = $data['campaign_id'];
       Corelog::log("New Campaign created: $this->campaign_id", Corelog::CRUD);
     }

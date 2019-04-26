@@ -56,6 +56,13 @@ class Program
   public $parent_id = null;
 
   /**
+   * @property-read integer $user_id
+   * owner id of current record
+   * @var integer
+   */
+  public $user_id = NULL;
+
+  /**
    * **************************************************** Program Parameters **
    */
 
@@ -169,6 +176,17 @@ class Program
         case 'name':
         case 'type':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
+          break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
           break;
       }
     }
@@ -319,6 +337,7 @@ class Program
       $this->type = $data['type'];
       $this->data = json_decode($data['data'], true);
       $this->parent_id = $data['parent_id'];
+      $this->user_id = $data['created_by'];
 
       // expand data field and load all additional program parameters
       $this->parameter_load($this->data, true);

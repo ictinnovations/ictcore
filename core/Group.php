@@ -38,8 +38,12 @@ class Group
   /** @var string */
   public $description = '';
 
-  /** @var integer */
-  public $created_by = NULL;
+  /**
+   * @property-read integer $user_id
+   * owner id of current record
+   * @var integer
+   */
+  public $user_id = NULL;
 
   public function __construct($group_id = NULL)
   {
@@ -61,6 +65,17 @@ class Group
           break;
         case 'name':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
+          break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
           break;
       }
     }
@@ -88,14 +103,14 @@ class Group
   private function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE group_id='%group_id%' ";
-    $result = DB::query(self::$table, $query, array('group_id' => $this->group_id), true);
+    $result = DB::query(self::$table, $query, array('group_id' => $this->group_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->group_id = $data['group_id'];
       $this->name = $data['name'];
       $this->contact_total = $data['contact_total'];
       $this->description = $data['description'];
-      $this->created_by = $data['created_by'];
+      $this->user_id = $data['created_by'];
       Corelog::log("group loaded name: $this->name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Group not found');
@@ -105,7 +120,7 @@ class Group
   public function delete()
   {
     Corelog::log("Group delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'group_id', $this->group_id, true);
+    return DB::delete(self::$table, 'group_id', $this->group_id);
   }
 
   public function __isset($field)
@@ -157,11 +172,11 @@ class Group
 
     if (isset($data['group_id']) && !empty($data['group_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'group_id', true);
+      $result = DB::update(self::$table, $data, 'group_id');
       Corelog::log("group updated: $this->group_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->group_id = $data['contact_group_id']; // NOTE: DB::update using table name suffixed with _id as primary key
       Corelog::log("New group created: $this->group_id", Corelog::CRUD);
     }

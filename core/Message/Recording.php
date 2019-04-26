@@ -141,6 +141,17 @@ class Recording extends Message
         case 'description':
           $aWhere[] = "$search_field LIKE '%$search_value%'";
           break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -160,7 +171,7 @@ class Recording extends Message
   protected function load()
   {
     $query = "SELECT * FROM " . self::$table . " WHERE recording_id='%recording_id%' ";
-    $result = DB::query(self::$table, $query, array('recording_id' => $this->recording_id), true);
+    $result = DB::query(self::$table, $query, array('recording_id' => $this->recording_id));
     $data = mysql_fetch_assoc($result);
     if ($data) {
       $this->recording_id = $data['recording_id'];
@@ -173,6 +184,7 @@ class Recording extends Message
       $this->channel = $data['channel'];
       $this->sample = $data['sample'];
       $this->bitrate = $data['bitrate'];
+      $this->user_id = $data['created_by'];
       Corelog::log("Recording loaded name: $this->name", Corelog::CRUD);
     } else {
       throw new CoreException('404', 'Recording not found');
@@ -182,7 +194,7 @@ class Recording extends Message
   public function delete()
   {
     Corelog::log("Recording delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'recording_id', $this->recording_id, true);
+    return DB::delete(self::$table, 'recording_id', $this->recording_id);
   }
 
   protected function set_file_name($file_path)
@@ -237,11 +249,11 @@ class Recording extends Message
 
     if (isset($data['recording_id']) && !empty($data['recording_id'])) {
       // update existing record
-      $result = DB::update(self::$table, $data, 'recording_id', true);
+      $result = DB::update(self::$table, $data, 'recording_id');
       Corelog::log("Recording updated: $this->recording_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $this->recording_id = $data['recording_id'];
       Corelog::log("New Recording created: $this->recording_id", Corelog::CRUD);
     }

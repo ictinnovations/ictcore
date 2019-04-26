@@ -115,6 +115,9 @@ class User
   /** @var integer */
   public $active = 0;
 
+  /** @var integer */
+  public $owner_id = null;
+
   /**
    * ***************************************************** Runtime Variables **
    */
@@ -176,6 +179,16 @@ class User
         case 'first_name':
         case 'last_name':
           $aWhere[] = "$search_field = '$search_value'";
+          break;
+
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
           break;
       }
     }
@@ -280,12 +293,12 @@ class User
     Corelog::log("Deleting user: $this->user_id", Corelog::CRUD);
     // first remove roles assignements for current user
     $query = 'DELETE FROM ' . self::$link_role . ' WHERE usr_id=%user_id%';
-    DB::query(self::$link_role, $query, array('user_id' => $this->user_id), true);
+    DB::query(self::$link_role, $query, array('user_id' => $this->user_id));
     // then remove permissions for current user
     $query = 'DELETE FROM ' . self::$link_permission . ' WHERE usr_id=%user_id%';
-    DB::query(self::$link_permission, $query, array('user_id' => $this->user_id), true);
+    DB::query(self::$link_permission, $query, array('user_id' => $this->user_id));
     // now delete user
-    return DB::delete(self::$table, 'usr_id', $this->user_id, true);
+    return DB::delete(self::$table, 'usr_id', $this->user_id);
   }
 
   public function __isset($field)
@@ -391,16 +404,16 @@ class User
     if (isset($data['user_id']) && !empty($data['user_id'])) {
       // first remove existing roles assignements
       $query = 'DELETE FROM ' . self::$link_role . ' WHERE usr_id=%user_id%';
-      DB::query(self::$link_role, $query, array('user_id' => $this->user_id), true);
+      DB::query(self::$link_role, $query, array('user_id' => $this->user_id));
       // then remove permissions for current user
       $query = 'DELETE FROM ' . self::$link_permission . ' WHERE usr_id=%user_id%';
-      DB::query(self::$link_permission, $query, array('user_id' => $this->user_id), true);
+      DB::query(self::$link_permission, $query, array('user_id' => $this->user_id));
       // update existing record
-      $result = DB::update(self::$table, $data, 'usr_id', true);
+      $result = DB::update(self::$table, $data, 'usr_id');
       Corelog::log("User updated: $this->user_id", Corelog::CRUD);
     } else {
       // add new
-      $result = DB::update(self::$table, $data, false, true);
+      $result = DB::update(self::$table, $data, false);
       $data['user_id'] = $data['usr_id']; // mapping
       $this->user_id = $data['user_id'];
       Corelog::log("New user created: $this->user_id", Corelog::CRUD);
@@ -409,13 +422,13 @@ class User
     // save roles for current user
     foreach ($this->aRole as $oRole) {
       $query = "INSERT INTO " . self::$link_role . " (usr_id, role_id) VALUES (%user_id%, %role_id%)";
-      $result = DB::query(self::$link_role, $query, array('user_id' => $this->user_id, 'role_id' => $oRole->role_id), true);
+      $result = DB::query(self::$link_role, $query, array('user_id' => $this->user_id, 'role_id' => $oRole->role_id));
     }
 
     // save permissions for current user
     foreach ($this->aPermission as $permission_id) {
       $query = "INSERT INTO " . self::$link_permission . " (usr_id, permission_id) VALUES (%user_id%, %permission_id%)";
-      $result = DB::query(self::$link_permission, $query, array('user_id' => $this->user_id, 'permission_id' => $permission_id), true);
+      $result = DB::query(self::$link_permission, $query, array('user_id' => $this->user_id, 'permission_id' => $permission_id));
     }
 
     return $result;
