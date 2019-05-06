@@ -244,6 +244,7 @@ class Core
     Corelog::log('Final spool status : ' . $oTransmission->oSpool->status, Corelog::FLOW);
     $oTransmission->oSpool->save();
     Corelog::log('Final transmission status : ' . $oTransmission->status, Corelog::FLOW);
+    $oTransmission->last_run = time();
     $oTransmission->save();
     Corelog::log('-----------------> transaction ended <-----------------', Corelog::FLOW);
   }

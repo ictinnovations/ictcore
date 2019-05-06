@@ -358,9 +358,15 @@ class Transmission
     $this->account_id = $this->oAccount->account_id;
   }
 
-  private function set_contact_id($contact_id)
+  private function set_contact_id($contact_id, $newData = array())
   {
     $this->oContact = new Contact($contact_id);
+    if (!empty($newData)) {
+      foreach ($newData as $field => $value) {
+        $this->oContact->$field = $value;
+      }
+      $this->oContact->save();
+    }
     $this->contact_id = $this->oContact->contact_id;
   }
 
@@ -387,16 +393,12 @@ class Transmission
 
   private function set_phone($phone)
   {
-    $oContact = Contact::construct_from_array(array('phone' => $phone));
-    $oContact->save();
-    $this->set_contact_id($oContact->contact_id);
+    $this->set_contact_id($oContact->contact_id, array('phone' => $phone));
   }
 
   private function set_email($email)
   {
-    $oContact = Contact::construct_from_array(array('email' => $email));
-    $oContact->save();
-    $this->set_contact_id($oContact->contact_id);
+    $this->set_contact_id($oContact->contact_id, array('email' => $email));
   }
 
   public function save()

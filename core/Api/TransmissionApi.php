@@ -45,6 +45,8 @@ class TransmissionApi extends Api
         $oContact->email = empty($data['email']) ? null : $data['email'];
         $oContact->save();
         $contact_id = $oContact->contact_id;
+        unset($data['phone']);
+        unset($data['email']);
       } else {
         throw new CoreException(412, 'contact is missing');
       }
