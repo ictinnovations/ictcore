@@ -81,6 +81,25 @@ class UserApi extends Api
   }
 
   /**
+   * Update user passwd
+   *
+   * @url PUT /users/$user_id/password
+   */
+  public function update_password($user_id, $data = array())
+  {
+    $this->_authorize('user_update');
+
+    $oUser = new User($user_id);
+    $oUser->password = $data['password'];
+
+    if ($oUser->save()) {
+      return $oUser;
+    } else {
+      throw new CoreException(417, 'User password update failed');
+    }
+  }
+
+  /**
    * Create a new user
    *
    * @url DELETE /users/$user_id

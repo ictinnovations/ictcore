@@ -181,6 +181,7 @@ User Management
 * GET users
 * GET users/{user_id}
 * PUT users/{user_id}
+* PUT users/{user_id}/password
 * DELETE users/{user_id}
 * PUT users/{user_id}/permissions/{permission\_id}
 * DELETE users/{user_id}/permissions/{permission\_id}

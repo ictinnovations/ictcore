@@ -1,3 +1,6 @@
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
+
 /*******************************************************************/
 /* Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   */
 /* Developed By: Nasir Iqbal                                       */

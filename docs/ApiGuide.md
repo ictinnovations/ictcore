@@ -38,7 +38,7 @@ __Note:__ Unlike other APIs this API does not require separate authentication in
     + Attributes
 
         + username: admin (string) - api username for authentication
-        + passowrd: mysecret (string) - api password for authentication
+        + password: mysecret (string) - api password for authentication
 
 + Response 200 (application/json)
     
@@ -1712,6 +1712,28 @@ list all exiting users, optionally client can filter users using query string (k
             Authentication: Bearer JWT
 
 + Response 200
+
+## User Password [/users/{user_id}/password]
+
++ Parameters
+
+    + user_id (number) - ID of the user in the form of an integer
+
+### Update Password [PUT]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes
+
+        + password : mysecret (string, required) - New user password 
+
++ Response 200 (application/json)
+
+    + Attributes (User)
 
 ## User Role Define [/users/{user_id}/roles/{role_id}]
 
