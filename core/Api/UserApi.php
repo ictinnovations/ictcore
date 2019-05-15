@@ -87,7 +87,7 @@ class UserApi extends Api
    */
   public function update_password($user_id, $data = array())
   {
-    $this->_authorize('user_update');
+    $this->_authorize('user_password');
 
     $oUser = new User($user_id);
     $oUser->password = $data['password'];

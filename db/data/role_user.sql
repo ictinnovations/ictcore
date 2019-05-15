@@ -11,8 +11,12 @@ SELECT @permissionId := permission_id FROM permission WHERE name='configuration_
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* configuration_read */
 SELECT @permissionId := permission_id FROM permission WHERE name='user_read';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* user_read */
+SELECT @permissionId := permission_id FROM permission WHERE name='user_password';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* user_password */
 SELECT @permissionId := permission_id FROM permission WHERE name='usr_read';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr_read */
+SELECT @permissionId := permission_id FROM permission WHERE name='usr_password';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr_password */
 SELECT @permissionId := permission_id FROM permission WHERE name='account_read';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account_read */
 SELECT @permissionId := permission_id FROM permission WHERE name='account_update';

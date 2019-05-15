@@ -205,7 +205,7 @@ class Document extends Message
   public function delete()
   {
     Corelog::log("Document delete", Corelog::CRUD);
-    return DB::delete(self::$table, 'document_id', $this->document_ids);
+    return DB::delete(self::$table, 'document_id', $this->document_id);
   }
 
   protected function set_file_name($file_path)

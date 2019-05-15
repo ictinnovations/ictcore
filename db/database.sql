@@ -211,12 +211,14 @@ INSERT INTO permission VALUES (NULL, 'user', '');
 INSERT INTO permission VALUES (NULL, 'user_create', '');
 INSERT INTO permission VALUES (NULL, 'user_list', '');
 INSERT INTO permission VALUES (NULL, 'user_read', '');
+INSERT INTO permission VALUES (NULL, 'user_password', '');
 INSERT INTO permission VALUES (NULL, 'user_update', '');
 INSERT INTO permission VALUES (NULL, 'user_delete', '');
 INSERT INTO permission VALUES (NULL, 'usr', '');
 INSERT INTO permission VALUES (NULL, 'usr_create', '');
 INSERT INTO permission VALUES (NULL, 'usr_list', '');
 INSERT INTO permission VALUES (NULL, 'usr_read', '');
+INSERT INTO permission VALUES (NULL, 'usr_password', '');
 INSERT INTO permission VALUES (NULL, 'usr_update', '');
 INSERT INTO permission VALUES (NULL, 'usr_delete', '');
 -- Role permissions
