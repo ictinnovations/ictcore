@@ -127,7 +127,26 @@ class Document extends Message
   public static $media_supported = array(
       'pdf'  => 'application/pdf',
       'tif'  => 'image/tiff',
-      'tiff' => 'image/x-tiff'
+      'tiff' => 'image/x-tiff',
+      'png'  => 'image/png',
+      'jpg'  => 'image/jpeg',
+      'jpeg' => 'image/x-citrix-jpeg',
+      /*
+      'txt'  => 'text/plain',
+      'text' => 'text/plain',
+      'htm'  => 'text/htm',
+      'html' => 'text/html',
+      // office files
+      'ppt'  => 'application/vnd.ms-powerpoint',
+      'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'odp'  => 'application/vnd.oasis.opendocument.presentation',
+      'doc'  => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'odt'  => 'application/vnd.oasis.opendocument.text',
+      'xls'  => 'application/vnd.ms-excel',
+      'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'ods'  => 'application/vnd.oasis.opendocument.spreadsheet'
+      */
   );
 
   public function __construct($document_id = NULL)
@@ -221,7 +240,8 @@ class Document extends Message
       $pos = array_search($tiff_file, $aFile);
       unset($aFile[$pos]);
     } else {
-      $file_type = empty($this->type) ? 'wav' : $this->type;
+      // create new file
+      $file_type = empty($this->type) ? 'pdf' : $this->type;
       $file_name = 'document_' . $user_id . '_';
       $file_name .= DB::next_record_id($file_name);
       $tiff_file = $path_data . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . $file_name . '.tif';
@@ -229,7 +249,7 @@ class Document extends Message
 
     foreach($aFile as $file) {
       $aType = explode('.', $file);
-      $file_type = isset($this->type) ? $this->type : end($aType);
+      $file_type = empty($this->type) ? end($aType) : $this->type;
       $file_type = strtolower($file_type);
       $this->create_tiff($file, $file_type, $tiff_file); // it will append new tiff file into $tiff_file
     }
@@ -353,16 +373,19 @@ class Document extends Message
       case 'jpeg':
         Corelog::log("Converting png/jpg into pdf", Corelog::CRUD);
         $pdfFile = "$sourceFile.pdf";
-        $cmd = \ICT\Core\sys_which('convert', '/usr/bin') . " $sourceFile -type Bilevel -monochrome $pdfFile";
+        $cmd = \ICT\Core\sys_which('convert', '/usr/bin') . " $sourceFile $pdfFile";
         exec($cmd);
         //exec("rm -rf '$sourceFile'");
         break;
       case 'pptx':
       case 'ppt':
+      case 'odp':
       case 'docx':
       case 'doc':
+      case 'odt':
       case 'xlsx':
       case 'xls':
+      case 'ods':
         Corelog::log("Converting office document into pdf", Corelog::CRUD);
         $office_binary = \ICT\Core\sys_which('libreoffice', '/usr/bin');
         $target_dir = dirname($sourceFile);

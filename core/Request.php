@@ -77,7 +77,7 @@ class Request
     // TODO: task_cancel in not supported
   }
 
-  public function task_process(\ICT\Core\Task $oTask)
+  public static function task_process(\ICT\Core\Task $oTask)
   {
     try {
       $oRequest = unserialize($oTask->data); // data is serilized request

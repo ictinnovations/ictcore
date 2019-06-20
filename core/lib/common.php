@@ -69,7 +69,7 @@ function path_string_to_array($path) {
 function path_append($path, $file) {
   $aPath = path_string_to_array($path);
   $aPath[] = $file;
-  return path_array_to_string($aPath);
+  return path_array_to_string(array_filter($aPath)); // also remove empty
 }
 
 /**

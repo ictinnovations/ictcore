@@ -114,3 +114,67 @@ SELECT @permissionId := permission_id FROM permission WHERE name='account_update
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account_update */
 SELECT @permissionId := permission_id FROM permission WHERE name='account_list';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account_list */
+
+
+alter table program add column updated_by                      int(11) unsigned       default NULL after parent_id;
+alter table program add column last_updated                    int(11)                default NULL after parent_id;
+alter table program add column created_by                      int(11)                default NULL after parent_id;
+alter table program add column date_created                    int(11)                default NULL after parent_id;
+
+SET foreign_key_checks = 0;
+ALTER DATABASE ictfax CHARACTER SET utf8 COLLATE utf8_general_ci;
+-- mysql --database=ictfax -B -N -e "SHOW TABLES" | awk '{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci; SET foreign_key_checks = 1; "}' | mysql --database=ictfax
+ALTER TABLE account            CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE action             CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE application        CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE auto_number        CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE campaign           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE carriertype        CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE codec              CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE config             CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE config_data        CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE config_node        CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE configuration      CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE configuration_data CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE contact            CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE contact_group      CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE contact_link       CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE csv_users          CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE dialplan           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE document           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE gateway            CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE ivr                CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE node               CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE permission         CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE program            CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE program_resource   CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE provider           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE resource           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE role               CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE role_permission    CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE role_resource      CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE schedule           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE sequence           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE service            CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE session            CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE spool              CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE spool_result       CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE task               CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE template           CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE transmission       CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE unit               CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE unit_block         CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE user_permission    CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE user_resource      CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE user_role          CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE usr                CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+SET foreign_key_checks = 1;
+
+INSERT INTO permission VALUES (NULL, 'user_password', '');
+INSERT INTO permission VALUES (NULL, 'usr_password', '');
+SELECT @permissionId := permission_id FROM permission WHERE name='user_password';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* user_password */
+SELECT @roleId := role_id FROM role WHERE name='user';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* user_password */
+SELECT @permissionId := permission_id FROM permission WHERE name='usr_password';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr_password */

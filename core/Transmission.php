@@ -454,7 +454,7 @@ class Transmission
   {
     if (empty($schedule_data)) {
       $schedule_data = array(
-          'status' => Task::ONHOLD,
+          'status' => Task::PENDING,
           'delay' => 60
       );
     }

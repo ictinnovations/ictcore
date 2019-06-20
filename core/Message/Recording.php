@@ -216,6 +216,7 @@ class Recording extends Message
       // start aRecording with existing recording
       $aRecording[] = $new_file;
     } else {
+      // create new file
       $file_type = empty($this->type) ? 'wav' : $this->type;
       $file_name = 'recording_' . $user_id . '_';
       $file_name .= DB::next_record_id($file_name);
@@ -223,6 +224,9 @@ class Recording extends Message
     }
 
     foreach($aFile as $file) {
+      $aType = explode('.', $file);
+      $file_type = empty($this->type) ? end($aType) : $this->type;
+      $file_type = strtolower($file_type);
       $temporary_file = tempnam('/tmp', 'tmp_file') . '.wav';
       $this->create_wav($file_path, $file_type, $temporary_file);
       $aRecording[] = $temporary_file;

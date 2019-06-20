@@ -26,7 +26,7 @@ class Schedule extends Task
   );
 
   /** @var integer */
-  public $status = Task::ONHOLD;
+  public $status = Task::PENDING;
 
   /**
    * @property-read integer $schedule_id 
