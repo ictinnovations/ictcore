@@ -181,14 +181,14 @@ class Campaign
     }
   }
 
-  public function set_delay($delay)
+  public function set_cpm($cpm)
   {
-    $this->cpm = $delay;
+    $this->cpm = $cpm;
   }
 
-  public function get_delay()
+  public function get_cpm()
   {
-    return $this->delay;
+    return $this->cpm;
   }
 
   public function get_id()
