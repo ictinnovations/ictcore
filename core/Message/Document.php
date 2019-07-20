@@ -32,6 +32,7 @@ class Document extends Message
       'pages',
       'size_x',
       'size_y',
+      'quality',
       'resolution_x',
       'resolution_y'
   );
@@ -88,6 +89,13 @@ class Document extends Message
    * @var integer
    */
   protected $size_y = NULL;
+
+  /**
+   * @property integer $quality
+   * Quality of document
+   * @param string("basic", "standard", "fine", "super", "superior", "ultra") $quality
+   */
+  public $quality = 'standard';
 
   /**
    * @property-read integer $resolution_x
@@ -251,10 +259,40 @@ class Document extends Message
       $aType = explode('.', $file);
       $file_type = empty($this->type) ? end($aType) : $this->type;
       $file_type = strtolower($file_type);
-      $this->create_tiff($file, $file_type, $tiff_file); // it will append new tiff file into $tiff_file
+      $this->create_tiff($file, $file_type, $tiff_file, $this->quality); // it will append new tiff file into $tiff_file
     }
     $this->type = $file_type;
     $this->file_name = $tiff_file;
+  }
+
+  protected function set_quality($quality) {
+    switch ($quality) {
+      case 'basic':
+        $this->resolution_x = 100;
+        $this->resolution_y = 98;  // or 100
+        break;
+      case 'standard':
+        $this->resolution_x = 204; // or 200
+        $this->resolution_y = 98;  // or 100
+      case 'fine':
+        $this->resolution_x = 204; // or 200
+        $this->resolution_y = 196; // or 200
+        break;
+      case 'super':
+        $this->resolution_x = 204; // or 200
+        $this->resolution_y = 391; // or 400
+        break;
+      case 'superior':
+        $this->resolution_x = 300;
+        $this->resolution_y = 300;
+        break;
+      case 'ultra':
+        $this->resolution_x = 408; // or 400
+        $this->resolution_y = 391; // or 400
+        break;
+      default:
+        break;
+    }
   }
 
   public function save()
@@ -285,11 +323,13 @@ class Document extends Message
     return $result;
   }
 
-  private function create_tiff($sourceFile, $type, $targetFile)
+  private function create_tiff($sourceFile, $type, $targetFile, $quality = 'standard')
   {
     $this->pages = 0;
     $this->size_y = 0;
     $this->size_x = 0;
+
+    $this->set_quality($quality);
 
     $infos = '';
     $pdfFile = $this->create_pdf($sourceFile, $type);

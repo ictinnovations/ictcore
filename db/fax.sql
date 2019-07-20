@@ -19,6 +19,7 @@ CREATE TABLE document
    pages                    int(11)                NOT NULL default 0,
    size_x                   int(11)                NOT NULL default 0,
    size_y                   int(11)                NOT NULL default 0,
+   quality                  ENUM('basic', 'standard', 'fine', 'super', 'superior', 'ultra') default 'standard',
    resolution_x             int(11)                NOT NULL default 0,
    resolution_y             int(11)                NOT NULL default 0,
    date_created             int(11)                default NULL,
