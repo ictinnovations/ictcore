@@ -220,6 +220,7 @@ class Document extends Message
       $this->pages = $data['pages'];
       $this->size_x = $data['size_x'];
       $this->size_y = $data['size_y'];
+      $this->quality = $data['quality'];
       $this->resolution_x = $data['resolution_x'];
       $this->resolution_y = $data['resolution_y'];
       $this->user_id = $data['created_by'];
@@ -305,6 +306,7 @@ class Document extends Message
         'description' => $this->description,
         'size_x' => $this->size_x,
         'size_y' => $this->size_y,
+        'quality' => $this->quality,
         'resolution_x' => $this->resolution_x,
         'resolution_y' => $this->resolution_y,
         'pages' => $this->pages
