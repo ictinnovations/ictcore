@@ -85,9 +85,7 @@ class TransmissionApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('transmission_list');
-    $filter  = (array)$query;
-    $filter += $this->_authorization_filter();
-    $listTransmission = Transmission::search($filter);
+    $listTransmission = Transmission::search((array)$query);
     foreach ($listTransmission as $key => $aTransmission) {
       $listAccount = Account::search(array('account_id' => $aTransmission['account_id']));
       $listTransmission[$key]['account'] = array_shift($listAccount);
