@@ -89,7 +89,7 @@ class TransmissionApi extends Api
     foreach ($listTransmission as $key => $aTransmission) {
       $listAccount = Account::search(array('account_id' => $aTransmission['account_id']));
       $listTransmission[$key]['account'] = array_shift($listAccount);
-      $listContact = Account::search(array('contact_id' => $aTransmission['contact_id']));
+      $listContact = Contact::search(array('contact_id' => $aTransmission['contact_id']));
       $listTransmission[$key]['contact'] = array_shift($listContact);
     }
     return $listTransmission;
