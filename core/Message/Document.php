@@ -275,6 +275,7 @@ class Document extends Message
       case 'standard':
         $this->resolution_x = 204; // or 200
         $this->resolution_y = 98;  // or 100
+        break;
       case 'fine':
         $this->resolution_x = 204; // or 200
         $this->resolution_y = 196; // or 200

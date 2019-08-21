@@ -41,6 +41,8 @@ class Transmission
    * ********************************************* Transmission related data **
    */
   private static $table = 'transmission';
+  private static $table_account = 'account';
+  private static $table_contact = 'contact';
   private static $fields = array(
       'transmission_id',
       'title',
@@ -199,7 +201,9 @@ class Transmission
   public static function search($aFilter = array())
   {
     $aTransmission = array();
-    $from_str = self::$table;
+    $from_str  = self::$table . ' t';
+    $from_str .= ' LEFT JOIN ' . self::$table_account . ' a ON t.account_id=a.account_id';
+    $from_str .= ' LEFT JOIN ' . self::$table_contact . ' c ON t.contact_id=c.contact_id';
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
@@ -208,28 +212,40 @@ class Transmission
         case 'account_id':
         case 'contact_id':
         case 'campaign_id':
-          $aWhere[] = "$search_field = $search_value";
+          $aWhere[] = "t.$search_field = $search_value";
           break;
         case 'service_flag':
-          $aWhere[] = "($search_field & $search_value) = $search_value";
+          $aWhere[] = "(t.$search_field & $search_value) = $search_value";
           break;
         case 'title':
         case 'origin':
         case 'direction':
         case 'status':
         case 'response':
-          $aWhere[] = "$search_field LIKE '%$search_value%'";
+          $aWhere[] = "t.$search_field LIKE '%$search_value%'";
           break;
 
         case 'user_id':
         case 'created_by':
-          $aWhere[] = "created_by = '$search_value'";
+          $aWhere[] = "t.created_by = '$search_value'";
           break;
         case 'before':
-          $aWhere[] = "date_created <= $search_value";
+          $aWhere[] = "t.date_created <= $search_value";
           break;
         case 'after':
-          $aWhere[] = "date_created >= $search_value";
+          $aWhere[] = "t.date_created >= $search_value";
+          break;
+
+        case 'email':
+        case 'phone':
+          $aWhere[] = "(a.$search_field LIKE '%$search_value%' OR c.$search_field LIKE '%$search_value%')";
+          break;
+        case 'account_email':
+        case 'account_phone':
+        case 'contact_email':
+        case 'contact_phone':
+          $fixed_field = str_replace(array('account_', 'contact_'), array('a.', 'c.'), $search_field);
+          $aWhere[] = "$fixed_field LIKE '%$search_value%'";
           break;
       }
     }
@@ -237,7 +253,8 @@ class Transmission
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT transmission_id, account_id, contact_id, status, response, direction, last_run FROM " . $from_str;
+    $contact_fields = 'a.phone AS contact_phone, a.email AS contact_email, c.phone AS contact_phone, c.email AS contact_email';
+    $query = "SELECT t.transmission_id, t.account_id, t.contact_id, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str;
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
     while ($data = mysql_fetch_assoc($result)) {
