@@ -86,7 +86,6 @@ class TransmissionApi extends Api
   {
     $this->_authorize('transmission_list');
     $filter  = (array)$query;
-    $filter += $this->_authorization_filter();
     $listTransmission = Transmission::search($filter);
     return $listTransmission;
   }
