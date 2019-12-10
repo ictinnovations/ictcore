@@ -254,7 +254,7 @@ class Transmission
     }
 
     $contact_fields = 'a.phone AS contact_phone, a.email AS contact_email, c.phone AS contact_phone, c.email AS contact_email';
-    $query = "SELECT t.transmission_id, t.account_id, t.contact_id, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str;
+    $query = "SELECT t.transmission_id, t.account_id, t.contact_id, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str . " LIMIT 5000";
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
     while ($data = mysql_fetch_assoc($result)) {
