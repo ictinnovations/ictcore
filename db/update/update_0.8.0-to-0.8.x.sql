@@ -180,3 +180,5 @@ SELECT @permissionId := permission_id FROM permission WHERE name='usr_password';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr_password */
 
 ALTER TABLE document ADD quality                  ENUM('basic', 'standard', 'fine', 'super', 'superior', 'ultra') default 'standard';
+
+ALTER TABLE account ADD    settings                       text AFTER active;

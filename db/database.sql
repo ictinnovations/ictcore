@@ -24,6 +24,7 @@ CREATE TABLE account
    email                          varchar(128)           default NULL,
    address                        varchar(128)           default NULL,
    active                         int(1)                 NOT NULL default 0,
+   settings                       text,
    date_created                   int(11)                default NULL,
    created_by                     int(11)                default NULL,
    last_updated                   int(11)                default NULL,

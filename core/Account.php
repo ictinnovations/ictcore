@@ -30,6 +30,7 @@ class Account
       'phone',
       'email',
       'address',
+      'settings',
       'active',
       'user_id'
   );
@@ -78,6 +79,9 @@ class Account
 
   /** @var string */
   public $address = NULL;
+
+  /** @var array */
+  public $settings = array();
 
   /** @var integer */
   public $active = 0;
@@ -254,6 +258,7 @@ class Account
       $this->phone = $data['phone'];
       $this->email = $data['email'];
       $this->address = $data['address'];
+      $this->settings = json_decode($data['settings'], true);
       $this->active = $data['active'];
       $this->user_id = $data['created_by'];
     } else {
@@ -328,6 +333,7 @@ class Account
         'phone' => $this->phone,
         'email' => $this->email,
         'address' => $this->address,
+        'settings' => json_encode($this->data, JSON_NUMERIC_CHECK),
         'active' => $this->active
             // Note: user_id or created_by field can't be updated here, instead use associate method
     );
@@ -414,6 +420,13 @@ class Account
       }
     }
     return true;
+  }
+
+  public function setting_read($name, $default = null) {
+    if (isset($this->settings[$name])) {
+      return $this->settings[$name];
+    }
+    return $default;
   }
 
 }

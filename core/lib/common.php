@@ -66,6 +66,12 @@ function path_string_to_array($path) {
   return explode(',', $path);
 }
 
+function path_prepend($path, $file) {
+  $aPath = path_string_to_array($path);
+  array_unshift($aPath, $file);
+  return path_array_to_string(array_filter($aPath)); // also remove empty
+}
+
 function path_append($path, $file) {
   $aPath = path_string_to_array($path);
   $aPath[] = $file;

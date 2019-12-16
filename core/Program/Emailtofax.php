@@ -9,6 +9,7 @@ namespace ICT\Core\Program;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+use Dompdf\Dompdf;
 use ICT\Core\Account;
 use ICT\Core\Application\Email_receive;
 use ICT\Core\Conf;
@@ -200,6 +201,22 @@ class Emailtofax extends Program
         $oSession = Session::get_instance();
         $oTemplate = $oSession->template;
         $attachment = $oTemplate->attachment;
+        if ($this->aResource['account']->setting_read('emailtofax_coversheet', 'disabled') == 'body') {
+          if (!empty(trem($oTemplate->body))) {
+            global $path_cache;
+            $coversheet_pdf = tempnam($path_cache, 'coversheet_') . '.pdf';
+            // Generate PDF from body
+            $dompdf = new Dompdf();
+            $dompdf->loadHtml($oTemplate->body);
+            $dompdf->setPaper('A4', 'portrait'); // Setup the paper size and orientation
+            $dompdf->render();                   // Render the HTML as PDF
+            file_put_contents($coversheet_pdf, $dompdf->output());
+            // prepend pdf into existing attachment list
+            if (is_file($coversheet_pdf)) {
+              $attachment = \ICT\Core\path_prepend($attachment);
+            }
+          }
+        }
         $this->send_fax($attachment);
       } else {
         // send notification to user, about email error

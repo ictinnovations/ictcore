@@ -195,6 +195,65 @@ class AccountApi extends Api
     return $oAccount->dissociate();
   }
 
+  /**
+   * Read setting associated with this account
+   *
+   * @url GET /accounts/$account_id/settings/$name
+   */
+  public function setting_read($account_id, $name)
+  {
+    $this->_authorize('account_read');
+    $oAccount = Account::load($account_id);
+
+    if (isset($oAccount->settings[$name])) {
+      $oAccount->settings[$name];
+      return $oAccount->save();
+    }
+    throw new CoreException(404, 'Setting not found');
+  }
+
+  /**
+   * Save setting for this account
+   *
+   * @url PUT /accounts/$account_id/settings/$name
+   */
+  public function setting_write($account_id, $name, $data = array())
+  {
+    $this->_authorize('account_update');
+    $oAccount = Account::load($account_id);
+    $is_updated = false;
+
+    if (is_array($data)) {
+      if (isset($data['value'])) {
+        $oAccount->settings[$name] = $data['value'];
+        $is_updated = true;
+      } elseif (isset($data['data'])) {
+        $oAccount->settings[$name] = $data['data'];
+        $is_updated = true;
+      }
+    } elseif (!empty($data)) {
+      $oAccount->settings[$name] = $data;
+      $is_updated = true;
+    }
+    if ($is_updated) {
+      return $oAccount->save();
+    }
+    throw new CoreException(417, 'Account setting update failed! no value or data parameter set');
+  }
+
+  /**
+   * Delete a setting from given account
+   *
+   * @url DELETE /accounts/$account_id/setting/$name
+   */
+  public function setting_delete($account_id, $name)
+  {
+    $this->_authorize('account_update');
+    $oAccount = Account::load($account_id);
+    unset($oAccount[$name]);
+    return $oAccount->save();
+  }
+
   // include classes from Account folder
   protected static function rest_include()
   {

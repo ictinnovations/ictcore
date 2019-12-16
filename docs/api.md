@@ -166,6 +166,9 @@ Account / Email / DID / Extension
 * DELETE /accounts/{account_id}/programs/{program\_name}
 * PUT /accounts/{account_id}/users/{user\_id}
 * DELETE /accounts/{account_id}/users
+* GET /accounts/{account_id}/settings/{name}
+* PUT /accounts/{account_id}/settings/{name}
+* DELETE /accounts/{account_id}/settings/{name}
 
 ### DIDs
 * POST dids

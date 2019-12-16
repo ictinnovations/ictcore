@@ -1637,6 +1637,56 @@ Delete an existing account
 
     + Attributes (Account)
 
+
+## Account Settings [/accounts/{account_id}/settings/{name}]
+
++ Parameters
+
+    + account_id (number) - ID of the account in the form of an integer
+    + name (string) - Account setting name
+
+### View a Account Setting [GET]
+
+Read / view account setting
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + value: value (string) - will return current value of the given account setting
+
+### Update Account Setting [PUT]
+
+Create a new or update an existing account setting
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (Account)
+
++ Response 200
+
+### Delete Account Setting [DELETE]
+
+Delete an existing account setting
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200
+
 # Group User Management
 
 ## User Collection [/users]
