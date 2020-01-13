@@ -43,6 +43,7 @@ class Transmission
   private static $table = 'transmission';
   private static $table_account = 'account';
   private static $table_contact = 'contact';
+  private static $table_user = 'usr';
   private static $fields = array(
       'transmission_id',
       'title',
@@ -204,6 +205,7 @@ class Transmission
     $from_str  = self::$table . ' t';
     $from_str .= ' LEFT JOIN ' . self::$table_account . ' a ON t.account_id=a.account_id';
     $from_str .= ' LEFT JOIN ' . self::$table_contact . ' c ON t.contact_id=c.contact_id';
+    $from_str .= ' LEFT JOIN ' . self::$table_user . ' u ON t.created_by=u.usr_id';
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
@@ -253,8 +255,9 @@ class Transmission
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $contact_fields = 'a.phone AS contact_phone, a.email AS contact_email, c.phone AS contact_phone, c.email AS contact_email';
-    $query = "SELECT t.transmission_id, t.account_id, t.contact_id, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str . " LIMIT 5000";
+    $owner_fields   = 't.account_id, a.phone AS account_phone, a.email AS account_email, t.created_by AS user_id, u.username AS username';
+    $contact_fields = 't.contact_id, c.phone AS contact_phone, c.email AS contact_email';
+    $query = "SELECT t.transmission_id, $owner_fields, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str . " LIMIT 5000";
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
     while ($data = mysql_fetch_assoc($result)) {

@@ -37,7 +37,12 @@ class AccountApi extends Api
     } else {
       $oAccount = new Account();
     }
+    $aSetting = $oAccount->settings; // prepare a copy of default settings
     $this->set($oAccount, $data);
+    if (isset($data['settings']) && !empty($data['settings'])) {
+      // override default settings but preserve the unchanged settings
+      $oAccount->settings = array_merge($aSetting, $oAccount->settings);
+    }
 
     if ($oAccount->save()) {
       return $oAccount->account_id;
@@ -108,7 +113,12 @@ class AccountApi extends Api
     $this->_authorize('account_update');
 
     $oAccount = Account::load($account_id);
+    $aSetting = $oAccount->settings; // prepare a copy of old settings
     $this->set($oAccount, $data);
+    if (isset($data['settings']) && !empty($data['settings'])) {
+      // override old settings but preserve the unchanged settings
+      $oAccount->settings = array_merge($aSetting, $oAccount->settings);
+    }
 
     if ($oAccount->save()) {
       return $oAccount;
@@ -244,13 +254,13 @@ class AccountApi extends Api
   /**
    * Delete a setting from given account
    *
-   * @url DELETE /accounts/$account_id/setting/$name
+   * @url DELETE /accounts/$account_id/settings/$name
    */
   public function setting_delete($account_id, $name)
   {
     $this->_authorize('account_update');
     $oAccount = Account::load($account_id);
-    unset($oAccount[$name]);
+    unset($oAccount->settings[$name]);
     return $oAccount->save();
   }
 

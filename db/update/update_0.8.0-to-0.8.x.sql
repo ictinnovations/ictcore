@@ -182,3 +182,20 @@ INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* usr_pass
 ALTER TABLE document ADD quality                  ENUM('basic', 'standard', 'fine', 'super', 'superior', 'ultra') default 'standard';
 
 ALTER TABLE account ADD    settings                       text AFTER active;
+
+INSERT INTO permission VALUES (NULL, 'statistic', '');
+INSERT INTO permission VALUES (NULL, 'statistic_admin', '');
+INSERT INTO permission VALUES (NULL, 'configuration', '');
+INSERT INTO permission VALUES (NULL, 'program_admin', '');
+INSERT INTO permission VALUES (NULL, 'transmission_admin', '');
+INSERT INTO permission VALUES (NULL, 'task_admin', '');
+INSERT INTO permission VALUES (NULL, 'schedule_admin', '');
+INSERT INTO permission VALUES (NULL, 'spool_admin', '');
+INSERT INTO permission VALUES (NULL, 'result_admin', '');
+INSERT INTO permission VALUES (NULL, 'provider_admin', '');
+INSERT INTO permission VALUES (NULL, 'contact_admin', '');
+INSERT INTO permission VALUES (NULL, 'group_admin', '');
+INSERT INTO permission VALUES (NULL, 'account_admin', '');
+INSERT INTO permission VALUES (NULL, 'user_admin', '');
+INSERT INTO permission VALUES (NULL, 'usr_admin', '');
+INSERT INTO permission VALUES (NULL, 'campaign_admin', '');

@@ -23,10 +23,11 @@ class CoreApi extends Api
    *
    * @url GET /statistics
    */
-  public function statistics()
+  public function statistics($query = array())
   {
     $this->_authorize('statistic_read');
-    return Core::statistic();
+    $filter = (array)$query;
+    return Core::statistic($filter);
   }
 
   /**

@@ -225,6 +225,11 @@ class DB
     }
 
     if ($primary_key === FALSE) { // new record => INSERT
+      // this will fix a bug related to pooerly written loops
+      if (isset($values['primary_key']) && $values['primary_key'] == $values[$table . '_id']) {
+        unset($values['primary_key']);
+        unset($values[$table . '_id']);
+      }
       unset($columns['updated_by']);
       unset($columns['last_updated']);
 

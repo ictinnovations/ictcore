@@ -75,7 +75,7 @@ CREATE TABLE contact_group
 CREATE TABLE contact_link
 (
    group_id                      int(11)                NOT NULL,
-   contact_id                    int(11)                NOT NULLS,
+   contact_id                    int(11)                NOT NULL,
    PRIMARY KEY (group_id, contact_id)
 ) ENGINE = InnoDB;
 

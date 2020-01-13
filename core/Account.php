@@ -261,6 +261,10 @@ class Account
       $this->settings = json_decode($data['settings'], true);
       $this->active = $data['active'];
       $this->user_id = $data['created_by'];
+
+      if (!is_array($this->settings)) {
+        $this->settings = array();
+      }
     } else {
       throw new CoreException('404', 'Account not found');
     }
@@ -333,7 +337,7 @@ class Account
         'phone' => $this->phone,
         'email' => $this->email,
         'address' => $this->address,
-        'settings' => json_encode($this->data, JSON_NUMERIC_CHECK),
+        'settings' => json_encode($this->settings, JSON_NUMERIC_CHECK),
         'active' => $this->active
             // Note: user_id or created_by field can't be updated here, instead use associate method
     );

@@ -18,18 +18,46 @@ require_once dirname(__FILE__) . "/lib/init.php";
 class Core
 {
 
-  public static function statistic()
+  public static function statistic($aFilter = array())
   {
+    $aWhere    = array();
+    $where_str = '1=1';
+    foreach ($aFilter as $search_field => $search_value) {
+      switch($search_field) {
+        case 'date_created':
+        case 'since':
+        case 'from':
+          $aWhere[] = "t.date_created >= '$search_value'";
+          break;
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "t.created_by = '$search_value'";
+          break;
+      }
+    }
+    if (!empty($aWhere)) {
+      $where_str = implode(' AND ', $aWhere);
+    }
+
+    // table alias are being used to keep the filter even with JOINs
+    $campaign_query     = "SELECT COUNT(t.campaign_id) FROM campaign t WHERE $where_str";
+    $group_query        = "SELECT COUNT(t.contact_group_id) FROM contact_group t WHERE $where_str";
+    $contact_query      = "SELECT COUNT(t.contact_id) FROM contact t WHERE $where_str";
+    $transmission_query = "SELECT COUNT(t.transmission_id) FROM transmission WHERE t $where_str";
+    $spool_query        = "SELECT COUNT(s.spool_id) FROM spool s JOIN account t ON s.account_id=t.account_id WHERE $where_str";
+
     $aStatistic = array(
-        'campaign_total' => DB::query_result('campaign', "SELECT COUNT(*) FROM campaign"),
-        'campaign_active' => DB::query_result('campaign', "SELECT COUNT(*) FROM campaign WHERE status='".Campaign::STATUS_RUNNING."'"),
-        'group_total' => DB::query_result('contact_group', "SELECT COUNT(*) FROM contact_group"),
-        'contact_total' => DB::query_result('contact', "SELECT COUNT(*) FROM contact"),
-        'transmission_total' => DB::query_result('transmission', "SELECT COUNT(*) FROM transmission"),
-        'transmission_active' => DB::query_result('transmission', "SELECT COUNT(*) FROM transmission WHERE status='".Transmission::STATUS_PROCESSING."'"),
-        'spool_total' => DB::query_result('spool', "SELECT COUNT(*) FROM spool"),
-        'spool_success' => DB::query_result('spool', "SELECT COUNT(*) FROM spool wHERE status='".Spool::STATUS_COMPLETED."'"),
-        'spool_failed' => DB::query_result('spool', "SELECT COUNT(*) FROM spool wHERE status='".Spool::STATUS_FAILED."'"),
+        'campaign_total' => DB::query_result('campaign', $campaign_query),
+        'campaign_active' => DB::query_result('campaign', "$campaign_query AND status='".Campaign::STATUS_RUNNING."'"),
+        'group_total' => DB::query_result('contact_group', $group_query),
+        'contact_total' => DB::query_result('contact', $contact_query),
+        'transmission_total' => DB::query_result('transmission', $transmission_query),
+        'transmission_inbound' => DB::query_result('transmission', "$transmission_query AND direction='".Transmission::INBOUND."'"),
+        'transmission_outbound' => DB::query_result('transmission', "$transmission_query AND direction='".Transmission::OUTBOUND."'"),
+        'transmission_active' => DB::query_result('transmission', "$transmission_query AND status='".Transmission::STATUS_PROCESSING."'"),
+        'spool_total' => DB::query_result('spool', $spool_query),
+        'spool_success' => DB::query_result('spool', "$spool_query AND status='".Spool::STATUS_COMPLETED."'"),
+        'spool_failed' => DB::query_result('spool', "$spool_query AND status='".Spool::STATUS_FAILED."'"),
     );
     return $aStatistic;
   }

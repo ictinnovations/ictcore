@@ -141,7 +141,10 @@ CREATE TABLE role_permission
 -- Common permissions
 INSERT INTO permission VALUES (NULL, 'api', '');
 INSERT INTO permission VALUES (NULL, 'api_access', '');
+INSERT INTO permission VALUES (NULL, 'statistic', '');
 INSERT INTO permission VALUES (NULL, 'statistic_read', '');
+INSERT INTO permission VALUES (NULL, 'statistic_admin', '');
+INSERT INTO permission VALUES (NULL, 'configuration', '');
 INSERT INTO permission VALUES (NULL, 'configuration_read', '');
 INSERT INTO permission VALUES (NULL, 'configuration_write', '');
 -- Program permissions
@@ -151,6 +154,7 @@ INSERT INTO permission VALUES (NULL, 'program_list', '');
 INSERT INTO permission VALUES (NULL, 'program_read', '');
 INSERT INTO permission VALUES (NULL, 'program_delete', '');
 INSERT INTO permission VALUES (NULL, 'program_execute', '');
+INSERT INTO permission VALUES (NULL, 'program_admin', '');
 -- Transmission permissions
 INSERT INTO permission VALUES (NULL, 'transmission', '');
 INSERT INTO permission VALUES (NULL, 'transmission_create', '');
@@ -159,26 +163,31 @@ INSERT INTO permission VALUES (NULL, 'transmission_read', '');
 INSERT INTO permission VALUES (NULL, 'transmission_update', '');
 INSERT INTO permission VALUES (NULL, 'transmission_delete', '');
 INSERT INTO permission VALUES (NULL, 'transmission_send', '');
+INSERT INTO permission VALUES (NULL, 'transmission_admin', '');
 -- Task permissions
 INSERT INTO permission VALUES (NULL, 'task', '');
 INSERT INTO permission VALUES (NULL, 'task_create', '');
 INSERT INTO permission VALUES (NULL, 'task_read', '');
 INSERT INTO permission VALUES (NULL, 'task_list', '');
 INSERT INTO permission VALUES (NULL, 'task_delete', '');
+INSERT INTO permission VALUES (NULL, 'task_admin', '');
 -- Schedule permissions
 INSERT INTO permission VALUES (NULL, 'schedule', '');
 INSERT INTO permission VALUES (NULL, 'schedule_create', '');
 INSERT INTO permission VALUES (NULL, 'schedule_read', '');
 INSERT INTO permission VALUES (NULL, 'schedule_list', '');
 INSERT INTO permission VALUES (NULL, 'schedule_delete', '');
+INSERT INTO permission VALUES (NULL, 'schedule_admin', '');
 -- Spool permissions
 INSERT INTO permission VALUES (NULL, 'spool', '');
 INSERT INTO permission VALUES (NULL, 'spool_read', '');
 INSERT INTO permission VALUES (NULL, 'spool_list', '');
+INSERT INTO permission VALUES (NULL, 'spool_admin', '');
 -- Result permissions
 INSERT INTO permission VALUES (NULL, 'result', '');
 INSERT INTO permission VALUES (NULL, 'result_read', '');
 INSERT INTO permission VALUES (NULL, 'result_list', '');
+INSERT INTO permission VALUES (NULL, 'result_admin', '');
 -- Provider permissions
 INSERT INTO permission VALUES (NULL, 'provider', '');
 INSERT INTO permission VALUES (NULL, 'provider_create', '');
@@ -186,6 +195,7 @@ INSERT INTO permission VALUES (NULL, 'provider_list', '');
 INSERT INTO permission VALUES (NULL, 'provider_read', '');
 INSERT INTO permission VALUES (NULL, 'provider_update', '');
 INSERT INTO permission VALUES (NULL, 'provider_delete', '');
+INSERT INTO permission VALUES (NULL, 'provider_admin', '');
 -- Contact permissions
 INSERT INTO permission VALUES (NULL, 'contact', '');
 INSERT INTO permission VALUES (NULL, 'contact_create', '');
@@ -193,6 +203,7 @@ INSERT INTO permission VALUES (NULL, 'contact_list', '');
 INSERT INTO permission VALUES (NULL, 'contact_read', '');
 INSERT INTO permission VALUES (NULL, 'contact_update', '');
 INSERT INTO permission VALUES (NULL, 'contact_delete', '');
+INSERT INTO permission VALUES (NULL, 'contact_admin', '');
 -- GROUP permissions
 INSERT INTO permission VALUES (NULL, 'group', '');
 INSERT INTO permission VALUES (NULL, 'group_create', '');
@@ -200,6 +211,7 @@ INSERT INTO permission VALUES (NULL, 'group_list', '');
 INSERT INTO permission VALUES (NULL, 'group_read', '');
 INSERT INTO permission VALUES (NULL, 'group_update', '');
 INSERT INTO permission VALUES (NULL, 'group_delete', '');
+INSERT INTO permission VALUES (NULL, 'group_admin', '');
 -- Account permissions
 INSERT INTO permission VALUES (NULL, 'account', '');
 INSERT INTO permission VALUES (NULL, 'account_create', '');
@@ -207,6 +219,7 @@ INSERT INTO permission VALUES (NULL, 'account_list', '');
 INSERT INTO permission VALUES (NULL, 'account_read', '');
 INSERT INTO permission VALUES (NULL, 'account_update', '');
 INSERT INTO permission VALUES (NULL, 'account_delete', '');
+INSERT INTO permission VALUES (NULL, 'account_admin', '');
 -- User permissions
 INSERT INTO permission VALUES (NULL, 'user', '');
 INSERT INTO permission VALUES (NULL, 'user_create', '');
@@ -215,6 +228,7 @@ INSERT INTO permission VALUES (NULL, 'user_read', '');
 INSERT INTO permission VALUES (NULL, 'user_password', '');
 INSERT INTO permission VALUES (NULL, 'user_update', '');
 INSERT INTO permission VALUES (NULL, 'user_delete', '');
+INSERT INTO permission VALUES (NULL, 'user_admin', '');
 INSERT INTO permission VALUES (NULL, 'usr', '');
 INSERT INTO permission VALUES (NULL, 'usr_create', '');
 INSERT INTO permission VALUES (NULL, 'usr_list', '');
@@ -222,6 +236,7 @@ INSERT INTO permission VALUES (NULL, 'usr_read', '');
 INSERT INTO permission VALUES (NULL, 'usr_password', '');
 INSERT INTO permission VALUES (NULL, 'usr_update', '');
 INSERT INTO permission VALUES (NULL, 'usr_delete', '');
+INSERT INTO permission VALUES (NULL, 'usr_admin', '');
 -- Role permissions
 INSERT INTO permission VALUES (NULL, 'role', '');
 INSERT INTO permission VALUES (NULL, 'role_create', '');
@@ -244,6 +259,7 @@ INSERT INTO permission VALUES (NULL, 'campaign_update', '');
 INSERT INTO permission VALUES (NULL, 'campaign_delete', '');
 INSERT INTO permission VALUES (NULL, 'campaign_start', '');
 INSERT INTO permission VALUES (NULL, 'campaign_stop', '');
+INSERT INTO permission VALUES (NULL, 'campaign_admin', '');
 
 /*==============================================================*/
 /* Table: resource                                              */
