@@ -22,6 +22,8 @@ class Core
   {
     $aWhere    = array();
     $where_str = '1=1';
+    $where_str_account = '';
+    $where_str_service = '';
     foreach ($aFilter as $search_field => $search_value) {
       switch($search_field) {
         case 'date_created':
@@ -33,6 +35,12 @@ class Core
         case 'created_by':
           $aWhere[] = "t.created_by = '$search_value'";
           break;
+        case 'service_flag':
+          $where_str_service = " AND t.service_flag='$search_value'";
+          break;
+        case 'account_type':
+          $where_str_account = " AND t.type='$search_value'";
+          break;
       }
     }
     if (!empty($aWhere)) {
@@ -40,30 +48,30 @@ class Core
     }
 
     // table alias are being used to keep the filter even with JOINs
+    $user_query         = "SELECT COUNT(t.usr_id) FROM usr t";
+    $account_query      = "SELECT COUNT(t.account_id) FROM account t WHERE $where_str $where_str_account";
     $campaign_query     = "SELECT COUNT(t.campaign_id) FROM campaign t WHERE $where_str";
-    $group_query        = "SELECT COUNT(t.contact_group_id) FROM contact_group t WHERE $where_str";
+    $group_query        = "SELECT COUNT(t.group_id) FROM contact_group t WHERE $where_str";
     $contact_query      = "SELECT COUNT(t.contact_id) FROM contact t WHERE $where_str";
-    $transmission_query = "SELECT COUNT(t.transmission_id) FROM transmission WHERE t $where_str";
-    $spool_query        = "SELECT COUNT(s.spool_id) FROM spool s JOIN account t ON s.account_id=t.account_id WHERE $where_str";
+    $transmission_query = "SELECT COUNT(t.transmission_id) FROM transmission t WHERE $where_str $where_str_service";
 
     $aStatistic = array(
+        'user_total' => DB::query_result('usr', $user_query),
+        'account_total' => DB::query_result('account', $account_query),
         'campaign_total' => DB::query_result('campaign', $campaign_query),
-        'campaign_active' => DB::query_result('campaign', "$campaign_query AND status='".Campaign::STATUS_RUNNING."'"),
+        'campaign_active' => DB::query_result('campaign', "$campaign_query AND t.status='".Campaign::STATUS_RUNNING."'"),
         'group_total' => DB::query_result('contact_group', $group_query),
         'contact_total' => DB::query_result('contact', $contact_query),
         'transmission_total' => DB::query_result('transmission', $transmission_query),
-        'transmission_inbound' => DB::query_result('transmission', "$transmission_query AND direction='".Transmission::INBOUND."'"),
-        'transmission_outbound' => DB::query_result('transmission', "$transmission_query AND direction='".Transmission::OUTBOUND."'"),
-        'transmission_active' => DB::query_result('transmission', "$transmission_query AND status='".Transmission::STATUS_PROCESSING."'"),
-        'spool_total' => DB::query_result('spool', $spool_query),
-        'spool_success' => DB::query_result('spool', "$spool_query AND status='".Spool::STATUS_COMPLETED."'"),
-        'spool_failed' => DB::query_result('spool', "$spool_query AND status='".Spool::STATUS_FAILED."'"),
+        'transmission_inbound' => DB::query_result('transmission', "$transmission_query AND t.direction='".Transmission::INBOUND."'"),
+        'transmission_outbound' => DB::query_result('transmission', "$transmission_query AND t.direction='".Transmission::OUTBOUND."'"),
+        'transmission_active' => DB::query_result('transmission', "$transmission_query AND t.status='".Transmission::STATUS_PROCESSING."'"),
     );
     return $aStatistic;
   }
 
   /**
-   * Initiate delivery / sending proces for a previously created transmission
+   * Initiate delivery / sending process for a previously created transmission
    * @param Transmission $oTransmission
    */
   public static function send(Transmission $oTransmission)

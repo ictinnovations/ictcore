@@ -48,7 +48,7 @@ class Dnc extends Application
     $oService = new Voice();
     $template_path = $oService->template_path('dnc');
     $oService->application_execute($this, $template_path, 'template');
-  }
 
-  return Spool::STATUS_CONNECTED;
+    return Spool::STATUS_CONNECTED;
+  }
 }
