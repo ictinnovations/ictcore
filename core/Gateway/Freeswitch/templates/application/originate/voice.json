@@ -6,6 +6,7 @@
     "transfer_on_fail": "'UNALLOCATED_NUMBER auto_cause xml ictcore_fail'",
     "api_hangup_hook": "'lua /usr/ictcore/bin/freeswitch/spool_failed.lua {{ transmission.spool.spool_id }} {{ application.application_id }} error'",
     "session_in_hangup_hook": "true",
+    "continue_on_fail": "true",
     "ignore_early_media": "true",
     "codec_string": "'PCMU,PCMA'",
     "spool_status": "connected",
@@ -23,6 +24,10 @@
     {
       "name": "bgapi originate",
       "data": "sofia/gateway/{{ provider.name }}/{{ freeswitch.set_prefix(application.destination, provider.prefix) }} '&lua(/usr/ictcore/bin/freeswitch/application.lua {{ transmission.spool.spool_id }} {{ application.application_id }} success)'"
+    },
+    {
+      "name": "lua",
+      "data": "/usr/ictcore/bin/freeswitch/spool_failed.lua {{ transmission.spool.spool_id }} {{ application.application_id }} error"
     }
   ]
 }
