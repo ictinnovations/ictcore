@@ -202,7 +202,8 @@ class Emailtofax extends Program
         $oTemplate = $oSession->template;
         $attachment = $oTemplate->attachment;
         if ($this->aResource['account']->setting_read('emailtofax_coversheet', 'disabled') == 'body') {
-          if (!empty(trim($oTemplate->body))) {
+          $body_str = trim($oTemplate->body);
+          if (!empty($body_str)) {
             global $path_cache;
             $coversheet_pdf = tempnam($path_cache, 'coversheet_') . '.pdf';
             // Generate PDF from body
