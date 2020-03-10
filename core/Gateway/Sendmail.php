@@ -43,6 +43,9 @@ class Sendmail extends Gateway
   /** @var string $password */
   protected $password;
 
+  /** @var string $encryption */
+  protected $encryption;
+
   /** @var string $port */
   protected $port;
 
@@ -59,6 +62,7 @@ class Sendmail extends Gateway
   {
     $this->host = Conf::get('sendmail:host', '127.0.0.1');
     $this->port = Conf::get('sendmail:port', '25');
+    $this->encryption = Conf::get('sendmail:encryption', null);
     $this->username = Conf::get('sendmail:user', '');
     $this->password = Conf::get('sendmail:pass', '');
     $this->type = Conf::get('sendmail:type', 'sendmail');
@@ -76,6 +80,9 @@ class Sendmail extends Gateway
       case 'smtp':
         try {
           $this->conn = Swift_SmtpTransport::newInstance($this->host, $this->port);
+          if (!empty($this->encryption)) {
+            $this->conn->setEncryption($this->encryption);
+          }
           $this->conn->setUsername($this->username);
           $this->conn->setPassword($this->password);
         } catch (Exception $conn_error) {
@@ -117,6 +124,12 @@ class Sendmail extends Gateway
       Corelog::log("Sendmail sending commands", Corelog::CRUD, $command);
     } else {
       Corelog::log("Sendmail sending commands via:".$oProvider->name, Corelog::CRUD, $command);
+      $this->type = $oProvider->type;
+      $this->host = $oProvider->host;
+      $this->port = $oProvider->port;
+      $this->encryption = $oProvider->dialstring;
+      $this->username = $oProvider->username;
+      $this->password = $oProvider->password;
     }
 
     // Convert json into data array
