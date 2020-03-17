@@ -108,6 +108,9 @@ Programs
 ### Voice Call with pre recorded message
 * POST programs/voicemessage
 
+### Voice Call with tts
+* POST programs/voicetts
+
 ### Custom Forward program
 * POST programs/forward
 

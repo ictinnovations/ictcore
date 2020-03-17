@@ -317,6 +317,26 @@ Prepare given voice recording for provided account, and make it ready to be play
     + Attributes
               
         + program_id : 1 (number) - program id  of recently created program
+
+## Voice TTS program [/programs/voicetts]
+
+Prepare given voice tts for provided account, and make it ready to be played during call
+
+### Create New Voice TTS program [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Authentication: Bearer JWT
+
+    + Attributes (ProgramVoicetts)
+
++ Response 200 (application/json)
+
+    + Attributes
+
+        + program_id : 1 (number) - program id  of recently created program        
             
 
 # Group Transmission - the actual call or action
