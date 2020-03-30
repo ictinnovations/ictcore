@@ -14,6 +14,7 @@ class Spool
 
   /** @const */
   const STATUS_QUEUED = 'queued';
+  const STATUS_STARTED = 'started';
   const STATUS_CONNECTED = 'connected';
   const STATUS_DONE = 'done'; // when we are not sure if failed or completed
   const STATUS_COMPLETED = 'completed';
@@ -247,6 +248,9 @@ class Spool
       return;
     }
     switch ($status) {
+      case Spool::STATUS_STARTED:
+        $this->time_start = time();
+        break;
       case Spool::STATUS_CONNECTED:
         $this->time_connect = time();
         break;

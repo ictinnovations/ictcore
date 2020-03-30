@@ -86,8 +86,7 @@ class Core
       $oResponse->spool_id = $oTransmission->oSpool->spool_id;
     }
     Corelog::log('Attempting with spool_id : ' . $oTransmission->oSpool->spool_id, Corelog::FLOW);
-    $oTransmission->oSpool->time_start = time();
-
+    $oTransmission->oSpool->status = Spool::STATUS_STARTED;
     // Trigger program to handle further actions
     $oTransmission->status = Transmission::STATUS_PROCESSING;
 
