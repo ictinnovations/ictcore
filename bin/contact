@@ -104,7 +104,11 @@ class ContactCli
     // adding contact
     foreach ($csv_data as $csv_values) {
       try {
-        $aContact = array_combine($this->csv_columns, $csv_values);
+        if (count($csv_values) > 1) {
+          $aContact = array_combine($this->csv_columns, $csv_values);
+        } else {
+          $aContact = array_combine(array('phone'), $csv_values);
+        }
         $this->add_contact($aContact);
         $count++;
       } catch (CoreException $e) {
