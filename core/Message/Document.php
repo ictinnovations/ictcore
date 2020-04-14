@@ -144,6 +144,7 @@ class Document extends Message
       'text' => 'text/plain',
       'htm'  => 'text/htm',
       'html' => 'text/html',
+      */
       // office files
       'ppt'  => 'application/vnd.ms-powerpoint',
       'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
@@ -154,7 +155,6 @@ class Document extends Message
       'xls'  => 'application/vnd.ms-excel',
       'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'ods'  => 'application/vnd.oasis.opendocument.spreadsheet'
-      */
   );
 
   public function __construct($document_id = NULL)
@@ -430,11 +430,13 @@ class Document extends Message
       case 'xls':
       case 'ods':
         Corelog::log("Converting office document into pdf", Corelog::CRUD);
+        global $path_cache;
+        $home_dir = $path_cache; // home directory is required to save / read office configurations
+        $target_dir = pathinfo($sourceFile, PATHINFO_DIRNAME); // use source directory as target directory
+        $include_path = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'; // required to include all required jvm
         $office_binary = \ICT\Core\sys_which('libreoffice', '/usr/bin');
-        $target_dir = dirname($sourceFile);
-        $target_file = basename($sourceFile).'.pdf';
-        $oConverter = new OfficeConverter($sourceFile, $target_dir, $office_binary);
-        $pdfFile = $oConverter->convertTo($target_file);
+        $result = exec("export HOME=$home_dir && export PATH=$include_path && $office_binary --headless --convert-to pdf $sourceFile  --outdir $target_dir");
+        $pdfFile = str_replace(pathinfo($sourceFile, PATHINFO_EXTENSION), 'pdf', $sourceFile);
         break;
       default:
         Corelog::log("Unknown file type assume it as pdf", Corelog::CRUD);
