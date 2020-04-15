@@ -347,33 +347,21 @@ class Document extends Message
       }
     }
 
-    $page_arg = '';
-    if ($this->size_y > 595 && $this->size_x < $this->size_y) {
-      // rotate
-      $page_arg .= " -c \"<</Orientation 0>> setpagedevice\"";
-      // swap
-      list($this->size_y, $this->size_x) = array($this->size_x, $this->size_y);
-    }
-
-    if ($this->size_y != 595 || $this->size_x > 842) {
-      if ($this->size_x > 842) {
-        $this->size_x = 842; // height must be limited to A4 height (842)
-      }
-      $this->size_y = 595;   // width must be EQUAL to A4 width (595)
-    }
-
-    // some time simple pdf to tiff conversion can create problem in fax sending, I don't why? 
+    // some time simple pdf to tiff conversion can create problem in fax sending, I don't why? probably we need a raster image then vector
     // but ps to tiff conversion can solve this problem
-    $cmd = \ICT\Core\sys_which('pdf2ps', '/usr/bin') . " '$pdfFile' '$pdfFile.ps'";
+    // also it will fix the image size and orientation issue
+    global $path_etc;
+    $config = "$path_etc/postscript/rotate.ps";
+    $resolution_string = $this->resolution_x . "x" . $this->resolution_y;
+    $cmd = \ICT\Core\sys_which('gs', '/usr/bin') . " -q -dNOPAUSE -dBATCH -P- -dSAFER -sDEVICE=ps2write -r$resolution_string -sOutputFile='$pdfFile.ps' -c save pop -f '$config' '$pdfFile'";
     exec($cmd);
 
-    $resolution_string = $this->resolution_x . "x" . $this->resolution_y;
     //$cmd = "convert -quiet -density -threshold 85% 150 $sourceFile -shave 65x65 -colorspace rgb -quality 100 -resample 320 $targetFile";
     // for monochrome (black/wite) color
     //$mono = ' -c "<< /HalftoneMode 1 >> setuserparams"';
     //$mono = ' -dDITHER=300 -Ilib stocht.ps -c "{ dup .9 lt { pop 0 } if } settransfer"';
     $mono = ' -dDITHER=300 -c "{ dup .85 lt { pop 0 } if } settransfer"'; // ref https://bugs.ghostscript.com/show_bug.cgi?id=694762
-    $cmd  = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -r$resolution_string -sOutputFile='$targetFile.tmp' -dFIXEDMEDIA -dDEVICEWIDTHPOINTS=$this->size_y -dDEVICEHEIGHTPOINTS=$this->size_x $mono -f '$pdfFile.ps'";
+    $cmd  = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -sOutputFile='$targetFile.tmp' $mono -f '$pdfFile.ps'";
     Corelog::log("Converting source image into fax support tiff", Corelog::CRUD, $cmd);
     exec($cmd);
     //exec("rm -rf '$sourceFile'");

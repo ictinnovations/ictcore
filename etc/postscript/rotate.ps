@@ -1,0 +1,8 @@
+%!PS
+  %   Sequence to set up for a single page size, auto fit all pages.
+  %   Autorotate A4 Letter and Legal page sizes to Portrait
+  << /Policies << /PageSize 3 >>
+     /InputAttributes currentpagedevice /InputAttributes get    %current dict
+     dup { pop 1 index exch undef } forall    % remove all page sizes
+     dup 0 << /PageSize [ 595 0 595 842 ] >> put    % [ min-w min-h max-w max-h ] max-w for letter/legal is 612, max-h for legal is 1008 or 99999
+  >> setpagedevice
