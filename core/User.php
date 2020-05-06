@@ -496,7 +496,7 @@ class User
             return $oUser;
           }
         }
-        Corelog::log('Network authentication failed', Corelog::ERROR);
+        Corelog::log('Network authentication has been failed', Corelog::ERROR);
         return false;
     }
   }
