@@ -10,6 +10,13 @@
         <action application="hangup"/>
       </condition>
     </extension>
+    <extension name="application_inbound_to">
+     <condition field="${sip_to_user}" expression="^\+?(\d+)$">
+       <action application="set" data="destination_number=${sip_to_user}">
+       <action application="lua" data="/usr/ictcore/bin/freeswitch/application.lua 0 inbound success" />
+       <action application="hangup"/>
+     </condition>
+    </extension>
   </context>
   <!-- handle failed outgoing calls -->
   <context name="ictcore_fail">
