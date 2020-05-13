@@ -93,9 +93,9 @@ Group: ict
 Summary: fax addon for ICTCore
 # for pdf and tiff handling  # TODO yudit
 %if %{rhel} < 7
-Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client libreoffice-core libtiff
+Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client libreoffice libtiff
 %else
-Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client libreoffice-core libtiff-tools
+Requires: ictcore ictcore-gateway-fax ghostscript ImageMagick poppler-utils hylafax+-client libreoffice libtiff-tools
 %endif
 
 %description fax
