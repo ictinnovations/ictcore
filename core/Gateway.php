@@ -75,6 +75,11 @@ class Gateway
     }
   }
 
+  public static function default_route()
+  {
+    return null; // no default route
+  }
+
   public static function template_dir()
   {
     return '.';

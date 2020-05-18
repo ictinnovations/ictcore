@@ -132,6 +132,12 @@ class Service
       $oProvider = Provider::load($aProvider['provider_id']);
       return $oProvider;
     }
+    $oGateway  = static::get_gateway();
+    $oProvider = $oGateway->default_route();
+    if ($oProvider) {
+      Corelog::log('Using default gateway', Corelog::NOTICE);
+      return $oProvider;
+    }
     throw new CoreException('404', 'No provider available');
   }
 

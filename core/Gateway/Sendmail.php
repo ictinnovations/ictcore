@@ -15,6 +15,8 @@ use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\Gateway;
 use ICT\Core\Provider;
+use ICT\Core\Provider\Smtp;
+use ICT\Core\Provider\Emailcmd;
 use ICT\Core\Request;
 use Swift_Attachment;
 use Swift_Mailer;
@@ -37,36 +39,32 @@ class Sendmail extends Gateway
   /** @var boolean $conn */
   protected $conn = false;
 
-  /** @var string $username */
-  protected $username;
-
-  /** @var string $password */
-  protected $password;
-
-  /** @var string $encryption */
-  protected $encryption;
-
-  /** @var string $port */
-  protected $port;
-
-  /** @var string $host */
-  protected $host;
-
-  /** @var string $type */
-  protected $type;
-
-  /** @var string $cli */
-  protected $cli;
+  /** $var Provider $oProvider */
+  protected $oProvider;
 
   public function __construct()
   {
-    $this->host = Conf::get('sendmail:host', '127.0.0.1');
-    $this->port = Conf::get('sendmail:port', '25');
-    $this->encryption = Conf::get('sendmail:encryption', null);
-    $this->username = Conf::get('sendmail:user', '');
-    $this->password = Conf::get('sendmail:pass', '');
-    $this->type = Conf::get('sendmail:type', 'sendmail');
-    $this->cli = Conf::get('sendmail:cli', '/usr/sbin/sendmail');
+    // no gateway, we have to connect directly with provider, see default_route
+  }
+
+  public static function default_route()
+  {
+    $type = Conf::get('sendmail:type', 'sendmail');
+    switch ($type) {
+      case 'smtp':
+        $oProvider = new Smtp();
+        $oProvider->host = Conf::get('sendmail:host', '127.0.0.1');
+        $oProvider->port = Conf::get('sendmail:port', '25');
+        $oProvider->encryption = Conf::get('sendmail:encryption', null);
+        $oProvider->username = Conf::get('sendmail:user', '');
+        $oProvider->password = Conf::get('sendmail:pass', '');
+        return $oProvider;
+      case 'sendmail':
+        $oProvider = new Emailcmd();
+        $oProvider->cli = Conf::get('sendmail:cli', '/usr/sbin/sendmail');
+        return $oProvider;
+    }
+    return null;
   }
 
   protected function validate_email($email)
@@ -76,15 +74,15 @@ class Sendmail extends Gateway
 
   protected function connect()
   {
-    switch ($this->type) {
+    switch ($this->oProvider->type) {
       case 'smtp':
         try {
-          $this->conn = Swift_SmtpTransport::newInstance($this->host, $this->port);
-          if (!empty($this->encryption)) {
-            $this->conn->setEncryption($this->encryption);
+          $this->conn = Swift_SmtpTransport::newInstance($this->oProvider->host, $this->oProvider->port);
+          if (!empty($this->oProvider->encryption)) {
+            $this->conn->setEncryption($this->oProvider->encryption);
           }
-          $this->conn->setUsername($this->username);
-          $this->conn->setPassword($this->password);
+          $this->conn->setUsername($this->oProvider->username);
+          $this->conn->setPassword($this->oProvider->password);
         } catch (Exception $conn_error) {
           throw new CoreException("500", "smtp connection error", $conn_error);
         }
@@ -92,7 +90,7 @@ class Sendmail extends Gateway
       case 'sendmail':
       default:
         try {
-          $this->conn = Swift_SendmailTransport::newInstance($this->cli);
+          $this->conn = Swift_SendmailTransport::newInstance($this->oProvider->cli);
         } catch (Exception $conn_error) {
           throw new CoreException("500", "sendmail connection error", $conn_error);
         }
@@ -120,18 +118,6 @@ class Sendmail extends Gateway
 
   public function send($command, Provider $oProvider = NULL)
   {
-    if (empty($oProvider)) {
-      Corelog::log("Sendmail sending commands", Corelog::CRUD, $command);
-    } else {
-      Corelog::log("Sendmail sending commands via:".$oProvider->name, Corelog::CRUD, $command);
-      $this->type = $oProvider->type;
-      $this->host = $oProvider->host;
-      $this->port = $oProvider->port;
-      $this->encryption = $oProvider->dialstring;
-      $this->username = $oProvider->username;
-      $this->password = $oProvider->password;
-    }
-
     // Convert json into data array
     $data = json_decode($command, TRUE);
 
@@ -164,6 +150,7 @@ class Sendmail extends Gateway
     }
 
     // Connect and deliver email message
+    $this->oProvider = $oProvider; // assignment required before connect, so it can consume it
     $this->connect();
     if ($this->conn) {
       try {

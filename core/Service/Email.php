@@ -58,19 +58,6 @@ class Email extends Service
     return $oGateway;
   }
 
-  public static function get_route()
-  {
-    try{
-      return parent::get_route();
-    } catch (CoreException $ex) {
-      Corelog::log($ex->getMessage(), Corelog::NOTICE);
-      Corelog::log('Using localhost as email gateway', Corelog::NOTICE);
-      $oProvider = new Smtp();
-      $oProvider->name = 'localhost';
-      return $oProvider;
-    }
-  }
-
   /**
    * ******************************************* Default message for service **
    */
