@@ -12,7 +12,7 @@
     </extension>
     <extension name="application_inbound_to">
      <condition field="${sip_to_user}" expression="^\+?(\d+)$">
-       <action application="set" data="destination_number=${sip_to_user}">
+       <action application="set" data="destination_number=${sip_to_user}"/>
        <action application="lua" data="/usr/ictcore/bin/freeswitch/application.lua 0 inbound success" />
        <action application="hangup"/>
      </condition>
