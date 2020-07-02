@@ -121,3 +121,5 @@ A trunk, 3rd party provider required to originate / terminate transmissions. ICT
 1. Sip for Voice and Fax
 2. Smpp for SMS
 3. Sendmail for Email
+4. Emailcmd for Email
+5. Http for SMS

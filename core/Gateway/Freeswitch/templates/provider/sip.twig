@@ -12,5 +12,6 @@
     <param name="register" value="{% if provider.register == 1 %}true{% else %}false{% endif %}"/>
     <param name="from-user" value="{{ provider.username }}"/>
     <param name="from-domain" value="{{ provider.host }}"/>
+    <!-- <param name="caller-id-in-from" value="true"/> -->
   </gateway>
 </include>
