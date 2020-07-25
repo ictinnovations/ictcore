@@ -18,6 +18,9 @@ use ICT\Core\Result;
 use ICT\Core\Scheme;
 use ICT\Core\Service\Fax;
 use ICT\Core\Transmission;
+use Dompdf\Dompdf;
+use ICT\Core\Token;
+use ICT\Core\Account;
 
 class Sendfax extends Program
 {
@@ -88,7 +91,48 @@ class Sendfax extends Program
     $outboundCall->destination = '[transmission:destination:phone]';
 
     $faxSend = new Fax_send();
-    $faxSend->message = $this->aResource['document']->file_name;
+    
+    $attachment = $this->aResource['document']->file_name;
+    
+    $oAccount = new Account(Account::USER_DEFAULT);
+    
+    $Setting = $oAccount->setting_read('coverpage', 'disabled');
+    
+    file_put_contents('/tmp/a.txt', $Setting, FILE_APPEND);
+    
+    if ($oAccount->setting_read('coverpage', 'disabled') == 'sendcover') {
+    
+      // Send Cover sheet with the Sender and Receiver name and current date
+      global $path_cache;
+      $coverpage_pdf = tempnam($path_cache, 'coverpage_') . '.pdf';
+      // Generate Cover page PDF
+      $dompdf = new Dompdf();
+    
+      $cover_body = '<div style="border-style: solid;"><p>&nbsp;' . date("Y-m-d") .'</p><br><p>&nbsp;To: [transmission:destination:phone]</p><p>&nbsp;Sender: [transmission:source:first_name] [transmission:source:last_name] ([transmission:source:email])' . '</p></div>';
+
+
+      $resourceToken = new Token(Token::SOURCE_ALL, $this->aResource);
+      $cover_body = $resourceToken->render_string($cover_body);
+
+
+      $dompdf->loadHtml($cover_body);
+      $dompdf->setPaper('A4', 'portrait'); // Setup the paper size and orientation
+      $dompdf->render();                   // Render the HTML as PDF
+      file_put_contents($coverpage_pdf, $dompdf->output());
+        
+      if (is_file($coverpage_pdf)) {
+        $attachment = \ICT\Core\path_prepend($attachment, $coverpage_pdf);
+      }
+    
+      $oDocument = new Document();
+      $oDocument->file_name = $attachment;
+      $oDocument->save();
+    
+      $attachment = $oDocument->file_name;
+    
+    }
+    
+    $faxSend->message = $attachment;
     $faxSend->header = $this->aResource['document']->name;
 
     $hangupCall = new Disconnect();

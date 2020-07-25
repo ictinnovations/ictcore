@@ -231,6 +231,9 @@ class Account
 
   public static function load($account_id)
   {
+    if ($account_id < 0) {
+      return new self($account_id);
+    }
     $class_name = self::getClass($account_id);
     if ($class_name) {
       Corelog::log("Creating instance of : $class_name for account: $account_id", Corelog::CRUD);
