@@ -96,10 +96,6 @@ class Sendfax extends Program
     
     $oAccount = new Account(Account::USER_DEFAULT);
     
-    $Setting = $oAccount->setting_read('coverpage', 'disabled');
-    
-    file_put_contents('/tmp/a.txt', $Setting, FILE_APPEND);
-    
     if ($oAccount->setting_read('coverpage', 'disabled') == 'sendcover') {
     
       // Send Cover sheet with the Sender and Receiver name and current date

@@ -181,7 +181,7 @@ class Account
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
-    $query = "SELECT account_id, type, username, first_name, last_name, phone, email FROM " . $from_str;
+    $query = "SELECT account_id, type, username, first_name, last_name, phone, email, created_by FROM " . $from_str;
     Corelog::log("account search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('account', $query);
     while ($data = mysql_fetch_assoc($result)) {
