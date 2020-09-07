@@ -372,13 +372,9 @@ class Program
     foreach ($methodList as $resourceLoader) {
       if (0 === strpos($resourceLoader, 'resource_load_')) {
         $aResource = $this->{$resourceLoader}();
-        if (is_object($aResource)) {
+        if (is_object($aResource)) { // only objects are allowed in resources
           $resource_name = str_replace('resource_load_', '', $resourceLoader);
           $this->aResource[$resource_name] = $aResource;
-        } else if (is_array($aResource)) {
-          foreach ($aResource as $resource_name => $resource) {
-            $this->aResource[$resource_name] = $resource;
-          }
         }
       }
     }
@@ -394,12 +390,13 @@ class Program
     $this->resource_load();
 
     foreach ($this->aResource as $name => $value) {
+      $id_field = isset($value->id) ? 'id' : $name.'_id';
       // in case of $value is not object we don't need to save its id
-      if (is_object($value) && $value->id) {
+      if (is_object($value) && $value->{$id_field}) {
         $fields = array(
             'program_id' => $this->program_id,
             'resource_type' => $name,
-            'resource_id' => $value->id
+            'resource_id' => $value->{$id_field}
         );
         DB::update(self::$table . '_resource', $fields);
       }
