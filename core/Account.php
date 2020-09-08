@@ -408,9 +408,7 @@ class Account
   public function remove_program($program_name = 'all')
   {
     Corelog::log("Removing program from: $this->account_id Program: $program_name", Corelog::CRUD);
-    $listProgram  = array();
-    $listProgram += Program::resource_search('account', $this->account_id);
-    $listProgram += Program::resource_search($this->type, $this->account_id);
+    $listProgram = Program::resource_search(array($this->type, 'account'), $this->account_id);
 
     if (!empty($listProgram)) { // no error / false
       foreach ($listProgram as $aProgram) {

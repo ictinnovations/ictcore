@@ -759,7 +759,7 @@ CREATE TABLE program_resource (
    resource_type               varchar(64)              NOT NULL default 'message',
    resource_id                 int(11) unsigned         default NULL
 ) ENGINE = InnoDB;
-CREATE INDEX program_resource_resource_type ON program_resource (resource_type);
+CREATE INDEX program_resource_resource_type ON program_resource (program_id, resource_type);
 
 /*==============================================================*/
 /* Table: application                                           */

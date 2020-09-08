@@ -248,10 +248,6 @@ class Program
   {
     Corelog::log("Constructing porgram", Corelog::LOGIC);
 
-    if (!empty($this->program_id)) {
-      $this->remove();
-    }
-
     $this->resource_load();
 
     $oScheme = $this->scheme();
@@ -412,9 +408,12 @@ class Program
   public static function resource_search($resource_type, $resource_id)
   {
     $aProgram = array();
-
-    $query = "SELECT program_id FROM " . self::$table . "_resource WHERE resource_type='%resource_type%' AND resource_id=%resource_id%";
-    $result = DB::query(self::$table . "_resource", $query, array('resource_type' => $resource_type, 'resource_id' => $resource_id));
+    
+    if (is_array($resource_type)) {
+     $resource_type = implode("','", $resource_type);
+    }
+    $query = "SELECT program_id FROM " . self::$table . "_resource WHERE resource_type IN ('$resource_type') AND resource_id=%resource_id%";
+    $result = DB::query(self::$table . "_resource", $query, array('resource_id' => $resource_id));
     while ($resource = mysql_fetch_assoc($result)) {
       $aProgram[] = $resource;
     }
