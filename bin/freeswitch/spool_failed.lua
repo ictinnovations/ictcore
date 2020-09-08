@@ -27,9 +27,13 @@ function application_fetch()
   local api_request  = ictcore_access
   local api_response = ''
 
+  -- application_data = JSON:encode must be placed before application_id, And I don't know why ?
+  api_request['application_data'] = JSON:encode(app_result)
   api_request['spool_id']         = spool_id
   api_request['application_id']   = app_id
-  api_request['application_data'] = JSON:encode(app_result)
+
+  -- disable any further execution, untill we have fresh application id
+  app_id = nil
 
   if call_status == 'active' then
     oCall:execute("curl", ictcore_url .. " post " .. UrlEncode.table(api_request))
@@ -39,6 +43,8 @@ function application_fetch()
     else
       api_response = false
     end
+    oFreeswitch.consoleLog("INFO", tostring(api_response_code))
+    oFreeswitch.consoleLog("INFO", tostring(api_response))
   elseif call_status == 'hangup' then
     api_response = oFreeAPI:executeString("curl " .. ictcore_url .. " post " .. UrlEncode.table(api_request))
   else
@@ -71,31 +77,47 @@ app_result['result']  = result_val
 app_result['response']= response
 app_result['call_id'] = tostring(env:getHeader("uuid"))
 
+app_result['time_start']   = tostring(env:getHeader("start_epoch"))
+app_result['time_connect'] = tostring(env:getHeader("answer_epoch"))
+app_result['time_end']     = tostring(env:getHeader("end_epoch"))
+app_result['amount']       = tostring(env:getHeader("billsec"))
+app_result['status']       = 'completed'
+app_result['response']     = ''
+
+if (app_result['amount'] == nil or app_result['amount'] == '') then
+  app_result['amount']     = 0
+  app_result['amount_net'] = 0
+end
+
+-- determine call status
+local time_connect = tonumber(env:getHeader("answer_epoch"))
+if (app_result['result'] == 'error' or time_connect == nil or time_connect < 1) then
+  app_result['status']   = 'failed'
+  if (app_result['response'] == '') then
+    app_result['response'] = tostring(env:getHeader("hangup_cause"))
+  end
+end
+
 -- Logging
 -- -------
 freeswitch.consoleLog("INFO", string.format("[ spool_id=%s ]\n", spool_id))
 freeswitch.consoleLog("INFO", "call hangup: " .. tostring(env:getHeader("hangup_cause")))
-
-local call_result = tostring(env:getHeader("hangup_cause"))
-
--- only update in case of failure
-app_result['status']   = "failed"
-app_result['response'] = tostring(env:getHeader("hangup_cause"))
-if app_result['response'] == 'NORMAL_CLEARING' then
-  app_result['status']   = "completed"
-  app_result['response'] = ''
-end
 
 -- USER AND NETWORK INFO
 freeswitch.consoleLog("INFO", "CallerID:" .. " - " .. tostring(env:getHeader("Caller-Caller-ID-Number")))
 freeswitch.consoleLog("INFO", "CallerID Name:" .. " - " .. tostring(env:getHeader("Caller-Caller-ID-Name")))
 freeswitch.consoleLog("INFO", "Network Addr:" .. " - " .. tostring(env:getHeader("Caller-Network-Addr")))
 freeswitch.consoleLog("INFO", "Destination:" .. " - " .. tostring(env:getHeader("Caller-Destination-Number")))
-freeswitch.consoleLog("INFO", "Status:" .. " - " .. tostring(env:getHeader("state")))
-freeswitch.consoleLog("INFO", "Dialplan:" .. " - " .. tostring(env:getHeader("dialplan")))
+freeswitch.consoleLog("INFO", "Status:" .. " - " .. tostring(env:getHeader("Answer-State")))
+freeswitch.consoleLog("INFO", "Direction:" .. " - " .. tostring(env:getHeader("Caller-Direction")))
 freeswitch.consoleLog("INFO", "Call Result:" .. " - " .. app_result['status'])
+freeswitch.consoleLog("INFO", "Response:" .. " - " .. app_result['response'])
 
 -- finally submit data
 application_fetch()
+
+-- See everything
+-- dat = env:serialize()
+-- freeswitch.consoleLog("INFO","Here's everything:\n" .. dat .. "\n")
 
 freeswitch.consoleLog("INFO", "All Done")

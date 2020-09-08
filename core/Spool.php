@@ -249,19 +249,28 @@ class Spool
     }
     switch ($status) {
       case Spool::STATUS_STARTED:
-        $this->time_start = time();
+        if (empty($this->time_start)) {
+          $this->time_start = time();
+        }
         break;
       case Spool::STATUS_CONNECTED:
-        $this->time_connect = time();
+        if (empty($this->time_connect)) {
+          $this->time_connect = time();
+        }
         break;
       case Spool::STATUS_COMPLETED:
       case Spool::STATUS_FAILED:
       case Spool::STATUS_INVALID:
-        $this->time_end = time();
+        if (empty($this->time_end)) {
+          $this->time_end = time();
+        }
         break;
       case Spool::STATUS_DONE:
         // decide if spool failed or completed ?
         if (Spool::STATUS_CONNECTED == $this->status) {
+          if (empty($this->amount)) {
+            $this->amount = $this->time_end - $this->time_connect;
+          }
           $this->__set('status', Spool::STATUS_COMPLETED);
         } else {
           $this->__set('status', Spool::STATUS_FAILED);

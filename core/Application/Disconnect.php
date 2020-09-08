@@ -65,6 +65,13 @@ class Disconnect extends Application
 
   public function process()
   {
+    if (isset($this->result['status'])) {
+      if ($this->result['status'] == 'failed') {
+        return Spool::STATUS_FAILED;
+      } else if ($this->result['status'] == 'completed') {
+        return Spool::STATUS_COMPLETED;
+      }
+    }
     // TODO call duration, call response
     // no need to check result, in either case disconnect mean success
     return Spool::STATUS_DONE;

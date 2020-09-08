@@ -18,83 +18,27 @@ UrlEncode = (loadfile "/usr/ictcore/bin/freeswitch/lib/url_encode.lua")() -- one
 
 -- Hangup_Hook What to do after hangup
 -- -----------------------------------
--- In this function, first we will try to submit data from recent application and
--- then we will try to post other call related details (cdr data)
+-- In this function, we will try to submit data from recent application and
 function application_Hangup(s, status, arg)
-  -- in case call is still active
-  if oCall:ready() then
-    oCall:hangup()
-  end
-
   call_status = 'hangup'
 
   oFreeswitch.consoleLog("INFO", string.format("[ spool_id=%s ]\n", spool_id))
   oFreeswitch.consoleLog("INFO", "call hangup: " .. tostring(oCall:getVariable("hangup_cause")))
 
-  local hangupApplicationResult = {}
-  hangupApplicationResult['time_start']   = tostring(oCall:getVariable("start_epoch"))
-  hangupApplicationResult['time_connect'] = tostring(oCall:getVariable("answer_epoch"))
-  hangupApplicationResult['time_end']     = tostring(oCall:getVariable("end_epoch"))
-  hangupApplicationResult['amount']       = tostring(oCall:getVariable("duration"))
-  hangupApplicationResult['amount_net']   = tostring(oCall:getVariable("billsec"))
-  hangupApplicationResult['status']       = "completed"
-  hangupApplicationResult['response']     = ''
-
-  if (hangupApplicationResult['amount'] == nil or hangupApplicationResult['amount'] == '') then
-    hangupApplicationResult['amount']     = 0
-    hangupApplicationResult['amount_net'] = 0
-  end
-
-  -- only update in case of failure
-  local response_str = oCall:hangupCause()
-  if oCall:answered() == false then
-    hangupApplicationResult['result']   = 'error'
-    hangupApplicationResult['status']   = 'failed'
-    hangupApplicationResult['response'] = oCall:hangupCause()
-  else
-    hangupApplicationResult['result']   = 'success'
-  end
-
-  -- USER AND NETWORK INFO
-  oFreeswitch.consoleLog("INFO", "CallerID:" .. " - " .. tostring(oCall:getVariable("Caller-Caller-ID-Number")))
-  oFreeswitch.consoleLog("INFO", "CallerID Name:" .. " - " .. tostring(oCall:getVariable("Caller-Caller-ID-Name")))
-  oFreeswitch.consoleLog("INFO", "Network Addr:" .. " - " .. tostring(oCall:getVariable("Caller-Network-Addr")))
-  oFreeswitch.consoleLog("INFO", "Destination:" .. " - " .. tostring(oCall:getVariable("Caller-Destination-Number")))
-  oFreeswitch.consoleLog("INFO", "Status:" .. " - " .. tostring(oCall:getVariable("state")))
-  oFreeswitch.consoleLog("INFO", "Dialplan:" .. " - " .. tostring(oCall:getVariable("dialplan")))
-  oFreeswitch.consoleLog("INFO", "Call Result:" .. " - " .. status)
-
   -- collect data from recent application
   app_result = {}
-  app_result['extra'] = {} -- also send call end notification to server
   if aOutput ~= nil then
     for var_name_app, var_name_gateway in pairs(aOutput) do
       app_result[var_name_app] = tostring(oCall:getVariable(var_name_gateway))
     end
   end
 
-  -- if hangup application is set then also include hangup application results as extra
-  if hangupApplicationID ~= nil then
-    if (app_id ~= nil and app_id ~= hangupApplicationID) then
-      -- collect data for hangup application
-      extra_hangup_request = ictcore_access   -- include default parameters
-      extra_hangup_request['spool_id']         = spool_id
-      extra_hangup_request['application_id']   = hangupApplicationID
-      extra_hangup_request['application_data'] = hangupApplicationResult
-      -- in the array of extra data, hangup application is one element
-      extra = {}
-      extra['hangup']     = extra_hangup_request
-      app_result['extra'] = extra
-    else
-      app_id     = hangupApplicationID
-      app_result = hangupApplicationResult
-    end
+  -- if application is still exist then post its result to ictcore
+  if (app_id ~= nil and app_id ~= hangupApplicationID) then
+    application_fetch()
   end
 
-  -- finally submit data
-  application_fetch()
-
-  oFreeswitch.consoleLog("INFO", "All Done")
+  oFreeswitch.consoleLog("INFO", "Execution Done")
 end
 
 -- Application Fetch
@@ -239,7 +183,9 @@ else -- probably it is an originate request so try to read disconnect_applicatio
   hangupApplicationID = oCall:getVariable('disconnect_application_id')
 end
 
-oCall:setVariable('api_hangup_hook', '')  -- cancel default hangup hook
+-- replace default hangup hook
+oCall:setVariable('api_hangup_hook', 'lua /usr/ictcore/bin/freeswitch/spool_failed.lua ' .. spool_id .. ' ' .. hangupApplicationID .. ' success')
+oCall:setVariable('session_in_hangup_hook', 'true') -- make sure session is available in hangup function
 oCall:setHangupHook("application_Hangup") -- set hangup to a function
 -- oCall:setAutoHangup(false)                -- continue in the dialplan
 
