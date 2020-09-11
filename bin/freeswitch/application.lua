@@ -103,6 +103,7 @@ function application_execute(appData)
         end
         if var_name == 'disconnect_application_id' then
           hangupApplicationID = var_value
+          oCall:setVariable('api_hangup_hook', 'lua /usr/ictcore/bin/freeswitch/spool_failed.lua ' .. spool_id .. ' ' .. hangupApplicationID .. ' success')
         end
         oCall:setVariable(var_name, var_value)
       end
@@ -180,11 +181,12 @@ if app_id == 'inbound' then
   app_result['source']      = oCall:getVariable('caller_id_number')
   app_result['context']     = 'external' -- TODO oCall:getVariable('context')
 else -- probably it is an originate request so try to read disconnect_application_id
+-- replace default hangup hook
   hangupApplicationID = oCall:getVariable('disconnect_application_id')
+  oCall:setVariable('api_hangup_hook', 'lua /usr/ictcore/bin/freeswitch/spool_failed.lua ' .. spool_id .. ' ' .. hangupApplicationID .. ' success')
 end
 
--- replace default hangup hook
-oCall:setVariable('api_hangup_hook', 'lua /usr/ictcore/bin/freeswitch/spool_failed.lua ' .. spool_id .. ' ' .. hangupApplicationID .. ' success')
+-- also add hangup function
 oCall:setVariable('session_in_hangup_hook', 'true') -- make sure session is available in hangup function
 oCall:setHangupHook("application_Hangup") -- set hangup to a function
 -- oCall:setAutoHangup(false)                -- continue in the dialplan
