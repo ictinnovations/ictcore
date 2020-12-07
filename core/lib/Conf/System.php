@@ -40,4 +40,10 @@ class System extends Conf
     parent::merge_array($configuration);
   }
 
+  public static function set($name, $value, $permanent = FALSE, $reference = array(), $permission = Conf::PERMISSION_NODE_WRITE)
+  {
+    $reference['class'] = Conf::SYSTEM;
+    $reference += array('node_id' => Conf::NODE_ALL); // set node_id, if not already set
+    parent::set($name, $value, $permanent, $reference, $permission);
+  }
 }

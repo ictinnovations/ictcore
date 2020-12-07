@@ -39,4 +39,8 @@ class File extends Conf
     parent::merge_array($configuration);
   }
 
+  public static function set($name, $value, $permanent = FALSE, $reference = array(), $permission = Conf::PERMISSION_FILE_WRITE)
+  {
+    throw new Exception("Unsupported method", '500');
+  }
 }

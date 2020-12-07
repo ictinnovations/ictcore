@@ -40,4 +40,11 @@ class User extends Conf
     parent::merge_array($configuration);
   }
 
+  public static function set($name, $value, $permanent = FALSE, $reference = array(), $permission = Conf::PERMISSION_USER_WRITE)
+  {
+    $oSession = Session::get_instance();
+    $reference['class'] = Conf::USER;
+    $reference += array('created_by' => $oSession->get('user:user_id', null)); // set created_by, if not already set
+    parent::set($name, $value, $permanent, $reference, $permission);
+  }
 }
