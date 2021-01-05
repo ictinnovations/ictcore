@@ -2,6 +2,8 @@
 
 namespace ICT\Core;
 
+use ICT\Core\Contact;
+
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
@@ -30,7 +32,8 @@ class Campaign
       'account_id',
       'status',
       'pid',
-      'last_run'
+      'last_run',
+      'source',
   );
   private static $read_only = array(
       'campaign_id',
@@ -61,12 +64,11 @@ class Campaign
   /** @var string */
   public $status = Campaign::STATUS_NEW;
 
-  /**
-   * @property-read integer $user_id
-   * owner id of current record
-   * @var integer
-   */
-  public $user_id = NULL;
+  /** @var string */
+  public $source = '';
+
+  /** @var integer */
+  public $created_by = NULL;
   
   public function __construct($campaign_id = NULL)
   {
@@ -198,9 +200,12 @@ class Campaign
 
   public function save()
   {
+    $oAccount = new Account(Account::USER_DEFAULT);
     if ($this->account_id < 1) {
-      $oAccount = new Account(Account::USER_DEFAULT);
       $this->account_id = $oAccount->account_id;
+    }
+    if ($oAccount->setting_read('crmsettings', 'disabled') == 'ictcrm') {
+       $this->fetch_remote_group();
     }
     $data = array(
         'campaign_id' => $this->campaign_id,
@@ -209,7 +214,8 @@ class Campaign
         'cpm' => $this->cpm,
         'try_allowed' => $this->try_allowed,
         'account_id' => $this->account_id,
-        'status' => $this->status
+        'status' => $this->status,
+        'source' => $this->source
     );
 
     if (isset($data['campaign_id']) && !empty($data['campaign_id'])) {
@@ -263,5 +269,131 @@ class Campaign
       $oSchedule->delete();
     }
   }
+   
+  public function fetch_remote_group() {
+    $url = Conf::get('crm:url', '');
+    if (!empty($url)) {
+      $username = Conf::get('crm:username', '');
+      $password = Conf::get('crm:password', '');
+
+      $login_parameters = array(
+         "user_auth" => array(
+              "user_name" => $username,
+              "password" => md5($password),
+              "version" => "1"
+         ),
+         "application_name" => "RestTest",
+         "name_value_list" => array(),
+     );
+
+     $login_result =  \ICT\Core\Group::call("login", $login_parameters, $url);
+
+     $leads = $this->get_relationship_contacts($login_result->id, $this->group_id, 'leads', $url);
+
+     $contacts = $this->get_relationship_contacts($login_result->id, $this->group_id, 'contacts', $url);
+
+     $prospects = $this->get_relationship_contacts($login_result->id, $this->group_id, 'prospects', $url);
+
+     $group_data = array (
+        "name" => "Group" . time(),
+        "description" => "remote"
+     );
+
+     $result = DB::update('contact_group', $group_data, false);
+     $this->group_id = $group_data['contact_group_id']; // NOTE: DB::update using table name suffixed with _id as primary key
+     Corelog::log("New group created: $this->group_id", Corelog::CRUD);
+
+     $aContact = array();
+
+     $aContact = $this->process_each_list($leads, $aContact);
+
+     $aContact = $this->process_each_list($contacts, $aContact);
+
+     $aContact = $this->process_each_list($prospects, $aContact);
+
+     foreach($aContact as $contact_entry) {
+       $oContact = new Contact();
+       $oContact->first_name = $contact_entry['first_name'];
+       $oContact->last_name = $contact_entry['last_name'];
+       $oContact->phone = $contact_entry['phone'];
+       $oContact->email = $contact_entry['email'];
+       $oContact->save();
+       $oContact->link($this->group_id);
+     }
+   }
+   else {
+     throw new CoreException(411, "CRM Not configured");   
+   }
+
+  }
+
+  public function get_relationship_contacts($session_id, $module_id, $relationship_name, $url) {
+
+    //get session id
+    $session_id = $session_id;
+
+    //retrieve related prospect list ------------------------------ 
+
+    $get_relationships_parameters = array(
+
+         'session'=>$session_id,
+
+         //The name of the module from which to retrieve records.
+         'module_name' => 'ProspectLists',
+
+         //The ID of the specified module bean.
+         'module_id' => $module_id,
+
+         //The relationship name of the linked field from which to return records.
+         'link_field_name' => $relationship_name,
+
+         //The portion of the WHERE clause from the SQL statement used to find the related items.
+         'related_module_query' => '',
+
+         //The related fields to be returned.
+         'related_fields' => array(
+            'id',
+            'first_name',
+            'last_name',
+            'phone_mobile',
+            'email',
+            'email1'
+         ),
+
+         //For every related bean returned, specify link field names to field information.
+         'related_module_link_name_to_fields_array' => array(
+         ),
+
+         //To exclude deleted records
+         'deleted'=> '0',
+
+         //order by
+         'order_by' => '',
+
+         //offset
+         'offset' => 0
+    );
+
+    $get_relationships_result =  \ICT\Core\Group::call("get_relationships", $get_relationships_parameters, $url);
+    return $get_relationships_result;
+
+    }
+
+    public function process_each_list($module_name, $aContact) {
+
+      foreach($module_name->entry_list as $entry) {
+
+        $data = array(
+          "first_name" => $entry->name_value_list->first_name->value,
+          "last_name" => $entry->name_value_list->last_name->value,
+          "phone" => $entry->name_value_list->phone_mobile->value,
+          "email" => $entry->name_value_list->email1->value
+        );
+
+        array_push($aContact , $data);
+      }
+      return $aContact;
+
+    }
  
 }

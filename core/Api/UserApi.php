@@ -14,6 +14,8 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\User;
 use ICT\Core\User\Permission;
+use ICT\Core\User\Role;
+use ICT\Core\Conf;
 
 class UserApi extends Api
 {
@@ -36,6 +38,37 @@ class UserApi extends Api
       throw new CoreException(417, 'User creation failed');
     }
   }
+
+  /**
+   * PUT CRM Configuration
+   *
+   * @url PUT /users/$user_id/config/$config_name
+   */
+  public function config_set($user_id, $config_name, $data)
+  {
+    $this->_authorize('user_update');
+
+    $reference = array();
+    $reference['created_by'] = $user_id;
+    $reference['class']      = Conf::USER;
+
+    $config_value = $data;
+
+    Conf::set($config_name, $config_value, true, $reference, Conf::PERMISSION_USER_WRITE);
+    return true;
+  }
+
+  /**
+   * GET CRM Configuration
+   *
+   * @url GET /users/$user_id/config/$config_name
+   */
+  public function config_get($user_id, $config_name)
+  {
+    $this->_authorize('user_read');
+
+    return Conf::get($config_name, '');
+  } 
 
   /**
    * List all available users

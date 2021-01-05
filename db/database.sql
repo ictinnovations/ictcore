@@ -561,6 +561,7 @@ CREATE TABLE campaign
    contact_total             int(11)                NOT NULL default 0,
    contact_done              int(11)                NOT NULL default 0,
    status                    varchar(128)           NOT NULL default '',
+   source                    varchar(128)           NOT NULL default '',
    pid                       varchar(128)           NOT NULL default '',
    last_run                  int(11)                default NULL,
    date_created              int(11)                default NULL,

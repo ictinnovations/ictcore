@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Group;
 use SplFileInfo;
+use ICT\Core\Account;
 
 class GroupApi extends Api
 {
@@ -40,7 +41,14 @@ class GroupApi extends Api
   public function list_view($query = array())
   {
     $this->_authorize('group_list');
-    return Group::search((array)$query);
+    $oGroup = new Group();
+    $oAccount = new Account(Account::USER_DEFAULT);      
+    if ($oAccount->setting_read('crmsettings', 'disabled') == 'ictcrm') {
+          return $oGroup->get_crm_target_list();
+    }
+    else {
+      return $oGroup::search($filter);
+    }
   }
 
   /**

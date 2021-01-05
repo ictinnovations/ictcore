@@ -182,5 +182,92 @@ class Group
     }
     return $result;
   }
+
+    public function get_crm_target_list() {
+
+    $url = Conf::get('crm:url', '');
+    if (!empty($url)) {
+      $username = Conf::get('crm:username', '');
+      $password = Conf::get('crm:password', '');
+
+      $login_parameters = array(
+         "user_auth" => array(
+              "user_name" => $username,
+              "password" => md5($password),
+              "version" => "1"
+         ),
+         "application_name" => "RestTest",
+         "name_value_list" => array(),
+     );
+
+     $login_result = Group::call("login", $login_parameters, $url);
+
+     $entryArgs = array(
+         //Session id - retrieved from login call
+	'session' => $login_result->id,
+         //Module to get_entry_list for
+	'module_name' => 'ProspectLists',
+         //Order by - unused
+	'order_by' => '',
+         'query' => '',
+         //Start with the first record
+	'offset' => 0,
+         //Return the id and name fields
+	'select_fields' => array('id','name','first_name','last_name'),   
+
+         //Do not show deleted
+  	'deleted' => 0,
+    );
+
+    $list_result =Group::call('get_entry_list', $entryArgs, $url);
+    $result = array();
+
+    foreach($list_result->entry_list as $entry) {
+      $object = new \stdClass(); 
+      $object->name = $entry->name_value_list->name->value;
+      $object->group_id = $entry->name_value_list->id->value;
+
+      array_push($result, $object);
+    }
+    return $result; 
+    }
+    else {
+      throw new CoreException(411, "CRM Not configured");
+    }
+
+  }
+
+  public static function call($method, $parameters, $url)
+    {
+        ob_start();
+        $curl_request = curl_init();
+
+        curl_setopt($curl_request, CURLOPT_URL, $url);
+        curl_setopt($curl_request, CURLOPT_POST, 1);
+        curl_setopt($curl_request, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+        curl_setopt($curl_request, CURLOPT_HEADER, 1);
+        curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl_request, CURLOPT_FOLLOWLOCATION, 0);
+
+        $jsonEncodedData = json_encode($parameters);
+
+        $post = array(
+             "method" => $method,
+             "input_type" => "JSON",
+             "response_type" => "JSON",
+             "rest_data" => $jsonEncodedData
+        );
+
+        curl_setopt($curl_request, CURLOPT_POSTFIELDS, $post);
+        $result = curl_exec($curl_request);
+        curl_close($curl_request);
+
+        $result = explode("\r\n\r\n", $result, 2);
+        $response = json_decode($result[1]);
+        ob_end_flush();
+
+        return $response;
+    }
   
 }
