@@ -1,3 +1,11 @@
+ICTCore 1.1.0
+-------------
+
+Dated: 6-Jan-2021
+
+* Cover page support in both web2fax and email2fax
+* Added the support for a single field like phone number in csv file
+
 ICTCore 1.0.2
 -------------
 
