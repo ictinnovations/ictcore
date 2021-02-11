@@ -262,7 +262,7 @@ class UserApi extends Api
   /**
    * Import new users from into DB
    *
-   * @url GET /users/csv
+   * @url POST /users/csv
    */
   public function import_csv($data = array(), $mime = 'text/csv')
   {
@@ -287,7 +287,7 @@ class UserApi extends Api
     /**
      * Export all users form DB
      *
-     * @url POST /users/csv
+     * @url GET /users/csv
      */
     public function export_csv()
     {
