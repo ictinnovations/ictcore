@@ -1831,8 +1831,9 @@ list all exiting users, optionally client can filter users using query string (k
     + Body
 
             "CSV file contents"
++ Response 200
 
-+ Attributes (user)
+    + Attributes (user)
 
 ## User Role Define [/users/{user_id}/roles/{role_id}]
 
