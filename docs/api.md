@@ -194,6 +194,8 @@ User Management
 * PUT users/{user_id}/roles/{role\_id}
 * DELETE users/{user_id}/roles/{role\_id}
 * GET /users/{user_id}/accounts
+* GET /users/csv
+* POST /users/csv
 
 Trunk / Termination Providers APIs
 ----------------------------------
