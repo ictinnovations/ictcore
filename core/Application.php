@@ -168,7 +168,7 @@ class Application
     }
     $query = "SELECT application_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id, 'weight' => $weight));
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aApplication[] = $data;
     }
     Corelog::log("Application search for program: $program_id", Corelog::CRUD, $aApplication);
@@ -191,8 +191,8 @@ class Application
     if (ctype_digit(trim($application_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE application_id='%application_id%' ";
       $result = DB::query(self::$table, $query, array('application_id' => $application_id));
-      if (is_resource($result)) {
-        $application_type = mysql_result($result, 0);
+      if ($result) {
+        $application_type = $result[0];
       }
     } else {
       $application_type = $application_id;
@@ -225,7 +225,7 @@ class Application
   {
     $query = "SELECT * FROM " . self::$table . " WHERE application_id='%application_id%' ";
     $result = DB::query(self::$table, $query, array('application_id' => $this->application_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->application_id = $data['application_id'];
       $this->name = $data['name'];

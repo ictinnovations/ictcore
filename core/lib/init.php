@@ -35,7 +35,7 @@ $loader = require dirname($path_core) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTO
 include_once "common.php";    // common functions
 
 // Read database and other basic configuration from configuration file
-ConfFile::load('/etc/ictcore.conf');
+ConfFile::load($path_etc.'/ictcore.conf');
 
 // Corelog will be our default error handler
 set_error_handler(array('ICT\\Core\\Corelog', 'error_handler'), E_ALL);

@@ -18,6 +18,7 @@ require_once dirname(__FILE__) . "/lib/init.php";
 class Core
 {
 
+
   public static function statistic($aFilter = array())
   {
     $aWhere    = array();

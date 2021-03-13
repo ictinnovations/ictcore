@@ -86,7 +86,7 @@ class Group
     $query = "SELECT group_id, name, contact_total FROM " . $from_str;
     Corelog::log("group search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('group', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aGroup[] = $data;
     }
 
@@ -104,7 +104,7 @@ class Group
   {
     $query = "SELECT * FROM " . self::$table . " WHERE group_id='%group_id%' ";
     $result = DB::query(self::$table, $query, array('group_id' => $this->group_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->group_id = $data['group_id'];
       $this->name = $data['name'];

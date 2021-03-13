@@ -136,7 +136,7 @@ class Text extends Message
     $query = "SELECT text_id, name, type, length, description FROM " . $from_str;
     Corelog::log("text search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('text', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aText[] = $data;
     }
 
@@ -147,7 +147,7 @@ class Text extends Message
   {
     $query = "SELECT * FROM " . self::$table . " WHERE text_id='%text_id%' ";
     $result = DB::query(self::$table, $query, array('text_id' => $this->text_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->text_id = $data['text_id'];
       $this->name = $data['name'];

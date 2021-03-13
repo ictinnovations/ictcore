@@ -197,7 +197,7 @@ class Program
     $query = "SELECT program_id, name, type, parent_id FROM " . $from_str;
     Corelog::log("program search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('program', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aProgram[] = $data;
     }
 
@@ -210,7 +210,7 @@ class Program
     $where = "parent_id='%program_id%'";
     $query = "SELECT program_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id));
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aProgram[] = $data;
     }
     Corelog::log("Child program search for program: $program_id", Corelog::CRUD, $aProgram);
@@ -292,8 +292,8 @@ class Program
     if (ctype_digit(trim($program_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE program_id='%program_id%' ";
       $result = DB::query(self::$table, $query, array('program_id' => $program_id));
-      if (is_resource($result)) {
-        $program_type = mysql_result($result, 0);
+      if ($result) {
+        $program_type = $result[0];
       }
     } else {
       $program_type = $program_id;
@@ -326,7 +326,7 @@ class Program
   {
     $query = "SELECT * FROM " . self::$table . " WHERE program_id='%program_id%' ";
     $result = DB::query(self::$table, $query, array('program_id' => $this->program_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->program_id = $data['program_id'];
       $this->name = $data['name'];
@@ -414,7 +414,7 @@ class Program
     }
     $query = "SELECT program_id FROM " . self::$table . "_resource WHERE resource_type IN ('$resource_type') AND resource_id=%resource_id%";
     $result = DB::query(self::$table . "_resource", $query, array('resource_id' => $resource_id));
-    while ($resource = mysql_fetch_assoc($result)) {
+    forEach ($result as $resource ) {
       $aProgram[] = $resource;
     }
 

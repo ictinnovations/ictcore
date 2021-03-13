@@ -384,13 +384,13 @@ CREATE TABLE configuration
 /*==============================================================*/
 CREATE TABLE configuration_data
 (
-   configuration_id               int(11)                default NULL,
+   configuration_id               int(11)                NOT NULL,
    class                          int(11)                default 1,
    node_id                        int(11) unsigned       default 0,
-   campaign_id                    int(11) unsigned       default NULL,
+   campaign_id                    int(11) unsigned       NOT NULL,
    data                           varchar(255)           default NULL,
    date_created                   int(11)                default NULL,
-   created_by                     int(11)                default NULL,
+   created_by                     int(11)                NOT NULL,
    last_updated                   int(11)                default NULL,
    updated_by                     int(11) unsigned       default NULL,
    PRIMARY KEY (configuration_id, class, node_id, created_by, campaign_id)
@@ -604,7 +604,7 @@ DELIMITER ;
 /*==============================================================*/
 CREATE TABLE session
 (
-   session_id                     varchar(80)            default NULL,
+   session_id                     varchar(80)            NOT NULL,
    time_start                     int(11)                default 0,
    data                           text,
    PRIMARY KEY (session_id)

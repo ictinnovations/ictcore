@@ -59,6 +59,7 @@ class Api
 
   public function create_interface($interface_type = null, $root_path = null)
   {
+
     global $path_cache;
     if (!empty($interface_type) && $interface_type = 'rest') {
       // Initialize the server

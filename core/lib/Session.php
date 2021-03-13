@@ -95,13 +95,14 @@ class Session extends Data
   {
     Corelog::log("Session read requested with id: $id", Corelog::DEBUG);
     session_write_close();
-    $query = "SELECT data FROM session WHERE session_id='$id'";
-    if (!$result = mysql_query($query, $this->_db_link)) {
-      Corelog::log("Session read failed with error: " . mysql_error($this->_db_link), Corelog::WARNING);
+    $query = "SELECT data FROM session WHERE session_id='".$id."'";
+    if (!$result = DB::rawSelect($query)) {
+      Corelog::log("Session read failed with error: ", Corelog::WARNING);
       return FALSE;
     }
-    if (mysql_num_rows($result)) {
-      $row = mysql_fetch_assoc($result);
+
+    if (count($result)) {
+      $row = $result;
       $data = unserialize($row["data"]);
       if ($data instanceof Data) {
         $this->merge($data);
@@ -120,15 +121,15 @@ class Session extends Data
       $data = $this;
     }
     $values = array(
-      '%id%'   => mysql_real_escape_string($id, $this->_db_link),
-      '%data%' => mysql_real_escape_string(serialize($data), $this->_db_link)
+      '%id%'   => $id,
+      '%data%' => serialize($data)
     );
     $query = "INSERT INTO session (session_id, time_start, data)
                      VALUES ('%id%', UNIX_TIMESTAMP(), '%data%')
               ON DUPLICATE KEY UPDATE time_start=UNIX_TIMESTAMP(), data='%data%'";
     $final_query = str_replace(array_keys($values), array_values($values), $query);
-    mysql_query($final_query, $this->_db_link);
-    if (mysql_affected_rows($this->_db_link)) {
+
+    if (DB::raw_insert_delete_update($final_query)>0) {
       return TRUE;
     }
     Corelog::log("Session write failed", Corelog::WARNING);
@@ -138,7 +139,7 @@ class Session extends Data
   {
     Corelog::log("Session delete requested with id: $id", Corelog::DEBUG);
     $query = "DELETE FROM session where session_id='$id'";
-    $result = mysql_query($query, $this->_db_link);
+    $result = DB::raw_insert_delete_update($query);
     if ($result) {
       return TRUE;
     } else {
@@ -150,7 +151,7 @@ class Session extends Data
   {
     Corelog::log("Session gc requested with lif: $life", Corelog::DEBUG);
     $query = "DELETE FROM session WHERE time_start < " . (time() - $life);
-    $result = mysql_query($query, $this->_db_link);
+    $result = DB::raw_insert_delete_update($query);
     if ($result) {
       return TRUE;
     } else {
