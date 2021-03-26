@@ -23,6 +23,7 @@ class File extends Conf
 
   public static function load($file_path = NULL)
   {
+
     $configSource = is_file($file_path) ? $file_path : self::$config_file;
 
     //reading configuration file.

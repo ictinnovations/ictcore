@@ -93,7 +93,7 @@ class Result
 
     $query = "SELECT * FROM " . $from_str;
     $result = DB::query(self::$table, $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aResult[] = $data;
     }
     Corelog::log("Result search for spool", Corelog::CRUD, $aResult);
@@ -104,7 +104,7 @@ class Result
   {
     $query = "SELECT * FROM " . self::$table . " WHERE spool_result_id='%spool_result_id%'";
     $result = DB::query(self::$table, $query, array('spool_result_id' => $this->spool_result_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->spool_result_id = $data['spool_result_id'];
       $this->application_id = $data['application_id'];

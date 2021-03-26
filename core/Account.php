@@ -128,7 +128,7 @@ class Account
         $query = "SELECT account_id FROM " . self::$table . " WHERE active=1 AND created_by=%user_id%
                    ORDER BY account_id DESC LIMIT 1";
         $result = DB::query(self::$table, $query, array('user_id' => $oSession->user->user_id));
-        $data = mysql_fetch_assoc($result);
+        $data = $result[0];
         $this->account_id = $data['account_id'];
       }
       $this->_load();
@@ -184,7 +184,7 @@ class Account
     $query = "SELECT account_id, type, username, first_name, last_name, phone, email, created_by FROM " . $from_str;
     Corelog::log("account search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('account', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aAccount[] = $data;
     }
 
@@ -211,8 +211,8 @@ class Account
     if (ctype_digit(trim($account_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
       $result = DB::query(self::$table, $query, array('account_id' => $account_id));
-      if (is_resource($result)) {
-        $account_type = mysql_result($result, 0);
+      if ($result) {
+        $account_type = $result[0];
       }
     } else {
       $account_type = $account_id;
@@ -249,7 +249,7 @@ class Account
     Corelog::log("Loading account: $this->account_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE account_id='%account_id%' ";
     $result = DB::query(self::$table, $query, array('account_id' => $this->account_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->account_id = $data['account_id'];
       $this->type = $data['type'];

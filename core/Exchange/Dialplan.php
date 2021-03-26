@@ -156,7 +156,7 @@ class Dialplan
                         weight ASC, gateway_flag ASC";
     Corelog::log("dialplan search with $query", Corelog::DEBUG);
     $result = DB::query(self::$table, $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $listDialplan[] = $data;
     }
 
@@ -168,7 +168,7 @@ class Dialplan
   {
     $query = "SELECT * FROM " . self::$table . " WHERE dialplan_id='%dialplan_id%' ";
     $result = DB::query(self::$table, $query, array('dialplan_id' => $this->dialplan_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->dialplan_id = $data['dialplan_id'];
       $this->gateway_flag = $data['gateway_flag'];

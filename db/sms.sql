@@ -28,13 +28,11 @@ CREATE TABLE text
 /*==============================================================*/
 /* Desc: Dumping Default System configurations                  */
 /*==============================================================*/
--- service
-INSERT INTO configuration VALUES (NULL,'service','sms_status','0',254); --ready
+INSERT INTO configuration VALUES (NULL,'service','sms_status','0',254);
 
 /*==============================================================*/
 /* Table: insert sms module permissions                         */
 /*==============================================================*/
--- Text permissions
 INSERT INTO permission VALUES (NULL, 'text', '');
 INSERT INTO permission VALUES (NULL, 'text_create', '');
 INSERT INTO permission VALUES (NULL, 'text_list', '');

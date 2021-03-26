@@ -148,7 +148,7 @@ class Contact
     }
     Corelog::log("contact search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('contact', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aContact[] = $data;
     }
 
@@ -177,7 +177,7 @@ class Contact
   {
     $query = "SELECT * FROM " . self::$table . " WHERE contact_id='%contact_id%' ";
     $result = DB::query(self::$table, $query, array('contact_id' => $this->contact_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->contact_id = $data['contact_id'];
       $this->first_name = $data['first_name'];
@@ -199,7 +199,7 @@ class Contact
   public function delete()
   {
     Corelog::log("Contact delete", Corelog::CRUD);
-    mysql_query("DELETE from contact_link where contact_id=".$this->contact_id);
+    DB::raw_insert_delete_update("DELETE from contact_link where contact_id=".$this->contact_id);
     DB::delete(self::$table_link, 'contact_id', $this->contact_id);
     return DB::delete(self::$table, 'contact_id', $this->contact_id);
   }
@@ -303,12 +303,12 @@ class Contact
     } else {
       $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id=%contact_id% AND group_id=%group_id%";
     }
-    DB::query(self::$table, $req_query, array('contact_id' => $this->contact_id, 'group_id' => $group_id));
-    $get_link_count = mysql_query("SELECT * from contact_link");
-    $result_add = mysql_query("DELETE from contact_link where contact_id=".$this->contact_id." AND group_id=".$group_id);
-    $result = mysql_num_rows($get_link_count)-1;
+    DB::insert_delete_update(self::$table, $link_delete_query, array('contact_id' => $this->contact_id, 'group_id' => $group_id));
+    $get_link_count = DB::rawSelect("SELECT * from contact_link");
+    $result_add = DB::raw_insert_delete_update("DELETE from contact_link where contact_id=".$this->contact_id." AND group_id=".$group_id);
+    $result = count($get_link_count)-1;
     //$count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
-    //$cont_result =  mysql_num_rows($count_contact);
+    //$cont_result =  count($count_contact);
     //$udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
     Corelog::log("group contacts Deleted: ", Corelog::CRUD);
     return $result ;

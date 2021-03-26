@@ -199,7 +199,7 @@ class Document extends Message
     $query = "SELECT document_id, name, file_name, type, pages, description FROM " . $from_str;
     Corelog::log("document search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('document', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aDocument[] = $data;
     }
 
@@ -210,7 +210,7 @@ class Document extends Message
   {
     $query = "SELECT * FROM " . self::$table . " WHERE document_id='%document_id%' ";
     $result = DB::query(self::$table, $query, array('document_id' => $this->document_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->document_id = $data['document_id'];
       $this->name = $data['name'];

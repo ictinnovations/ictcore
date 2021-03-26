@@ -129,9 +129,9 @@ function do_login($user)
   }
 
   $oSession->user = $oUser;
-  ICT\Core\Conf\User::load();
+  \ICT\Core\Conf\User::load();
   Corelog::log("do_login, results", Corelog::DEBUG, $oSession->user);
-  \ICT\Core\Conf\User::load();  
+  \ICT\Core\Conf\User::load();
   return $oSession->user;
 }
 

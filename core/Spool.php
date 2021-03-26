@@ -154,7 +154,7 @@ class Spool
     $query = "SELECT spool_id, account_id, transmission_id, status, response FROM " . $from_str;
     Corelog::log("spool search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('spool', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aSpool[] = $data;
     }
 
@@ -165,7 +165,7 @@ class Spool
   {
     $query = "SELECT * FROM " . self::$table . " WHERE spool_id='%spool_id%' ";
     $result = DB::query(self::$table, $query, array('spool_id' => $this->spool_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->spool_id = $data['spool_id'];
       $this->time_spool = $data['time_spool'];

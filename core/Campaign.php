@@ -116,7 +116,7 @@ class Campaign
     $query = "SELECT c.*, p.type AS program_type FROM " . $from_str;
     Corelog::log("Campaign search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('Campaign', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aCampaign[] = $data;
     }
 
@@ -127,7 +127,7 @@ class Campaign
   {
     $query = "SELECT * FROM " . self::$table . " WHERE campaign_id='%campaign_id%' ";
     $result = DB::query(self::$table, $query, array('campaign_id' => $this->campaign_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->campaign_id = $data['campaign_id'];
       $this->program_id  = $data['program_id'];

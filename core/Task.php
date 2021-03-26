@@ -125,7 +125,7 @@ class Task
     $query = "SELECT task_id, account_id, type, action, data FROM " . $from_str;
     Corelog::log("task search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('task', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data ) {
       $aTask[] = $data;
     }
 
@@ -141,7 +141,7 @@ class Task
               WHERE status = " . Task::PENDING . "
                 AND (t.last_run IS NULL OR (t.last_run + 59) < UNIX_TIMESTAMP())"; // don't run a task twice
     $rsTask = DB::query(self::$table, $query, array());
-    while ($data = mysql_fetch_assoc($rsTask)) {
+    forEach ($rsTask as $data) {
       $aTask[] = $data;
     }
     Corelog::log("Task search", Corelog::CRUD, $aTask);
@@ -152,7 +152,7 @@ class Task
   {
     $query = "SELECT * FROM " . self::$table . " WHERE task_id='%task_id%'";
     $task = DB::query(self::$table, $query, array('task_id' => $this->task_id));
-    $data = mysql_fetch_assoc($task);
+    $data = $task;
     if ($data) {
       $this->task_id = $data['task_id'];
       $this->type = $data['type'];

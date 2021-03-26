@@ -16,7 +16,7 @@ ICTCore TODOs
   * mysql_fetch_object
   * mysql_fetch_row
   * mysql_insert_id
-  * mysql_num_rows
+  * count
   * mysql_query
   * mysql_real_escape_string
   * mysql_result

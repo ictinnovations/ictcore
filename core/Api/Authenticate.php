@@ -24,6 +24,7 @@ class AuthenticateApi extends Api
    */
   public function create($data = array())
   {
+
     $key_type = null;
     $credentials = null;
 

@@ -221,7 +221,6 @@ class Ivr extends Program
   private function _scheme_add_action($oScheme, $app_index, $aApps, $aActions) 
   {
     $app_actions = $this->_scheme_find_action($aActions, $app_index);
-    //echo "<pre>";print_r($app_actions);
     foreach($app_actions as $key => $action) {
       if ($action->pointer->linked_app_index) { 
         $aApps[$app_index]->processed = true;

@@ -96,16 +96,21 @@ class Conf extends Data
 
     $filter_string = implode(' AND ', $filter);
     // in following query ORDER BY class make sure that top level values should be overwritten specific configuration
-    $query = "SELECT c.type, c.name, cd.data FROM configuration c LEFT JOIN configuration_data cd 
-                 ON c.configuration_id = cd.configuration_id
-               WHERE $filter_string 
-               ORDER BY cd.class ASC, cd.node_id ASC, cd.created_by ASC";
-    $result = DB::query('configuration', $query);
-    if (!$result) {
-      throw new CoreException('500', 'Unable to get configuration, query failed');
-    }
 
-    while ($config = mysql_fetch_assoc($result)) {
+    $query = "SELECT c.type, c.name, cd.data FROM configuration c
+                 LEFT JOIN configuration_data cd
+                 ON c.configuration_id = cd.configuration_id
+               WHERE $filter_string
+               ORDER BY cd.class ASC, cd.node_id ASC, cd.created_by ASC";
+
+      //$query = "SELECT type, name, data FROM configuration c";
+    $result = DB::query("configuration",$query);
+
+   /* if (!$result) {
+      throw new CoreException('500', 'Unable to get configuration, query failed');
+    }*/
+
+    foreach($result as $config) {
       $type = $config['type'];
       $name = $config['name'];
       $data = $config['data'];
@@ -131,8 +136,8 @@ class Conf extends Data
     $query = "SELECT configuration_id FROM configuration
                WHERE (permission_flag & $permission)=$permission AND type='$type' AND name='$name'";
     $result = DB::query('configuration', $query);
-    if (mysql_num_rows($result)) {
-      $configuration_id = mysql_result($result, 0, 0);
+    if (count($result)) {
+      $configuration_id = $result[0][0];
     } else {
       Corelog::log("Unable to save configuration. type:$type, name:$name", Corelog::ERROR);
       return;

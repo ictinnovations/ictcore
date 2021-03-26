@@ -49,6 +49,8 @@ class Role
     if (!empty($role_id)) {
       $this->role_id = $role_id;
       $this->load();
+    }else {
+
     }
   }
 
@@ -76,7 +78,7 @@ class Role
     $query = "SELECT role_id, name FROM " . $from_str;
     Corelog::log("role search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('role', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    forEach ($result as $data) {
       $aRole[] = $data;
     }
 
@@ -88,7 +90,7 @@ class Role
     Corelog::log("Loading role: $this->role_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE role_id='%role_id%'";
     $result = DB::query(self::$table, $query, array('role_id' => $this->role_id));
-    $data = mysql_fetch_assoc($result);
+    $data = $result[0];
     if ($data) {
       $this->role_id = $data['role_id'];
       $this->name = $data['name'];
@@ -102,6 +104,7 @@ class Role
 
   private function load_permission()
   {
+
     $this->aPermission = array();
 
     $query = "SELECT rp.permission_id FROM " . self::$link_permission . " rp WHERE rp.role_id=" . $this->role_id;
