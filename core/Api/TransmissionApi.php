@@ -156,8 +156,21 @@ class TransmissionApi extends Api
   /**
    * Update existing transmission
    *
-   * no update needed
+   * @url PUT /transmissions/$transmission_id
    */
+   public function update($transmission_id, $data = array())
+   {
+    $this->_authorize('transmission_update');
+
+    $oTransmission = new Transmission($transmission_id);
+    $this->set($oTransmission, $data);
+
+    if ($oTransmission->save()) {
+      return $oTransmission;
+    } else {
+      throw new CoreException(417, 'Transmission update failed');
+    }
+  }
 
   /**
    * Delete a transmission

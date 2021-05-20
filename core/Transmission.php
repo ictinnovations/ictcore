@@ -144,7 +144,7 @@ class Transmission
    * 0 = no deleted, 1 = deleted
    * @var integer
    */
-  private $is_deleted = 0;
+  public $is_deleted = 0;
 
   /**
    * $property-read integer $campaign_id
@@ -236,6 +236,10 @@ class Transmission
           break;
         case 'after':
           $aWhere[] = "t.date_created >= $search_value";
+          break;
+
+        case 'is_deleted':
+          $aWhere[] = "t.$search_field = '$search_value'";
           break;
 
         case 'email':
