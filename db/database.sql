@@ -71,6 +71,11 @@ CREATE TRIGGER usr_insert AFTER INSERT
            NEW.email, NEW.address, NEW.active, NEW.date_created, NEW.usr_id, NULL, NULL;
   END;
 |
+CREATE TRIGGER usr_update AFTER UPDATE
+  ON usr FOR EACH ROW BEGIN
+    UPDATE account SET email = NEW.email , phone = NEW.phone WHERE type = 'account' AND created_by = NEW.usr_id limit 1;
+  END; 
+|
 DELIMITER ;
 
 /*==============================================================*/
