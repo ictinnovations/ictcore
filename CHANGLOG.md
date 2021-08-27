@@ -1,3 +1,17 @@
+ICTCore 1.2.0
+-------------
+
+Dated: 27-Aug-2021
+
+* Bugs removal
+* Configurations added
+* Freeswitch upgraded to Freeswitch 1.20
+* Dialing prefix manipulation support added
+* Api guide rewritten into blueprint api specifications
+* Provisioning API added for phones / extensions
+* API added for System statistic
+
+
 ICTCore 1.1.0
 -------------
 
@@ -12,7 +26,6 @@ ICTCore 1.0.2
 Dated: 13-May-2020
 
 * Voice TTS application and program added
-* Freeswitch upgraded to Freeswitch 1.20
 * Coversheet support added into Emailtofax prorgram
 * Fax Quality support added
 * IVR program added
@@ -21,11 +34,7 @@ Dated: 13-May-2020
 * DID and Forwarding support added for Fax ATA support
 * File formate supported added for major Office related formats
 * Multiple documents/attachments support added for fax
-* Dialing prefix manipulation support added
 * Performance and installation related improvements
-* Api guide rewritten into blueprint api specifications
-* Provisioning API added for phones / extensions
-* API added for System statistic
 
 ICTCore 0.8.0
 -------------
