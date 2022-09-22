@@ -9,9 +9,9 @@ ICTCore is a PHP and Linux based service application which support multiple gate
 
 ICTCore developed by [ICT Innovations] and following are few projects developed over ICTCore communications framework
 
-[ICTFax] open source fax server software
-[ICTDialer]  open source auto dialer software
-[ICTCRM]   open source CRM with unified communications 
+[ICTFax] open source fax server software.
+[ICTDialer]  open source auto dialer software.
+[ICTCRM]   open source CRM with unified communications. 
 
 
 Features
@@ -123,5 +123,5 @@ Contact us: [Contact Us :: ICT Innovations Pakistan](http://www.ictinnovations.c
 [ICTCore]: https://www.ictcore.org/ "ICTCore Communictions framework"
 [ICT Innovations]: https://www.ictinnovations.com/ "ICT Innovations leveraging open source in ICTs"
 [ICTFax]: https://www.ictfax.org/ "open source Fax server software"
-[ICTDialer]: https://github.com/ictinnovations/ictdialer / "open source auto diler software"
+[ICTDialer]: https://github.com/ictinnovations/ictdialer/ "open source auto diler software"
 [ICTCRM]: https://www.ictcrm.com/ "open source CRM with uified communications"
