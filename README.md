@@ -1,11 +1,18 @@
 ICTCore - A Unified Communications Framework for CTI
 ====================================================
 
-ICTCore core is open source unified communications framework for developers and integrators to rapidly develop ICT based applications using their existing development skills. By using ICTCore, developer can create communication based applications such as Auto attendant, Fax to Email, Click to Call etc.. they can program custom business logic that can control incoming and outgoing communication instances.
+[ICTCore] core is open source unified communications framework for developers and integrators to rapidly develop ICT based applications using their existing development skills. By using ICTCore, developer can create communication based applications such as Auto attendant, Fax to Email, Click to Call etc.. they can program custom business logic that can control incoming and outgoing communication instances.
 
-ICTCore having primary focus on integrated and automated communications. ICTCore goal is to be a common server-side software / back-end for CTI (computer telephony integration) related projects. Further as a framework it can be extended to develop new communication solution and services using user's existing development skills and infrastructure.
+[ICTCore] having primary focus on integrated and automated communications. ICTCore goal is to be a common server-side software / back-end for CTI (computer telephony integration) related projects. Further as a framework it can be extended to develop new communication solution and services using user's existing development skills and infrastructure.
 
-ICTCore is a PHP and Linux based service application which support multiple gateway interfaces like Freeswitch, Kannel and Sendmail further it offers inbound and outbound transmissions for voice, fax, sms and email. However main feature of ICTCore is its unified way of integration which allow different kind of services to interact with each other, for example a message can trigger a call or an inbound fax can be forwarded over email.
+[ICTCore] is a PHP and Linux based service application which support multiple gateway interfaces like Freeswitch, Kannel and Sendmail further it offers inbound and outbound transmissions for voice, fax, sms and email. However main feature of ICTCore is its unified way of integration which allow different kind of services to interact with each other, for example a message can trigger a call or an inbound fax can be forwarded over email.
+
+ICTCore developed by [ICT Innovations] and following are few projects developed over ICTCore communications framework
+
+[ICTFax] open source fax server software
+[ICTDialer]  open source auto dialer software
+[ICTCRM]   open source CRM with unified communications 
+
 
 Features
 --------
@@ -18,7 +25,7 @@ ICTCore allow developers to use multiple communication methods / services like C
 * Uses unified terminology and share-able resources for all its services
 
 ### Scenario based automation
-ICTCore have builtin support for few most commonly used scenarios, However ICTCore architecture allow developers to easily implement their own custom scenarios and requirements.
+ICTCore have builtin support for few most commonly used scenarios, However [ICTCore] architecture allow developers to easily implement their own custom scenarios and requirements.
 
 * Flexible programs and logic to allow custom scenario
 * Uses one program per scenario approach
@@ -101,7 +108,7 @@ Following is an example about sending fax by using ICTCore
 
 Get involved!
 -------------
-We believe in leveraging open source in telecommunications, providing a free platform for simple and advanced CTI applications. ICTCore was built by people like you, and we need your help to make ICTCore better! Why not participate in a useful project today? Please check docs folder to learn how to begin.
+We believe in leveraging open source in telecommunications, providing a free platform for simple and advanced CTI applications. [ICTCore] was built by people like you, and we need your help to make ICTCore better! Why not participate in a useful project today? Please check docs folder to learn how to begin.
 
 License
 -------
@@ -113,3 +120,8 @@ Website: [ICTCore website](http://ictcore.org/)
 About us: [About Us :: ICT Innovations Pakistan](http://www.ictinnovations.com/about-ict-innovations)  
 Contact us: [Contact Us :: ICT Innovations Pakistan](http://www.ictinnovations.com/contact)
 
+[ICTCore]: https://www.ictcore.org/ "ICTCore Communictions framework"
+[ICT Innovations]: https://www.ictinnovations.com/ "ICT Innovations leveraging open source in ICTs"
+[ICTFax]: https://www.ictfax.org/ "open source Fax server software"
+[ICTDialer]: https://github.com/ictinnovations/ictdialer / "open source auto diler software"
+[ICTCRM]: https://www.ictcrm.com/ "open source CRM with uified communications"
