@@ -258,4 +258,52 @@ class UserApi extends Api
     $filter['created_by'] = $user_id;
     return Account::search($filter);
   }
+
+  /**
+   * Import new users from into DB
+   *
+   * @url POST /users/csv
+   */
+  public function import_csv($data = array(), $mime = 'text/csv')
+  {
+    $this->_authorize('user_create');
+    $csv_data = explode(PHP_EOL, $data);
+    $temp = array_pop($csv_data);
+
+    // skip header row
+    $header_csv = str_getcsv($csv_data[0], ",");
+    foreach(array_slice($csv_data, 1) as $row) {
+      $row_csv = str_getcsv($row, ",");
+      $user_data = array_combine($header_csv, $row_csv);
+
+      $oUser = new User();
+      $this->set($oUser, $user_data);
+      $oUser->__set('active', intval($user_data['active']));
+      if (!$oUser->save()) {
+        throw new CoreException(417, 'Could not save User');
+      }
+    }
+
+    /**
+     * Export all users form DB
+     *
+     * @url GET /users/csv
+     */
+    public function export_csv()
+    {
+      $fields = array('username', 'passwd', 'first_name', 'last_name', 'email', 'address', 'company', 'active');
+      $query = 'SELECT ' . implode(", ", $fields) . ' FROM usr';
+      $result = DB::query('usr', $query);
+      $filepath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'users.csv';
+      $handle = fopen($filepath, 'w');
+      $head = implode(",", $fields) . "\n";
+      fwrite($handle, $head);
+      while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+        $csv = implode(",",$row) . "\n";
+        fwrite($handle, $csv);
+      }
+      fclose($handle);
+      return new SplFileInfo($filepath);
+    }
+  }
 }

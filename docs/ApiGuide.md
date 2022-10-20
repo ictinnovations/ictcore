@@ -1805,6 +1805,36 @@ list all exiting users, optionally client can filter users using query string (k
 
     + Attributes (User)
 
+### Export All Users via CSV [/users/csv]
+
+list all exiting users, optionally client can filter users using query string (key value pair) in url, while using any of following fields
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+
++ Response 200 (text/csv)
+
+    + csv (array[User])
+
+### Import All Users via CSV [/users/csv]
+
+list all exiting users, optionally client can filter users using query string (key value pair) in url, while using any of following fields
+
++ Request
+
+    + Headers
+
+            Authentication: Bearer JWT
+    + Body
+
+            "CSV file contents"
++ Response 200
+
+    + Attributes (user)
+
 ## User Role Define [/users/{user_id}/roles/{role_id}]
 
 + Parameters
