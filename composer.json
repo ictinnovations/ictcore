@@ -20,7 +20,7 @@
     "aza/thread": "^1.1",
     "twig/twig": "^1.35",
     "jacwright/restserver": "dev-master",
-    "firebase/php-jwt": "^5.0",
+    "firebase/php-jwt": "^6.0",
     "firehed/processmanager": "dev-master",
     "ncjoes/office-converter": "dev-master",
     "dompdf/dompdf": "^0.8.3"
