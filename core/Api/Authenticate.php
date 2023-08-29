@@ -26,7 +26,6 @@ class AuthenticateApi extends Api
   {
     $key_type = null;
     $credentials = null;
-
     if (isset($data['hash'])) {
       $key_type = User::AUTH_TYPE_DIGEST;
       $credentials = array('username' => null, 'password' => $data['hash']);
@@ -37,7 +36,6 @@ class AuthenticateApi extends Api
       $key_type = User::AUTH_TYPE_BASIC;
       $credentials = array('username' => null, 'password' => $data['password']);
     }
-
     if (isset($data['email'])) {
       $credentials['username'] = $data['email'];
     } else if (isset($data['username'])) {
@@ -47,7 +45,6 @@ class AuthenticateApi extends Api
     } else {
       throw new CoreException(401, 'No valid username found');
     }
-
     try {
       $oUser = User::authenticate($credentials, $key_type);
       $oUser->token = $oUser->generate_token();
@@ -55,13 +52,11 @@ class AuthenticateApi extends Api
       $oUser->expires_in = (60 * 60 * 24 * 30 * 12 * 1); // valid for one year
       $oUser->token_type = 'Bearer';
       $oUser->scope = 'All';
-
       return $oUser;
     } catch (CoreException $ex) {
       throw new CoreException(401, 'Invalid user name and password: '.$ex->getMessage());
     }
   }
-
   /**
    * Cancel current authentication token
    *

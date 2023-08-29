@@ -199,7 +199,7 @@ class Document extends Message
     $query = "SELECT document_id, name, file_name, type, pages, description FROM " . $from_str;
     Corelog::log("document search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('document', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aDocument[] = $data;
     }
 
@@ -210,7 +210,7 @@ class Document extends Message
   {
     $query = "SELECT * FROM " . self::$table . " WHERE document_id='%document_id%' ";
     $result = DB::query(self::$table, $query, array('document_id' => $this->document_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->document_id = $data['document_id'];
       $this->name = $data['name'];
@@ -361,13 +361,15 @@ class Document extends Message
     //$mono = ' -c "<< /HalftoneMode 1 >> setuserparams"';
     //$mono = ' -dDITHER=300 -Ilib stocht.ps -c "{ dup .9 lt { pop 0 } if } settransfer"';
     $mono = ' -dDITHER=300 -c "{ dup .85 lt { pop 0 } if } settransfer"'; // ref https://bugs.ghostscript.com/show_bug.cgi?id=694762
-    $cmd  = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -sOutputFile='$targetFile.tmp' $mono -f '$pdfFile.ps'";
+
+      $cmd  = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -sOutputFile='$targetFile.tmp' $mono -f '$pdfFile.ps'";
     Corelog::log("Converting source image into fax support tiff", Corelog::CRUD, $cmd);
     exec($cmd);
     //exec("rm -rf '$sourceFile'");
     // -a for append and -t for tiles i.e pages in correct sequence like A1,A2,A3,B1,B2,C1,C2,C3
     $cmd = \ICT\Core\sys_which('tiffcp', '/usr/bin') . " -x -a '$targetFile.tmp' '$targetFile'";
     exec($cmd);
+
     exec("rm -rf '$targetFile.tmp'");
 
     return $this->pages;

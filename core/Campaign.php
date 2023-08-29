@@ -116,7 +116,7 @@ class Campaign
     $query = "SELECT c.*, p.type AS program_type FROM " . $from_str;
     Corelog::log("Campaign search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('Campaign', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aCampaign[] = $data;
     }
 
@@ -127,7 +127,7 @@ class Campaign
   {
     $query = "SELECT * FROM " . self::$table . " WHERE campaign_id='%campaign_id%' ";
     $result = DB::query(self::$table, $query, array('campaign_id' => $this->campaign_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->campaign_id = $data['campaign_id'];
       $this->program_id  = $data['program_id'];
@@ -389,6 +389,9 @@ class Campaign
           "phone" => $entry->name_value_list->phone_mobile->value,
           "email" => $entry->name_value_list->email1->value
         );
+Corelog::log(print_r($data, true), Corelog::ERROR);    
+//  Corelog::log("line number 195".print_r($_instance, true), Corelog::ERROR);
+
 
         array_push($aContact , $data);
       }

@@ -264,7 +264,7 @@ class Transmission
     $query = "SELECT t.transmission_id, $owner_fields, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str . " LIMIT 5000";
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aTransmission[] = $data;
     }
 
@@ -275,7 +275,7 @@ class Transmission
   {
     $query = "SELECT * FROM " . self::$table . " WHERE transmission_id='%transmission_id%' ";
     $result = DB::query(self::$table, $query, array('transmission_id' => $this->transmission_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->transmission_id = $data['transmission_id'];
       $this->title = $data['title'];

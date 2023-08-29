@@ -83,7 +83,7 @@ class Action
     $aAction = array();
     $query = "SELECT action_id FROM " . self::$table . " WHERE application_id='%application_id%' ";
     $result = DB::query(self::$table, $query, array('application_id' => $application_id));
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aAction[] = $data;
     }
     Corelog::log("Search actions for application: $application_id", Corelog::DEBUG, $aAction);
@@ -95,7 +95,7 @@ class Action
     Corelog::log("Loading action: $this->action_id", Corelog::DEBUG);
     $query = "SELECT * FROM " . self::$table . " WHERE action_id='%action_id%' ";
     $result = DB::query(self::$table, $query, array('action_id' => $this->action_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     $this->action_id = $data['action_id'];
     $this->type = $data['type'];
     $this->action = $data['action'];

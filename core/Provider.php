@@ -125,7 +125,7 @@ class Provider
     $query = "SELECT provider_id, name, host, service_flag, node_id, type FROM " . $from_str;
     Corelog::log("provider search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query(self::$table, $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aProvider[] = $data;
     }
 
@@ -137,9 +137,11 @@ class Provider
     if (ctype_digit(trim($provider_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
       $result = DB::query(self::$table, $query, array('provider_id' => $provider_id));
-      if (is_resource($result)) {
-        $provider_type = mysql_result($result, 0);
-      }
+      if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $provider_type = $row['type'];
+    }
+
     } else {
       $provider_type = $provider_id;
       $provider_id   = null;
@@ -166,13 +168,13 @@ class Provider
       return new self($provider_id);
     }
   }
-
-  private function _load()
-  {
+private function _load()
+{
     Corelog::log("Loading provider: $this->provider_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
     $result = DB::query(self::$table, $query, array('provider_id' => $this->provider_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
+
     if ($data) {
       $this->provider_id = $data['provider_id'];
       $this->name = $data['name'];

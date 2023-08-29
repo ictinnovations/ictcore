@@ -64,7 +64,7 @@ class IB_Config
   public $version = null;
   public $is_ini = false;
   public $file_name = '';
-  public $file_path = '/usr/ictbroadcast/etc';
+  public $file_path = '/usr/ictcore/etc';
   public $gateway_flag = 0;
   public $source = '';
   public $group_name = '';
@@ -91,8 +91,8 @@ class IB_Config
     }
 
     $result = DB::query('config', "SELECT config_id FROM config WHERE file_name='$this->file_name' AND file_path='$this->file_path'");
-    if (mysql_num_rows($result)) {
-      $this->config_id = mysql_result($result, 0, 0);
+    if (mysqli_num_rows($result)) {
+      $this->config_id = mysqli_result($result, 0, 0);
     } else {
       Corelog::log("Creating new Config $this->file_name", Corelog::COMMON);
     }
@@ -113,7 +113,7 @@ class IB_Config
           'gateway_flag' => $this->gateway_flag
       );
       DB::update('config', $data);
-      $this->config_id = mysql_insert_id(DB::$link);
+      $this->config_id = mysqli_insert_id(DB::$link);
     }
 
     Corelog::log("Config file created $this->file_name", Corelog::COMMON, $this);
@@ -133,7 +133,7 @@ class IB_Config
   public function load($group_name = false, $group_child = false, $description = false, $node_id = false)
   {
     $rsConfig = DB::query('config', "SELECT * FROM config WHERE config_id=$this->config_id LIMIT 1");
-    if ($rsConfig && $config = mysql_fetch_object($rsConfig)) {
+    if ($rsConfig && $config = mysqli_fetch_object($rsConfig)) {
       $this->config_id = $config->config_id;
       $this->source = $config->source;
       $this->version = $config->version;
@@ -160,7 +160,7 @@ class IB_Config
                WHERE file_name='$this->file_name' $group_filter
                ORDER BY group_name, group_child, config_data_id";
     $rsData = DB::query('config_data', $query);
-    while ($data_row = mysql_fetch_assoc($rsData)) {
+    while ($data_row = mysqli_fetch_assoc($rsData)) {
       $this->data[] = $data_row['data'];
     }
   }
@@ -193,15 +193,15 @@ class IB_Config
       $raw_description = $this->description;
     }
 
-    $description = mysql_real_escape_string($raw_description, DB::$link);
-    $data = mysql_real_escape_string($raw_data, DB::$link);
+    $description = mysqli_real_escape_string($raw_description, DB::$link);
+    $data = mysqli_real_escape_string($raw_data, DB::$link);
 
     if ($skip_duplicate) {
       $query = "SELECT COUNT(*) FROM config_data 
                 WHERE group_name='$this->group_name' AND group_child='$this->group_child' AND data='$data' 
                   AND description='$description' AND file_name='$this->file_name'";
-      $rsQry = mysql_query($query, DB::$link);
-      if (mysql_result($rsQry, 0, 0) > 0) {
+      $rsQry = mysqli_query($query, DB::$link);
+      if (mysqli_result($rsQry, 0, 0) > 0) {
         return false;
       }
     }
@@ -238,7 +238,7 @@ class IB_Config
     // currently not fully implemented
     DB::query('config', "UPDATE config SET version=version+1 WHERE file_name='$this->file_name' LIMIT 1");
     $result = DB::query('config', "SELECT version FROM config WHERE file_name='$this->file_name' LIMIT 1");
-    $this->version = mysql_result($result, 0, 0);
+    $this->version = mysqli_result($result, 0, 0);
     return $this->version;
   }
 
@@ -288,7 +288,7 @@ class IB_Config
                 $query_filter";
     $rs1 = DB::query('config', $query);
 
-    while ($config = mysql_fetch_object($rs1)) {
+    while ($config = mysqli_fetch_object($rs1)) {
       $this->config_id = $config->config_id;
       $this->load(false, false, false, $node_id);
 
@@ -313,7 +313,7 @@ class IB_Config
   {
     // insert new record in config_node table if there is not already
     $result = DB::query('config_node', "SELECT * FROM config_node WHERE config_id=$this->config_id AND node_id=$node_id LIMIT 1");
-    if (mysql_num_rows($result) < 1) {
+    if (mysqli_num_rows($result) < 1) {
       DB::query('config_node', "INSERT INTO config_node (config_id, node_id, date_created) 
                                VALUES ($this->config_id, $node_id, UNIX_TIMESTAMP())");
     }
@@ -326,9 +326,9 @@ class IB_Config
   {
     Corelog::log("Cleaning absolute Config files", Corelog::COMMON);
     $result = DB::query('config', "SELECT config_id FROM config WHERE version < 0");
-    while ($result && $config = mysql_fetch_object($result)) {
+    while ($result && $config = mysqli_fetch_object($result)) {
       $rsData = DB::query('config_data', "SELECT * FROM config_node WHERE file_name='$config->file_name' AND version > 0");
-      if (!mysql_num_rows($rsData)) {
+      if (!mysqli_num_rows($rsData)) {
         DB::query('config_data', "DELETE FROM config_node WHERE file_name='$config->file_name'");
         DB::query('config', "DELETE FROM config WHERE config_id=$config->config_id");
       }

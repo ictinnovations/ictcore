@@ -22,34 +22,44 @@ class GroupApi extends Api
    *
    * @url POST /groups
    */
-  public function create($data = array())
-  {
-    $this->_authorize('group_create');
-    $oGroup = new Group();
-    $this->set($oGroup, $data);
-    if ($oGroup->save()) {
-      return $oGroup->group_id;
-    } else {
-      throw new CoreException(417, 'group creation failed');
-    }
-  }
+   public function create($data = array())
+   {
+       $this->_authorize('group_create');
+       $oGroup = new Group();
+       if (isset($data['group_id'])) {
+           $oGroup->group_id = $data['group_id'];
+       }
+       if (isset($data['name'])) {
+           $oGroup->name = $data['name'];
+       }
+       if (isset($data['contact_total'])) {
+         $oGroup->contact_total = $data['contact_total'];
+     }
+       if (isset($data['description'])) {
+           $oGroup->description = $data['description'];
+       }
+       if ($oGroup->save()) {
+           return $oGroup->group_id;
+       } else {
+           throw new CoreException(417, 'group creation failed');
+       }
+   }
   /**
    * List all available groups
    *
    * @url GET /groups
    */
-  public function list_view($query = array())
-  {
+public function list_view($query = array())
+{
     $this->_authorize('group_list');
     $oGroup = new Group();
-    $oAccount = new Account(Account::USER_DEFAULT);      
+    $oAccount = new Account(Account::USER_DEFAULT);
     if ($oAccount->setting_read('crmsettings', 'disabled') == 'ictcrm') {
-          return $oGroup->get_crm_target_list();
+        return $oGroup->get_crm_target_list();
+    } else {
+        return $oGroup::search($query);
     }
-    else {
-      return $oGroup::search($filter);
-    }
-  }
+}
 
   /**
    * List all available groups
@@ -84,10 +94,19 @@ class GroupApi extends Api
   public function update($group_id, $data = array())
   {
     $this->_authorize('group_update');
-
-    $oGroup = new Group($group_id);
-    $this->set($oGroup, $data);
-
+$oGroup = new Group();
+if (isset($data['group_id'])) {
+    $oGroup->group_id = $data['group_id'];
+}
+if (isset($data['name'])) {
+    $oGroup->name = $data['name'];
+}
+if (isset($data['contact_total'])) {
+  $oGroup->contact_total = $data['contact_total'];
+}
+if (isset($data['description'])) {
+    $oGroup->description = $data['description'];
+}
     if ($oGroup->save()) {
       return $oGroup;
     } else {
@@ -95,6 +114,7 @@ class GroupApi extends Api
     }
   }
 
+  
   /**
    * remove group
    *
@@ -123,7 +143,6 @@ class GroupApi extends Api
     if ($group_id == 'sample') {
       return $this->sample_csv();
     }
-
     $oGroup = new Group($group_id);
     if ($oGroup) {
       $aFilter = (array)$query;

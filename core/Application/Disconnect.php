@@ -48,13 +48,15 @@ class Disconnect extends Application
    * @var array 
    */
   public static $supportedResult = array(
-      'result' => array('success')
+    'result' => array('success')
   );
-
+  
   public function execute()
   {
     if ($this->oTransmission->service_flag == Voice::SERVICE_FLAG) {
       $oService = new Voice();
+      // var_dump($oService);
+      Corelog::log(print_r($oSeession, true), Corelog::ERROR);
     } else if ($this->oTransmission->service_flag == Fax::SERVICE_FLAG) {
       $oService = new Fax();
     }

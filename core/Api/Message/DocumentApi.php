@@ -23,22 +23,22 @@ class DocumentApi extends Api
    *
    * @url POST /documents
    * @url POST /messages/documents
-   */
+   */ 
   public function create($data = array())
   {
     $this->_authorize('document_create');
-
     $oDocument = new Document();
-    unset($data['file_name']);
-    $this->set($oDocument, $data);
-
+    $oDocument->name = isset($data['name']) ? $data['name'] : null;
+    $oDocument->file_name = isset($data['file_name']) ? $data['file_name'] : null;
+    $oDocument->type = isset($data['type']) ? $data['type'] : null;
+    $oDocument->description = isset($data['description']) ? $data['description'] : null;
     if ($oDocument->save()) {
-      return $oDocument->document_id;
+      $document_id = $oDocument->document_id;
+      return $document_id;
     } else {
       throw new CoreException(417, 'Document creation failed');
     }
   }
-
   /**
    * List all available documents
    *
@@ -60,7 +60,6 @@ class DocumentApi extends Api
   public function read($document_id)
   {
     $this->_authorize('document_read');
-
     $oDocument = new Document($document_id);
     return $oDocument;
   }
@@ -78,7 +77,6 @@ class DocumentApi extends Api
   public function upload($document_id, $data = null, $mime = 'application/pdf')
   {
     $this->_authorize('document_create');
-
     $oDocument = new Document($document_id);
     if (!empty($data)) {
       if (in_array($mime, Document::$media_supported)) {
@@ -111,7 +109,6 @@ class DocumentApi extends Api
   public function download($document_id)
   {
     $this->_authorize('document_read');
-
     $oDocument = new Document($document_id);
     Corelog::log("Document media / download requested :$oDocument->file_name", Corelog::CRUD);
     $pdf_file = $oDocument->create_pdf($oDocument->file_name, 'tif');
@@ -123,7 +120,7 @@ class DocumentApi extends Api
     }
   }
 
-  /**
+/**
    * Update existing document
    *
    * @url PUT /documents/$document_id
@@ -131,17 +128,17 @@ class DocumentApi extends Api
    */
   public function update($document_id, $data = array())
   {
-    $this->_authorize('document_update');
-
-    $oDocument = new Document($document_id);
-    unset($data['file_name']);
-    $this->set($oDocument, $data);
-
-    if ($oDocument->save()) {
-      return $oDocument;
-    } else {
-      throw new CoreException(417, 'Document update failed');
-    }
+      $this->_authorize('document_update');
+      $oDocument = new Document($document_id); 
+      unset($data['file_name']);
+      foreach ($data as $key => $value) {
+          $oDocument->$key = $value;
+      }
+      if ($oDocument->save()) {
+          return $oDocument;
+      } else {
+          throw new CoreException(417, 'Document update failed');
+      }
   }
 
   /**
@@ -153,9 +150,7 @@ class DocumentApi extends Api
   public function remove($document_id)
   {
     $this->_authorize('document_delete');
-
     $oDocument = new Document($document_id);
-
     $result = $oDocument->delete();
     if ($result) {
       return $result;

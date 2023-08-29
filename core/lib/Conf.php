@@ -105,7 +105,7 @@ class Conf extends Data
       throw new CoreException('500', 'Unable to get configuration, query failed');
     }
 
-    while ($config = mysql_fetch_assoc($result)) {
+    while ($config = mysqli_fetch_assoc($result)) {
       $type = $config['type'];
       $name = $config['name'];
       $data = $config['data'];
@@ -131,8 +131,8 @@ class Conf extends Data
     $query = "SELECT configuration_id FROM configuration
                WHERE (permission_flag & $permission)=$permission AND type='$type' AND name='$name'";
     $result = DB::query('configuration', $query);
-    if (mysql_num_rows($result)) {
-      $configuration_id = mysql_result($result, 0, 0);
+    if (mysqli_num_rows($result)) {
+      $configuration_id = static::sql_result($result, 0, 0);
     } else {
       Corelog::log("Unable to save configuration. type:$type, name:$name", Corelog::ERROR);
       return;
@@ -159,4 +159,12 @@ class Conf extends Data
       DB::query('configuration', $query);
     }
   }
+
+  public static function sql_result($result, $number, $field=0) {
+        mysqli_data_seek($result, $number);
+        $row = mysqli_fetch_array($result);
+        return $row[$field];
+  }
+
+  
 }

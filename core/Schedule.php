@@ -78,7 +78,7 @@ class Schedule extends Task
 
     $query = "SELECT * FROM " . self::$sub_table . " WHERE task_id='%task_id%'";
     $schedule = DB::query(self::$sub_table, $query, array('task_id' => $this->task_id));
-    while ($data = mysql_fetch_assoc($schedule)) {
+    while ($data = mysqli_fetch_assoc($schedule)) {
       $year[] = $data['year'];
       $month[] = $data['month'];
       $day[] = $data['day'];

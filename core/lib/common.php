@@ -173,7 +173,7 @@ function sys_which($cmd, $search_path = NULL, $self_call = false)
   }
 
   if (!$self_call) {
-    $possible_path = '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/X11R6/bin:/usr/local/apache/bin:/usr/local/mysql/bin';
+    $possible_path = '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/X11R6/bin:/usr/local/apache/bin:/usr/local/mysqli/bin';
     $possible_path .= ':' . realpath($path_lib);
     return sys_which($cmd, $possible_path, true);
   }

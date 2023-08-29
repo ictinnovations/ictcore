@@ -145,7 +145,7 @@ class Template extends Message
     $query = "SELECT template_id, name, subject, type, length, description FROM " . $from_str;
     Corelog::log("template search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('template', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aTemplate[] = $data;
     }
 
@@ -156,7 +156,7 @@ class Template extends Message
   {
     $query = "SELECT * FROM " . self::$table . " WHERE template_id='%template_id%' ";
     $result = DB::query(self::$table, $query, array('template_id' => $this->template_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->template_id = $data['template_id'];
       $this->name = $data['name'];

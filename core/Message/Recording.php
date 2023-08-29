@@ -161,7 +161,7 @@ class Recording extends Message
     $query = "SELECT recording_id, name, file_name, type, length, description FROM " . $from_str;
     Corelog::log("recording search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('recording', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aRecording[] = $data;
     }
 
@@ -172,7 +172,7 @@ class Recording extends Message
   {
     $query = "SELECT * FROM " . self::$table . " WHERE recording_id='%recording_id%' ";
     $result = DB::query(self::$table, $query, array('recording_id' => $this->recording_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->recording_id = $data['recording_id'];
       $this->name = $data['name'];
@@ -319,7 +319,7 @@ class Recording extends Message
   {
     $type = array();
     $query = DB::query('codec', 'SELECT * FROM codec WHERE active=1');
-    while ($codec = mysql_fetch_object($query)) {
+    while ($codec = mysqli_fetch_object($query)) {
       $type[$codec->codec_value] = $codec->codec_value;
     }
     return $type;

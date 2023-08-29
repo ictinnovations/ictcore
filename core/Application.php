@@ -168,7 +168,7 @@ class Application
     }
     $query = "SELECT application_id FROM " . self::$table . " WHERE $where";
     $result = DB::query(self::$table, $query, array('program_id' => $program_id, 'weight' => $weight));
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aApplication[] = $data;
     }
     Corelog::log("Application search for program: $program_id", Corelog::CRUD, $aApplication);
@@ -191,8 +191,10 @@ class Application
     if (ctype_digit(trim($application_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE application_id='%application_id%' ";
       $result = DB::query(self::$table, $query, array('application_id' => $application_id));
-      if (is_resource($result)) {
-        $application_type = mysql_result($result, 0);
+      if ($result instanceof \mysqli_result) {
+        while($row = mysqli_fetch_assoc($result)) {
+          $application_type = $row['type'];
+        }
       }
     } else {
       $application_type = $application_id;
@@ -225,7 +227,7 @@ class Application
   {
     $query = "SELECT * FROM " . self::$table . " WHERE application_id='%application_id%' ";
     $result = DB::query(self::$table, $query, array('application_id' => $this->application_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->application_id = $data['application_id'];
       $this->name = $data['name'];
@@ -340,6 +342,18 @@ class Application
     return $oResult;
   }
 
+  public function prepare()
+  {
+    // nothing to prepare
+  }
+
+  public function _prepare(Transmission &$oTransmission)
+  {
+    // Corelog::log("Prepare application : $this->type($this->application_id)", Corelog::FLOW);
+    $this->oTransmission = $oTransmission;
+    $this->prepare();
+  }
+
   public function execute()
   {
     $oService = new Service();
@@ -394,6 +408,28 @@ class Application
     if (!empty($this->result['result'])) {
       $this->result_create($this->result['result'], $this->name, Result::TYPE_APPLICATION);
     }
+
+    // then update spool counters
+    if ($spool_status == Spool::STATUS_COMPLETED) {
+      if (!empty($this->result['time_start'])) {
+        $oTransmission->oSpool->time_start = $this->result['time_start'];
+      }
+      if (!empty($this->result['time_connect'])) {
+        $oTransmission->oSpool->time_connect = $this->result['time_connect'];
+      }
+      if (!empty($this->result['time_end'])) {
+        $oTransmission->oSpool->time_end = $this->result['time_end'];
+      }
+      if (isset($this->result['amount'])) {
+        $oTransmission->oSpool->amount = $this->result['amount'];
+      }
+    }
+    if ($spool_status == Spool::STATUS_FAILED) {
+      if (isset($this->result['response'])) {
+        $oTransmission->oSpool->response = $this->result['response'];
+      }
+    }
+
     // then update spool status
     $oTransmission->oSpool->status = $spool_status;
 

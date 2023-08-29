@@ -5,11 +5,10 @@ namespace ICT\Core;
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
- * Website : http://www.ictinnovations.com/                        *
+ * Website : http://www.ictinnovations.com/                        *        
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
-// DB related functions
 class DB
 {
 
@@ -23,48 +22,52 @@ class DB
     $db_pass = Conf::get('db:pass', '');
     $db_name = Conf::get('db:name', 'ictcore');
 
-    $link = mysql_connect($db_host, $db_user, $db_pass, $link_new);
+    $link = mysqli_connect($db_host, $db_user, $db_pass);
     if (!$link) {
-      throw new CoreException('500', 'Unable to connect database server error:' . mysql_error($link));
+      throw new CoreException('500', 'Unable to connect database server error:' . mysqli_error($link));
     }
-    $result = mysql_select_db($db_name, $link);
+    $result = mysqli_select_db($link, $db_name);
     if (!$result) {
       throw new CoreException('500', 'Unable to select database');
     }
-    mysql_query("SET time_zone = '+00:00'", $link); // required to bypass server timezone settings
+    mysqli_query($link, "SET time_zone = '+00:00'"); // required to bypass server timezone settings
 
     return $link;
   }
 
   static function next_record_id($table, $field = '')
   {
-    $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'", DB::$link);
-    if (mysql_num_rows($result)) {
-      $newid = mysql_result($result, 0) + 1;
-      mysql_query("UPDATE sequence SET sequence = $newid WHERE table_name = '$table'", DB::$link);
-      return $newid;
+    $result = mysqli_query(DB::$link, "SELECT sequence FROM sequence WHERE table_name='$table'");
+    if (mysqli_num_rows($result)) {
+      while($row = mysqli_fetch_assoc($result)) {
+        $newid = $row['sequence'] + 1;
+        mysqli_query(DB::$link, "UPDATE sequence SET sequence = $newid WHERE table_name = '$table'");
+        return $newid;
+      }
     } else {
       $field = $field ? $field : $table . '_id';
-      $result = mysql_query("SELECT MAX($field) as newid FROM $table", DB::$link);
+      $result = mysqli_query(DB::$link, "SELECT MAX($field) as newid FROM $table");
       if ($result) {
-        $col_newid = mysql_result($result, 0);
-        $newid = $col_newid ? $col_newid + 1 : 1;
+        while($row = mysqli_fetch_assoc($result)) {
+          $col_newid = $row['newid'];
+          $newid = $col_newid ? $col_newid + 1 : 1;
+        }
       } else {
         $newid = 0;
       }
       $newid = $newid ? $newid + 1 : 1;
-      mysql_query("INSERT INTO sequence (table_name, sequence) VALUES ('$table', $newid)", DB::$link);
+      mysqli_query(DB::$link, "INSERT INTO sequence (table_name, sequence) VALUES ('$table', $newid)");
       return $newid;
     }
   }
 
   static function save_record_id($table, $index)
   {
-    $result = mysql_query("SELECT sequence FROM sequence WHERE table_name='$table'", DB::$link);
-    if (mysql_num_rows($result)) {
-      mysql_query("UPDATE sequence SET sequence=$index WHERE table_name='$table'", DB::$link);
+    $result = mysqli_query(DB::$link, "SELECT sequence FROM sequence WHERE table_name='$table'");
+    if (mysqli_num_rows($result)) {
+      mysqli_query(DB::$link, "UPDATE sequence SET sequence=$index WHERE table_name='$table'");
     } else {
-      mysql_query("INSERT INTO sequence (table_name, sequence) VALUES ('$table', $index)", DB::$link);
+      mysqli_query(DB::$link, "INSERT INTO sequence (table_name, sequence) VALUES ('$table', $index)");
     }
   }
 
@@ -93,7 +96,7 @@ class DB
 
     $result = self::query($DBTable, $query, array(), $check_auth);
     $aRecord = array();
-    while ($record = mysql_fetch_array($result)) {
+    while ($record = mysqli_fetch_array($result)) {
       if (!empty($record[1]) && !is_null($record[1])) {
         $id = $record[0];
         $aRecord[$id] = $record[1];
@@ -106,12 +109,12 @@ class DB
   static function column_list($table)
   {
     $aColumn = array();
-    $result = mysql_query("SHOW COLUMNS FROM $table", DB::$link);
+    $result = mysqli_query(DB::$link, "SHOW COLUMNS FROM $table");
     if ($result === FALSE) {
-      Corelog::log("DB:unknown table: $table: " . mysql_error(DB::$link), Corelog::ERROR);
+      Corelog::log("DB:unknown table: $table: " . mysqli_error(DB::$link), Corelog::ERROR);
       return FALSE;
     }
-    while ($column = mysql_fetch_assoc($result)) {
+    while ($column = mysqli_fetch_assoc($result)) {
       $column_name = $column['Field'];
       $aColumn[$column_name] = $column;
     }
@@ -132,7 +135,7 @@ class DB
         $type = strtolower(substr($column['Type'], 0, strpos($column['Type'], '(')));
         $aMap[$column_name] = array(
             'name' => $column['Field'],
-            'value' => mysql_real_escape_string($aData[$column_name], DB::$link),
+            'value' => mysqli_real_escape_string(DB::$link, $aData[$column_name]),
             'is_string' => !in_array(trim($type), $non_text), // treat as string field not is a number
             'default' => $column['Default']
         );
@@ -177,6 +180,7 @@ class DB
         'smallint', 'tinyint', 'function'
     );
 
+// session chack
     $row_id = FALSE;
     $oSession = Session::get_instance();
     $user_id = $oSession->user->user_id;
@@ -184,15 +188,15 @@ class DB
     $data = array();
     $query_start = '';
     $query_end = '';
-    //$query_data  = '';
+    // $query_data  = '';
 
-    $col_result = mysql_query("SHOW COLUMNS FROM $table", DB::$link);
+    $col_result = mysqli_query(DB::$link,  "SHOW COLUMNS FROM $table");
     if ($col_result === FALSE) {
-      Corelog::log("DB:unknown table: $table: " . mysql_error(DB::$link), Corelog::ERROR);
+      Corelog::log("DB:unknown table: $table: " . mysqli_error(DB::$link), Corelog::ERROR);
       return FALSE;
     }
     // Field      | Type     | Null | Key | Default | Extra  ==> Value
-    while ($column = mysql_fetch_assoc($col_result)) {
+    while ($column = mysqli_fetch_assoc($col_result)) {
       $column_name = $column['Field'];
 
       switch ($column_name) {
@@ -213,17 +217,20 @@ class DB
             break;
           }
         default:
+
           if (array_key_exists($column_name, $values) && $values[$column_name] !== NULL) {
             //  update <=              or if INSERT then don't include empty values
             if ($primary_key !== FALSE || ($primary_key === FALSE && $values[$column_name] != '')) {
               $columns[$column_name] = $column;
-              $columns[$column_name]['Value'] = mysql_real_escape_string($values[$column_name], DB::$link);
+              $columns[$column_name]['Value'] = mysqli_real_escape_string(DB::$link, $values[$column_name]);
             }
           }
+          
           break;
       }
     }
 
+   
     if ($primary_key === FALSE) { // new record => INSERT
       // this will fix a bug related to pooerly written loops
       if (isset($values['primary_key']) && $values['primary_key'] == $values[$table . '_id']) {
@@ -246,8 +253,8 @@ class DB
       $row_id = $columns[$primary_key]['Value'];
 
       /* // remove unchanged columns from query
-        $current_rs   = mysql_query("SELECT * FROM $table_name WHERE $primary_key = $row_id", DB::$link);
-        $current_data = mysql_fetch_assoc($current_rs);
+        $current_rs   = mysqli_query(DB::$link, "SELECT * FROM $table_name WHERE $primary_key = $row_id");
+        $current_data = mysqli_fetch_assoc($current_rs);
         foreach ($columns as $col_name => $col_value) {
         if ($col_value == $current_data[$col_name]) {
         unset($columns[$col_name]);
@@ -290,37 +297,41 @@ class DB
         $data[$key] = "$key='$value'";
       }
     }
-    $query_data = implode($data, ', ');
+    $query_data = implode(', ', $data);
     $query_full = "$query_start $query_data $query_end";
-    $qry_result = mysql_query($query_full, DB::$link);
+    $qry_result = mysqli_query(DB::$link, $query_full);
     Corelog::log("DB:update query executed on table: $table", Corelog::DEBUG, $query_full);
     if ($qry_result === FALSE) {
-      Corelog::log("DB:update error table: $table error: " . mysql_error(DB::$link), Corelog::WARNING);
+      Corelog::log("DB:update error table: $table error: " . mysqli_error(DB::$link), Corelog::WARNING);
       return FALSE;
     }
-    $values['primary_key'] = mysql_insert_id(DB::$link);
+    $values['primary_key'] = mysqli_insert_id(DB::$link);
     if ($primary_key === FALSE) {
       $values[$table . '_id'] = $values['primary_key'];
     }
     return $qry_result;
   }
-
-  public static function query_result($table, $query, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
+  public static function query_result($table, $query, $field, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
   {
-    $result = self::query($table, $query, $aValues , $check_auth, $foreign_table, $foreign_key);
-    if (is_resource($result)) {
-      return mysql_result($result, 0);
-    }
-    return null;
+    $result = self::query($table, $query, $aValues , $field, $check_auth, $foreign_table, $foreign_key);
+      if ($result instanceof \mysqli_result) {
+          while ($row = mysqli_fetch_assoc($result)) {
+              if (array_key_exists($field, $row)) {
+                  return $row[$field];
+              }
+          }
+      } else {
+          // Handle the case where the query result is not a valid mysqli_result
+          return null;
+      }
+      return null;
   }
-
   static function query($table, $req_query, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
   {
     $values = array();
     foreach ($aValues as $key => $value) {
-      $values["%$key%"] = mysql_real_escape_string($value, DB::$link);
+      $values["%$key%"] = mysqli_real_escape_string(DB::$link, $value);
     }
-
     if ($check_auth) {
       if ($foreign_table == '') {
         $values['%auth_filter%'] = self::auth_filter($table);
@@ -336,17 +347,22 @@ class DB
       $boolStr = ($values['%auth_filter%']) ? 'TRUE' : 'FALSE';
       $req_query = preg_replace('/(\w*\.)?\%auth_filter\%/', $boolStr, $req_query);
     }
-
     $final_query = str_replace(array_keys($values), array_values($values), $req_query);
     Corelog::log("DB:query executed on table: $table", Corelog::DEBUG, $final_query);
-    return mysql_query($final_query, DB::$link);
-  }
+    $result = mysqli_query(DB::$link, $final_query);
+    
+    if (!$result) {
+        Corelog::log("Error executing query: $final_query", Corelog::ERROR);
+        Corelog::log("MySQL Error: " . mysqli_error(DB::$link), Corelog::ERROR);
+    }
+    
+    return $result;
 
+  }
   static function delete($table, $primary_key, $row_id, $check_auth = FALSE, $foreign_table = '', $foreign_key = '', $foreign_value = '')
   {
     $values = array($primary_key => $row_id);
     Corelog::log("DB:delete requested on table: $table", Corelog::DEBUG);
-
     if ($check_auth) {
       $query = "DELETE FROM $table WHERE $primary_key=%$primary_key% AND %auth_filter%";
       $values[$foreign_key] = $foreign_value;
@@ -356,7 +372,6 @@ class DB
       return self::query($table, $query, $values, FALSE);
     }
   }
-
   static function auth_filter($table, $auth_key = 'created_by', $auth_value = FALSE)
   {
     if (can_access($table . '_admin')) {
@@ -374,10 +389,10 @@ class DB
           return FALSE; // null user id is not allowed
         }
         $user_key = 'created_by';
-        $auth_value = mysql_real_escape_string($auth_value, DB::$link);
+        $auth_value = mysqli_real_escape_string(DB::$link, $auth_value);
         $parent_query = "SELECT $auth_key FROM $table WHERE $auth_key=$auth_value AND $user_key=$user_value";
-        $parent_result = mysql_query($parent_query, DB::$link);
-        if (mysql_num_rows($parent_result) == NULL) {
+        $parent_result = mysqli_query(DB::$link, $parent_query);
+        if (mysqli_num_rows($parent_result) == NULL) {
           return FALSE;
         }
       }

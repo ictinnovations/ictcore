@@ -24,7 +24,9 @@ use ICT\Core\Account;
 
 class Sendfax extends Program
 {
-
+     /** @var array */
+     public $result = array();
+  
   /** @var string */
   public $name = 'sendfax';
 
@@ -55,6 +57,26 @@ class Sendfax extends Program
     );
     return $aParameters;
   }
+
+ /**
+     * Set properties of the Sendfax object.
+     * This method should be defined if needed for the Sendfax class.
+     *
+     * @param array $data Array of property values to set.
+     */
+    public function set($data = array())
+    {
+        if (isset($data['document_id'])) {
+            $this->document_id = $data['document_id'];
+        }
+        // You can add more conditions to set other properties based on $data array.
+
+        // Call the parent set method if needed
+        // parent::set($data);
+        $this->result['result'] = 'error';
+
+    }
+
 
   /**
    * Locate and load document

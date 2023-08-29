@@ -76,7 +76,7 @@ class Role
     $query = "SELECT role_id, name FROM " . $from_str;
     Corelog::log("role search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('role', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aRole[] = $data;
     }
 
@@ -88,7 +88,7 @@ class Role
     Corelog::log("Loading role: $this->role_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE role_id='%role_id%'";
     $result = DB::query(self::$table, $query, array('role_id' => $this->role_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->role_id = $data['role_id'];
       $this->name = $data['name'];
@@ -206,7 +206,7 @@ class Role
     $aPart = explode('_', $permission);
     $level = count($aPart);
     $perm = '';
-
+    
     // first check if parent permission exist and then try for sub permissions
     for ($i = 0; $i < $level; $i++) {
       $perm .= $aPart[$i];
@@ -218,5 +218,5 @@ class Role
     }
     return false;
   }
-
+  
 }

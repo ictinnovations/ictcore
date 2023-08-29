@@ -25,14 +25,19 @@ class CampaignApi extends Api
   {
     $this->_authorize('campaign_create');
     $oCampaign = new Campaign();
-    $this->set($oCampaign, $data);
-
+        if (isset($data['program_id'])) {
+          $oCampaign->program_id = $data['program_id'];
+      }     
+    if (isset($data['group_id'])) {
+      $oCampaign->group_id = $data['group_id'];
+  }
     if ($oCampaign->save()) {
       return $oCampaign->campaign_id;
     } else {
       throw new CoreException(417, 'Campaign creation failed');
     }
   }
+
 
   /**
    * List all available contacts
@@ -67,7 +72,6 @@ class CampaignApi extends Api
     $this->_authorize('campaign_update');
     $oCampaign= new Campaign($campaign_id);
     $this->set($oCampaign, $data);
-
     if ($oCampaign->save()) {
       if ($oCampaign->status == Campaign::STATUS_RUNNING) {
         $oCampaign->reload();
@@ -132,9 +136,7 @@ class CampaignApi extends Api
   public function schedule_create($campaign_id, $action, $data = array())
   {
     $this->_authorize('task_create');
-
     $oCampaign = new Campaign($campaign_id);
-
     $oSchedule = new Schedule();
     $this->set($oSchedule, $data);
     $oSchedule->type = 'campaign';
@@ -142,10 +144,8 @@ class CampaignApi extends Api
     $oSchedule->data = $oCampaign->campaign_id;
     $oSchedule->account_id = $oCampaign->account_id;
     $oSchedule->save();
-
     return $oSchedule->task_id;
   }
-
   /**
    * Cancel campaign schedule
    *

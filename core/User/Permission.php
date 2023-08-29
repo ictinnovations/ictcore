@@ -67,7 +67,7 @@ class Permission
     $query = "SELECT permission_id, name FROM " . $from_str;
     Corelog::log("permission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('permission', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aPermission[] = $data;
     }
 
@@ -79,7 +79,7 @@ class Permission
     Corelog::log("Loading permission: $this->permission_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE permission_id='%permission_id%'";
     $result = DB::query(self::$table, $query, array('permission_id' => $this->permission_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->permission_id = $data['permission_id'];
       $this->name = $data['name'];

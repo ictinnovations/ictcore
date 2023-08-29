@@ -199,7 +199,7 @@ class User
     $query = "SELECT usr_id AS user_id, username, first_name, last_name, phone, email FROM " . $from_str;
     Corelog::log("user search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('user', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aUser[] = $data;
     }
 
@@ -244,7 +244,7 @@ class User
     }
     $query = "SELECT u.* FROM " . self::$table . " u WHERE %search_field%='%search_value%'";
     $result = DB::query(self::$table, $query, array('search_field' => $search_field, 'search_value' => $search_value));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->user_id = $data['usr_id'];
       $this->role_id = $data['role_id'];
@@ -282,6 +282,7 @@ class User
   {
     $this->aPermission = array();
     $listPermission = $this->search_permission();
+    
     foreach($listPermission as $aPermission) {
       $permission_id = $aPermission['permission_id'];
       $this->aPermission[$permission_id] = $aPermission['name'];
@@ -449,8 +450,9 @@ class User
         "is_admin" => can_access('user_create', $this->user_id) ? "1" : "0",
         "api-version" => "1.0"
     );
+     $private_key_resource = openssl_pkey_get_private($private_key);
+    return JWT::encode($token, $private_key_resource, Conf::get('security:hash_type', 'RS256'));
 
-    return JWT::encode($token, $private_key, Conf::get('security:hash_type', 'RS256'));
   }
 
   public static function authenticate($access_key, $key_type = User::AUTH_TYPE_BASIC)
@@ -462,7 +464,9 @@ class User
           $key_file = Conf::get('security:public_key', '/usr/ictcore/etc/ssh/ib_node.pub');
           $hash_type = Conf::get('security:hash_type', 'RS256');
           $public_key = file_get_contents($key_file);
-          $token = JWT::decode($access_key, $public_key, array($hash_type));
+          $public_key_resource = openssl_pkey_get_public($public_key);
+          $token = JWT::decode($access_key, $public_key_resource, array($hash_type));
+
           if ($token) {
             // TODO check api-version
             if (!empty($token->user_id)) {
@@ -519,6 +523,7 @@ class User
 
     // now try with role permissions
     foreach ($this->aRole as $oRole) {
+
       if ($oRole->authorize($permission)) {
         return true;
       }

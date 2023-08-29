@@ -24,13 +24,10 @@ class ProviderApi extends Api
   public function create($data = array())
   {
     $this->_authorize('provider_create');
-
     $type = $data['type'];
     unset($data['type']);
-
     $oProvider = Provider::load($type);
     $this->set($oProvider, $data);
-
     if ($oProvider->save()) {
       return $oProvider->provider_id;
     } else {
@@ -57,7 +54,6 @@ class ProviderApi extends Api
   public function read($provider_id)
   {
     $this->_authorize('provider_read');
-
     $oProvider = Provider::load($provider_id);
     return $oProvider;
   }
@@ -70,10 +66,10 @@ class ProviderApi extends Api
   public function update($provider_id, $data = array())
   {
     $this->_authorize('provider_update');
-
     $oProvider = Provider::load($provider_id);
-    $this->set($oProvider, $data);
-
+    $oProvider->name = $data['name'];
+    $oProvider->service_flag = $data['service_flag'];
+    $oProvider->node_id = $data['node_id'];
     if ($oProvider->save()) {
       return $oProvider;
     } else {
@@ -89,9 +85,7 @@ class ProviderApi extends Api
   public function remove($provider_id)
   {
     $this->_authorize('provider_delete');
-
     $oProvider = Provider::load($provider_id);
-
     $result = $oProvider->delete();
     if ($result) {
       return $result;

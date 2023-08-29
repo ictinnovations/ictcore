@@ -128,22 +128,21 @@ class Account
         $query = "SELECT account_id FROM " . self::$table . " WHERE active=1 AND created_by=%user_id%
                    ORDER BY account_id DESC LIMIT 1";
         $result = DB::query(self::$table, $query, array('user_id' => $oSession->user->user_id));
-        $data = mysql_fetch_assoc($result);
+        $data = mysqli_fetch_assoc($result);
         $this->account_id = $data['account_id'];
       }
       $this->_load();
     }
   }
-
-  public static function construct_from_array($aAccount)
-  {
-    $oAccount = new Account();
-    foreach ($aAccount as $field => $value) {
-      $oAccount->$field = $value;
-    }
-    return $oAccount;
+//
+public function set($data) {
+  foreach ($data as $field => $value) {
+      // Only set the property if it exists in the Contact object
+      if (property_exists($this, $field)) {
+          $this->$field = $value;
+      }
   }
-
+}
   public static function search($aFilter = array())
   {
     $aAccount = array();
@@ -184,7 +183,7 @@ class Account
     $query = "SELECT account_id, type, username, first_name, last_name, phone, email, created_by FROM " . $from_str;
     Corelog::log("account search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('account', $query);
-    while ($data = mysql_fetch_assoc($result)) {
+    while ($data = mysqli_fetch_assoc($result)) {
       $aAccount[] = $data;
     }
 
@@ -208,27 +207,29 @@ class Account
 
   public static function getClass(&$account_id, $namespace = 'ICT\\Core\\Account')
   {
-    if (ctype_digit(trim($account_id))) {
-      $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
-      $result = DB::query(self::$table, $query, array('account_id' => $account_id));
-      if (is_resource($result)) {
-        $account_type = mysql_result($result, 0);
+      $account_type = ''; // Initialize the variable here
+      if (ctype_digit(trim($account_id))) {
+          $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
+          $result = DB::query(self::$table, $query, array('account_id' => $account_id));
+          if (is_resource($result)) {
+              $account_type = mysqli_result($result, 0);
+          }
+      } else {
+          $account_type = $account_id;
+          $account_id   = null;
       }
-    } else {
-      $account_type = $account_id;
-      $account_id   = null;
-    }
-    $class_name = ucfirst(strtolower(trim($account_type)));
-    if (!empty($namespace)) {
-      $class_name = $namespace . '\\' . $class_name;
-    }
-    if (class_exists($class_name, true)) {
-      return $class_name;
-    } else {
-      return false;
-    }
+      // The rest of the code remains unchanged
+      $class_name = ucfirst(strtolower(trim($account_type)));
+      if (!empty($namespace)) {
+          $class_name = $namespace . '\\' . $class_name;
+      }
+      if (class_exists($class_name, true)) {
+          return $class_name;
+      } else {
+          return false;
+      }
   }
-
+  
   public static function load($account_id)
   {
     if ($account_id < 0) {
@@ -249,7 +250,7 @@ class Account
     Corelog::log("Loading account: $this->account_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE account_id='%account_id%' ";
     $result = DB::query(self::$table, $query, array('account_id' => $this->account_id));
-    $data = mysql_fetch_assoc($result);
+    $data = mysqli_fetch_assoc($result);
     if ($data) {
       $this->account_id = $data['account_id'];
       $this->type = $data['type'];

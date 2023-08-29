@@ -19,12 +19,12 @@ class DidApi extends AccountApi
    *
    * @url POST /dids
    */
-  public function create($data = array())
+public function create($data = array(), $account_id = null)
   {
     $data['type'] = 'did';
     return parent::create($data);
   }
-
+  
   /**
    * List all available accounts
    *

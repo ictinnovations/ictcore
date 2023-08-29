@@ -10,14 +10,13 @@ namespace ICT\Core;
  * *************************************************************** */
 
 use Exception;
+use ICT\Core\CoreException;
 use ICT\Core\Exchange\Dialplan;
 
 /* Bootstrap, load all required libraries and configurations */
 require_once dirname(__FILE__) . "/lib/init.php";
-
 class Core
 {
-
   public static function statistic($aFilter = array())
   {
     $aWhere    = array();
@@ -27,50 +26,52 @@ class Core
     foreach ($aFilter as $search_field => $search_value) {
       switch($search_field) {
         case 'date_created':
-        case 'since':
-        case 'from':
-          $aWhere[] = "t.date_created >= '$search_value'";
-          break;
-        case 'user_id':
-        case 'created_by':
-          $aWhere[] = "t.created_by = '$search_value'";
-          break;
-        case 'service_flag':
+          case 'since':
+            case 'from':
+              $aWhere[] = "t.date_created >= '$search_value'";
+              break;
+              case 'user_id':
+                case 'created_by':
+                  $aWhere[] = "t.created_by = '$search_value'";
+                  break;
+                  case 'service_flag':
           $where_str_service = " AND t.service_flag='$search_value'";
           break;
-        case 'account_type':
+          case 'account_type':
           $where_str_account = " AND t.type='$search_value'";
           break;
       }
     }
     if (!empty($aWhere)) {
       $where_str = implode(' AND ', $aWhere);
+
     }
-
-    // table alias are being used to keep the filter even with JOINs
-    $user_query         = "SELECT COUNT(t.usr_id) FROM usr t";
-    $account_query      = "SELECT COUNT(t.account_id) FROM account t WHERE $where_str $where_str_account";
-    $campaign_query     = "SELECT COUNT(t.campaign_id) FROM campaign t WHERE $where_str";
-    $group_query        = "SELECT COUNT(t.group_id) FROM contact_group t WHERE $where_str";
-    $contact_query      = "SELECT COUNT(t.contact_id) FROM contact t WHERE $where_str";
-    $transmission_query = "SELECT COUNT(t.transmission_id) FROM transmission t WHERE $where_str $where_str_service";
-
-    $aStatistic = array(
-        'user_total' => DB::query_result('usr', $user_query),
-        'account_total' => DB::query_result('account', $account_query),
-        'campaign_total' => DB::query_result('campaign', $campaign_query),
-        'campaign_active' => DB::query_result('campaign', "$campaign_query AND t.status='".Campaign::STATUS_RUNNING."'"),
-        'group_total' => DB::query_result('contact_group', $group_query),
-        'contact_total' => DB::query_result('contact', $contact_query),
-        'transmission_total' => DB::query_result('transmission', $transmission_query),
-        'transmission_inbound' => DB::query_result('transmission', "$transmission_query AND t.direction='".Transmission::INBOUND."'"),
-        'transmission_outbound' => DB::query_result('transmission', "$transmission_query AND t.direction='".Transmission::OUTBOUND."'"),
-        'transmission_active' => DB::query_result('transmission', "$transmission_query AND t.status='".Transmission::STATUS_PROCESSING."'"),
-    );
-    return $aStatistic;
+// Count records from different tables
+$userTotal = DB::query_result('usr', 'SELECT COUNT(*) FROM usr', 'COUNT(*)');
+$accountTotal = DB::query_result('account', 'SELECT COUNT(*) FROM account', 'COUNT(*)');
+$didTotal = DB::query_result('account', "SELECT COUNT(*) FROM account WHERE type = 'did'", 'COUNT(*)');
+$contactTotal = DB::query_result('contact', 'SELECT COUNT(*) FROM contact', 'COUNT(*)');
+$transmissionInboundTotal = DB::query_result('transmission', "SELECT COUNT(*) FROM transmission WHERE direction = '".Transmission::INBOUND."'", 'COUNT(*)');
+$transmissionOutboundTotal = DB::query_result('transmission', "SELECT COUNT(*) FROM transmission WHERE direction = '".Transmission::OUTBOUND."'", 'COUNT(*)');
+$aStatistic = array(
+  'user_total' => intval($userTotal),
+  'account_total' => intval($accountTotal),
+  'did_total' => intval($didTotal),
+  'contact_total' => intval($contactTotal),
+  'transmission_inbound' => intval($transmissionInboundTotal),
+  'transmission_outbound' => intval($transmissionOutboundTotal),
+);
+  foreach ($aStatistic as $field => &$value) {
+      if ($value !== null) {
+          $value = intval($value); // Convert to integer
+      } else {
+          $value = 0;
+      }
   }
-
-  /**
+  return $aStatistic;
+  }
+  
+ /**
    * Initiate delivery / sending process for a previously created transmission
    * @param Transmission $oTransmission
    */
@@ -79,7 +80,7 @@ class Core
     Corelog::log('=================> transmission execution <=================', Corelog::FLOW);
     Corelog::log('Executing transmission with id : ' . $oTransmission->transmission_id, Corelog::FLOW);
 
-    // Starting a new response for current transmission
+    // Starting new response for current transmission
     $oResponse = new Response();
     if (!is_object($oTransmission->oSpool)) {
       $oTransmission->spool_create();
@@ -225,45 +226,6 @@ class Core
 
     // return our response
     return $oSession->response;
-  }
-
-  /**
-   * Locate existing account for given phone or email address
-   * @param string $account phone number or email address
-   * @param string $accountField i.e 'phone' or 'email'
-   * @return boolean|Account
-   */
-  public static function locate_account($account, $accountField = 'phone')
-  {
-    // locate an existing account
-    $accountFilter = array($accountField => $account);
-    $listAccount = Account::search($accountFilter);
-    if ($listAccount) {
-      $aAccount = array_shift($listAccount);
-      return Account::load($aAccount['account_id']);
-    }
-    return false; // no account found
-  }
-
-  /**
-   * Locate existing contact or create new for given phone or email address
-   * @param string $contact phone number or email address
-   * @param string $contactField i.e phone or email
-   * @return Contact
-   */
-  public static function locate_contact($contact, $contactField = 'phone')
-  {
-    // locate an existing contact or create it
-    $contactFilter = array($contactField => $contact);
-    $listContact = Contact::search($contactFilter);
-    if ($listContact) {
-      $aContact = array_shift($listContact);
-      $oContact = new Contact($aContact['contact_id']);
-    } else { // create a new contact
-      $oContact = new Contact();
-      $oContact->$contactField = $contact;
-    }
-    return $oContact;
   }
 
   /**

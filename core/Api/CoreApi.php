@@ -14,6 +14,7 @@ use ICT\Core\Conf;
 use ICT\Core\Core;
 use ICT\Core\Gateway\Freeswitch;
 use ICT\Core\Request;
+use ICT\Core\CoreException;
 
 class CoreApi extends Api
 {
@@ -39,14 +40,12 @@ class CoreApi extends Api
   {
     $this->_authorize('transmission_create');
     $this->_authorize('transmission_update');
-
     // now process the main request
     $oResponse = $this->process_response($spool_id, $application_id, $data, $gateway_flag);
     // and publish output
     if (!empty($oResponse->application_data)) {
       echo $oResponse->application_data;
     }
-
     // after all process data from additional app if there is any, we need to proecess it after main application
     // so it can use main application result to calculate next action while processing program
     // normally it will be used with last application to collect results of originate like applications
@@ -58,7 +57,6 @@ class CoreApi extends Api
     }
     exit();
   }
-
   function process_response($spool_id, $application_id, $application_data = array(), $gateway_flag = Freeswitch::GATEWAY_FLAG)
   {
     $oRequest = new Request();
@@ -84,7 +82,6 @@ class CoreApi extends Api
         $oRequest->destination = $application_data['destination'];
       }
     }
-
     return Core::process($oRequest);
   }
 
