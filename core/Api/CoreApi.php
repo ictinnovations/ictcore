@@ -55,7 +55,7 @@ class CoreApi extends Api
         $this->process_response($aApp['spool_id'], $aApp['application_id'], $aApp['application_data'], $aApp['gateway_flag']);
       }
     }
-    exit();
+    
   }
   function process_response($spool_id, $application_id, $application_data = array(), $gateway_flag = Freeswitch::GATEWAY_FLAG)
   {

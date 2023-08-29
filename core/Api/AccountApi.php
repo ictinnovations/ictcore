@@ -28,27 +28,27 @@ class AccountApi extends Api
    *
    * @url POST /accounts
    */
-  public function create($data = array(), $account_id = null)
-  {
-      $this->_authorize('account_create');
-  
-      if (isset($data['type']) && !empty($data['type'])) {
-          $oAccount = Account::load($data['type']);
-      } else {
-          $oAccount = new Account();
-      }
-      $aSetting = $oAccount->settings;
-      $oAccount = new Account();
-      $oAccount->account_id = $account_id;
-      $oAccount->set($data);
-      if (isset($data['settings']) && !empty($data['settings'])) {
-          $oAccount->settings = array_merge($aSetting, $oAccount->settings);
-      }
-      if ($oAccount->save()) {
-          return $oAccount->account_id;
-      } else {
-          throw new CoreException(417, 'Account creation failed');
-      }
+public function create($data = array(), $account_id = null)
+{
+    $this->_authorize('account_create');
+
+    if (isset($data['type']) && !empty($data['type'])) {
+        $oAccount = Account::load($data['type']);
+    } else {
+        $oAccount = new Account();
+    }
+    $aSetting = $oAccount->settings;
+    $oAccount = new Account();
+    $oAccount->account_id = $account_id;
+    $oAccount->set($data);
+    if (isset($data['settings']) && !empty($data['settings'])) {
+        $oAccount->settings = array_merge($aSetting, $oAccount->settings);
+    }
+    if ($oAccount->save()) {
+        return $oAccount->account_id;
+    } else {
+        throw new CoreException(417, 'Account creation failed');
+    }
   }
   
   /**
@@ -108,23 +108,23 @@ class AccountApi extends Api
    *
    * @url PUT /accounts/$account_id
    */
-  public function update($account_id, $data = array())
-  {
-    $this->_authorize('account_update');
+public function update($account_id, $data = array())
+{
+  $this->_authorize('account_update');
 
-    $oAccount = Account::load($account_id);
-    $aSetting = $oAccount->settings; 
-    $oAccount->account_id = $account_id;
-    $oAccount->set($data);
-    if (isset($data['settings']) && !empty($data['settings'])) {
-      $oAccount->settings = array_merge($aSetting, $oAccount->settings);
-    }
-    if ($oAccount->save()) {
-      return $oAccount;
-    } else {
-      throw new CoreException(417, 'Account update failed');
-    }
+  $oAccount = Account::load($account_id);
+$aSetting = $oAccount->settings; 
+$oAccount->account_id = $account_id;
+$oAccount->set($data);
+  if (isset($data['settings']) && !empty($data['settings'])) {
+    $oAccount->settings = array_merge($aSetting, $oAccount->settings);
   }
+  if ($oAccount->save()) {
+    return $oAccount;
+  } else {
+    throw new CoreException(417, 'Account update failed');
+  }
+}
 
   /**
    * Delete a account

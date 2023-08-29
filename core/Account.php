@@ -134,14 +134,14 @@ class Account
       $this->_load();
     }
   }
-//
-public function set($data) {
-  foreach ($data as $field => $value) {
-      // Only set the property if it exists in the Contact object
-      if (property_exists($this, $field)) {
-          $this->$field = $value;
-      }
+
+public function set($data) 
+{
+ foreach ($data as $field => $value) {
+  if (property_exists($this, $field)) {
+   $this->$field = $value;
   }
+ }
 }
   public static function search($aFilter = array())
   {
@@ -204,75 +204,73 @@ public function set($data) {
 
     return $aAccount;
   }
-
-  public static function getClass(&$account_id, $namespace = 'ICT\\Core\\Account')
-  {
-      $account_type = ''; // Initialize the variable here
-      if (ctype_digit(trim($account_id))) {
-          $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
-          $result = DB::query(self::$table, $query, array('account_id' => $account_id));
-          if (is_resource($result)) {
-              $account_type = mysqli_result($result, 0);
-          }
-      } else {
-          $account_type = $account_id;
-          $account_id   = null;
-      }
-      // The rest of the code remains unchanged
-      $class_name = ucfirst(strtolower(trim($account_type)));
-      if (!empty($namespace)) {
-          $class_name = $namespace . '\\' . $class_name;
-      }
-      if (class_exists($class_name, true)) {
-          return $class_name;
-      } else {
-          return false;
-      }
-  }
-  
-  public static function load($account_id)
-  {
-    if ($account_id < 0) {
-      return new self($account_id);
+public static function getClass(&$account_id, $namespace = 'ICT\\Core\\Account')
+{
+    $account_type = ''; // Initialize the variable here
+if (ctype_digit(trim($account_id))) {
+$query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
+$result = DB::query(self::$table, $query, array('account_id' => $account_id));
+if (is_resource($result)) {
+$account_type = mysqli_result($result, 0);
     }
-    $class_name = self::getClass($account_id);
-    if ($class_name) {
-      Corelog::log("Creating instance of : $class_name for account: $account_id", Corelog::CRUD);
-      return new $class_name($account_id);
-    } else {
-      Corelog::log("$class_name class not found, Creating instance of : Account", Corelog::CRUD);
-      return new self($account_id);
-    }
-  }
+} else {
+    $account_type = $account_id;
+    $account_id   = null;
+}
+// The rest of the code remains unchanged
+$class_name = ucfirst(strtolower(trim($account_type)));
+if (!empty($namespace)) {
+    $class_name = $namespace . '\\' . $class_name;
+}
+if (class_exists($class_name, true)) {
+    return $class_name;
+} else {
+    return false;
+}
+}
 
-  protected function _load()
-  {
-    Corelog::log("Loading account: $this->account_id", Corelog::CRUD);
-    $query = "SELECT * FROM " . self::$table . " WHERE account_id='%account_id%' ";
-    $result = DB::query(self::$table, $query, array('account_id' => $this->account_id));
-    $data = mysqli_fetch_assoc($result);
-    if ($data) {
-      $this->account_id = $data['account_id'];
-      $this->type = $data['type'];
-      $this->username = $data['username'];
-      $this->passwd = $data['passwd'];
-      $this->passwd_pin = $data['passwd_pin'];
-      $this->first_name = $data['first_name'];
-      $this->last_name = $data['last_name'];
-      $this->phone = $data['phone'];
-      $this->email = $data['email'];
-      $this->address = $data['address'];
-      $this->settings = json_decode($data['settings'], true);
-      $this->active = $data['active'];
-      $this->user_id = $data['created_by'];
+public static function load($account_id)
+{
+if ($account_id < 0) {
+  return new self($account_id);
+}
+$class_name = self::getClass($account_id);
+if ($class_name) {
+  Corelog::log("Creating instance of : $class_name for account: $account_id", Corelog::CRUD);
+  return new $class_name($account_id);
+} else {
+  Corelog::log("$class_name class not found, Creating instance of : Account", Corelog::CRUD);
+  return new self($account_id);
+}
+}
 
-      if (!is_array($this->settings)) {
-        $this->settings = array();
-      }
-    } else {
-      throw new CoreException('404', 'Account not found');
+protected function _load()
+{
+  Corelog::log("Loading account: $this->account_id", Corelog::CRUD);
+  $query = "SELECT * FROM " . self::$table . " WHERE account_id='%account_id%' ";
+  $result = DB::query(self::$table, $query, array('account_id' => $this->account_id));
+  $data = mysqli_fetch_assoc($result);
+  if ($data) {
+    $this->account_id = $data['account_id'];
+    $this->type = $data['type'];
+    $this->username = $data['username'];
+    $this->passwd = $data['passwd'];
+    $this->passwd_pin = $data['passwd_pin'];
+    $this->first_name = $data['first_name'];
+    $this->last_name = $data['last_name'];
+    $this->phone = $data['phone'];
+    $this->email = $data['email'];
+    $this->address = $data['address'];
+    $this->settings = json_decode($data['settings'], true);
+    $this->active = $data['active'];
+    $this->user_id = $data['created_by'];
+    if (!is_array($this->settings)) {
+      $this->settings = array();
     }
+  } else {
+    throw new CoreException('404', 'Account not found');
   }
+}
 
   public function delete()
   {
