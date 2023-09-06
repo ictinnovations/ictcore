@@ -15,26 +15,29 @@ use ICT\Core\Provider;
 
 class ProviderApi extends Api
 {
-
-  /**
-   * Create a new provider
-   *
-   * @url POST /providers
-   */
-  public function create($data = array())
-  {
-    $this->_authorize('provider_create');
-    $type = $data['type'];
-    unset($data['type']);
-    $oProvider = Provider::load($type);
-    $this->set($oProvider, $data);
-    if ($oProvider->save()) {
-      return $oProvider->provider_id;
-    } else {
-      throw new CoreException(417, 'Provider creation failed');
-    }
-  }
-
+/**
+ * Create a new provider
+ *
+ * @url POST /providers
+ */
+public function create($data = array())
+{
+$this->_authorize('provider_create');
+$type = $data['type'];
+unset($data['type']);
+$provider_id = null;
+if (isset($data['provider_id'])) {
+  $provider_id = $data['provider_id'];
+}
+$oProvider = Provider::load($type);
+$oProvider->provider_id = $provider_id;
+$oProvider->set($data);
+if ($oProvider->save()) {
+  return $oProvider->provider_id;
+} else {
+  throw new CoreException(417, 'Provider creation failed');
+}
+}
   /**
    * List all available providers
    *
@@ -45,7 +48,6 @@ class ProviderApi extends Api
     $this->_authorize('provider_list');
     return Provider::search((array)$query);
   }
-
   /**
    * Gets the provider by id
    *
@@ -57,7 +59,6 @@ class ProviderApi extends Api
     $oProvider = Provider::load($provider_id);
     return $oProvider;
   }
-
   /**
    * Update existing provider
    *
@@ -66,32 +67,31 @@ class ProviderApi extends Api
   public function update($provider_id, $data = array())
   {
     $this->_authorize('provider_update');
-    $oProvider = Provider::load($provider_id);
-    $oProvider->name = $data['name'];
-    $oProvider->service_flag = $data['service_flag'];
-    $oProvider->node_id = $data['node_id'];
+    $oProvider = new Provider();
+    $oProvider->provider_id = $provider_id;
+    $oProvider->set($data);
     if ($oProvider->save()) {
       return $oProvider;
     } else {
       throw new CoreException(417, 'Provider update failed');
     }
   }
-
   /**
    * Create a new provider
    *
    * @url DELETE /providers/$provider_id
    */
-  public function remove($provider_id)
-  {
+public function remove($provider_id)
+{
     $this->_authorize('provider_delete');
-    $oProvider = Provider::load($provider_id);
+    $oProvider = new Provider();
+    $oProvider->provider_id = $provider_id;
     $result = $oProvider->delete();
     if ($result) {
-      return $result;
+        return $result;
     } else {
-      throw new CoreException(417, 'Provider delete failed');
+        throw new CoreException(417, 'Provider delete failed');
     }
-  }
+}
 
 }

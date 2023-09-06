@@ -53,8 +53,8 @@ class Provider
   public $type = 'provider';
 
   /**
-   * @property integer $service_flag 
-   * @var integer 
+   * @property integer $service_flag
+   * @var integer
    */
   public $service_flag = NULL;
 
@@ -91,14 +91,13 @@ class Provider
   /** @var integer */
   public $active = NULL;
 
-  public function __construct($provider_id = NULL)
-  {
-    if (!empty($provider_id)) {
-      $this->provider_id = $provider_id;
-      $this->_load();
+  public function set($data) {
+    foreach ($data as $field => $value) {
+        if (property_exists($this, $field)) {
+            $this->$field = $value;
+        }
     }
   }
-
   public static function search($aFilter = array())
   {
     $aProvider = array();
@@ -131,32 +130,31 @@ class Provider
 
     return $aProvider;
   }
-
-  public static function getClass(&$provider_id, $namespace = 'ICT\\Core\\Provider')
-  {
-    if (ctype_digit(trim($provider_id))) {
-      $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
-      $result = DB::query(self::$table, $query, array('provider_id' => $provider_id));
-      if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $provider_type = $row['type'];
-    }
-
-    } else {
-      $provider_type = $provider_id;
-      $provider_id   = null;
-    }
-    $class_name = ucfirst(strtolower(trim($provider_type)));
-    if (!empty($namespace)) {
-      $class_name = $namespace . '\\' . $class_name;
-    }
-    if (class_exists($class_name, true)) {
-      return $class_name;
-    } else {
-      return false;
-    }
+public static function getClass(&$provider_id, $namespace = 'ICT\\Core\\Provider')
+{
+  $provider_type = null;
+  if (ctype_digit(trim($provider_id))) {
+    $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
+    $result = DB::query(self::$table, $query, array('provider_id' => $provider_id));
+    if ($result && $result->num_rows > 0) {
+      $row = $result->fetch_assoc();
+      $provider_type = $row['type'];
   }
 
+  } else {
+    $provider_type = $provider_id;
+    $provider_id   = null;
+  }
+  $class_name = ucfirst(strtolower(trim($provider_type)));
+  if (!empty($namespace)) {
+    $class_name = $namespace . '\\' . $class_name;
+  }
+  if (class_exists($class_name, true)) {
+    return $class_name;
+  } else {
+    return false;
+  }
+}
   public static function load($provider_id)
   {
     $class_name = self::getClass($provider_id);
@@ -247,6 +245,7 @@ private function _load()
         'provider_id' => $this->provider_id,
         'name' => $this->name,
         'service_flag' => $this->service_flag,
+        //change
         'node_id' => $this->node_id,
         'host' => $this->host,
         'port' => $this->port,

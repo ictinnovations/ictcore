@@ -19,12 +19,12 @@ class ExtensionApi extends AccountApi
    *
    * @url POST /extensions
    */
-public function create($data = array(), $account_id = null)
-{
-  $data['type'] = 'extension';
-  return parent::create($data);
-}
-
+  public function create($data = array(), $account_id = null)
+  {
+    $data['type'] = 'extension';
+    return parent::create($data);
+  }
+  
   /**
    * List all available accounts
    *

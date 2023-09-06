@@ -22,6 +22,9 @@ class DB
     $db_pass = Conf::get('db:pass', '');
     $db_name = Conf::get('db:name', 'ictcore');
 
+    if (!is_string($db_host)) {
+      throw new CoreException('500', 'Invalid database host format');
+  }
     $link = mysqli_connect($db_host, $db_user, $db_pass);
     if (!$link) {
       throw new CoreException('500', 'Unable to connect database server error:' . mysqli_error($link));

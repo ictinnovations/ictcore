@@ -168,7 +168,7 @@ class Kannel extends Gateway
         'error' => ''
     );
 
-    /* NOTE: 
+    /* NOTE:
      * under apache multithreading does not work
      * so we have to use scheduling
      */
@@ -207,7 +207,6 @@ class Kannel extends Gateway
     $config_file = $this->config_filename($type, $name);
     unlink($config_file);
   }
-
   public function config_reload()
   {
     // TODO: develop reload method for kannel

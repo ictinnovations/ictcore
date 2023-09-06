@@ -88,7 +88,7 @@ class Freeswitch extends Gateway
       $this->conn = $socket;
       return $this->conn;
     } else {
-      Corelog::log("Freeswitch connection failed", Corelog::ERROR);
+    Corelog::log("Freeswitch connection failed with error: $error_msg", Corelog::ERROR);
       return false;
     }
   }

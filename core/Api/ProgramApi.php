@@ -24,27 +24,27 @@ class ProgramApi extends Api
    * @url POST /programs
    * @url POST /programs/$program_name
    */
-  public function create($program_name = null, $data = array())
-  {
-      $this->_authorize('program_create');
-      $oProgram = Program::load($program_name);
-      $oProgram->program_id = $program_name;
-      if (isset($data['name'])) {
-        $oProgram->name = $data['name'];
-    }
-    if (isset($data['type'])) {
-        $oProgram->type = $data['type'];
-    }
-      $oProgram->set($data); // This line is causing the error
-      $this->set($oProgram, $data);
-      if ($oProgram->save()) {
-          $oProgram->deploy();
-          return $oProgram->program_id;
-      } else {
-          throw new CoreException(417, 'Program creation failed');
-      }
-  }
 
+   public function create($program_name = null, $data = array())
+   {
+       $this->_authorize('program_create');
+       $oProgram = Program::load($program_name);
+       $oProgram->program_id = $program_name;
+       if (isset($data['name'])) {
+         $oProgram->name = $data['name'];
+     }
+     if (isset($data['type'])) {
+         $oProgram->type = $data['type'];
+     }
+       $oProgram->set($data); // This line is causing the error
+       $this->set($oProgram, $data);
+       if ($oProgram->save()) {
+           $oProgram->deploy();
+           return $oProgram->program_id;
+       } else {
+           throw new CoreException(417, 'Program creation failed');
+       }
+   }
   /**
    * Initiate a new transmission for given program
    *
@@ -127,7 +127,6 @@ class ProgramApi extends Api
       throw new CoreException(417, 'Program update failed');
     }
   }
-
   /**
    * Remove a program
    *
@@ -144,5 +143,4 @@ class ProgramApi extends Api
       throw new CoreException(417, 'Program delete failed');
     }
   }
-
 }
