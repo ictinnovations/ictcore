@@ -392,10 +392,10 @@ CREATE TABLE configuration_data
    configuration_id               int(11)                default NULL,
    class                          int(11)                default 1,
    node_id                        int(11) unsigned       default 0,
-   campaign_id                    int(11) unsigned       default NULL,
+   campaign_id                    int(11) unsigned       default 0,
    data                           varchar(255)           default NULL,
    date_created                   int(11)                default NULL,
-   created_by                     int(11)                default NULL,
+   created_by                     int(11)                default 0,
    last_updated                   int(11)                default NULL,
    updated_by                     int(11) unsigned       default NULL,
    PRIMARY KEY (configuration_id, class, node_id, created_by, campaign_id)
@@ -558,8 +558,8 @@ CREATE TABLE transmission (
 CREATE TABLE campaign
 (
    campaign_id               int(11) unsigned       NOT NULL auto_increment,
-   program_id                int(11)                NOT NULL,
-   group_id                  int(11)                NOT NULL ,
+   program_id                int(11)                default NULL,
+   group_id                  int(11)                default NULL,
    account_id                int(11)                default NULL,
    cpm                       int(11)                NOT NULL default 2,
    try_allowed               int(11)                NOT NULL default 1,
@@ -630,7 +630,7 @@ CREATE TABLE spool (
    call_id                     varchar(80)              NOT NULL default '',
    status                      varchar(80)              NOT NULL default '',
    response                    varchar(80)              NOT NULL default '',
-   amount                      int(11)                  NOT NULL default 0,
+   amount                      int(11)                  NULL default 0,
    service_flag                int(11) unsigned         default NULL,
    transmission_id             int(11) unsigned         default NULL,
    provider_id                 int(11) unsigned         default NULL,
@@ -776,7 +776,7 @@ CREATE TABLE application (
    name                        varchar(64)              NOT NULL default '',
    type                        varchar(64)              NOT NULL default '',
    data                        text,
-   weight                      int(4)                   NOT NULL default 0,
+   weight                      int(4)                   NULL default 0,
    program_id                  int(11) unsigned         default NULL,
    PRIMARY KEY (application_id)
 ) ENGINE = InnoDB;
@@ -789,9 +789,9 @@ CREATE INDEX application_programe_id ON application (program_id);
 CREATE TABLE action (
    action_id                   int(11) unsigned         NOT NULL auto_increment,
    type                        varchar(128)             NOT NULL default '',
-   action                      int(11)                  NOT NULL default 0,
+   action                      int(11)                  NULL default 0,
    data                        varchar(64)              NOT NULL default '',
-   weight                      int(4)                   NOT NULL default 0,
+   weight                      int(4)                   NULL default 0,
    is_default                  int(1)                   default 0,
    application_id              int(11) unsigned         default NULL,
    PRIMARY KEY (action_id)
@@ -807,7 +807,7 @@ CREATE TABLE provider
    provider_id                   int(11) unsigned       NOT NULL auto_increment,
    name                          varchar(128)           NOT NULL default '',
    service_flag                  int(11) unsigned       default NULL,
-   node_id                       int(11) unsigned       NOT NULL,
+   node_id                       int(11) unsigned       NULL,
    host                          varchar(128)           NOT NULL default '',
    port                          int(6)                 NOT NULL default 5060,
    username                      varchar(128)           NOT NULL default '',
