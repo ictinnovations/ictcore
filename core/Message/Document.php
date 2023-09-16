@@ -29,6 +29,7 @@ class Document extends Message
       'file_name',
       'type',
       'description',
+      'ocr',
       'pages',
       'size_x',
       'size_y',
@@ -71,6 +72,10 @@ class Document extends Message
 
   /** @var string */
   public $description = NULL;
+  
+  /** @var string */
+  public $ocr = NULL;
+  /**
 
   /**
    * @property-read integer $pages
@@ -217,6 +222,7 @@ class Document extends Message
       $this->file_name = $data['file_name'];
       $this->type = $data['type'];
       $this->description = $data['description'];
+      $this->ocr = $data['ocr'];
       $this->pages = $data['pages'];
       $this->size_x = $data['size_x'];
       $this->size_y = $data['size_y'];
@@ -305,6 +311,7 @@ class Document extends Message
         'file_name' => $this->file_name,
         'type' => $this->type,
         'description' => $this->description,
+        'ocr' => $this->ocr,
         'size_x' => $this->size_x,
         'size_y' => $this->size_y,
         'quality' => $this->quality,
