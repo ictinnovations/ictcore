@@ -48,24 +48,16 @@ ICTCore is build for developers, ICTCore allows developers to
 
 Install
 -------
-Currently ICTCore binaries are available for CentOs 6 and 7, To install ICTCore you need a freshly installed server and then you can follow the instructions mentioned in following. If you are looking for source code you can find it at github [ICTCore: Open Source Unified Communications Framework](https://github.com/ictinnovations/ictcore)
+Currently ICTCore binaries are available for CentOs 7, 8 and RockyLinux 8, To install ICTCore you need a freshly installed server and then you can follow the instructions mentioned in following. If you are looking for source code you can find it at github [ICTCore: Open Source Unified Communications Framework](https://github.com/ictinnovations/ictcore)
 
 1. First of all we need to install ict and epel repositories  
 
-for CentOs 7  
+##### CentOs 7 Installation Guide   
 
 ```
     yum install -y https://service.ictinnovations.com/repo/7/ict-release-7-4.el7.centos.noarch.rpm  
     yum install -y https://files.freeswitch.org/repo/yum/centos-release/freeswitch-release-repo-0-1.noarch.rpm
     yum install -y epel-release  
-```
-
-for CentOs 6  
-
-```
-    rpm -Uvh 'http://service.ictinnovations.com/repo/6/ict-release-6-2.noarch.rpm'  
-    rpm -Uvh 'http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'  
-    rpm -Uvh 'http://files.freeswitch.org/freeswitch-release-1-0.noarch.rpm'  
 ```
 
 2. Install ICTCore  
@@ -82,6 +74,151 @@ for CentOs 6
 5. Update `/etc/ictcore.conf` and `/etc/odbc.ini` for database access
 
 6. Restart HTTP / Apache server
+
+##### CentOs 8 / RockyLinux 8 Installation Guide   
+
+Disable the current PHP version and enable required PHP from remi repo
+
+```
+yum module disable php:7.2
+yum install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+yum module enable php:remi-7.4
+```
+
+Install the Okey repository for FreeSWITCH from this link 
+
+```
+rpm -ivh http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm
+```
+
+Install ICTCore packages
+
+```
+yum install ictcore ictcore-fax ictcore-email ictcore-voice ictcore-freeswitch
+```
+
+- Install FastCGI Process Manager 
+
+```
+yum install -y php php-fpm php-gd php-mysqlnd php-imap
+```
+
+Configure the document root in apache configuration file /etc/httpd/conf/httpd.conf
+
+```
+DocumentRoot "/usr/ictfax"
+#
+# Relax access to content within /var/www.
+#
+<Directory "/var/www">
+    AllowOverride None
+    # Allow open access:
+    Require all granted
+</Directory>
+
+# Further relax access to the default document root:
+<Directory "/usr/ictfax">
+```
+
+Update /etc/httpd/conf.modules.d/00-mpm.conf like following
+
+```
+#LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+LoadModule mpm_event_module modules/mod_mpm_event.so
+```
+
+Change PHP_ADMIN_VALUE open_basedir line into from /etc/httpd/conf.d/ictcore.conf file
+
+```
+SetEnv PHP_ADMIN_VALUE "open_basedir = /usr/ictcore/:/usr/bin:/bin:/tmp/"
+```
+
+Install Imagic 
+
+```
+yum install -y ImageMagick ImageMagick-devel  
+pecl install imagick  
+echo "extension=imagick.so" > /etc/php.d/imagick.ini  
+```
+
+Install mcrypt 
+
+```
+yum install --enablerepo=epel php-devel php-pear libmcrypt libmcrypt-devel  
+
+pecl install mcrypt  
+echo 'extension=mcrypt.so' > /etc/php.d/mcrypt.ini 
+```
+
+Disable selinux and restart the services 
+
+```
+setenforce 0
+service httpd restart
+service php-fpm restart
+```
+
+Setup the ICTCore database 
+
+```CREATE DATABASE ictfax;
+USE ictfax;
+GRANT ALL PRIVILEGES ON ictfax.* TO ictfaxuser@localhost IDENTIFIED BY 'plsChangeIt';
+FLUSH PRIVILEGES;
+source /usr/ictcore/db/database.sql;
+source /usr/ictcore/db/email.sql;
+source /usr/ictcore/db/fax.sql;
+source /usr/ictcore/db/voice.sql;
+source /usr/ictcore/db/data/role_user.sql;
+source /usr/ictcore/db/data/role_admin.sql;
+source /usr/ictcore/db/data/demo_users.sql;
+
+```
+
+Open the file /etc/ictcore.conf and find out the [db] section and replace user, password and database name in the following lines:
+
+```
+user = ictfaxuser
+pass = plsChangeIt
+name = ictfax
+```
+
+Configure EMAIL TO FAX / FAX TO EMAIL SERVICE (OPTIONAL)"  
+
+```
+echo "ictcore" >> /etc/mail/trusted-users
+echo "apache" >> /etc/mail/trusted-users
+
+echo "FAX_DOMAIN.COM" >> /etc/mail/local-host-names
+
+echo '@FAX_DOMAIN.COM ictcore' >> /etc/mail/virtusertable
+
+```
+
+to apply email related changes
+
+```
+/etc/mail/make
+```
+
+Configure the email-2-fax services
+
+```
+cd /usr/ictcore/bin/sendmail
+./email_to_fax
+```
+
+Restart sendmail service so changes can take affect
+
+```
+chkconfig sendmail on
+service sendmail restart
+```
+
+In case if document not uploading then install "libtiff-tools" package 
+
+```
+yum install libtiff-tools -y
+```
 
 Getting started
 ---------------
