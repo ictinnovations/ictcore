@@ -23,6 +23,7 @@ use Swift_Mailer;
 use Swift_Message;
 use Swift_SendmailTransport;
 use Swift_SmtpTransport;
+use ICT\Core\Account\EAddress;
 
 global $path_root;
 require_once $path_root . '/vendor/swiftmailer/swiftmailer/lib/swift_required.php';
@@ -195,4 +196,9 @@ class Sendmail extends Gateway
     return $core_dir . '/Gateway/Sendmail/templates';
   }
 
+  public static function locate_account($account)
+  {
+    // in both external or internal email address will be same
+    return EAddress::locate($account, static::CONTACT_FIELD);
+  }
 }

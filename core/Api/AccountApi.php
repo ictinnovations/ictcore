@@ -17,6 +17,7 @@ use ICT\Core\Program;
 use ICT\Core\User;
 use stdClass;
 
+#[\AllowDynamicProperties]
 class AccountApi extends Api
 {
 
@@ -28,29 +29,29 @@ class AccountApi extends Api
    *
    * @url POST /accounts
    */
-  public function create($data = array(), $account_id = null)
+  public function create($data = array())
   {
-      $this->_authorize('account_create');
-  
-      if (isset($data['type']) && !empty($data['type'])) {
-          $oAccount = Account::load($data['type']);
-      } else {
-          $oAccount = new Account();
-      }
-      $aSetting = $oAccount->settings;
+    $this->_authorize('account_create');
+
+    if (isset($data['type']) && !empty($data['type'])) {
+      $oAccount = Account::load($data['type']);
+    } else {
       $oAccount = new Account();
-      $oAccount->account_id = $account_id;
-      $oAccount->set($data);
-      if (isset($data['settings']) && !empty($data['settings'])) {
-          $oAccount->settings = array_merge($aSetting, $oAccount->settings);
-      }
-      if ($oAccount->save()) {
-          return $oAccount->account_id;
-      } else {
-          throw new CoreException(417, 'Account creation failed');
-      }
+    }
+    $aSetting = $oAccount->settings; // prepare a copy of default settings
+    $this->set($oAccount, $data);
+    if (isset($data['settings']) && !empty($data['settings'])) {
+      // override default settings but preserve the unchanged settings
+      $oAccount->settings = array_merge($aSetting, $oAccount->settings);
+    }
+
+    if ($oAccount->save()) {
+      return $oAccount->account_id;
+    } else {
+      throw new CoreException(417, 'Account creation failed');
+    }
   }
-  
+
   /**
    * List all available accounts
    *
@@ -113,12 +114,13 @@ class AccountApi extends Api
     $this->_authorize('account_update');
 
     $oAccount = Account::load($account_id);
-    $aSetting = $oAccount->settings; 
-    $oAccount->account_id = $account_id;
-    $oAccount->set($data);
+    $aSetting = $oAccount->settings; // prepare a copy of old settings
+    $this->set($oAccount, $data);
     if (isset($data['settings']) && !empty($data['settings'])) {
+      // override old settings but preserve the unchanged settings
       $oAccount->settings = array_merge($aSetting, $oAccount->settings);
     }
+
     if ($oAccount->save()) {
       return $oAccount;
     } else {

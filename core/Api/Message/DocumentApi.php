@@ -15,6 +15,7 @@ use ICT\Core\Corelog;
 use ICT\Core\Message\Document;
 use SplFileInfo;
 
+#[\AllowDynamicProperties]
 class DocumentApi extends Api
 {
 
@@ -23,22 +24,22 @@ class DocumentApi extends Api
    *
    * @url POST /documents
    * @url POST /messages/documents
-   */ 
+   */
   public function create($data = array())
   {
     $this->_authorize('document_create');
+
     $oDocument = new Document();
-    $oDocument->name = isset($data['name']) ? $data['name'] : null;
-    $oDocument->file_name = isset($data['file_name']) ? $data['file_name'] : null;
-    $oDocument->type = isset($data['type']) ? $data['type'] : null;
-    $oDocument->description = isset($data['description']) ? $data['description'] : null;
+    unset($data['file_name']);
+    $this->set($oDocument, $data);
+
     if ($oDocument->save()) {
-      $document_id = $oDocument->document_id;
-      return $document_id;
+      return $oDocument->document_id;
     } else {
       throw new CoreException(417, 'Document creation failed');
     }
   }
+
   /**
    * List all available documents
    *
@@ -60,6 +61,7 @@ class DocumentApi extends Api
   public function read($document_id)
   {
     $this->_authorize('document_read');
+
     $oDocument = new Document($document_id);
     return $oDocument;
   }
@@ -77,6 +79,7 @@ class DocumentApi extends Api
   public function upload($document_id, $data = null, $mime = 'application/pdf')
   {
     $this->_authorize('document_create');
+
     $oDocument = new Document($document_id);
     if (!empty($data)) {
       if (in_array($mime, Document::$media_supported)) {
@@ -102,25 +105,31 @@ class DocumentApi extends Api
 
   /**
    * Download document by id
-   *
+   * @noAuth
    * @url GET /documents/$document_id/media
    * @url GET /messages/documents/$document_id/media
    */
-  public function download($document_id)
+  public function download($document_id, $query = array())
   {
-    $this->_authorize('document_read');
+    // $this->_authorize('document_read');
+
     $oDocument = new Document($document_id);
     Corelog::log("Document media / download requested :$oDocument->file_name", Corelog::CRUD);
-    $pdf_file = $oDocument->create_pdf($oDocument->file_name, 'tif');
-    if (file_exists($pdf_file)) {
-      $oFile = new SplFileInfo($pdf_file);
+    if (isset($query['format']) && $query['format'] == 'jpg') {
+      $page_no     = isset($query['page']) ? $query['page'] : 1;
+      $output_file = $oDocument->create_jpg($oDocument->file_name, $page_no);  
+    } else {
+      $output_file = $oDocument->create_pdf($oDocument->file_name, 'tif');
+    }
+    if (file_exists($output_file)) {
+      $oFile = new SplFileInfo($output_file);
       return $oFile;
     } else {
       throw new CoreException(404, 'Document media not found');
     }
   }
 
-/**
+  /**
    * Update existing document
    *
    * @url PUT /documents/$document_id
@@ -128,17 +137,17 @@ class DocumentApi extends Api
    */
   public function update($document_id, $data = array())
   {
-      $this->_authorize('document_update');
-      $oDocument = new Document($document_id); 
-      unset($data['file_name']);
-      foreach ($data as $key => $value) {
-          $oDocument->$key = $value;
-      }
-      if ($oDocument->save()) {
-          return $oDocument;
-      } else {
-          throw new CoreException(417, 'Document update failed');
-      }
+    $this->_authorize('document_update');
+
+    $oDocument = new Document($document_id);
+    unset($data['file_name']);
+    $this->set($oDocument, $data);
+
+    if ($oDocument->save()) {
+      return $oDocument;
+    } else {
+      throw new CoreException(417, 'Document update failed');
+    }
   }
 
   /**
@@ -150,7 +159,9 @@ class DocumentApi extends Api
   public function remove($document_id)
   {
     $this->_authorize('document_delete');
+
     $oDocument = new Document($document_id);
+
     $result = $oDocument->delete();
     if ($result) {
       return $result;

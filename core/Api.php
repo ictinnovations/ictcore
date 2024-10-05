@@ -27,7 +27,6 @@ class Api
   {
     try {
       $oUser = User::authenticate($credentials, $auth_type);
-      
       if ($oUser instanceof User) {
         do_login($oUser);
         return true;
@@ -46,10 +45,9 @@ class Api
     }
     return true;
   }
-  
+
   protected function set($oEntity, $data)
   {
-    exit;
     foreach ($data as $key => $value) {
       try {
         $oEntity->$key = $value;
@@ -58,6 +56,7 @@ class Api
       }
     }
   }
+
   public function create_interface($interface_type = null, $root_path = null)
   {
     global $path_cache;

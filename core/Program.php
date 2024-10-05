@@ -11,6 +11,7 @@ namespace ICT\Core;
 
 use ICT\Core\Exchange\Dialplan;
 
+#[\AllowDynamicProperties]
 class Program
 {
 
@@ -289,12 +290,11 @@ class Program
 
   public static function getClass(&$program_id, $namespace = 'ICT\\Core\\Program')
   {
-    $program_type = '';
     if (ctype_digit(trim($program_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE program_id='%program_id%' ";
       $result = DB::query(self::$table, $query, array('program_id' => $program_id));
-      if (is_resource($result)) {
-        $program_type = mysqli_result($result, 0);
+      if ($row = $result->fetch_row()) {
+          $program_type = $row[0];
       }
     } else {
       $program_type = $program_id;
@@ -642,15 +642,16 @@ class Program
       $contact = $oRequest->source;
     }
 
-    // search fo existing account and contact
+   // search for existing account and contact
     $oGateway = Gateway::load($oDialplan->gateway_flag);
-    $contactField = $oGateway::CONTACT_FIELD;
-    if (empty($contactField)) {
-      $contactField = $oGateway::CONTACT_ANONYMOUS;
-    }
-    $oAccount = Core::locate_account($account, $contactField);
+    $oAccount = $oGateway->locate_account($account);
     if ($oAccount) {
-      $oContact = Core::locate_contact($contact, $contactField);
+      $oContact = $oGateway->locate_contact($contact);
+      if ($oContact === false) {
+        $oContact = new Contact();
+        $contactField = $oGateway::CONTACT_FIELD;
+        $oContact->$contactField = $contact;
+      }
       return array('account' => $oAccount, 'contact' => $oContact);
     } else {
       return false; // no account found

@@ -191,10 +191,8 @@ class Application
     if (ctype_digit(trim($application_id))) {
       $query = "SELECT type FROM " . self::$table . " WHERE application_id='%application_id%' ";
       $result = DB::query(self::$table, $query, array('application_id' => $application_id));
-      if ($result instanceof \mysqli_result) {
-        while($row = mysqli_fetch_assoc($result)) {
-          $application_type = $row['type'];
-        }
+      if ($row = $result->fetch_row()) {
+        $application_type = $row[0];
       }
     } else {
       $application_type = $application_id;
@@ -340,18 +338,6 @@ class Application
     }
     $oResult = $this->oTransmission->result_create($data, $name, $type, $this->application_id);
     return $oResult;
-  }
-
-  public function prepare()
-  {
-    // nothing to prepare
-  }
-
-  public function _prepare(Transmission &$oTransmission)
-  {
-    // Corelog::log("Prepare application : $this->type($this->application_id)", Corelog::FLOW);
-    $this->oTransmission = $oTransmission;
-    $this->prepare();
   }
 
   public function execute()

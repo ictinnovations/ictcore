@@ -39,7 +39,7 @@ class Sendemail extends Program
   public $template_id = '[template:template_id]';
 
   /**
-   * return a name value pair of all aditional program parameters which we need to save
+   * return a name value pair of all additional program parameters which we need to save
    * @return array
    */
   public function parameter_save()

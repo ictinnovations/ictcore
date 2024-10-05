@@ -22,14 +22,14 @@ Destination: <b>[request:transmission:contact:phone]</b><br>
 
 Our system is currently processing your fax and we will inform you once it has been sent.<br><br>
 
-Thank you for using [company:name].<br>
+Thank you for using [site:title].<br>
 
-Did you know that you can view your faxes online at [company:name]. Need Help? Please visit our website<br><br>
+Did you know that you can view your faxes online at [site:title]. Need Help? Please visit our website<br><br>
 
 <b>Best Regards</b></p>
-<p style="color:#666"><b>[company:name] Team</b></p>
-<p style="color:#666">[company:name] - Online Faxing </p>
-<p style="color:#666">Email : support@ictinnovations.com </p>
+<p style="color:#666"><b>[site:title] Team</b></p>
+<p style="color:#666">[site:title] - Online Faxing </p>
+<p style="color:#666">Email : [site:email] </p>
 <p style="color:#666">Site : <a href="http://ictcore.org">ictcore.org</a></p>
 <br><p style="text-align:center;color:#666">ICTCore is developed by <a href="http://ictinnovations.com/">ICT Innovations</a></p>
 </td>
@@ -55,6 +55,6 @@ Our system is processing it and we will inform you when done.
 
 Thanks
 -----------------------
-The [company:name] Team
+The [site:title] Team
 EOS;
 /* just an empty line, needed by EOS to maintain new line condition */

@@ -21,12 +21,12 @@ Received at   : [fax:transmission:account:phone]<br>
 Received from : [fax:transmission:contact:phone]<br>
 Total pages   : [fax:document:pages]<br><br>
 
-Thank you for using [company:name].<br>
-Did you know that you can view your faxes online at [company:name]. Need Help? Visit our websie<br><br>
+Thank you for using [website:title].<br>
+Did you know that you can view your faxes online at [website:title]. Need Help? Visit our website<br><br>
 
 <b>Best Regards</b></p>
-<p style="color:#666"><b>[company:name] Team</b></p>
-<p style="color:#666">[company:name] - Online Faxing </p>
+<p style="color:#666"><b>[website:title] Team</b></p>
+<p style="color:#666">[site:title] - Online Faxing </p>
 <p style="color:#666">Site : <a href="http://ictcore.org">ictcore.org</a></p>
 <br><p style="text-align:center;color:#666">ICTCore is developed by <a href="http://ictinnovations.com/">ICT Innovations</a></p>
 </td>
@@ -53,6 +53,6 @@ Total pages   : [fax:document:pages]
 
 Thanks
 -----------------------
-The [company:name] Team
+The [site:title] Team
 EOS;
 /* just an empty line, needed by EOS to maintain new line condition */

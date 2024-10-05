@@ -52,59 +52,47 @@ class Group
       $this->load();
     } 
   }
+
   public static function search($aFilter = array())
-  {   //.......
-      if (!is_array($aFilter)) {
-          // Handle the case when $aFilter is not an array
-          // For example, you can display an error message or return an empty result
-          return array();
+  {
+    $aGroup = array();
+    $from_str = self::$table;
+    $aWhere = array();
+    foreach ($aFilter as $search_field => $search_value) {
+      switch ($search_field) {
+        case 'group_id':
+          $aWhere[] = "$search_field = $search_value";
+          break;
+        case 'name':
+          $aWhere[] = "$search_field LIKE '%$search_value%'";
+          break;
+
+        case 'user_id':
+        case 'created_by':
+          $aWhere[] = "created_by = '$search_value'";
+          break;
+        case 'before':
+          $aWhere[] = "date_created <= $search_value";
+          break;
+        case 'after':
+          $aWhere[] = "date_created >= $search_value";
+          break;
       }
-  //.......
-      $aGroup = array();
-      $from_str = self::$table;
-      $aWhere = array();
-  
-      foreach ($aFilter as $search_field => $search_value) {
-          if (!isset($search_field) || !isset($search_value)) {
-              continue; // Skip this iteration if either search_field or search_value is not set
-          }
-  
-          switch ($search_field) {
-              case 'group_id':
-                  $aWhere[] = "$search_field = $search_value";
-                  break;
-              case 'name':
-                  $aWhere[] = "$search_field LIKE '%$search_value%'";
-                  break;
-  
-              case 'user_id':
-              case 'created_by':
-                  $aWhere[] = "created_by = '$search_value'";
-                  break;
-              case 'before':
-                  $aWhere[] = "date_created <= '$search_value'";
-                  break;
-              case 'after':
-                  $aWhere[] = "date_created >= '$search_value'";
-                  break;
-          }
-      }
-  
-      if (!empty($aWhere)) {
-          $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
-      }
-  
-      $query = "SELECT group_id, name, contact_total FROM " . $from_str;
-      Corelog::log("group search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
-      $result = DB::query('group', $query);
-  
-      while ($data = mysqli_fetch_assoc($result)) {
-          $aGroup[] = $data;
-      }
-  
-      return $aGroup;
+    }
+    if (!empty($aWhere)) {
+      $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+    }
+
+    $query = "SELECT group_id, name, contact_total FROM " . $from_str;
+    Corelog::log("group search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
+    $result = DB::query('group', $query);
+    while ($data = mysqli_fetch_assoc($result)) {
+      $aGroup[] = $data;
+    }
+
+    return $aGroup;
   }
-  
+
   // List Group Contact
   public function search_contact($aFilter = array(), $full = false)
   {
@@ -172,131 +160,27 @@ class Group
   {
     return $this->group_id;
   }
+
   public function save()
   {
-      $data = array(
-          'group_id' => $this->group_id,
-          'name' => $this->name,
-          'contact_total' => $this->contact_total,
-          'description' => $this->description
-      );
-      if (isset($data['group_id']) && !empty($data['group_id'])) {
-          // Update existing record
-          $result = DB::update(self::$table, $data, 'group_id');
-          Corelog::log("Group updated: $this->group_id", Corelog::CRUD);
-      } else {
-          // Add new record
-          $result = DB::update(self::$table, $data, false);
-          $this->group_id = $result; // Use the result of the DB::update operation
-          Corelog::log("New group created: $this->group_id", Corelog::CRUD);
-      }
-      return $result;
-  }
-  // public function save() {
-  //   $data = array(
-  //       'group_id' => $this->group_id,
-  //       'name' => $this->name,
-  //       'contact_total' => $this->contact_total,
-  //       'description' => $this->description
-  //   );
-  //   if (isset($data['group_id']) && !empty($data['group_id'])) {
-  //     // update existing record
-  //     $result = DB::update(self::$table, $data, 'group_id');
-  //     Corelog::log("group updated: $this->group_id", Corelog::CRUD);
-  //   } else {
-  //     // add new
-  //     $result = DB::update(self::$table, $data, false);
-  //     $this->group_id = $data['contact_group_id']; // NOTE: DB::update using table name suffixed with _id as primary key
-  //     Corelog::log("New group created: $this->group_id", Corelog::CRUD);
-  //   }
-  //   return $result;
-  // }
-
-    public function get_crm_target_list() {
-
-    $url = Conf::get('crm:url', '');
-    if (!empty($url)) {
-      $username = Conf::get('crm:username', '');
-      $password = Conf::get('crm:password', '');
-
-      $login_parameters = array(
-         "user_auth" => array(
-              "user_name" => $username,
-              "password" => md5($password),
-              "version" => "1"
-         ),
-         "application_name" => "RestTest",
-         "name_value_list" => array(),
-     );
-
-     $login_result = Group::call("login", $login_parameters, $url);
-
-     $entryArgs = array(
-         //Session id - retrieved from login call
-	'session' => $login_result->id,
-         //Module to get_entry_list for
-	'module_name' => 'ProspectLists',
-         //Order by - unused
-	'order_by' => '',
-         'query' => '',
-         //Start with the first record
-	'offset' => 0,
-         //Return the id and name fields
-	'select_fields' => array('id','name','first_name','last_name'),   
-
-         //Do not show deleted
-  	'deleted' => 0,
+    $data = array(
+        'group_id' => $this->group_id,
+        'name' => $this->name,
+        // read only 'contact_total' => $this->contact_total,
+        'description' => $this->description
     );
 
-    $list_result =Group::call('get_entry_list', $entryArgs, $url);
-    $result = array();
-
-    foreach($list_result->entry_list as $entry) {
-      $object = new \stdClass(); 
-      $object->name = $entry->name_value_list->name->value;
-      $object->group_id = $entry->name_value_list->id->value;
-
-      array_push($result, $object);
+    if (isset($data['group_id']) && !empty($data['group_id'])) {
+      // update existing record
+      $result = DB::update(self::$table, $data, 'group_id');
+      Corelog::log("group updated: $this->group_id", Corelog::CRUD);
+    } else {
+      // add new
+      $result = DB::update(self::$table, $data, false);
+      $this->group_id = $data['contact_group_id']; // NOTE: DB::update using table name suffixed with _id as primary key
+      Corelog::log("New group created: $this->group_id", Corelog::CRUD);
     }
-    return $result; 
-    }
-    else {
-      throw new CoreException(411, "CRM Not configured");
-    }
-
+    return $result;
   }
-
-  public static function call($method, $parameters, $url)
-    {
-        ob_start();
-        $curl_request = curl_init();
-
-        curl_setopt($curl_request, CURLOPT_URL, $url);
-        curl_setopt($curl_request, CURLOPT_POST, 1);
-        curl_setopt($curl_request, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
-        curl_setopt($curl_request, CURLOPT_HEADER, 1);
-        curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl_request, CURLOPT_FOLLOWLOCATION, 0);
-
-        $jsonEncodedData = json_encode($parameters);
-
-        $post = array(
-             "method" => $method,
-             "input_type" => "JSON",
-             "response_type" => "JSON",
-             "rest_data" => $jsonEncodedData
-        );
-
-        curl_setopt($curl_request, CURLOPT_POSTFIELDS, $post);
-        $result = curl_exec($curl_request);
-        curl_close($curl_request);
-
-        $result = explode("\r\n\r\n", $result, 2);
-        $response = json_decode($result[1]);
-        ob_end_flush();
-
-        return $response;
-    }
   
 }

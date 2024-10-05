@@ -15,6 +15,7 @@ use ICT\Core\Corelog;
 use ICT\Core\Gateway;
 use ICT\Core\Provider;
 use ICT\Core\Request;
+use ICT\Core\Account\Did;
 
 class Kannel extends Gateway
 {
@@ -168,7 +169,7 @@ class Kannel extends Gateway
         'error' => ''
     );
 
-    /* NOTE:
+    /* NOTE: 
      * under apache multithreading does not work
      * so we have to use scheduling
      */
@@ -194,6 +195,11 @@ class Kannel extends Gateway
     return false;
   }
 
+  public static function locate_account($account)
+  {
+    return Did::locate($account, static::CONTACT_FIELD);
+  }
+
   public function config_save($type, $name, $data = '')
   {
     Corelog::log("Kannel saving config for type: $type, name: $name", Corelog::CRUD);
@@ -207,6 +213,7 @@ class Kannel extends Gateway
     $config_file = $this->config_filename($type, $name);
     unlink($config_file);
   }
+
   public function config_reload()
   {
     // TODO: develop reload method for kannel

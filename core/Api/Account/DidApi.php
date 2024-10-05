@@ -11,6 +11,7 @@ namespace ICT\Core\Api\Account;
 
 use ICT\Core\Api\AccountApi;
 
+#[\AllowDynamicProperties]
 class DidApi extends AccountApi
 {
 
@@ -19,12 +20,12 @@ class DidApi extends AccountApi
    *
    * @url POST /dids
    */
-public function create($data = array(), $account_id = null)
+  public function create($data = array())
   {
     $data['type'] = 'did';
     return parent::create($data);
   }
-  
+
   /**
    * List all available accounts
    *

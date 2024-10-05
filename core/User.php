@@ -14,6 +14,7 @@ use Firebase\JWT\JWT;
 use ICT\Core\User\Permission;
 use ICT\Core\User\Role;
 
+#[\AllowDynamicProperties]
 class User
 {
 
@@ -23,6 +24,7 @@ class User
   const AUTH_TYPE_DIGEST = 'digest';
   const AUTH_TYPE_BEARER = 'bearer';
   const AUTH_TYPE_NETWORK = 'network';
+  const AUTH_TYPE_SAML = 'saml';
 
   private static $table = 'usr';
   private static $link_role = 'user_role';
@@ -132,6 +134,12 @@ class User
 
   /** @var array $aPermission  */
   private $aPermission = array();
+
+  public static $media_supported = array(
+      'png'  => 'image/png',
+      'jpg'  => 'image/jpeg',
+      'jpeg' => 'image/x-citrix-jpeg',
+  );
 
   public function __construct($user_id = NULL)
   {
@@ -282,7 +290,6 @@ class User
   {
     $this->aPermission = array();
     $listPermission = $this->search_permission();
-    
     foreach($listPermission as $aPermission) {
       $permission_id = $aPermission['permission_id'];
       $this->aPermission[$permission_id] = $aPermission['name'];
@@ -450,9 +457,8 @@ class User
         "is_admin" => can_access('user_create', $this->user_id) ? "1" : "0",
         "api-version" => "1.0"
     );
-     $private_key_resource = openssl_pkey_get_private($private_key);
-    return JWT::encode($token, $private_key_resource, Conf::get('security:hash_type', 'RS256'));
 
+    return JWT::encode($token, $private_key, Conf::get('security:hash_type', 'RS256'));
   }
 
   public static function authenticate($access_key, $key_type = User::AUTH_TYPE_BASIC)
@@ -464,9 +470,7 @@ class User
           $key_file = Conf::get('security:public_key', '/usr/ictcore/etc/ssh/ib_node.pub');
           $hash_type = Conf::get('security:hash_type', 'RS256');
           $public_key = file_get_contents($key_file);
-          $public_key_resource = openssl_pkey_get_public($public_key);
-          $token = JWT::decode($access_key, $public_key_resource, array($hash_type));
-
+          $token = JWT::decode($access_key, $public_key, array($hash_type));
           if ($token) {
             // TODO check api-version
             if (!empty($token->user_id)) {
@@ -480,8 +484,17 @@ class User
         Corelog::log('Bearer authentication failed', Corelog::ERROR);
         return false;
 
+      case User::AUTH_TYPE_SAML;
+        if (!empty($access_key['email'])) {
+          $oUser = new self($access_key['email']);
+          return $oUser;
+        }
+        Corelog::log('SAML authentication failed', Corelog::ERROR);
+        return false;
+
       case User::AUTH_TYPE_NETWORK:
         return false; // TODO
+
       case User::AUTH_TYPE_DIGEST:
         if (!empty($access_key['username'])) {
           $oUser = new self($access_key['username']);
@@ -494,6 +507,7 @@ class User
 
       case User::AUTH_TYPE_BASIC:
       default:
+
         if (!empty($access_key['username'])) {
           $oUser = new self($access_key['username']);
           if ($oUser->get_password_hash() == md5($access_key['password'])) {
@@ -523,7 +537,6 @@ class User
 
     // now try with role permissions
     foreach ($this->aRole as $oRole) {
-
       if ($oRole->authorize($permission)) {
         return true;
       }
@@ -533,4 +546,11 @@ class User
     return false;
   }
 
+  public function show_image($user_id) {
+    Conf\User::load($user_id);
+    $filepath = Conf::get('site:logo', 'site:logo');
+    header('Content-Type: ' . mime_content_type($filepath));
+    header('Content-Length: ' . filesize($filepath));
+    echo file_get_contents($filepath);
+  }
 }

@@ -36,7 +36,7 @@ class Corelog
   public static $process_id = NULL;
   public static $log_file = 'ictcore.log';
 
-  public static function error_handler($error_no, $error_string, $error_file, $error_line, $error_context) {
+  public static function error_handler($error_no, $error_string, $error_file, $error_line, $error_context=[]) {
     $message = "$error_string in $error_file on line $error_line";
     $class   = Corelog::NOTICE;
     switch ($error_no) {

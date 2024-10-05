@@ -11,6 +11,7 @@ namespace ICT\Core;
 
 use Exception;
 
+#[\AllowDynamicProperties]
 class Transmission
 {
 
@@ -44,6 +45,10 @@ class Transmission
   private static $table_account = 'account';
   private static $table_contact = 'contact';
   private static $table_user = 'usr';
+  private static $table_spool = 'spool';
+  private static $table_spool_result = 'spool_result';
+  private static $table_document = 'document';
+  private static $table_program_resource = 'program_resource';
   private static $fields = array(
       'transmission_id',
       'title',
@@ -206,6 +211,16 @@ class Transmission
     $from_str .= ' LEFT JOIN ' . self::$table_account . ' a ON t.account_id=a.account_id';
     $from_str .= ' LEFT JOIN ' . self::$table_contact . ' c ON t.contact_id=c.contact_id';
     $from_str .= ' LEFT JOIN ' . self::$table_user . ' u ON t.created_by=u.usr_id';
+    $from_str .= ' LEFT JOIN ' . self::$table_spool . ' sp ON sp.transmission_id = t.transmission_id ';
+
+    $from_str_in = $from_str;
+   
+    $from_str .= ' LEFT JOIN ' . self::$table_program_resource . ' pr ON t.program_id = pr.program_id ';
+    $from_str .= ' LEFT JOIN ' . self::$table_document . ' d ON pr.resource_id = d.document_id AND pr.resource_type = "document" ';
+    
+    $from_str_in .= ' LEFT JOIN ' . self::$table_spool_result . ' sr ON sr.spool_id = sp.spool_id AND sr.spool_result_id = (SELECT MAX(mx.spool_result_id) AS max_id FROM spool_result mx)';
+    $from_str_in .= ' LEFT JOIN ' . self::$table_document . ' d ON sr.data = d.document_id ';
+
     $aWhere = array();
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
@@ -257,11 +272,19 @@ class Transmission
     }
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
+      $from_str_in .= ' WHERE ' . implode(' AND ', $aWhere);
     }
 
     $owner_fields   = 't.account_id, a.phone AS account_phone, a.email AS account_email, t.created_by AS user_id, u.username AS username';
     $contact_fields = 't.contact_id, c.phone AS contact_phone, c.email AS contact_email';
-    $query = "SELECT t.transmission_id, $owner_fields, $contact_fields, t.status, t.response, t.direction, t.last_run FROM " . $from_str . " LIMIT 5000";
+    $document_fields = 'd.type as format, d.file_name as file_name, d.document_id';
+    $spool_fields = 'sp.response as reason';
+    $query = "SELECT t.transmission_id, $owner_fields, $contact_fields, $document_fields, $spool_fields, t.status, t.response, t.direction, t.title, t.last_run FROM " . $from_str . " LIMIT 5000";
+    
+    if (strpos($from_str_in, 'inbound') !== false) {
+      $query = "SELECT t.transmission_id, $owner_fields, $contact_fields, $document_fields, $spool_fields, t.status, t.response, t.direction, t.title, t.last_run FROM " . $from_str_in . " LIMIT 5000";
+    }
+
     Corelog::log("transmission search with $query", Corelog::DEBUG, array('aFilter' => $aFilter));
     $result = DB::query('transmission', $query);
     while ($data = mysqli_fetch_assoc($result)) {

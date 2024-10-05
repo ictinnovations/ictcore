@@ -11,6 +11,7 @@ namespace ICT\Core\Provider;
 
 use ICT\Core\Provider;
 use ICT\Core\Service\Voice;
+use ICT\Core\Gateway\Freeswitch;
 
 class Sip extends Provider
 {
@@ -58,4 +59,8 @@ class Sip extends Provider
     return parent::delete();
   }
 
+  public static function _status($provider_name) {
+    $oFreeswitch = new Freeswitch();
+    return $oFreeswitch->provider_status($provider_name);
+  }
 }

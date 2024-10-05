@@ -1,3 +1,4 @@
+
 --[[
 application.lua
 Disclaimer: Use at your own risk.  No implied warranties or help if/when stuff blows up.
@@ -39,6 +40,7 @@ function application_Hangup(s, status, arg)
   end
 
   oFreeswitch.consoleLog("INFO", "Execution Done")
+--  application_fetch()
 end
 
 -- Application Fetch

@@ -1,10 +1,8 @@
 <include>
-{% spaceless %}
 {% set listPrefix = provider.prefix|split(',') %}
 {% for prefix in listPrefix %}
-  {% set prefix_remove = prefix|split('|', 2)[0] %}
-  {% set prefix_add = prefix|split('|', 2)[1] %}
-  {% endspaceless %}
+{% set prefix_remove = prefix|split('|', 2)[0] %}
+{% set prefix_add = prefix|split('|', 2)[1] %}
 <extension name="provider_{{ provider.provider_id }}_prefix_{{ prefix_remove }}">
   <condition field="destination_number" expression="^{{ prefix_remove }}(\d+)$">
     <action application="bridge" data="sofia/gateway/{{ provider.name }}/{{ prefix_add }}$1"/>
@@ -12,3 +10,4 @@
 </extension>
 {% endfor %}
 </include>
+

@@ -11,6 +11,7 @@ namespace ICT\Core\Api\Account;
 
 use ICT\Core\Api\AccountApi;
 
+#[\AllowDynamicProperties]
 class ExtensionApi extends AccountApi
 {
 
@@ -19,12 +20,12 @@ class ExtensionApi extends AccountApi
    *
    * @url POST /extensions
    */
-  public function create($data = array(), $account_id = null)
+  public function create($data = array())
   {
     $data['type'] = 'extension';
     return parent::create($data);
   }
-  
+
   /**
    * List all available accounts
    *

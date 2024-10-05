@@ -9,6 +9,8 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+ use ICT\Core\freeSwitchEsl;
+
 class Provider
 {
 
@@ -91,13 +93,14 @@ class Provider
   /** @var integer */
   public $active = NULL;
 
-  public function set($data) {
-    foreach ($data as $field => $value) {
-        if (property_exists($this, $field)) {
-            $this->$field = $value;
-        }
+  public function __construct($provider_id = NULL)
+  {
+    if (!empty($provider_id)) {
+      $this->provider_id = $provider_id;
+      $this->_load();
     }
   }
+
   public static function search($aFilter = array())
   {
     $aProvider = array();
@@ -130,17 +133,15 @@ class Provider
 
     return $aProvider;
   }
+  
 public static function getClass(&$provider_id, $namespace = 'ICT\\Core\\Provider')
 {
-  $provider_type = null;
   if (ctype_digit(trim($provider_id))) {
     $query = "SELECT type FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
     $result = DB::query(self::$table, $query, array('provider_id' => $provider_id));
-    if ($result && $result->num_rows > 0) {
-      $row = $result->fetch_assoc();
-      $provider_type = $row['type'];
+    if ($row = $result->fetch_row()) {
+      $provider_type = $row[0];
   }
-
   } else {
     $provider_type = $provider_id;
     $provider_id   = null;
@@ -155,6 +156,7 @@ public static function getClass(&$provider_id, $namespace = 'ICT\\Core\\Provider
     return false;
   }
 }
+
   public static function load($provider_id)
   {
     $class_name = self::getClass($provider_id);
@@ -166,13 +168,13 @@ public static function getClass(&$provider_id, $namespace = 'ICT\\Core\\Provider
       return new self($provider_id);
     }
   }
-private function _load()
+
+ private function _load()
 {
     Corelog::log("Loading provider: $this->provider_id", Corelog::CRUD);
     $query = "SELECT * FROM " . self::$table . " WHERE provider_id='%provider_id%' ";
     $result = DB::query(self::$table, $query, array('provider_id' => $this->provider_id));
     $data = mysqli_fetch_assoc($result);
-
     if ($data) {
       $this->provider_id = $data['provider_id'];
       $this->name = $data['name'];
@@ -245,7 +247,6 @@ private function _load()
         'provider_id' => $this->provider_id,
         'name' => $this->name,
         'service_flag' => $this->service_flag,
-        //change
         'node_id' => $this->node_id,
         'host' => $this->host,
         'port' => $this->port,
@@ -262,7 +263,7 @@ private function _load()
 
     if (isset($data['provider_id']) && !empty($data['provider_id'])) {
       // update existing record
-      unset($data['type']); // don't allow to change type
+         unset($data['type']); // don't allow to change type
       $result = DB::update(self::$table, $data, 'provider_id');
       Corelog::log("Provider updated: $this->provider_id", Corelog::CRUD);
     } else {
@@ -275,4 +276,13 @@ private function _load()
     return $result;
   }
 
+  public function status()
+  {
+    return $this->_status($this->name);
+  }
+
+  public static function _status($provider_name)
+  {
+    return false; // not supported here, see sub-classes
+  }
 }

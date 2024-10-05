@@ -15,8 +15,10 @@ use ICT\Core\Exchange\Dialplan;
 
 /* Bootstrap, load all required libraries and configurations */
 require_once dirname(__FILE__) . "/lib/init.php";
+
 class Core
 {
+
   public static function statistic($aFilter = array())
   {
     $aWhere    = array();
@@ -44,32 +46,32 @@ class Core
     }
     if (!empty($aWhere)) {
       $where_str = implode(' AND ', $aWhere);
-
     }
-// Count records from different tables
-$userTotal = DB::query_result('usr', 'SELECT COUNT(*) FROM usr', 'COUNT(*)');
-$accountTotal = DB::query_result('account', 'SELECT COUNT(*) FROM account', 'COUNT(*)');
-$didTotal = DB::query_result('account', "SELECT COUNT(*) FROM account WHERE type = 'did'", 'COUNT(*)');
-$contactTotal = DB::query_result('contact', 'SELECT COUNT(*) FROM contact', 'COUNT(*)');
-$transmissionInboundTotal = DB::query_result('transmission', "SELECT COUNT(*) FROM transmission WHERE direction = '".Transmission::INBOUND."'", 'COUNT(*)');
-$transmissionOutboundTotal = DB::query_result('transmission', "SELECT COUNT(*) FROM transmission WHERE direction = '".Transmission::OUTBOUND."'", 'COUNT(*)');
-$aStatistic = array(
-  'user_total' => intval($userTotal),
-  'account_total' => intval($accountTotal),
-  'did_total' => intval($didTotal),
-  'contact_total' => intval($contactTotal),
-  'transmission_inbound' => intval($transmissionInboundTotal),
-  'transmission_outbound' => intval($transmissionOutboundTotal),
-);
-  foreach ($aStatistic as $field => &$value) {
-      if ($value !== null) {
-          $value = intval($value); // Convert to integer
-      } else {
-          $value = 0;
-      }
-  }
+
+    // table alias are being used to keep the filter even with JOINs
+    $user_query         = "SELECT COUNT(t.usr_id) as count FROM usr t";
+    $account_query      = "SELECT COUNT(t.account_id) as count FROM account t WHERE $where_str $where_str_account";
+    $did_query          = "SELECT COUNT(t.account_id) as count FROM account t WHERE $where_str AND type = 'did'";
+    $campaign_query     = "SELECT COUNT(t.campaign_id) as count FROM campaign t WHERE $where_str";
+    $group_query        = "SELECT COUNT(t.group_id) as count FROM contact_group t WHERE $where_str";
+    $contact_query      = "SELECT COUNT(t.contact_id) as count FROM contact t WHERE $where_str";
+    $transmission_query = "SELECT COUNT(t.transmission_id) as count FROM transmission t WHERE $where_str $where_str_service";
+
+    $aStatistic = array(
+      'user_total' => DB::query_result('usr', $user_query, 'count'),
+      'account_total' => DB::query_result('account', $account_query, 'count'),
+      'did_total' =>DB::query_result('account', $did_query, 'count'),
+      'campaign_total' => DB::query_result('campaign', $campaign_query, 'count'),
+      'campaign_active' => DB::query_result('campaign', "$campaign_query AND t.status='".Campaign::STATUS_RUNNING."'", 'count' ),
+      'group_total' => DB::query_result('contact_group', $group_query, 'count'),
+      'contact_total' => DB::query_result('contact', $contact_query, 'count'),
+      'transmission_total' => DB::query_result('transmission', $transmission_query, 'count'),
+      'transmission_inbound' => DB::query_result('transmission', "$transmission_query AND t.direction='".Transmission::INBOUND."'", 'count'),
+      'transmission_outbound' => DB::query_result('transmission', "$transmission_query AND t.direction='".Transmission::OUTBOUND."'", 'count'),
+      'transmission_active' => DB::query_result('transmission', "$transmission_query AND t.status='".Transmission::STATUS_PROCESSING."'", 'count'),
+  );
   return $aStatistic;
-  }
+}
   
  /**
    * Initiate delivery / sending process for a previously created transmission
@@ -171,7 +173,6 @@ $aStatistic = array(
           }
         }
         if (empty($oAccount)) {
-          Corelog::log('Request: '.print_r($oRequest,true), Corelog::ERROR);
           throw new CoreException("404", "No recipient found");
         }
         if (empty($oContact)) {
@@ -245,5 +246,5 @@ $aStatistic = array(
     $oTransmission->save();
     Corelog::log('-----------------> transaction ended <-----------------', Corelog::FLOW);
   }
-
+  
 }

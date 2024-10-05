@@ -12,7 +12,7 @@
 CREATE TABLE template
 (
    template_id              int(11) unsigned       NOT NULL auto_increment,
-   name                     varchar(128)           NOT NULL,
+   name                     varchar(128)           NOT NULL default '',
    type                     varchar(8)             NOT NULL default 1,
    description              varchar(255)           NOT NULL default '',
    subject                  varchar(255)           NOT NULL default '',

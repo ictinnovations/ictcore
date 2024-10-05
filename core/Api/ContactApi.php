@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\Contact;
 use ICT\Core\CoreException;
 
+#[\AllowDynamicProperties]
 class ContactApi extends Api
 {
 
@@ -21,23 +22,20 @@ class ContactApi extends Api
    *
    * @url POST /contacts
    */
-  //change
   public function create($data = array())
-{
+  {
     $this->_authorize('contact_create');
-    $contact_id = null;
-    if (isset($data['contact_id'])) {
-        $contact_id = $data['contact_id'];
-    }
+
     $oContact = new Contact();
-    $oContact->contact_id = $contact_id;  
-    $oContact->set($data);
+    $this->set($oContact, $data);
+
     if ($oContact->save()) {
-        return $oContact->contact_id;
+      return $oContact->contact_id;
     } else {
-        throw new CoreException(417, 'Contact creation failed');
+      throw new CoreException(417, 'Contact creation failed');
     }
-}
+  }
+
   /**
    * List all available contacts
    *
@@ -70,9 +68,10 @@ class ContactApi extends Api
   public function update($contact_id, $data = array())
   {
     $this->_authorize('contact_update');
-    $oContact = new Contact();
-    $oContact->contact_id = $contact_id;
-    $oContact->set($data);
+
+    $oContact = new Contact($contact_id);
+    $this->set($oContact, $data);
+
     if ($oContact->save()) {
       return $oContact;
     } else {
@@ -108,7 +107,9 @@ class ContactApi extends Api
   {
     $this->_authorize('contact_create');
     $this->_authorize('group_create');
+
     $oContact = new Contact($contact_id);
+
     if ($oContact->link($group_id)) {
       return $oContact;
     } else {
@@ -125,7 +126,9 @@ class ContactApi extends Api
   {
     $this->_authorize('contact_delete');
     $this->_authorize('group_delete');
+
     $oContact = new Contact($contact_id);
+
     $result = $oContact->link_delete($group_id);
     if ($result) {
       return $result;

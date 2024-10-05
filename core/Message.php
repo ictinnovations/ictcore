@@ -97,7 +97,7 @@ class Message implements JsonSerializable
     }
   }
 
-  public function jsonSerialize()
+  public function jsonSerialize():mixed
   {
     $json = array();
     foreach($this as $key => $value) {

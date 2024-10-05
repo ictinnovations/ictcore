@@ -11,6 +11,7 @@ namespace ICT\Core\Api;
 
 use ICT\Core\Api;
 
+#[\AllowDynamicProperties]
 class MessageApi extends Api
 {
   // empty class just to include classes from message folder

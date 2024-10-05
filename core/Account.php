@@ -134,15 +134,28 @@ class Account
       $this->_load();
     }
   }
-//
-public function set($data) {
-  foreach ($data as $field => $value) {
-      // Only set the property if it exists in the Contact object
-      if (property_exists($this, $field)) {
-          $this->$field = $value;
-      }
+
+  public static function construct_from_array($aAccount)
+  {
+    $oAccount = new Account();
+    foreach ($aAccount as $field => $value) {
+      $oAccount->$field = $value;
+    }
+    return $oAccount;
   }
-}
+
+  public static function locate($search_value, $contactField = 'phone')
+  {
+    // locate an existing account
+    $accountFilter = array($contactField => $search_value);
+    $listAccount = static::search($accountFilter);
+    if ($listAccount) {
+      $aAccount = array_shift($listAccount);
+      return Account::load($aAccount['account_id']);
+    }
+    return false; // no account found
+  }
+
   public static function search($aFilter = array())
   {
     $aAccount = array();
@@ -207,18 +220,16 @@ public function set($data) {
 
   public static function getClass(&$account_id, $namespace = 'ICT\\Core\\Account')
   {
-      $account_type = ''; // Initialize the variable here
       if (ctype_digit(trim($account_id))) {
           $query = "SELECT type FROM " . self::$table . " WHERE account_id='%account_id%' ";
           $result = DB::query(self::$table, $query, array('account_id' => $account_id));
-          if (is_resource($result)) {
-              $account_type = mysqli_result($result, 0);
+          if($row = $result->fetch_row()) {
+            $account_type = $row[0];
           }
       } else {
           $account_type = $account_id;
           $account_id   = null;
       }
-      // The rest of the code remains unchanged
       $class_name = ucfirst(strtolower(trim($account_type)));
       if (!empty($namespace)) {
           $class_name = $namespace . '\\' . $class_name;

@@ -29,7 +29,6 @@ class Document extends Message
       'file_name',
       'type',
       'description',
-      'ocr',
       'pages',
       'size_x',
       'size_y',
@@ -72,10 +71,6 @@ class Document extends Message
 
   /** @var string */
   public $description = NULL;
-  
-  /** @var string */
-  public $ocr = NULL;
-  /**
 
   /**
    * @property-read integer $pages
@@ -222,7 +217,6 @@ class Document extends Message
       $this->file_name = $data['file_name'];
       $this->type = $data['type'];
       $this->description = $data['description'];
-      $this->ocr = $data['ocr'];
       $this->pages = $data['pages'];
       $this->size_x = $data['size_x'];
       $this->size_y = $data['size_y'];
@@ -311,7 +305,6 @@ class Document extends Message
         'file_name' => $this->file_name,
         'type' => $this->type,
         'description' => $this->description,
-        'ocr' => $this->ocr,
         'size_x' => $this->size_x,
         'size_y' => $this->size_y,
         'quality' => $this->quality,
@@ -368,15 +361,13 @@ class Document extends Message
     //$mono = ' -c "<< /HalftoneMode 1 >> setuserparams"';
     //$mono = ' -dDITHER=300 -Ilib stocht.ps -c "{ dup .9 lt { pop 0 } if } settransfer"';
     $mono = ' -dDITHER=300 -c "{ dup .85 lt { pop 0 } if } settransfer"'; // ref https://bugs.ghostscript.com/show_bug.cgi?id=694762
-
-      $cmd  = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -sOutputFile='$targetFile.tmp' $mono -f '$pdfFile.ps'";
+    $cmd  = \ICT\Core\sys_which('gs', '/usr/bin') . " -dBATCH -dNOPAUSE -sDEVICE=tiffg3 -sOutputFile='$targetFile.tmp' $mono -f '$pdfFile.ps'";
     Corelog::log("Converting source image into fax support tiff", Corelog::CRUD, $cmd);
     exec($cmd);
     //exec("rm -rf '$sourceFile'");
     // -a for append and -t for tiles i.e pages in correct sequence like A1,A2,A3,B1,B2,C1,C2,C3
     $cmd = \ICT\Core\sys_which('tiffcp', '/usr/bin') . " -x -a '$targetFile.tmp' '$targetFile'";
     exec($cmd);
-
     exec("rm -rf '$targetFile.tmp'");
 
     return $this->pages;
@@ -449,6 +440,32 @@ class Document extends Message
   public function get_pdf_file()
   {
     return $this->create_pdf($this->file_name, $this->type);
+  }
+
+  public static function create_jpg($sourceFile, $page_no = 1)
+  {
+    $jpgFile = $sourceFile . '_' . $page_no . '.jpg';
+
+    $images = new Imagick($sourceFile);
+    for ($i = 1; $i <= $page_no; $i++) {
+      $images->next();
+    }
+    $thumb = $images->current();
+
+    // Providing 0 forces thumbnailImage to maintain aspect ratio
+    $thumb->setResolution(204,98);
+    $thumb->resampleImage(98,98,imagick::FILTER_UNDEFINED,1);
+    // $thumb->thumbnailImage(300,0); show full size
+    $thumb->setImageCompression(imagick::COMPRESSION_JPEG); 
+    $thumb->setImageCompressionQuality(90); 
+    $thumb->writeImage($jpgFile);
+
+    return $jpgFile;
+  }
+
+  public function get_jpg_file($page_no)
+  {
+    return $this->create_jpg($page_no);
   }
 
   public function get_link()

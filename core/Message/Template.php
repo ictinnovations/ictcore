@@ -164,7 +164,7 @@ class Template extends Message
       $this->subject = $data['subject'];
       $this->body = $data['body'];
       $this->body_alt = $data['body_alt'];
-      $this->aAttachment = json_decode($data['attachment']);
+      $this->aAttachment = json_decode($data['attachment'],TRUE);
       $this->attachment = $this->get_attachment();
       $this->type = $data['type'];
       $this->length = $data['length'];

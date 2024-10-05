@@ -14,6 +14,7 @@ use ICT\Core\Conf;
 use ICT\Core\Corelog;
 use ICT\Core\Gateway;
 use ICT\Core\Provider;
+use ICT\Core\Account\Did;
 
 class Freeswitch extends Gateway
 {
@@ -88,7 +89,7 @@ class Freeswitch extends Gateway
       $this->conn = $socket;
       return $this->conn;
     } else {
-    Corelog::log("Freeswitch connection failed with error: $error_msg", Corelog::ERROR);
+      Corelog::log("Freeswitch connection failed", Corelog::ERROR);
       return false;
     }
   }
@@ -193,6 +194,11 @@ class Freeswitch extends Gateway
     return false;
   }
 
+  public static function locate_account($account)
+  {
+    return Did::locate($account, static::CONTACT_FIELD);
+  }
+
   public function config_save($type, $name, $data = '')
   {
     $doc = new DOMDocument();
@@ -221,4 +227,32 @@ class Freeswitch extends Gateway
     $this->_send('bgapi sofia profile ictcore rescan');
   }
 
+  public function provider_status($provider_name) {
+    static $status_array = null;
+
+    if (empty($status_array)) {
+      $this->_send('api sofia status gateway');
+      $api_response = $this->_read();
+      $api_response = explode(PHP_EOL, $api_response);
+      $api_response = preg_grep('/ictcore/i', $api_response);
+      $status_array = array();
+      $key_array = array('name', 'data', 'state', 'ping_time', 'ib_calls', 'ob_calls');
+
+      foreach($api_response as $item) {
+        $charSet = preg_replace(array('/\s{2,}/', '/[\t\n]/'), ' ',  $item);
+        $charSet = rtrim($charSet);
+        $charSetArray = explode(" ", $charSet);
+        $charSetArray = array_filter($charSetArray);
+        $charSetArray = array_combine($key_array, $charSetArray);
+        $providerName = preg_replace('/ictcore::/s','', $charSetArray['name']);
+        $status_array[$providerName] = $charSetArray;
+      }
+    }
+
+    if (isset($status_array[$provider_name])) {
+      return $status_array[$provider_name]['state'];
+    }
+
+    return false; // unable to find status for the given provider
+   }
 }

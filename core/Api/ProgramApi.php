@@ -13,38 +13,32 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Program;
 use ICT\Core\Transmission;
-use ICT\Core\Program\Sendfax;
 
-
+#[\AllowDynamicProperties]
 class ProgramApi extends Api
 {
+
   /**
    * Create a new program
    *
    * @url POST /programs
    * @url POST /programs/$program_name
    */
+  public function create($program_name = null, $data = array())
+  {
+    $this->_authorize('program_create');
 
-   public function create($program_name = null, $data = array())
-   {
-       $this->_authorize('program_create');
-       $oProgram = Program::load($program_name);
-       $oProgram->program_id = $program_name;
-       if (isset($data['name'])) {
-         $oProgram->name = $data['name'];
-     }
-     if (isset($data['type'])) {
-         $oProgram->type = $data['type'];
-     }
-       $oProgram->set($data); // This line is causing the error
-       $this->set($oProgram, $data);
-       if ($oProgram->save()) {
-           $oProgram->deploy();
-           return $oProgram->program_id;
-       } else {
-           throw new CoreException(417, 'Program creation failed');
-       }
-   }
+    $oProgram = Program::load($program_name);
+    $this->set($oProgram, $data);
+
+    if ($oProgram->save()) {
+      $oProgram->deploy();
+      return $oProgram->program_id;
+    } else {
+      throw new CoreException(417, 'Program creation failed');
+    }
+  }
+
   /**
    * Initiate a new transmission for given program
    *
@@ -60,6 +54,7 @@ class ProgramApi extends Api
     if (empty($aTransmission)) {
       throw new CoreException(412, 'Transmission data is missing');
     }
+
     $oProgram = Program::load($program_name);
     $oTransmission = $oProgram->transmission_instant($aProgram, $aTransmission);
 
@@ -96,6 +91,7 @@ class ProgramApi extends Api
     if (ctype_digit($program_name)) {
       return $this->read($program_name);
     }
+
     $this->_authorize('program_list');
     if ($program_name) {
       $query['type'] = $program_name; // add program_name i.e class name as filter
@@ -106,6 +102,7 @@ class ProgramApi extends Api
   public function read($program_id)
   {
     $this->_authorize('program_read');
+
     $oProgram = Program::load($program_id);
     return $oProgram;
   }
@@ -118,8 +115,10 @@ class ProgramApi extends Api
   public function update($program_id, $data = array())
   {
     $this->_authorize('program_update');
+
     $oProgram = Program::load($program_id);
     $this->set($oProgram, $data);
+
     if ($oProgram->save()) {
       $oProgram->deploy();
       return $oProgram;
@@ -127,6 +126,7 @@ class ProgramApi extends Api
       throw new CoreException(417, 'Program update failed');
     }
   }
+
   /**
    * Remove a program
    *
@@ -135,7 +135,9 @@ class ProgramApi extends Api
   public function remove($program_id)
   {
     $this->_authorize('program_delete');
+
     $oProgram = Program::load($program_id);
+
     $result = $oProgram->delete();
     if ($result) {
       return $result;
@@ -143,4 +145,5 @@ class ProgramApi extends Api
       throw new CoreException(417, 'Program delete failed');
     }
   }
+
 }

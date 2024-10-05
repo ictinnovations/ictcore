@@ -64,7 +64,7 @@ class IB_Config
   public $version = null;
   public $is_ini = false;
   public $file_name = '';
-  public $file_path = '/usr/ictcore/etc';
+  public $file_path = '/usr/ictbroadcast/etc';
   public $gateway_flag = 0;
   public $source = '';
   public $group_name = '';
@@ -92,7 +92,7 @@ class IB_Config
 
     $result = DB::query('config', "SELECT config_id FROM config WHERE file_name='$this->file_name' AND file_path='$this->file_path'");
     if (mysqli_num_rows($result)) {
-      $this->config_id = mysqli_result($result, 0, 0);
+      $this->config_id = IB_Config::sql_result($result, 0, 0);
     } else {
       Corelog::log("Creating new Config $this->file_name", Corelog::COMMON);
     }
@@ -193,15 +193,15 @@ class IB_Config
       $raw_description = $this->description;
     }
 
-    $description = mysqli_real_escape_string($raw_description, DB::$link);
-    $data = mysqli_real_escape_string($raw_data, DB::$link);
+    $description = mysqli_real_escape_string(DB::$link, $raw_description);
+    $data = mysqli_real_escape_string(DB::$link, $raw_data );
 
     if ($skip_duplicate) {
       $query = "SELECT COUNT(*) FROM config_data 
                 WHERE group_name='$this->group_name' AND group_child='$this->group_child' AND data='$data' 
                   AND description='$description' AND file_name='$this->file_name'";
-      $rsQry = mysqli_query($query, DB::$link);
-      if (mysqli_result($rsQry, 0, 0) > 0) {
+      $rsQry = mysqli_query(DB::$link, $query);
+      if (IB_Config::sql_result($rsQry, 0, 0) > 0) {
         return false;
       }
     }
@@ -238,7 +238,7 @@ class IB_Config
     // currently not fully implemented
     DB::query('config', "UPDATE config SET version=version+1 WHERE file_name='$this->file_name' LIMIT 1");
     $result = DB::query('config', "SELECT version FROM config WHERE file_name='$this->file_name' LIMIT 1");
-    $this->version = mysqli_result($result, 0, 0);
+    $this->version = IB_Config::sql_result($result, 0, 0);
     return $this->version;
   }
 
@@ -335,4 +335,9 @@ class IB_Config
     }
   }
 
+  public static function sql_result($result, $number, $field=0) {
+        mysqli_data_seek($result, $number);
+        $row = mysqli_fetch_array($result);
+        return $row[$field];
+  }
 }

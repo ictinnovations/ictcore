@@ -39,7 +39,7 @@ class Sendsms extends Program
   public $text_id = '[text:text_id]';
 
   /**
-   * return a name value pair of all aditional program parameters which we need to save
+   * return a name value pair of all additional program parameters which we need to save
    * @return array
    */
   public function parameter_save()

@@ -15,6 +15,7 @@ use ICT\Core\Corelog;
 use ICT\Core\Message\Template;
 use SplFileInfo;
 
+#[\AllowDynamicProperties]
 class TemplateApi extends Api
 {
 

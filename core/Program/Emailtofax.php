@@ -14,9 +14,9 @@ use ICT\Core\Account;
 use ICT\Core\Application\Email_receive;
 use ICT\Core\Conf;
 use ICT\Core\Contact;
-use ICT\Core\Core;
 use ICT\Core\CoreException;
 use ICT\Core\Exchange\Dialplan;
+use ICT\Core\Gateway\Sendmail;
 use ICT\Core\Message\Document;
 use ICT\Core\Message\Template;
 use ICT\Core\Program;
@@ -51,7 +51,7 @@ class Emailtofax extends Program
   public $account_id = '[transmission:account:account_id]';
 
   /**
-   * return a name value pair of all aditional program parameters which we need to save
+   * return a name value pair of all additional program parameters which we need to save
    * @return array
    */
   public function parameter_save()
@@ -73,7 +73,7 @@ class Emailtofax extends Program
       $oAccount = new Account($this->account_id);
       return $oAccount;
     } else if (isset($this->email) && !empty($this->email)) {
-      $oAccount = Core::locate_account($this->email, 'email');
+      $oAccount = Sendmail::locate_account($this->email);
       if ($oAccount) {
         // update account_id with new value, and remove all temporary parameters
         $this->account_id = $oAccount->account_id;
@@ -235,7 +235,7 @@ class Emailtofax extends Program
             file_put_contents($coversheet_pdf, $dompdf->output());
             // prepend pdf into existing attachment list
             if (is_file($coversheet_pdf)) {
-              $attachment = \ICT\Core\path_prepend($attachment);
+              $attachment = \ICT\Core\path_prepend($attachment, $coversheet_pdf);
             }
           }
         }

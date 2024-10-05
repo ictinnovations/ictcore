@@ -14,6 +14,7 @@ use ICT\Core\CoreException;
 use ICT\Core\User\Permission;
 use ICT\Core\User\Role;
 
+#[\AllowDynamicProperties]
 class RoleApi extends Api
 {
 

@@ -11,8 +11,8 @@ namespace ICT\Core\Program;
 
 use ICT\Core\Account;
 use ICT\Core\Application\Email_receive;
-use ICT\Core\Core;
 use ICT\Core\Exchange\Dialplan;
+use ICT\Core\Gateway\Sendmail;
 use ICT\Core\Program;
 use ICT\Core\Result;
 use ICT\Core\Scheme;
@@ -43,7 +43,7 @@ class Receiveemail extends Program
   public $account_id = '[transmission:account:account_id]';
 
   /**
-   * return a name value pair of all aditional program parameters which we need to save
+   * return a name value pair of all additional program parameters which we need to save
    * @return array
    */
   public function parameter_save()
@@ -65,7 +65,7 @@ class Receiveemail extends Program
       $oAccount = new Account($this->account_id);
       return $oAccount;
     } else if (isset($this->email) && !empty($this->email)) {
-      $oAccount = Core::locate_account($this->email, 'email');
+      $oAccount = Sendmail::locate_account($this->email);
       if ($oAccount) {
         // update account_id with new value, and remove all temporary parameters
         $this->account_id = $oAccount->account_id;

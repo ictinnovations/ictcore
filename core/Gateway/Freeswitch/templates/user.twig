@@ -8,8 +8,8 @@
   </extension>
 {% endfor %}
   <extension name="external_extension">
-    <condition field="destination_number" expression="^0\d*$">
-      <action application="transfer" data="${destination_number} XML ictcore_gateway"/>
+    <condition field="destination_number" expression="^(\+|011|00|01|0)(\d+)$">
+      <action application="transfer" data="$2 XML ictcore_gateway"/>
     </condition>
   </extension>
   <extension name="catch_invalid">

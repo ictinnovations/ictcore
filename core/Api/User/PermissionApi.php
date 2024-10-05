@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\User\Permission;
 
+#[\AllowDynamicProperties]
 class PermissionApi extends Api
 {
 

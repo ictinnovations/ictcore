@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Message\Text;
 
+#[\AllowDynamicProperties]
 class TextApi extends Api
 {
 

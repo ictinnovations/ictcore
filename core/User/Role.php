@@ -206,7 +206,7 @@ class Role
     $aPart = explode('_', $permission);
     $level = count($aPart);
     $perm = '';
-    
+
     // first check if parent permission exist and then try for sub permissions
     for ($i = 0; $i < $level; $i++) {
       $perm .= $aPart[$i];
@@ -218,5 +218,5 @@ class Role
     }
     return false;
   }
-  
+
 }

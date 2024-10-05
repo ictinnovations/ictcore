@@ -85,6 +85,21 @@ class Gateway
     return '.';
   }
 
+  public static function locate_account($account)
+  {
+    return Account::locate($account, static::CONTACT_FIELD);
+  }
+
+  public static function locate_contact($contact)
+  {
+    // first search for matching accounts, to detect internal communication
+    $oAccount = Account::locate($contact, static::CONTACT_FIELD);
+    if (!empty($oAccount)) {
+      return $oAccount;
+    }
+    return Contact::locate($contact, static::CONTACT_FIELD);
+  }
+
   public function config_save($type, $name, $data = '')
   {
     Corelog::log("Gateway->config_save demo. type: $type, name: $name", Corelog::WARNING, $data);
@@ -100,4 +115,8 @@ class Gateway
     Corelog::log('Gateway->config_reload', Corelog::WARNING);
   }
 
+  public function provider_status($provider_name)
+  {
+    return false;
+  }
 }

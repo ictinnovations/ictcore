@@ -319,7 +319,7 @@ class Recording extends Message
   {
     $type = array();
     $query = DB::query('codec', 'SELECT * FROM codec WHERE active=1');
-    while ($codec = mysqli_fetch_object($query)) {
+    while ($codec = mysql_fetch_object($query)) {
       $type[$codec->codec_value] = $codec->codec_value;
     }
     return $type;

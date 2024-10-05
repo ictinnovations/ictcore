@@ -49,3 +49,5 @@ SELECT @permissionId := permission_id FROM permission WHERE name='group';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* group */
 SELECT @permissionId := permission_id FROM permission WHERE name='campaign';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* campaign */
+SELECT @permissionId := permission_id FROM permission WHERE name='enduser_password';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* enduser_password */

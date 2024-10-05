@@ -13,6 +13,7 @@ use ICT\Core\Api;
 use ICT\Core\Result;
 use ICT\Core\Spool;
 
+#[\AllowDynamicProperties]
 class SpoolApi extends Api
 {
 

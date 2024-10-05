@@ -21,4 +21,17 @@ SELECT @permissionId := permission_id FROM permission WHERE name='account';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* account */
 SELECT @permissionId := permission_id FROM permission WHERE name='provider';
 INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* provider */
+SELECT @permissionId := permission_id FROM permission WHERE name='tenant';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* tenant */
 
+/* Additional Permissions */
+SELECT @permissionId := permission_id FROM permission WHERE name='transmission';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* transmission */
+SELECT @permissionId := permission_id FROM permission WHERE name='document';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* document */
+SELECT @permissionId := permission_id FROM permission WHERE name='contact';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* contact */
+SELECT @permissionId := permission_id FROM permission WHERE name='group';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* group */
+SELECT @permissionId := permission_id FROM permission WHERE name='campaign';
+INSERT INTO role_permission VALUES (NULL, @roleId, @permissionId);   /* campaign */

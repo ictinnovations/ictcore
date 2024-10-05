@@ -29,7 +29,7 @@ function application_fetch()
 
   -- application_data = JSON:encode must be placed before application_id, And I don't know why ?
   api_request['application_data'] = JSON:encode(app_result)
-  api_request['spool_id']         = spool_id
+  api_request['spool_id']         = tostring(env:getHeader("spool_id"))
   api_request['application_id']   = app_id
 
   -- disable any further execution, untill we have fresh application id

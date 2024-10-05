@@ -5,10 +5,11 @@ namespace ICT\Core;
 /* * ***************************************************************
  * Copyright © 2014 ICT Innovations Pakistan All Rights Reserved   *
  * Developed By: Nasir Iqbal                                       *
- * Website : http://www.ictinnovations.com/                        *        
+ * Website : http://www.ictinnovations.com/                        *
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
+// DB related functions
 class DB
 {
 
@@ -22,9 +23,7 @@ class DB
     $db_pass = Conf::get('db:pass', '');
     $db_name = Conf::get('db:name', 'ictcore');
 
-    if (!is_string($db_host)) {
-      throw new CoreException('500', 'Invalid database host format');
-  }
+    // $link = mysqli_connect($db_host, $db_user, $db_pass, $link_new);
     $link = mysqli_connect($db_host, $db_user, $db_pass);
     if (!$link) {
       throw new CoreException('500', 'Unable to connect database server error:' . mysqli_error($link));
@@ -183,7 +182,6 @@ class DB
         'smallint', 'tinyint', 'function'
     );
 
-// session chack
     $row_id = FALSE;
     $oSession = Session::get_instance();
     $user_id = $oSession->user->user_id;
@@ -191,9 +189,9 @@ class DB
     $data = array();
     $query_start = '';
     $query_end = '';
-    // $query_data  = '';
+    //$query_data  = '';
 
-    $col_result = mysqli_query(DB::$link,  "SHOW COLUMNS FROM $table");
+    $col_result = mysqli_query(DB::$link, "SHOW COLUMNS FROM $table");
     if ($col_result === FALSE) {
       Corelog::log("DB:unknown table: $table: " . mysqli_error(DB::$link), Corelog::ERROR);
       return FALSE;
@@ -220,7 +218,6 @@ class DB
             break;
           }
         default:
-
           if (array_key_exists($column_name, $values) && $values[$column_name] !== NULL) {
             //  update <=              or if INSERT then don't include empty values
             if ($primary_key !== FALSE || ($primary_key === FALSE && $values[$column_name] != '')) {
@@ -228,12 +225,10 @@ class DB
               $columns[$column_name]['Value'] = mysqli_real_escape_string(DB::$link, $values[$column_name]);
             }
           }
-          
           break;
       }
     }
 
-   
     if ($primary_key === FALSE) { // new record => INSERT
       // this will fix a bug related to pooerly written loops
       if (isset($values['primary_key']) && $values['primary_key'] == $values[$table . '_id']) {
@@ -314,27 +309,25 @@ class DB
     }
     return $qry_result;
   }
+
   public static function query_result($table, $query, $field, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
   {
-    $result = self::query($table, $query, $aValues , $field, $check_auth, $foreign_table, $foreign_key);
-      if ($result instanceof \mysqli_result) {
-          while ($row = mysqli_fetch_assoc($result)) {
-              if (array_key_exists($field, $row)) {
-                  return $row[$field];
-              }
-          }
-      } else {
-          // Handle the case where the query result is not a valid mysqli_result
-          return null;
+    $result = self::query($table, $query, $aValues , $check_auth, $foreign_table, $foreign_key);
+    if ($result instanceof \mysqli_result) {
+      while($row = mysqli_fetch_assoc($result)) {
+        return $row[$field];
       }
-      return null;
+    }
+    return null;
   }
+
   static function query($table, $req_query, $aValues = array(), $check_auth = FALSE, $foreign_table = '', $foreign_key = '')
   {
     $values = array();
     foreach ($aValues as $key => $value) {
       $values["%$key%"] = mysqli_real_escape_string(DB::$link, $value);
     }
+
     if ($check_auth) {
       if ($foreign_table == '') {
         $values['%auth_filter%'] = self::auth_filter($table);
@@ -350,22 +343,17 @@ class DB
       $boolStr = ($values['%auth_filter%']) ? 'TRUE' : 'FALSE';
       $req_query = preg_replace('/(\w*\.)?\%auth_filter\%/', $boolStr, $req_query);
     }
+
     $final_query = str_replace(array_keys($values), array_values($values), $req_query);
     Corelog::log("DB:query executed on table: $table", Corelog::DEBUG, $final_query);
-    $result = mysqli_query(DB::$link, $final_query);
-    
-    if (!$result) {
-        Corelog::log("Error executing query: $final_query", Corelog::ERROR);
-        Corelog::log("MySQL Error: " . mysqli_error(DB::$link), Corelog::ERROR);
-    }
-    
-    return $result;
-
+    return mysqli_query(DB::$link, $final_query);
   }
+
   static function delete($table, $primary_key, $row_id, $check_auth = FALSE, $foreign_table = '', $foreign_key = '', $foreign_value = '')
   {
     $values = array($primary_key => $row_id);
     Corelog::log("DB:delete requested on table: $table", Corelog::DEBUG);
+
     if ($check_auth) {
       $query = "DELETE FROM $table WHERE $primary_key=%$primary_key% AND %auth_filter%";
       $values[$foreign_key] = $foreign_value;
@@ -375,6 +363,7 @@ class DB
       return self::query($table, $query, $values, FALSE);
     }
   }
+
   static function auth_filter($table, $auth_key = 'created_by', $auth_value = FALSE)
   {
     if (can_access($table . '_admin')) {

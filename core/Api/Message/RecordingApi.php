@@ -15,6 +15,7 @@ use ICT\Core\Corelog;
 use ICT\Core\Message\Recording;
 use SplFileInfo;
 
+#[\AllowDynamicProperties]
 class RecordingApi extends Api
 {
 

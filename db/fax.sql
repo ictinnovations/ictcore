@@ -12,11 +12,10 @@
 CREATE TABLE document
 (
    document_id              int(11) unsigned       NOT NULL auto_increment,
-   name                     varchar(128)           NOT NULL default '0',
-   type                     varchar(8)             NOT NULL,
-   file_name                varchar(128)           NOT NULL,
+   name                     varchar(128)           NOT NULL default '',
+   type                     varchar(8)             NOT NULL default '',
+   file_name                varchar(128)           NOT NULL default '',
    description              varchar(255)           NOT NULL default '',
-   ocr                      blob                   default NULL,
    pages                    int(11)                NOT NULL default 0,
    size_x                   int(11)                NOT NULL default 0,
    size_y                   int(11)                NOT NULL default 0,

@@ -14,9 +14,10 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\User;
 use ICT\Core\User\Permission;
-use ICT\Core\User\Role;
 use ICT\Core\Conf;
+use ICT\Core\Session;
 
+#[\AllowDynamicProperties]
 class UserApi extends Api
 {
 
@@ -38,37 +39,6 @@ class UserApi extends Api
       throw new CoreException(417, 'User creation failed');
     }
   }
-
-  /**
-   * PUT CRM Configuration
-   *
-   * @url PUT /users/$user_id/config/$config_name
-   */
-  public function config_set($user_id, $config_name, $data)
-  {
-    $this->_authorize('user_update');
-
-    $reference = array();
-    $reference['created_by'] = $user_id;
-    $reference['class']      = Conf::USER;
-
-    $config_value = $data;
-
-    Conf::set($config_name, $config_value, true, $reference, Conf::PERMISSION_USER_WRITE);
-    return true;
-  }
-
-  /**
-   * GET CRM Configuration
-   *
-   * @url GET /users/$user_id/config/$config_name
-   */
-  public function config_get($user_id, $config_name)
-  {
-    $this->_authorize('user_read');
-
-    return Conf::get($config_name, '');
-  } 
 
   /**
    * List all available users
@@ -123,6 +93,26 @@ class UserApi extends Api
     $this->_authorize('user_password');
 
     $oUser = new User($user_id);
+    $oUser->password = $data['password'];
+
+    if ($oUser->save()) {
+      return $oUser;
+    } else {
+      throw new CoreException(417, 'User password update failed');
+    }
+  }
+  
+  /**
+   * Update user passwd
+   *
+   * @url PUT /password/users
+   */
+  public function update_password_enduser($data = array())
+  {
+    $this->_authorize('enduser_password');
+
+    $oSession = Session::get_instance();
+    $oUser = new User($oSession->user->user_id);
     $oUser->password = $data['password'];
 
     if ($oUser->save()) {
@@ -258,5 +248,84 @@ class UserApi extends Api
     $filter['created_by'] = $user_id;
     return Account::search($filter);
   }
+
+  /**
+   * PUT User Configuration
+   *
+   * @url PUT /users/$user_id/config/$config_name
+   */
+  public function config_set($user_id, $config_name, $data)
+  {
+    $this->_authorize('user_update');
+
+    $reference = array();
+    $reference['created_by'] = $user_id;
+    $reference['class']      = Conf::USER;
+
+    $config_value = $data;
+
+    Conf::set($config_name, $config_value, true, $reference, Conf::PERMISSION_USER_WRITE);
+    return true;
+  }
+
+  /**
+   * GET User Configuration
+   *
+   * @url GET /users/$user_id/config/$config_name
+   */
+  public function config_get($user_id, $config_name)
+  {
+    $this->_authorize('user_read');
+
+    return Conf::get($config_name, '');
+  }
+
+  /**
+   * Upload logo by user_id
+   *
+   * @url PUT /users/$user_id/media
+   */
+  public function upload($user_id, $data = null, $mime = 'image/jpeg')
+  {
+    $this->_authorize('user_read');
+
+    global $path_data;
+    if (!empty($data)) {
+      if (in_array($mime, User::$media_supported)) {
+        $extension = array_search($mime, User::$media_supported);
+        $filename = $path_data . DIRECTORY_SEPARATOR . 'logo' . DIRECTORY_SEPARATOR . $user_id . '.' . $extension;
+        if (file_put_contents($filename, $data)) {
+          
+           // Save Configuration for logo 
+          $reference = array();
+          $reference['created_by'] = $user_id;
+          $reference['class']      = Conf::USER;
+
+          $config_name = 'site:logo';
+          $config_value = $filename;
+
+          Conf::set($config_name, $config_value, true, $reference, Conf::PERMISSION_USER_WRITE);
+
+          return $filename;
+        } else {
+          throw new CoreException(417, 'User media upload failed');
+        }
+      } else {
+        throw new CoreException(415, 'User media upload failed, invalid file type');
+      }
+    } else {
+      throw new CoreException(411, 'User media upload failed, no file uploaded');
+    }
+  } 
+  
+  /**
+   * GET logo by user_id
+   *
+   * @noAuth
+   * @url GET /users/$user_id/media
+   */
+   public function get_media($user_id) {
+     $oUser = new User($user_id);
+     return $oUser->show_image($user_id);
+   }
 }
-?>

@@ -73,8 +73,8 @@ CREATE TRIGGER usr_insert AFTER INSERT
 |
 CREATE TRIGGER usr_update AFTER UPDATE
   ON usr FOR EACH ROW BEGIN
-    UPDATE account SET email = NEW.email , phone = NEW.phone WHERE type = 'account' AND created_by = NEW.usr_id limit 1;
-  END; 
+    UPDATE account SET email = NEW.email, phone = NEW.phone WHERE type = 'account' AND created_by = NEW.usr_id limit 1;
+  END;
 |
 DELIMITER ;
 
@@ -558,15 +558,14 @@ CREATE TABLE transmission (
 CREATE TABLE campaign
 (
    campaign_id               int(11) unsigned       NOT NULL auto_increment,
-   program_id                int(11)                default NULL,
-   group_id                  int(11)                default NULL,
+   program_id                int(11)                NOT NULL,
+   group_id                  int(11)                NOT NULL ,
    account_id                int(11)                default NULL,
    cpm                       int(11)                NOT NULL default 2,
    try_allowed               int(11)                NOT NULL default 1,
    contact_total             int(11)                NOT NULL default 0,
    contact_done              int(11)                NOT NULL default 0,
    status                    varchar(128)           NOT NULL default '',
-   source                    varchar(128)           NOT NULL default '',
    pid                       varchar(128)           NOT NULL default '',
    last_run                  int(11)                default NULL,
    date_created              int(11)                default NULL,
@@ -630,7 +629,7 @@ CREATE TABLE spool (
    call_id                     varchar(80)              NOT NULL default '',
    status                      varchar(80)              NOT NULL default '',
    response                    varchar(80)              NOT NULL default '',
-   amount                      int(11)                  NULL default 0,
+   amount                      int(11)                  NOT NULL default 0,
    service_flag                int(11) unsigned         default NULL,
    transmission_id             int(11) unsigned         default NULL,
    provider_id                 int(11) unsigned         default NULL,
@@ -776,7 +775,7 @@ CREATE TABLE application (
    name                        varchar(64)              NOT NULL default '',
    type                        varchar(64)              NOT NULL default '',
    data                        text,
-   weight                      int(4)                   NULL default 0,
+   weight                      int(4)                   NOT NULL default 0,
    program_id                  int(11) unsigned         default NULL,
    PRIMARY KEY (application_id)
 ) ENGINE = InnoDB;
@@ -789,9 +788,9 @@ CREATE INDEX application_programe_id ON application (program_id);
 CREATE TABLE action (
    action_id                   int(11) unsigned         NOT NULL auto_increment,
    type                        varchar(128)             NOT NULL default '',
-   action                      int(11)                  NULL default 0,
+   action                      int(11)                  NOT NULL default 0,
    data                        varchar(64)              NOT NULL default '',
-   weight                      int(4)                   NULL default 0,
+   weight                      int(4)                   NOT NULL default 0,
    is_default                  int(1)                   default 0,
    application_id              int(11) unsigned         default NULL,
    PRIMARY KEY (action_id)
@@ -807,7 +806,7 @@ CREATE TABLE provider
    provider_id                   int(11) unsigned       NOT NULL auto_increment,
    name                          varchar(128)           NOT NULL default '',
    service_flag                  int(11) unsigned       default NULL,
-   node_id                       int(11) unsigned       NULL,
+   node_id                       int(11) unsigned       default NULL,
    host                          varchar(128)           NOT NULL default '',
    port                          int(6)                 NOT NULL default 5060,
    username                      varchar(128)           NOT NULL default '',
@@ -1808,3 +1807,18 @@ INSERT INTO auto_number SELECT num0+16, num1+16, num2+16, num3+16, num4+16 FROM 
 INSERT INTO auto_number SELECT num0+32, num1+32, num2+32, num3+32, num4+32 FROM auto_number;
 INSERT INTO auto_number SELECT num0+64, num1+64, num2+64, num3+64, num4+64 FROM auto_number;
 INSERT INTO auto_number SELECT num0+128, num1+128, num2+128, num3+128, num4+128 FROM auto_number;
+
+/* Multi-tenant configuration*/
+INSERT INTO configuration VALUES (NULL,'site','title','0',250);
+INSERT INTO configuration VALUES (NULL,'site','footer','0',250);
+INSERT INTO configuration VALUES (NULL,'site','logo','0',250);
+INSERT INTO configuration VALUES (NULL,'site','email','0',250);
+
+INSERT INTO configuration VALUES (NULL,'site','github','0',250);
+INSERT INTO configuration VALUES (NULL,'site','facebook','0',250);
+INSERT INTO configuration VALUES (NULL,'site','twitter','0',250);
+INSERT INTO configuration VALUES (NULL,'site','linkedin','0',250);
+
+/* End user password permission */
+
+INSERT INTO permission VALUES (NULL, 'enduser_password', '');

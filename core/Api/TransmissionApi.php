@@ -23,6 +23,7 @@ use ICT\Core\Service\Voice;
 use ICT\Core\Spool;
 use ICT\Core\Transmission;
 
+#[\AllowDynamicProperties]
 class TransmissionApi extends Api
 {
 
@@ -31,61 +32,52 @@ class TransmissionApi extends Api
    *
    * @url POST /transmissions
    */
+  public function create($data = array())
+  {
+    $this->_authorize('transmission_create');
 
-   public function setTransmissionData($transmission, $data)
-   {
-       foreach ($data as $key => $value) {
-           $transmission->$key = $value;
-       }
-   }
+    if (empty($data['program_id'])) {
+      throw new CoreException(412, 'program_id is missing');
+    }
+    if (empty($data['contact_id'])) {
+      if (!empty($data['phone']) || !empty($data['email'])) {
+        $oContact = new Contact();
+        $oContact->phone = empty($data['phone']) ? null : $data['phone'];
+        $oContact->email = empty($data['email']) ? null : $data['email'];
+        $oContact->save();
+        $contact_id = $oContact->contact_id;
+        unset($data['phone']);
+        unset($data['email']);
+      } else {
+        throw new CoreException(412, 'contact is missing');
+      }
+    } else {
+      $contact_id = $data['contact_id'];
+    }
+    unset($data['contact_id']);
 
-   public function create($data = array())
-   {
-       $this->_authorize('transmission_create');
+    if (empty($data['account_id'])) {
+      $oAccount = new Account(Account::USER_DEFAULT);
+      $account_id = $oAccount->account_id;
+    } else {
+      $account_id = $data['account_id'];
+    }
+    unset($data['account_id']);
 
-       if (empty($data['program_id'])) {
-           throw new CoreException(412, 'program_id is missing');
-       }
-       if (empty($data['contact_id'])) {
-           if (!empty($data['phone']) || !empty($data['email'])) {
-               $oContact = new Contact();
-               $oContact->phone = empty($data['phone']) ? null : $data['phone'];
-               $oContact->email = empty($data['email']) ? null : $data['email'];
-               $oContact->save();
-               $contact_id = $oContact->contact_id;
-               unset($data['phone']);
-               unset($data['email']);
-           } else {
-               throw new CoreException(412, 'contact is missing');
-           }
-       } else {
-           $contact_id = $data['contact_id'];
-       }
-       unset($data['contact_id']);
+    $direction = empty($data['direction']) ? Transmission::OUTBOUND : $data['direction'];
+    unset($data['direction']);
 
-       if (empty($data['account_id'])) {
-           $oAccount = new Account(Account::USER_DEFAULT);
-           $account_id = $oAccount->account_id;
-       } else {
-           $account_id = $data['account_id'];
-       }
-       unset($data['account_id']);
+    $oProgram = Program::load($data['program_id']);
+    $oTransmission = $oProgram->transmission_create($contact_id, $account_id, $direction);
+    $this->set($oTransmission, $data);
 
-       $direction = empty($data['direction']) ? Transmission::OUTBOUND : $data['direction'];
-       unset($data['direction']);
+    if ($oTransmission->save()) {
+      return $oTransmission->transmission_id;
+    } else {
+      throw new CoreException(417, 'Transmission creation failed');
+    }
+  }
 
-       $oProgram = Program::load($data['program_id']);
-       $oTransmission = $oProgram->transmission_create($contact_id, $account_id, $direction);
-
-       // Use the setTransmissionData method to set data in the $oTransmission object
-       $this->setTransmissionData($oTransmission, $data);
-
-       if ($oTransmission->save()) {
-           return $oTransmission->transmission_id;
-       } else {
-           throw new CoreException(417, 'Transmission creation failed');
-       }
-   }
   /**
    * List all available transmissions
    *
@@ -104,7 +96,7 @@ class TransmissionApi extends Api
     }
     return $listTransmission;
   }
-  
+
   /**
    * List all available calls
    *
@@ -115,7 +107,7 @@ class TransmissionApi extends Api
     $data['service_flag'] = Voice::SERVICE_FLAG;
     return $this->list_view($data);
   }
-  
+
   /**
    * List all available faxs
    *
@@ -124,10 +116,9 @@ class TransmissionApi extends Api
   public function fax_list($data = array())
   {
     $data['service_flag'] = Fax::SERVICE_FLAG;
-    // var_dump($data);
     return $this->list_view($data);
   }
-  
+
   /**
    * List all available SMS messages
    *
@@ -282,7 +273,6 @@ class TransmissionApi extends Api
    */
   public function status($transmission_id)
   {
-    // var_dump($transmission_id);
     $this->_authorize('transmission_read');
 
     $oTransmission = new Transmission($transmission_id);
@@ -318,9 +308,8 @@ class TransmissionApi extends Api
 
     $listSpool = $this->detail($transmission_id);
     $aSpool    = end($listSpool);
-    
+
     $filter  = (array)$query;
-    // var_dump($filter);
     $filter += array('spool_id' => $aSpool['spool_id']);
 
     return Result::search($filter);

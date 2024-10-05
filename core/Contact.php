@@ -9,12 +9,6 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * *************************************************************** */
 
- use ICT\Core\Corelog;
- use ICT\Core\DB;
- use ICT\Core\Conf;
- use ICT\Core\CoreException;
-
- 
 class Contact
 {
 
@@ -96,12 +90,27 @@ class Contact
       $this->address = Conf::get('company:address', 'PK');
     }
   }
-  public function set($data) {
-      foreach ($data as $field => $value) {
-          if (property_exists($this, $field)) {
-              $this->$field = $value;
-          }
-      }
+
+  public static function construct_from_array($aContact)
+  {
+    $oContact = new Contact();
+    foreach ($aContact as $field => $value) {
+      $oContact->$field = $value;
+    }
+    return $oContact;
+  }
+
+  public static function locate($contact, $contactField = 'phone')
+  {
+    // locate an existing contact or create it
+    $contactFilter = array($contactField => $contact);
+    $listContact = Contact::search($contactFilter);
+    if ($listContact) {
+      $aContact = array_shift($listContact);
+      $oContact = new Contact($aContact['contact_id']);
+      return $oContact;
+    }
+    return false;
   }
 
   public static function search($aFilter = array(), $full = false)
@@ -143,6 +152,7 @@ class Contact
     if (!empty($aWhere)) {
       $from_str .= ' WHERE ' . implode(' AND ', $aWhere);
     }
+
     if ($full) {
       $query = "SELECT c.contact_id, c.first_name, c.last_name, c.phone, c.email, c.address, "
               ."c.custom1, c.custom2, c.custom3, c.description FROM " . $from_str;
@@ -154,6 +164,7 @@ class Contact
     while ($data = mysqli_fetch_assoc($result)) {
       $aContact[] = $data;
     }
+
     // if no contact found, check for special contacts
     if (empty($aContact) && isset($aFilter['contact_id']) && $aFilter['contact_id'] == Contact::COMPANY) {
       $oContact = new Contact($aFilter['contact_id']);
@@ -171,6 +182,7 @@ class Contact
       }
       $aContact = $singleContact;
     }
+
     return $aContact;
   }
 
@@ -196,13 +208,15 @@ class Contact
       throw new CoreException('404', 'Contact not found');
     }
   }
+
   public function delete()
   {
     Corelog::log("Contact delete", Corelog::CRUD);
-    mysqli_query("DELETE FROM contact_link WHERE contact_id = " . $this->contact_id);
+    mysql_query("DELETE from contact_link where contact_id=".$this->contact_id);
     DB::delete(self::$table_link, 'contact_id', $this->contact_id);
     return DB::delete(self::$table, 'contact_id', $this->contact_id);
   }
+
   public function __isset($field)
   {
     $method_name = 'isset_' . $field;
@@ -298,16 +312,19 @@ class Contact
   public function link_delete($group_id = null)
   {
     if ($group_id == null) {
-      $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id = %contact_id%";
+      $link_delete_query = "DELECT FROM ".self::$table_link." WHERE contact_id=%contact_id%";
     } else {
-      $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id = %contact_id% AND group_id = %group_id%";
+      $link_delete_query = "DELETE FROM ".self::$table_link." WHERE contact_id=%contact_id% AND group_id=%group_id%";
     }
-    DB::query(self::$table, $link_delete_query, array('contact_id' => $this->contact_id, 'group_id' => $group_id));
-    $get_link_count = mysqli_query("SELECT * FROM contact_link");
-    $result_add = mysqli_query("DELETE FROM contact_link WHERE contact_id = ".$this->contact_id." AND group_id = ".$group_id);
-    $result = mysqli_num_rows($get_link_count) - 1;
+    DB::query(self::$table, $req_query, array('contact_id' => $this->contact_id, 'group_id' => $group_id));
+    $get_link_count = mysqli_query("SELECT * from contact_link");
+    $result_add = mysqli_query("DELETE from contact_link where contact_id=".$this->contact_id." AND group_id=".$group_id);
+    $result = mysqli_num_rows($get_link_count)-1;
+    //$count_contact = mysql_query("SELECT * from contact_link where group_id=".$group_id." GROUP BY contact_id");
+    //$cont_result =  mysql_num_rows($count_contact);
+    //$udate_group = mysql_query("UPDATE contact_group set contact_count=".$cont_result." where group_id=".$group_id);
     Corelog::log("group contacts Deleted: ", Corelog::CRUD);
-    return $result;
+    return $result ;
   }
 
 }
