@@ -648,3 +648,41 @@ class Transmission
   }
 
 }
+
+public function faxlogs($transmission_id , $status) {
+  $response = $this->oSpool->response;
+  $activity = new Activity();
+  $activity->faxlogs($transmission_id , $response);   
+}
+
+public function getfaxlogs($transmission_id){
+  $username = Session::get_instance()->user->username;
+  $activity = new Activity();
+  $activity->faxactivity("View Fax-logs by $username" , $transmission_id);
+  $query = "SELECT l.* 
+  FROM faxlogs AS l  
+  WHERE l.faxid = $transmission_id ";
+  $result = DB::query('faxlogs' , $query);
+  while ($data = $result->fetch_assoc()) {
+    $faxlogs[] = $data;
+  }
+  if(empty($faxlogs)){
+    return "";
+  }
+  return $faxlogs;
+}
+
+public function getfaxactivity($transmission_id){
+$query = "SELECT a.* 
+FROM faxactivity AS a  
+WHERE a.faxid = $transmission_id 
+ORDER BY a.id DESC";
+$result = DB::query('faxactivity' , $query);
+while ($data = $result->fetch_assoc()) {
+  $faxactivity[] = $data;
+}
+if(empty($faxactivity)){
+  return "";
+}
+return $faxactivity;
+}

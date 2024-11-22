@@ -315,4 +315,28 @@ class TransmissionApi extends Api
     return Result::search($filter);
   }
 
+     /**
+   * Gets the transmission by id
+   *noAuth
+   * @url GET /transmissions/faxactivity/$transmission_id
+   */
+  public function faxactivity($transmission_id)
+  {
+    $oTransmission = new Transmission($transmission_id);
+    return $oTransmission->getfaxactivity($transmission_id);
+  }
+
+  
+  /**
+   * Gets the transmission by id
+   *noAuth
+   * @url GET /transmissions/faxlogs/$transmission_id
+   */
+  public function faxlogs($transmission_id)
+  {
+    $oTransmission = new Transmission($transmission_id);
+    return $oTransmission->getfaxlogs($transmission_id);
+  }
+
+
 }

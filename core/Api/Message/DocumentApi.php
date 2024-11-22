@@ -107,9 +107,10 @@ class DocumentApi extends Api
    * Download document by id
    * @noAuth
    * @url GET /documents/$document_id/media
+   * @url GET /documents/$document_id/media/$transmission_id
    * @url GET /messages/documents/$document_id/media
    */
-  public function download($document_id, $query = array())
+  public function download($document_id, $transmission_id = NULL, $query = array())
   {
     // $this->_authorize('document_read');
 
@@ -123,6 +124,11 @@ class DocumentApi extends Api
     }
     if (file_exists($output_file)) {
       $oFile = new SplFileInfo($output_file);
+      $currentuser = Session::get_instance()->user->username;
+      $activity = new Activity();
+      if($transmission_id){
+      $activity->faxactivity("Downloaded/View By $currentuser" , $transmission_id);       
+      }
       return $oFile;
     } else {
       throw new CoreException(404, 'Document media not found');
