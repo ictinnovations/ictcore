@@ -131,6 +131,8 @@ if (!empty($emails)) {
     $attachment = \ICT\Core\path_array_to_string($aAttachment);
 
     $status = imap_setflag_full($conn, $email_number, "\\Seen");
+    imap_delete($conn, $email_number);
+    imap_expunge($conn);
     try {
       imap_mail_move($conn, $email_number, "$box_inbox.$box_dump");
     } catch (Exception $ex) {

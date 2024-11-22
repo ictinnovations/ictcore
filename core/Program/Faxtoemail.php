@@ -29,6 +29,8 @@ use ICT\Core\Service\Fax;
 use ICT\Core\Session;
 use ICT\Core\Token;
 use ICT\Core\Transmission;
+use ICT\Core\DB;
+
 
 class Faxtoemail extends Program
 {
@@ -279,8 +281,20 @@ class Faxtoemail extends Program
     );
 
     // Now we are ready to create new transmission for email
-    $emailTransmission = Sendemail::transmission_instant($programData, $transmissionData);
-    $emailTransmission->task_create();
+    //$emailTransmission = Sendemail::transmission_instant($programData, $transmissionData);
+    //$emailTransmission->task_create();
+    $account_id = $this->oTransmission->account_id;
+    $accounts = array();
+    $query = "SELECT * FROM account WHERE account_id = $account_id OR linkdid_id=$account_id";
+    $result = DB::query('account',$query);
+    while($rows = $result->fetch_assoc()){
+        $accounts[] = $rows;
+    }
+    foreach($accounts as $account){
+      $transmissionData['account_id'] = $account['account_id'];
+      $emailTransmission = Sendemail::transmission_instant($programData, $transmissionData);
+      $emailTransmission->task_create();
+    }
     //$emailTransmission->send();
   }
 

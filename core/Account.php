@@ -29,6 +29,7 @@ class Account
       'last_name',
       'phone',
       'email',
+      'linkdid_id',
       'address',
       'settings',
       'active',
@@ -76,6 +77,9 @@ class Account
 
   /** @var string */
   public $email = NULL;
+
+   /** @var integer */
+   public $linkdid_id = NULL;
 
   /** @var string */
   public $address = NULL;
@@ -164,6 +168,7 @@ class Account
     foreach ($aFilter as $search_field => $search_value) {
       switch ($search_field) {
         case 'account_id':
+        case 'linkdid_id':
           $aWhere[] = "$search_field = $search_value";
           break;
         case 'type':
@@ -351,6 +356,7 @@ class Account
         'last_name' => $this->last_name,
         'phone' => $this->phone,
         'email' => $this->email,
+        'linkdid_id' => $this->linkdid_id,
         'address' => $this->address,
         'settings' => json_encode($this->settings, JSON_NUMERIC_CHECK),
         'active' => $this->active
@@ -378,7 +384,7 @@ class Account
     Corelog::log("Changing account owner for: $this->account_id from: $this->user_id to: $user_id", Corelog::CRUD);
     // we can change created_by field only via direct query
     $this->user_id = $user_id; // also update the internal class variable
-    $query = "UPDATE " . self::$table . " SET created_by=%user_id% WHERE account_id=%account_id%";
+    $query = "UPDATE " . self::$table . " SET created_by=%user_id% WHERE email=Null account_id=%account_id%";
     $result = DB::query(self::$table, $query, array('user_id' => $user_id, 'account_id' => $this->account_id));
     if ($result && !empty($aUser) && is_array($aUser)) {
       foreach ($aUser as $field => $value) {

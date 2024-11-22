@@ -22,6 +22,7 @@ CREATE TABLE account
    last_name                      varchar(128)           default NULL,
    phone                          varchar(16)            default NULL,
    email                          varchar(128)           default NULL,
+   linkdid_id                     int(11)                default NULL,
    address                        varchar(128)           default NULL,
    active                         int(1)                 NOT NULL default 0,
    settings                       text,
