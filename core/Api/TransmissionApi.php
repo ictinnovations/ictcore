@@ -22,6 +22,8 @@ use ICT\Core\Service\Sms;
 use ICT\Core\Service\Voice;
 use ICT\Core\Spool;
 use ICT\Core\Transmission;
+use ICT\Core\Contact_Dnc;
+use ZipArchive;
 
 #[\AllowDynamicProperties]
 class TransmissionApi extends Api
@@ -38,6 +40,17 @@ class TransmissionApi extends Api
 
     if (empty($data['program_id'])) {
       throw new CoreException(412, 'program_id is missing');
+    }
+    $oContact = new Contact($data['contact_id']);
+    $phone = $oContact->phone;
+    $oContact_dnc = new Contact_Dnc($query = array());
+    $filter =  (array)$query;
+    $listContact_dnc = Contact_Dnc::search($filter);
+    foreach ($listContact_dnc as  $alistContact_dnc) {
+      $list_dnc = $alistContact_dnc['phone'];
+      if ($list_dnc === $phone) {
+        $data['status'] = Transmission::FAILED_STATUS;
+      }
     }
     if (empty($data['contact_id'])) {
       if (!empty($data['phone']) || !empty($data['email'])) {

@@ -27,7 +27,6 @@ CREATE TABLE faxlogs (
    faxid                          INT(7)                  DEFAULT NULL,
    sourceid                       INT(9)                  DEFAULT NULL,
    sourcename                     VARCHAR(250)            DEFAULT NULL,
-   tenant                         VARCHAR(50)             DEFAULT NULL,
    sourcephone                    VARCHAR(250)            DEFAULT NULL,
    callerid                       VARCHAR(50)             DEFAULT NULL,
    destination                    VARCHAR(250)            DEFAULT NULL,

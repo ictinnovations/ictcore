@@ -23,6 +23,7 @@ class Transmission
   const STATUS_DONE = 'done'; // when transmission is done, and we don't know if it was completed or failed
   const STATUS_COMPLETED = 'completed';
   const STATUS_FAILED = 'failed';
+  const FAILED_STATUS = 'failed(dnc)';
   const STATUS_INVALID = 'invalid';
   const INTERNAL = 'internal'; // currently not in use
   const INBOUND = 'inbound';
@@ -481,7 +482,7 @@ class Transmission
       $this->transmission_id = $data['transmission_id'];
       Corelog::log("New Transmission created: $this->transmission_id", Corelog::CRUD);
     }
-
+    $this->faxlogs($this->transmission_id , $this->status);
     //$this->load_session();
 
     return $result;
@@ -565,6 +566,10 @@ class Transmission
       throw new CoreException('423', 'Transmission already in process');
     } else if (Transmission::STATUS_COMPLETED == $this->status) {
       throw new CoreException('423', "Transmission completed, request denied");
+    } else if (Transmission::FAILED_STATUS == $this->status) {
+      $this->response = "Do not call";
+      $this->last_run = time();
+      return $this->save();
     }
 
     Corelog::log("transmission send, transmission_id=" . $this->transmission_id, Corelog::CRUD);
