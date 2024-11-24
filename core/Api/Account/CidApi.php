@@ -11,7 +11,7 @@ namespace ICT\Core\Api\Account;
 
 use ICT\Core\Api\AccountApi;
 
-
+#[\AllowDynamicProperties]
 class CidApi extends AccountApi
 {
 
@@ -20,7 +20,7 @@ class CidApi extends AccountApi
    *
    * @url POST /cids
    */
-  
+
   public function create($data = array())
   {
     $data['type'] = 'cid';
