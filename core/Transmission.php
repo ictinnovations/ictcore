@@ -25,6 +25,7 @@ class Transmission
   const STATUS_FAILED = 'failed';
   const FAILED_STATUS = 'failed(dnc)';
   const STATUS_INVALID = 'invalid';
+  const FAILED_STATUS = 'failed(dnc)';
   const INTERNAL = 'internal'; // currently not in use
   const INBOUND = 'inbound';
   const OUTBOUND = 'outbound';

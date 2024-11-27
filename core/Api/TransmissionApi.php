@@ -48,10 +48,15 @@ class TransmissionApi extends Api
     $listContact_dnc = Contact_Dnc::search($filter);
     foreach ($listContact_dnc as  $alistContact_dnc) {
       $list_dnc = $alistContact_dnc['phone'];
-      if ($list_dnc === $phone) {
-        $data['status'] = Transmission::FAILED_STATUS;
-      }
-    }
+      if ($data['phone']) {
+        if($list_dnc === $data['phone']) {
+          $data['status'] = Transmission::FAILED_STATUS;
+        }}
+        else {
+          if($list_dnc  === $phone) {
+            $data['status'] = Transmission::FAILED_STATUS;
+          }}
+        }
     if (empty($data['contact_id'])) {
       if (!empty($data['phone']) || !empty($data['email'])) {
         $oContact = new Contact();
