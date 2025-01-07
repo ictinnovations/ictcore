@@ -13,6 +13,8 @@ use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Corelog;
 use ICT\Core\Message\Document;
+use ICT\Core\Session;
+use ICT\Core\Activity;
 use SplFileInfo;
 
 #[\AllowDynamicProperties]

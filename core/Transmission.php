@@ -652,7 +652,6 @@ class Transmission
     return $this->aResult;
   }
 
-}
 
 public function faxlogs($transmission_id , $status) {
   $response = $this->oSpool->response;
@@ -690,4 +689,6 @@ if(empty($faxactivity)){
   return "";
 }
 return $faxactivity;
+}
+
 }

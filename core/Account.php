@@ -384,7 +384,7 @@ class Account
     Corelog::log("Changing account owner for: $this->account_id from: $this->user_id to: $user_id", Corelog::CRUD);
     // we can change created_by field only via direct query
     $this->user_id = $user_id; // also update the internal class variable
-    $query = "UPDATE " . self::$table . " SET created_by=%user_id% WHERE email=Null account_id=%account_id%";
+    $query = "UPDATE " . self::$table . " SET created_by=%user_id% WHERE account_id=%account_id%";
     $result = DB::query(self::$table, $query, array('user_id' => $user_id, 'account_id' => $this->account_id));
     if ($result && !empty($aUser) && is_array($aUser)) {
       foreach ($aUser as $field => $value) {

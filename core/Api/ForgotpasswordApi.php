@@ -13,7 +13,6 @@ use ICT\Core\DB;
 use ICT\Core\Api;
 use ICT\Core\Conf;
 use ICT\Core\User;
-use ICT\Core\Tenant;
 use ICT\Core\Forgot_password;
 use Firebase\JWT\JWT;
 use ICT\Core\Corelog;
