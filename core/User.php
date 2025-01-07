@@ -71,7 +71,7 @@ class User
    * @see User::set_username
    * @var string
    */
-  private $username = NULL;
+  public $username = NULL;
 
   /** @var string */
   private $passwd = NULL;

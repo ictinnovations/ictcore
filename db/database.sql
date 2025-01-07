@@ -73,9 +73,16 @@ CREATE TRIGGER usr_insert AFTER INSERT
 |
 CREATE TRIGGER usr_update AFTER UPDATE
   ON usr FOR EACH ROW BEGIN
-    UPDATE account SET email = NEW.email, phone = NEW.phone WHERE type = 'account' AND created_by = NEW.usr_id limit 1;
-  END;
+ UPDATE account SET username = NEW.username, passwd = NEW.passwd, first_name = NEW.first_name,
+  last_name = NEW.last_name, email = NEW.email, phone = NEW.phone WHERE type = 'account' AND created_by = NEW.usr_id limit 1;
+  End;
 |
+
+CREATE TRIGGER usr_delete AFTER DELETE 
+ ON usr FOR EACH ROW BEGIN
+   DELETE FROM account WHERE type = 'account' AND created_by = OLD.usr_id limit 1;
+   END;
+ | 
 DELIMITER ;
 
 /*==============================================================*/

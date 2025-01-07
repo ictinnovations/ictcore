@@ -212,7 +212,6 @@ class Contact
   public function delete()
   {
     Corelog::log("Contact delete", Corelog::CRUD);
-    mysql_query("DELETE from contact_link where contact_id=".$this->contact_id);
     DB::delete(self::$table_link, 'contact_id', $this->contact_id);
     return DB::delete(self::$table, 'contact_id', $this->contact_id);
   }
