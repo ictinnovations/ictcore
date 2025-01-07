@@ -48,7 +48,7 @@ class DB
       }
     } else {
       $field = $field ? $field : $table . '_id';
-      $result = mysqli_query(DB::$link, "SELECT MAX($field) as newid FROM $table");
+      //$result = mysqli_query(DB::$link, "SELECT MAX($field) as newid FROM $table");
       if ($result) {
         while($row = mysqli_fetch_assoc($result)) {
           $col_newid = $row['newid'];

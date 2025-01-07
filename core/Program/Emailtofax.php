@@ -156,16 +156,16 @@ class Emailtofax extends Program
         case Result::TYPE_MESSAGE:
           $oTemplate = new Template($oResult->data);
           $aAttachment = \ICT\Core\path_string_to_array($oTemplate->attachment);
-          if (empty($aAttachment)) {
-            $error = 'There is no attachment';
-            break 2; // in case of error, also terminate foreach loop
-          }
-          foreach ($aAttachment as $attachment) {
-            if (!is_file($attachment)) {
-              $error = 'Invalid attachment';
-              break 3; // in case of error, also terminate main foreach loop
-            }
-          }
+          // if (empty($aAttachment)) {
+          //   $error = 'There is no attachment';
+          //   break 2; // in case of error, also terminate foreach loop
+          // }
+          // foreach ($aAttachment as $attachment) {
+          //   if (!is_file($attachment)) {
+          //     $error = 'Invalid attachment';
+          //     break 3; // in case of error, also terminate main foreach loop
+          //   }
+          // }
           // save a refer
           $oSession = Session::get_instance();
           $oSession->template = $oTemplate;
@@ -321,7 +321,7 @@ class Emailtofax extends Program
 
     // prepare data for new transmission
     $reply_from = Conf::get('emailtofax:reply_account', 'default');
-    $transmissionData = array(
+    $transmissionData = array(how to apply for fsc improvement
         'contact_id' => $this->oTransmission->contact_id,
         // replace contact with company contact as per system configurations
         'account_id' => ($reply_from == 'company') ? Contact::COMPANY : $this->oTransmission->account_id,
