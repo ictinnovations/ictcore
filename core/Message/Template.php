@@ -88,9 +88,12 @@ class Template extends Message
    * @var array $media_supported
    */
   public static $media_supported = array(
-      'txt' => 'text/plain',
-      'html' => 'text/html',
-      'xml' => 'application/xml'
+    'pdf'  => 'application/pdf',
+    'tif'  => 'image/tiff',
+    'tiff' => 'image/x-tiff',
+    'png'  => 'image/png',
+    'jpg'  => 'image/jpeg',
+    'jpeg' => 'image/x-citrix-jpeg',
   );
 
   public function __construct($template_id = NULL)
