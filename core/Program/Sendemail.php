@@ -82,6 +82,8 @@ class Sendemail extends Program
   public function scheme()
   {
     $emailSend = new Email_send();
+    $emailSend->source = '[transmission:source:email]';
+    $emailSend->destination = '[transmission:destination:email]';
     $emailSend->subject = $this->aResource['template']->subject;
     $emailSend->body = $this->aResource['template']->body;
     $emailSend->body_alt = $this->aResource['template']->body_alt;

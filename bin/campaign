@@ -9,6 +9,7 @@ use ICT\Core\Corelog;
 use ICT\Core\Group;
 use ICT\Core\Program;
 use ICT\Core\Transmission;
+use ICT\Core\User;
 
 require dirname(__DIR__).'/vendor/autoload.php'; // composer
 declare(ticks=1);
@@ -73,6 +74,12 @@ class CampaignCli
   private $oCampaign = null;
 
   /**
+   * @var User $oUser
+   */
+  private $oUser = null;
+
+
+  /**
    * @var boolean $is_active
    */
   private $is_active = false;
@@ -121,7 +128,7 @@ class CampaignCli
     } else if (Campaign::STATUS_COMPLETED == $this->oCampaign->status) {
       throw new CoreException(423, 'Campaign already completed');
     }
-    \ICT\Core\do_login($this->oCampaign->user_id);
+    $this->oUser = \ICT\Core\do_login($this->oCampaign->user_id);
 
     $cpm = empty($this->oCampaign->cpm) ? 2 : $this->oCampaign->cpm;
     $this->delay = (1000000 * 60) / $cpm;
