@@ -10,6 +10,7 @@ namespace ICT\Core\Service;
  * *************************************************************** */
 
 use ICT\Core\Application;
+use ICT\Core\Gateway\Http;
 use ICT\Core\Gateway\Kannel;
 use ICT\Core\Message\Text;
 use ICT\Core\Provider;
@@ -24,7 +25,7 @@ class Sms extends Service
   const SERVICE_TYPE = 'sms';
   const CONTACT_FIELD = 'phone';
   const MESSAGE_CLASS = 'Text';
-  const GATEWAY_CLASS = 'Kannel';
+  const GATEWAY_CLASS = 'Http';
 
   public static function capabilities()
   {
@@ -51,7 +52,7 @@ class Sms extends Service
   {
     static $oGateway = NULL;
     if (empty($oGateway)) {
-      $oGateway = new Kannel();
+      $oGateway = new Http();
     }
     return $oGateway;
   }
