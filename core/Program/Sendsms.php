@@ -81,6 +81,8 @@ class Sendsms extends Program
   public function scheme()
   {
     $smsSend = new Sms_send();
+    $smsSend->source = '[transmission:source:phone]';
+    $smsSend->destination = '[transmission:destination:phone]';
     $smsSend->message = $this->aResource['text']->data;
     $smsSend->class = $this->aResource['text']->class;
     $smsSend->encoding = $this->aResource['text']->encoding;
