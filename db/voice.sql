@@ -12,9 +12,9 @@
 CREATE TABLE recording
 (
    recording_id             int(11) unsigned       NOT NULL auto_increment,
-   name                     varchar(128)           NOT NULL default,
-   type                     varchar(8)             NOT NULL default,
-   file_name                varchar(128)           NOT NULL default, 
+   name                     varchar(128)           NOT NULL default '',
+   type                     varchar(8)             NOT NULL default '',
+   file_name                varchar(128)           NOT NULL default '', 
    description              varchar(255)           NOT NULL default '',
    length                   int(11)                NOT NULL default 0,
    codec                    varchar(16)            NOT NULL default 'pcm',
