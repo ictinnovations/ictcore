@@ -22,10 +22,10 @@ class Transmission
   const STATUS_PROCESSING = 'processing';
   const STATUS_DONE = 'done'; // when transmission is done, and we don't know if it was completed or failed
   const STATUS_COMPLETED = 'completed';
+  const STATUS_FAILED_PROVIDER = 'no rpovider';
   const STATUS_FAILED = 'failed';
   const FAILED_STATUS = 'failed(dnc)';
   const STATUS_INVALID = 'invalid';
-  const FAILED_STATUS = 'failed(dnc)';
   const INTERNAL = 'internal'; // currently not in use
   const INBOUND = 'inbound';
   const OUTBOUND = 'outbound';
@@ -65,6 +65,7 @@ class Transmission
       'try_allowed',
       'try_done',
       'last_run',
+      'schedule_time',
       'is_deleted',
       'campaign_id'
   );
@@ -146,6 +147,15 @@ class Transmission
    */
   public $last_run = NULL;
 
+
+
+  /**
+   * @property integer $schedule_time
+   * @var integer 
+   */
+  public $schedule_time = NULL;
+
+
   /**
    * @property-read integer $is_deleted
    * 0 = no deleted, 1 = deleted
@@ -213,8 +223,8 @@ class Transmission
     $from_str .= ' LEFT JOIN ' . self::$table_account . ' a ON t.account_id=a.account_id';
     $from_str .= ' LEFT JOIN ' . self::$table_contact . ' c ON t.contact_id=c.contact_id';
     $from_str .= ' LEFT JOIN ' . self::$table_user . ' u ON t.created_by=u.usr_id';
-    $from_str .= ' LEFT JOIN ' . self::$table_spool . ' sp ON sp.transmission_id = t.transmission_id ';
-
+    //$from_str .= ' LEFT JOIN ' . self::$table_spool . ' sp ON sp.transmission_id = t.transmission_id ';
+    $from_str .= ' LEFT JOIN  ( SELECT s1.* FROM ' . self::$table_spool . '  s1 INNER JOIN (SELECT transmission_id, MAX(spool_id) AS max_id FROM spool GROUP BY transmission_id) s2 ON s1.spool_id = s2.max_id) sp ON sp.transmission_id = t.transmission_id';
     $from_str_in = $from_str;
    
     $from_str .= ' LEFT JOIN ' . self::$table_program_resource . ' pr ON t.program_id = pr.program_id ';
@@ -470,6 +480,7 @@ class Transmission
         'try_done' => $this->try_done,
         'last_run' => $this->last_run,
         'is_deleted' => $this->is_deleted,
+        'schedule_time' => $this->schedule_time,
         'campaign_id' => $this->campaign_id
     );
 
