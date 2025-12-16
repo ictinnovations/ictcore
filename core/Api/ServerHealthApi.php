@@ -5,9 +5,14 @@ namespace ICT\Core\Api;
 use ICT\Core\Api;
 use ICT\Core\CoreException;
 use ICT\Core\Corelog;
+use ICT\Core\ServerHealth;
+use ICT\Core\Transmission;
+use ICT\Core\Spool;
+use ICT\Core\DB;
 
-class SystemHealthApi extends Api
+class ServerHealthApi extends Api
 {
+
     /**
      * Get health status for ALL servers/nodes
      *
@@ -16,22 +21,27 @@ class SystemHealthApi extends Api
      */
     public function get_all_servers_health()
     {
-        try {
-            $healthData = \ICT\Core\ServerHealth::get_all_servers_health();
-            
+       try {
+            $healthData = ServerHealth::get_all_servers_health();
+
+            if (!is_array($healthData)) {
+                throw new CoreException(500, 'Invalid health data returned');
+            }
+
             return [
                 "status" => "success",
                 "servers" => $healthData,
                 "total_servers" => count($healthData),
                 "message" => "Server health data retrieved successfully"
             ];
-        } catch (\Exception $e) {
-            return [
-                "status" => "error",
-                "message" => $e->getMessage()
-            ];
+        } catch (\Throwable $e) {
+            throw new CoreException(
+                500,
+                'Failed to retrieve server health: ' . $e->getMessage()
+            );
         }
     }
+
 
     /**
      * Check and update health for ALL servers/nodes
@@ -40,10 +50,10 @@ class SystemHealthApi extends Api
      */
     public function check_all_servers_health()
     {
-        // $this->_authorize('system_admin');
+    
         
         try {
-            $results = \ICT\Core\ServerHealth::check_all_nodes_health();
+            $results = ServerHealth::check_all_nodes_health();
             
             return [
                 "status" => "success",
@@ -51,12 +61,13 @@ class SystemHealthApi extends Api
                 "results" => $results,
                 "message" => "Health check completed for all servers"
             ];
-        } catch (\Exception $e) {
-            return [
-                "status" => "error",
-                "message" => $e->getMessage()
-            ];
-        }
+        } catch (\Throwable $e) {
+        throw new CoreException(
+            500,
+            'Failed to Fetch Servers ',
+            $e
+        );
+    }
     }
 
     /**
@@ -66,11 +77,11 @@ class SystemHealthApi extends Api
      */
     public function get_server_health_history($node_id, $query = array())
     {
-        // $this->_authorize('system_read');
+       
         
         try {
             $filter = array_merge((array)$query, ['node_id' => $node_id]);
-            $history = \ICT\Core\ServerHealth::search($filter);
+            $history = ServerHealth::search($filter);
             
             return [
                 "status" => "success",
@@ -79,13 +90,37 @@ class SystemHealthApi extends Api
                 "total_records" => count($history),
                 "message" => "Health history retrieved successfully"
             ];
-        } catch (\Exception $e) {
-            return [
-                "status" => "error",
-                "message" => $e->getMessage()
-            ];
-        }
+        } catch (\Throwable $e) {
+        throw new CoreException(
+            500,
+            'Failed to load Serverhealth history',
+            $e
+        );
+    }
     }
 
-   
+
+
+    /**
+ * @url GET /users/kpi/fax-stats-v2
+ * Params: range=daily|weekly|monthly|yearly|custom
+ *         start=YYYY-MM-DD (optional for custom or for anchoring)
+ *         end=YYYY-MM-DD   (optional for custom)
+ */
+public function getFaxStatsV2($query = array())
+{
+    try {
+        return ServerHealth::faxStatsV2($query);
+    } catch (\Throwable $e) {
+        throw new CoreException(
+            500,
+            'Failed to load fax KPI stats',
+            $e
+        );
+    }
 }
+
+
+
+}
+   

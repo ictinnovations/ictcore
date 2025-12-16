@@ -1,6 +1,8 @@
 <?php
 
 namespace ICT\Core;
+use ICT\Core\DB;
+use ICT\Core\CoreException;
 
 /* * ***************************************************************
  * Copyright © 2016 ICT Innovations Pakistan All Rights Reserved   *
@@ -329,4 +331,185 @@ if (isset($data['id']) && !empty($data['id'])) {
         
         return $healthData;
     }
+
+
+
+        /**
+     * Main KPI handler
+     */
+    public static function faxStatsV2(array $query)
+    {
+        $range = $query['range'] ?? 'daily';
+        $startParam = $query['start'] ?? null;
+        $endParam   = $query['end'] ?? null;
+
+        list($startTs, $endTs) = self::computeRangeTimestamps(
+            $range,
+            $startParam,
+            $endParam
+        );
+
+        $periods = self::buildPeriodsForRange(
+            $range,
+            $startTs,
+            $endTs
+        );
+
+        $rows = self::fetchTransmissionStats(
+            $range,
+            $startTs,
+            $endTs
+        );
+
+        return self::formatChartResponse(
+            $range,
+            $periods,
+            $rows
+        );
+    }
+
+    /**
+     * Fetch grouped transmission stats from DB
+     */
+    private static function fetchTransmissionStats($range, $startTs, $endTs)
+    {
+        if ($range === 'yearly') {
+            $groupBy = "DATE_FORMAT(FROM_UNIXTIME(date_created), '%Y-%m')";
+        } else {
+            $groupBy = "DATE(FROM_UNIXTIME(date_created))";
+        }
+
+        $sql = "
+            SELECT 
+                {$groupBy} AS period_key,
+                SUM(CASE WHEN direction='outbound' THEN 1 ELSE 0 END) AS sent,
+                SUM(CASE WHEN direction='inbound' THEN 1 ELSE 0 END) AS received,
+                SUM(CASE WHEN status='completed' THEN 1 ELSE 0 END) AS success,
+                SUM(CASE WHEN status IN ('failed','failed(dnc)','no_provider') THEN 1 ELSE 0 END) AS failed
+            FROM transmission
+            WHERE is_deleted = 0
+              AND date_created BETWEEN {$startTs} AND {$endTs}
+            GROUP BY period_key
+            ORDER BY period_key ASC
+        ";
+
+        $res = DB::query('transmission', $sql);
+        $map = [];
+
+        while ($r = mysqli_fetch_assoc($res)) {
+            $map[$r['period_key']] = [
+                'sent'     => (int)$r['sent'],
+                'received' => (int)$r['received'],
+                'success'  => (int)$r['success'],
+                'failed'   => (int)$r['failed']
+            ];
+        }
+
+        return $map;
+    }
+
+    /**
+     * Build final chart response
+     */
+    private static function formatChartResponse($range, $periods, $map)
+    {
+        $labels = $sent = $received = $success = $failed = [];
+        $totals = ['sent'=>0,'received'=>0,'success'=>0,'failed'=>0];
+
+        foreach ($periods as $p) {
+            $labels[] = $p['label'];
+            $data = $map[$p['key']] ?? ['sent'=>0,'received'=>0,'success'=>0,'failed'=>0];
+
+            foreach ($data as $k => $v) {
+                $totals[$k] += $v;
+            }
+
+            $sent[]     = $data['sent'];
+            $received[] = $data['received'];
+            $success[]  = $data['success'];
+            $failed[]   = $data['failed'];
+        }
+
+        $totalAll = $totals['sent'] + $totals['received'];
+
+       return [
+              'ok'       => true,
+              'range'    => $range,
+              'labels'   => $labels,
+              'sent'     => $sent,
+              'received' => $received,
+              'success'  => $success,
+              'failed'   => $failed,
+              'totals'   => array_merge($totals, [
+              'success_rate' => $totalAll ? round(($totals['success']/$totalAll)*100,2) : 0,
+              'failure_rate' => $totalAll ? round(($totals['failed']/$totalAll)*100,2) : 0
+          ]),
+              'periods_meta' => $periods
+];
+    }
+
+    /**
+     * Date range resolver
+     */
+    private static function computeRangeTimestamps($range, $start, $end)
+    {
+        if ($range === 'custom' && $start && $end) {
+            return [
+                strtotime("$start 00:00:00"),
+                strtotime("$end 23:59:59")
+            ];
+        }
+
+        switch ($range) {
+            case 'monthly':
+                $s = strtotime(date('Y-m-01'));
+                $e = strtotime(date('Y-m-t')) + 86399;
+                break;
+            case 'yearly':
+                $y = date('Y');
+                $s = strtotime("$y-01-01");
+                $e = strtotime("$y-12-31 23:59:59");
+                break;
+            default:
+                $s = strtotime('today -6 days');
+                $e = strtotime('today 23:59:59');
+        }
+
+        return [$s, $e];
+    }
+
+    /**
+     * Build periods array
+     */
+    private static function buildPeriodsForRange($range, $start, $end)
+    {
+        $periods = [];
+
+        if ($range === 'yearly') {
+            $year = date('Y', $start);
+            for ($m=1;$m<=12;$m++) {
+                $key = sprintf('%04d-%02d', $year, $m);
+                $periods[] = [
+                    'label' => date('M', strtotime("$key-01")),
+                    'key'   => $key
+                ];
+            }
+            return $periods;
+        }
+
+        for ($d=$start; $d<=$end; $d+=86400) {
+            $periods[] = [
+                'label' => date('Y-m-d', $d),
+                'key'   => date('Y-m-d', $d)
+            ];
+        }
+
+        return $periods;
+    }
+
+
+
+
+
+    
 }
