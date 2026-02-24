@@ -321,7 +321,7 @@ class Emailtofax extends Program
 
     // prepare data for new transmission
     $reply_from = Conf::get('emailtofax:reply_account', 'default');
-    $transmissionData = array(how to apply for fsc improvement
+    $transmissionData = array(
         'contact_id' => $this->oTransmission->contact_id,
         // replace contact with company contact as per system configurations
         'account_id' => ($reply_from == 'company') ? Contact::COMPANY : $this->oTransmission->account_id,
