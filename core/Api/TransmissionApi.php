@@ -89,6 +89,13 @@ class TransmissionApi extends Api
     $oTransmission = $oProgram->transmission_create($contact_id, $account_id, $direction);
     $this->set($oTransmission, $data);
 
+if (!empty($data['scheduled']) && !empty($data['scheduled_time'])) {
+    $oTransmission->schedule_time = strtotime($data['scheduled_time']); // convert to UNIX timestamp
+    $oTransmission->status = Transmission::STATUS_PENDING;   // scheduled
+    $oTransmission->last_run = $oTransmission->schedule_time; // match last_run
+}
+
+
     if ($oTransmission->save()) {
       return $oTransmission->transmission_id;
     } else {
