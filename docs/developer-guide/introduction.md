@@ -20,7 +20,7 @@ Directory Structure
 * composer.json
 * CHANGLOG.md
 * TODO.md
-* LICENSE.md
+* LICENSE
 * README.md
 
 ### ICTCore Design
