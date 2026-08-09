@@ -20,6 +20,8 @@ LABEL org.opencontainers.image.title="ictcore" \
 RUN dnf -y install dnf-utils epel-release wget curl unzip which procps-ng \
  && dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm \
  && rpm -ivh http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm \
+ && ls -l /etc/pki/rpm-gpg/ \
+ && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-okayinc \
  && dnf -y module reset php \
  && dnf -y module enable php:${PHP_STREAM} \
  && dnf -y module enable mariadb:10.11 \
