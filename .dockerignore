@@ -1,0 +1,9 @@
+.git
+.github
+.idea
+.vscode
+tests
+ubuntu-installation
+vendor
+cache/*
+log/*

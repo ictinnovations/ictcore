@@ -1,0 +1,129 @@
+name: Docker
+
+on:
+  push:
+    branches: [ictcore]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  DOCKERHUB_IMAGE: docker.io/ictinnovations/ictcore
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build into the local daemon first so the smoke test runs against the
+      # exact image that gets pushed a few steps down.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: ictcore:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Boot the container
+        run: |
+          docker run -d --name ictcore-ci \
+            -e ICTCORE_HOST=127.0.0.1 \
+            -e FS_ESL_PASSWORD=ci-smoke-test \
+            -p 8080:80 -p 8021:8021 \
+            ictcore:ci
+
+      # MariaDB provisioning plus the FreeSWITCH start take well over a minute
+      # on a cold runner, so poll rather than sleeping a fixed amount.
+      # An unrouted GET /api/ returns 404 by design, so treat any sub-500 code
+      # as a pass. A 500 means PHP fatalled and is a real failure.
+      - name: Wait for the REST API
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/ || echo 000)
+            if [ "$code" -ge 200 ] && [ "$code" -lt 500 ]; then
+              echo "API answered $code after ${i}0s"; exit 0
+            fi
+            echo "  still $code"
+            sleep 10
+          done
+          echo "API never answered"; exit 1
+
+      - name: Check the FreeSWITCH event socket
+        run: |
+          for i in $(seq 1 30); do
+            if timeout 2 bash -c 'cat < /dev/null > /dev/tcp/127.0.0.1/8021' 2>/dev/null; then
+              echo "ESL listening after ${i}0s"; exit 0
+            fi
+            sleep 10
+          done
+          echo "ESL never came up"; exit 1
+
+      - name: Check the schema loaded
+        run: |
+          docker exec ictcore-ci mysql -N -B -e \
+            "SELECT COUNT(*) FROM ictfax.account" | grep -qE '^[0-9]+$'
+
+      - name: Container logs
+        if: always()
+        run: docker logs ictcore-ci
+
+      - name: Tear down
+        if: always()
+        run: docker rm -f ictcore-ci
+
+      # Pull requests from forks cannot read the registry token, so those runs
+      # stop at the smoke test and never push.
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: meta
+        if: github.event_name != 'pull_request'
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.IMAGE }}
+            ${{ env.DOCKERHUB_IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=ictcore
+            org.opencontainers.image.description=ICTCore unified communications framework: one REST API over voice, fax, SMS and email.
+            org.opencontainers.image.vendor=ICT Innovations
+            org.opencontainers.image.url=https://ictcore.org
+
+      # The layers are already in the gha cache from the build above, so this
+      # resolves to an export rather than a rebuild.
+      - uses: docker/build-push-action@v6
+        if: github.event_name != 'pull_request'
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha

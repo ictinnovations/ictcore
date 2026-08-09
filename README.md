@@ -48,6 +48,29 @@ ICTCore is build for developers, ICTCore allows developers to
 
 Install
 -------
+
+### Docker
+
+The quickest way to get a working REST API is the official image. It bundles
+Apache, PHP, FreeSWITCH and MariaDB, so there is nothing else to install.
+
+```
+docker run -d --name ictcore \
+  -p 8080:80 \
+  -p 5060:5060/tcp -p 5060:5060/udp \
+  -p 16384-16484:16384-16484/udp \
+  ictinnovations/ictcore:latest
+```
+
+First boot takes about two minutes while the database is created and the schema
+loads. After that the API answers on `http://localhost:8080/api/`. Publish the
+RTP range as shown or your calls will connect with no audio.
+
+To point the container at your own database server, or to build the image
+yourself, see [docker/README.md](docker/README.md).
+
+### From packages
+
 Currently ICTCore binaries are available for CentOs 7, 8 and RockyLinux 8, To install ICTCore you need a freshly installed server and then you can follow the instructions mentioned in following. If you are looking for source code you can find it at github [ICTCore: Open Source Unified Communications Framework](https://github.com/ictinnovations/ictcore)
 
 1. First of all we need to install ict and epel repositories  

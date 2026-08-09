@@ -1,0 +1,49 @@
+services:
+  ictcore:
+    image: ictinnovations/ictcore:latest
+    container_name: ictcore
+    restart: unless-stopped
+    environment:
+      # Point these at the db service below to run MariaDB separately.
+      # Leave DB_HOST unset and the image runs its own bundled MariaDB.
+      DB_HOST: db
+      DB_NAME: ictfax
+      DB_USER: ictfaxuser
+      DB_PASS: change-this-before-you-deploy
+      ICTCORE_HOST: localhost
+      FS_ESL_PASSWORD: change-this-too
+    ports:
+      - "8080:80"
+      - "8443:443"
+      - "5060:5060/tcp"
+      - "5060:5060/udp"
+      # RTP. Without this you get signalling but no audio.
+      - "16384-16484:16384-16484/udp"
+    volumes:
+      - ictcore-data:/usr/ictcore/data
+      - ictcore-log:/usr/ictcore/log
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11
+    container_name: ictcore-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ictfax
+      MARIADB_USER: ictfaxuser
+      MARIADB_PASSWORD: change-this-before-you-deploy
+      MARIADB_ROOT_PASSWORD: change-this-as-well
+    volumes:
+      - ictcore-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ictcore-data:
+  ictcore-log:
+  ictcore-db:
