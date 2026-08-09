@@ -20,9 +20,9 @@ LABEL org.opencontainers.image.title="ictcore" \
 RUN dnf -y install dnf-utils epel-release wget curl unzip which procps-ng \
  && dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm \
  && rpm -ivh http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm \
- && printf '[mariadb]\nname = MariaDB\nbaseurl = http://yum.mariadb.org/10.11/rhel8-amd64\ngpgkey = https://yum.mariadb.org/RPM-GPG-KEY-MariaDB\ngpgcheck = 1\n' > /etc/yum.repos.d/MariaDB.repo \
  && dnf -y module reset php \
  && dnf -y module enable php:${PHP_STREAM} \
+ && dnf -y module enable mariadb:10.11 \
  && dnf clean all
 
 # ── runtime packages ─────────────────────────────────────────
@@ -30,11 +30,19 @@ RUN dnf -y install --setopt=install_weak_deps=False \
       httpd mod_ssl \
       php php-cli php-json php-gd php-mysqlnd php-imap php-xml php-mbstring php-process \
       php-pecl-imagick \
-      MariaDB-server MariaDB-client \
+      mariadb-server mariadb \
       freeswitch freeswitch-config-vanilla freeswitch-lang-en freeswitch-sounds-en-us-callie \
       sox libtiff-tools ghostscript ImageMagick \
       supervisor openssl \
  && dnf clean all && rm -rf /var/cache/dnf
+
+# RHEL-family packaging hides the daemon in /usr/libexec and the name has moved
+# between mysqld and mariadbd across versions. Resolve it once here so
+# supervisord has a stable path and the build fails loudly if it disappears.
+RUN MYSQLD=$(ls /usr/libexec/mariadbd /usr/libexec/mysqld /usr/sbin/mariadbd /usr/sbin/mysqld 2>/dev/null | head -1) \
+ && test -n "$MYSQLD" \
+ && ln -sf "$MYSQLD" /usr/local/bin/ictcore-mysqld \
+ && echo "mariadb daemon: $MYSQLD"
 
 # ── composer ─────────────────────────────────────────────────
 ENV COMPOSER_ALLOW_SUPERUSER=1

@@ -44,7 +44,12 @@ fi
 if is_local_db; then
   if [[ ! -d /var/lib/mysql/mysql ]]; then
     log "initialising MariaDB data directory"
-    mariadb-install-db --user=mysql --datadir=/var/lib/mysql >/dev/null
+    # Renamed in MariaDB 10.4; keep the old name working on older bases.
+    if command -v mariadb-install-db >/dev/null 2>&1; then
+      mariadb-install-db --user=mysql --datadir=/var/lib/mysql >/dev/null
+    else
+      mysql_install_db --user=mysql --datadir=/var/lib/mysql >/dev/null
+    fi
   fi
 
   log "starting MariaDB for provisioning"
