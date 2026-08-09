@@ -73,7 +73,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # ── ICTCore itself, from this repository ─────────────────────
 WORKDIR /usr/ictcore
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-progress --ignore-platform-reqs \
+# composer update rather than install: the committed composer.lock predates the
+# dompdf requirement in composer.json, so install refuses to run. Drift is bounded
+# because composer.json caps twig at 1.x and swiftmailer at 5.x, which are the two
+# that decide PHP 7.4 compatibility.
+RUN composer update --no-dev --no-interaction --no-progress --prefer-dist --ignore-platform-reqs \
  && composer clear-cache
 
 COPY bin/   bin/
