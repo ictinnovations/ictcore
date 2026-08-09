@@ -17,11 +17,14 @@ LABEL org.opencontainers.image.title="ictcore" \
 # okay.com.mx carries the EL8 FreeSWITCH and spandsp builds. SignalWire put
 # their own packages behind a paid token, so this is the remaining free path
 # to a prebuilt FreeSWITCH on EL8 and it saves a 40 minute source compile.
+#
+# okay-release ships two signing keys but its repo file names only the newer
+# one, so dnf rejects every package signed with the older key. Both get
+# imported below rather than turning gpgcheck off.
 RUN dnf -y install dnf-utils epel-release wget curl unzip which procps-ng \
  && dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm \
  && rpm -ivh http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm \
- && ls -l /etc/pki/rpm-gpg/ \
- && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-okayinc \
+ && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-OKAY /etc/pki/rpm-gpg/RPM-GPG-KEY-okayinc \
  && dnf -y module reset php \
  && dnf -y module enable php:${PHP_STREAM} \
  && dnf -y module enable mariadb:10.11 \
