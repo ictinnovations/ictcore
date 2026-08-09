@@ -4,14 +4,22 @@ This directory builds a single container with everything ICTCore needs: Apache
 with mod_php, FreeSWITCH, and MariaDB. It's the fastest way to get a working
 REST API you can send requests at.
 
+There is no published `ictinnovations/ictcore` image. ICTCore is a framework
+rather than a finished product, so the ready-made images are the ones that sit
+on top of it, [ictfax](https://github.com/ictinnovations/ictfax) and
+[ictdialer](https://github.com/ictinnovations/ictdialer). Each builds this same
+stack and adds its own dashboard. Build from here when you want the bare API.
+
 ## Quick start
 
 ```bash
+docker build -f docker/Dockerfile -t ictcore:dev .
+
 docker run -d --name ictcore \
   -p 8080:80 \
   -p 5060:5060/tcp -p 5060:5060/udp \
   -p 16384-16484:16384-16484/udp \
-  ictinnovations/ictcore:latest
+  ictcore:dev
 ```
 
 Give it about two minutes on first boot. The entrypoint has to initialise the
@@ -54,16 +62,18 @@ docker compose up -d
 - `/usr/ictcore/data` for received faxes, recordings and uploads
 - `/usr/ictcore/log` for application logs
 
-## Building it yourself
+## Where the packages come from
 
-```bash
-docker build -f docker/Dockerfile -t ictcore:dev .
-```
+PHP comes from remi. FreeSWITCH comes from two Fedora Copr repositories,
+`beaveryoga/FreeSWITCH-1.10.12` for the switch and `beaveryoga/broadvoice` for
+the libraries EL8 has no package for (sofia-sip, spandsp3, libks2 and
+signalwire-client-c2).
 
-The build pulls PHP from remi and FreeSWITCH from okay.com.mx. SignalWire moved
-their own FreeSWITCH packages behind a paid token, so okay.com.mx is the
-remaining free source of a prebuilt EL8 package and it saves roughly forty
-minutes of compiling from source.
+SignalWire moved their own EL8 packages behind a paid token. The okay.com.mx
+mirror that people reach for next signs every RPM with key `C261E286186F7970`,
+which it does not ship and no keyserver carries, so nothing from it can be
+verified. Copr is HTTPS, GPG signed and hosted on Fedora infrastructure, and it
+still saves the forty minute source compile.
 
 PHP is pinned to 7.4 through the `PHP_STREAM` build argument. That isn't
 nostalgia. `composer.lock` pins Twig 1.35 and Swiftmailer 5.4, and both of them

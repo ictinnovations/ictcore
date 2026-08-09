@@ -1,10 +1,9 @@
 name: Docker
 
+# Manual only. ICTCore is not published as its own image; the ictfax and
+# ictdialer images each build a full stack and clone this repository during
+# their build. Kept here so the runtime pieces stay testable on demand.
 on:
-  push:
-    branches: [ictcore]
-    tags: ['v*']
-  pull_request:
   workflow_dispatch:
 
 env:

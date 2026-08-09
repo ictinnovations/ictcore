@@ -51,23 +51,30 @@ Install
 
 ### Docker
 
-The quickest way to get a working REST API is the official image. It bundles
-Apache, PHP, FreeSWITCH and MariaDB, so there is nothing else to install.
+`docker/Dockerfile` builds a container with Apache, PHP, FreeSWITCH and MariaDB
+already wired together, so there is nothing else to install.
 
 ```
+docker build -f docker/Dockerfile -t ictcore:dev .
+
 docker run -d --name ictcore \
   -p 8080:80 \
   -p 5060:5060/tcp -p 5060:5060/udp \
   -p 16384-16484:16384-16484/udp \
-  ictinnovations/ictcore:latest
+  ictcore:dev
 ```
 
 First boot takes about two minutes while the database is created and the schema
 loads. After that the API answers on `http://localhost:8080/api/`. Publish the
 RTP range as shown or your calls will connect with no audio.
 
-To point the container at your own database server, or to build the image
-yourself, see [docker/README.md](docker/README.md).
+If you want a finished product rather than the bare API, the
+[ictfax](https://github.com/ictinnovations/ictfax) and
+[ictdialer](https://github.com/ictinnovations/ictdialer) images build this same
+stack and add a dashboard, and both are published ready to pull.
+
+To point the container at your own database server see
+[docker/README.md](docker/README.md).
 
 ### From packages
 

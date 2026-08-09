@@ -14,17 +14,20 @@ LABEL org.opencontainers.image.title="ictcore" \
       org.opencontainers.image.url="https://ictcore.org"
 
 # ── base repos ───────────────────────────────────────────────
-# okay.com.mx carries the EL8 FreeSWITCH and spandsp builds. SignalWire put
-# their own packages behind a paid token, so this is the remaining free path
-# to a prebuilt FreeSWITCH on EL8 and it saves a 40 minute source compile.
+# FreeSWITCH comes from Fedora Copr. SignalWire moved their own EL8 packages
+# behind a paid token, and the okay.com.mx mirror that filled that gap signs
+# every RPM with a key it never publishes, so neither can be verified. Copr is
+# HTTPS, GPG signed and hosted on Fedora infrastructure.
 #
-# okay-release ships two signing keys but its repo file names only the newer
-# one, so dnf rejects every package signed with the older key. Both get
-# imported below rather than turning gpgcheck off.
+# beaveryoga/broadvoice carries the libraries FreeSWITCH links against that EL8
+# has no package for: sofia-sip, spandsp3, libks2 and signalwire-client-c2.
 RUN dnf -y install dnf-utils epel-release wget curl unzip which procps-ng \
  && dnf -y install https://rpms.remirepo.net/enterprise/remi-release-8.rpm \
- && rpm -ivh http://repo.okay.com.mx/centos/8/x86_64/release/okay-release-1-5.el8.noarch.rpm \
- && rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-OKAY /etc/pki/rpm-gpg/RPM-GPG-KEY-okayinc \
+ && curl -fsSL -o /etc/yum.repos.d/copr-freeswitch.repo \
+      https://copr.fedorainfracloud.org/coprs/beaveryoga/FreeSWITCH-1.10.12/repo/epel-8/beaveryoga-FreeSWITCH-1.10.12-epel-8.repo \
+ && curl -fsSL -o /etc/yum.repos.d/copr-freeswitch-deps.repo \
+      https://copr.fedorainfracloud.org/coprs/beaveryoga/broadvoice/repo/epel-8/beaveryoga-broadvoice-epel-8.repo \
+ && sed -i 's/^skip_if_unavailable=True/skip_if_unavailable=False/' /etc/yum.repos.d/copr-freeswitch*.repo \
  && dnf -y module reset php \
  && dnf -y module enable php:${PHP_STREAM} \
  && dnf -y module enable mariadb:10.11 \
@@ -36,7 +39,17 @@ RUN dnf -y install --setopt=install_weak_deps=False \
       php php-cli php-json php-gd php-mysqlnd php-imap php-xml php-mbstring php-process \
       php-pecl-imagick \
       mariadb-server mariadb \
-      freeswitch freeswitch-config-vanilla freeswitch-lang-en freeswitch-sounds-en-us-callie \
+      freeswitch freeswitch-config-vanilla freeswitch-lang-en \
+      freeswitch-application-conference freeswitch-application-db \
+      freeswitch-application-expr freeswitch-application-fifo \
+      freeswitch-application-hash freeswitch-application-fsv \
+      freeswitch-application-valet_parking freeswitch-application-httapi \
+      freeswitch-application-voicemail freeswitch-application-curl \
+      freeswitch-application-enum freeswitch-application-esf \
+      freeswitch-codec-opus freeswitch-codec-passthru-g729 \
+      freeswitch-codec-passthru-g723_1 freeswitch-codec-passthru-amr \
+      freeswitch-format-native-file freeswitch-format-local-stream \
+      freeswitch-format-tone-stream freeswitch-lua \
       sox libtiff-tools ghostscript ImageMagick \
       supervisor openssl \
  && dnf clean all && rm -rf /var/cache/dnf
