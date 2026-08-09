@@ -77,7 +77,14 @@ COPY composer.json composer.lock ./
 # dompdf requirement in composer.json, so install refuses to run. Drift is bounded
 # because composer.json caps twig at 1.x and swiftmailer at 5.x, which are the two
 # that decide PHP 7.4 compatibility.
-RUN composer update --no-dev --no-interaction --no-progress --prefer-dist --ignore-platform-reqs \
+#
+# policy.advisories.block=false because composer 2.9 refuses to resolve any package
+# carrying a published advisory, and every version this codebase pins is old enough
+# to have one. Turning the block off keeps the build honest about what it installs
+# instead of silently upgrading past the PHP 7.4 ceiling. Modernising twig,
+# swiftmailer, dompdf and php-jwt is the real fix and it belongs in composer.json.
+RUN composer config --no-plugins policy.advisories.block false \
+ && composer update --no-dev --no-interaction --no-progress --prefer-dist --ignore-platform-reqs \
  && composer clear-cache
 
 COPY bin/   bin/
