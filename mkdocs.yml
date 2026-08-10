@@ -1,0 +1,102 @@
+site_name: ICTCore
+site_description: >-
+  ICTCore is an open source unified communications framework for voice, fax,
+  SMS and email, with a REST API and FreeSWITCH, Kannel and Sendmail gateways.
+site_url: https://ictcore.readthedocs.io/
+repo_url: https://github.com/ictinnovations/ictcore
+repo_name: ictinnovations/ictcore
+edit_uri: edit/ictcore/docs/
+copyright: Copyright &copy; ICT Innovations. Released under the AGPL.
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - content.action.edit
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ictinnovations
+      name: ICT Innovations on GitHub
+    - icon: fontawesome/brands/npm
+      link: https://www.npmjs.com/package/n8n-nodes-ictcore
+      name: n8n community node
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Features: features.md
+      - System dependencies: dependencies.md
+      - Sizing a server: dimensioning.md
+  - Concepts:
+      - Basic components: intro_components.md
+      - Initializing a program: diagrams/program_scenario.md
+      - Sending a fax: diagrams/sendfax_scenario.md
+  - Configuration:
+      - Settings: settings.md
+      - WebRTC: WebRTC.md
+  - REST API:
+      - Overview: api.md
+      - Full API reference: ApiGuide.md
+  - Developer guide:
+      - Introduction: developer-guide/introduction.md
+      - Common methods: developer-guide/common.md
+      - User data:
+          - Account: developer-guide/user-data/account.md
+          - Contact: developer-guide/user-data/contact.md
+          - Message: developer-guide/user-data/message.md
+      - Logic:
+          - Program: developer-guide/logic/program.md
+          - Application: developer-guide/logic/application.md
+          - Action: developer-guide/logic/action.md
+      - Operation:
+          - Transmission: developer-guide/operation/transmission.md
+          - Schedule: developer-guide/operation/schedule.md
+          - Spool: developer-guide/operation/spool.md
+          - Gateway: developer-guide/operation/gateway.md
+          - Result: developer-guide/operation/result.md
+      - Infrastructure:
+          - Provider: developer-guide/infrastructure/provider.md
+          - Exchange: developer-guide/infrastructure/exchange.md
