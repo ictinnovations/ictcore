@@ -115,10 +115,14 @@ RUN groupadd -f freeswitch \
 # core/lib/Conf/File.php hard codes /etc/ictcore.conf, but the file the
 # entrypoint templates lives in the source tree. Symlink rather than copy so a
 # mounted /usr/ictcore still wins.
+#
+# httpd logs to a file by default, which in a container means PHP fatals land
+# somewhere nobody looks. Send the error log to stderr so docker logs shows it.
 RUN cp etc/http/ictcore.conf /etc/httpd/conf.d/ictcore.conf \
  && cp etc/php/ictcore.ini  /etc/php.d/99-ictcore.ini \
  && ln -sf /usr/ictcore/etc/ictcore.conf /etc/ictcore.conf \
  && sed -i 's/^User .*/User ictcore/;s/^Group .*/Group ictcore/' /etc/httpd/conf/httpd.conf \
+ && sed -i 's|^ErrorLog .*|ErrorLog /proc/self/fd/2|' /etc/httpd/conf/httpd.conf \
  && sed -i 's|#LoadModule mpm_prefork_module|LoadModule mpm_prefork_module|' /etc/httpd/conf.modules.d/00-mpm.conf \
  && sed -i 's|^LoadModule mpm_event_module|#LoadModule mpm_event_module|' /etc/httpd/conf.modules.d/00-mpm.conf \
  && mkdir -p cache log \

@@ -17,16 +17,20 @@ class DB
 
   static function connect($link_new = FALSE)
   {
-    $db_port = Conf::get('db:port', '3306');
-    $db_host = Conf::get('db:host', 'localhost') . ':' . $db_port;
+    $db_port = (int) Conf::get('db:port', 3306);
+    $db_host = Conf::get('db:host', 'localhost');
     $db_user = Conf::get('db:user', 'myuser');
     $db_pass = Conf::get('db:pass', '');
     $db_name = Conf::get('db:name', 'ictcore');
 
-    // $link = mysqli_connect($db_host, $db_user, $db_pass, $link_new);
-    $link = mysqli_connect($db_host, $db_user, $db_pass);
+    // mysqli takes the port as its own argument. The old mysql extension accepted
+    // a host:port string, mysqli does not, and glueing them resolves the whole
+    // thing as a hostname, so the connection fails on anything but the default.
+    $link = mysqli_connect($db_host, $db_user, $db_pass, NULL, $db_port);
     if (!$link) {
-      throw new CoreException('500', 'Unable to connect database server error:' . mysqli_error($link));
+      // mysqli_error() needs a live connection, so on a failed connect it can only
+      // ever return an empty string. mysqli_connect_error() carries the reason.
+      throw new CoreException('500', 'Unable to connect database server error:' . mysqli_connect_error());
     }
     $result = mysqli_select_db($link, $db_name);
     if (!$result) {
