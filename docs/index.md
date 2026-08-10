@@ -18,7 +18,8 @@ scenarios, and you can add your own when none of them fit.
 
 Three products are already built on top of it:
 
-- [ICTFax](https://ictfax.com) for fax server deployments
+- [ICTFax](https://ictfax.com) for fax server deployments, with the open source
+  edition [documented here](https://ictfax.readthedocs.io/)
 - [ICTPBX](https://ictpbx.com) for multi-tenant IP PBX
 - [ICTDialer](https://github.com/ictinnovations/ictdialer), the open source auto dialer
 
@@ -71,8 +72,8 @@ the start rather than discovering this later.
   with every endpoint, including the six-call fax sequence in the order you
   need to run it
 - [n8n-nodes-ictcore](https://www.npmjs.com/package/n8n-nodes-ictcore) for n8n workflows
-- [pbx-mcp](https://github.com/ictinnovations/pbx-mcp), an MCP server that lets
-  AI assistants inspect a live Asterisk or FreeSWITCH box
+- [pbx-mcp](https://pbx-mcp.readthedocs.io/), an MCP server that lets AI
+  assistants inspect a live Asterisk or FreeSWITCH box
 - [ansible-role-ictpbx](https://galaxy.ansible.com/ui/standalone/roles/tahiralmas/ictpbx/)
   to install the ICTPBX stack with one play
 
