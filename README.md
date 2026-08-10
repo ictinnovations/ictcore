@@ -1,6 +1,10 @@
 ICTCore - A Unified Communications Framework for CTI
 ====================================================
 
+[![Documentation Status](https://app.readthedocs.org/projects/ictcore/badge/?version=latest)](https://ictcore.readthedocs.io/en/latest/)
+
+**Documentation: [ictcore.readthedocs.io](https://ictcore.readthedocs.io/en/latest/)**
+
 [ICTCore] core is open source unified communications framework for developers and integrators to rapidly develop ICT based applications using their existing development skills. By using ICTCore, developer can create communication based applications such as Auto attendant, Fax to Email, Click to Call etc.. they can program custom business logic that can control incoming and outgoing communication instances.
 
 ICTCore having primary focus on integrated and automated communications. ICTCore goal is to be a common server-side software / back-end for CTI (computer telephony integration) related projects. Further as a framework it can be extended to develop new communication solution and services using user's existing development skills and infrastructure.
