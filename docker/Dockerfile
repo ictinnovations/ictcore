@@ -147,6 +147,10 @@ VOLUME ["/var/lib/mysql", "/usr/ictcore/data", "/usr/ictcore/log"]
 # 80/443 web + REST, 5060 SIP, 8021 FreeSWITCH event socket,
 # 16384-16484 RTP. Publish the RTP range too or you get signalling
 # with no audio, which is the classic first-run complaint.
+#
+# The event socket binds to loopback unless you set FS_ESL_LISTEN_IP=0.0.0.0.
+# It is a full control channel for the switch, so reaching it from outside the
+# container is opt-in and you want a real FS_ESL_PASSWORD before you do that.
 EXPOSE 80/tcp 443/tcp 5060/tcp 5060/udp 8021/tcp 16384-16484/udp
 
 # The REST router answers an unrouted GET /api/ with 404, so a plain curl -f
