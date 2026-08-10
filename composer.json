@@ -1,4 +1,14 @@
 {
+  "name": "ictinnovations/ictcore",
+  "description": "Unified communications framework with one REST API over voice, fax, SMS and email. The engine behind ICTFax, ICTDialer and ICTContact.",
+  "type": "library",
+  "license": "MPL-2.0",
+  "homepage": "https://ictcore.org",
+  "keywords": ["telephony", "voip", "freeswitch", "fax", "sms", "rest-api", "unified-communications"],
+  "support": {
+    "issues": "https://github.com/ictinnovations/ictcore/issues",
+    "source": "https://github.com/ictinnovations/ictcore"
+  },
   "repositories":
   [
     {
