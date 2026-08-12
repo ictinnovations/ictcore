@@ -50,6 +50,27 @@ ICTCore is build for developers, ICTCore allows developers to
 * RPM based installation
 
 
+What it looks like
+------------------
+
+ICTCore is a back end. It answers on a REST API and ships no dashboard, so there
+is nothing here to log into and nothing to screenshot.
+
+The interface belongs to whatever you build on top. [ICTFax] and [ICTDialer] are
+the two we maintain, and both put the same ICTCore engine behind a web dashboard:
+
+![ICTFax dashboard, built on ICTCore](https://raw.githubusercontent.com/ictinnovations/ictfax/ictfax-13/doc/screenshots/dashboard.png)
+
+Every counter on that page is an ICTCore transmission, and the job list underneath
+is the same data the API returns:
+
+![Outbound job list](https://raw.githubusercontent.com/ictinnovations/ictfax/ictfax-13/doc/screenshots/outbound-fax.png)
+
+Pull [ictinnovations/ictfax](https://hub.docker.com/r/ictinnovations/ictfax) or
+[ictinnovations/ictdialer](https://hub.docker.com/r/ictinnovations/ictdialer) if
+you want a finished product rather than a framework.
+
+
 Install
 -------
 
