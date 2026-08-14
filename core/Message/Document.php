@@ -15,7 +15,6 @@ use ICT\Core\DB;
 use ICT\Core\Message;
 use ICT\Core\Session;
 use ICT\Core\User;
-use NcJoes\OfficeConverter\OfficeConverter;
 
 class Document extends Message
 {
