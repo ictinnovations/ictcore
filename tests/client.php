@@ -1,8 +1,9 @@
 <?php
 
-require(__DIR__ . '/../vendor/nategood/httpful/bootstrap.php');
+// Uses ext-curl directly. This used to pull in nategood/httpful, which has no
+// PHP 8 release and was only ever needed by these two example scripts.
 
-// STEP 1: configure API function to connect and authenticate with ICTBroadcast server
+// STEP 1: configure API function to connect and authenticate with ICTCore server
 function ictcore_api($method, $arguments = array(), $files = array()) {
   $api_url  = 'http://core.voip.vision';
   $username = 'admin';
@@ -10,31 +11,44 @@ function ictcore_api($method, $arguments = array(), $files = array()) {
   $service_url = "$api_url/$method";
   echo $service_url."\n";
 
-  $request = \Httpful\Request::post($service_url); // Build a PUT request...
-  $request->expectsJson();                             // and also receiving in json
-  $request->sendsJson();
-  $request->authenticateWith($username, $password);    // authenticate with basic auth...
+  $headers = array('Accept: application/json');
 
-  // json is not supported with file upload
   if (empty($files)) {
-    $request->body(json_encode($arguments), Httpful\Mime::JSON);
+    $payload   = json_encode($arguments);
+    $headers[] = 'Content-Type: application/json';
   } else {
-    $request->sendsType(Httpful\Mime::UPLOAD);
-    $request->alwaysSerializePayload();
-    $request->body($arguments); // no JSON
-    $request->attach($files);
+    // json is not supported with file upload, so send multipart instead and let
+    // curl set the Content-Type with its own boundary.
+    $payload = $arguments;
+    foreach ($files as $field => $path) {
+      $payload[$field] = new CURLFile($path);
+    }
   }
 
-  $response = $request->send();            // attach a body/payload...
+  $ch = curl_init($service_url);
+  curl_setopt_array($ch, array(
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST           => true,
+    CURLOPT_POSTFIELDS     => $payload,
+    CURLOPT_HTTPHEADER     => $headers,
+    CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
+    CURLOPT_USERPWD        => "$username:$password"
+  ));
+  $body  = curl_exec($ch);
+  $error = curl_error($ch);
+  curl_close($ch);
 
+  if ($body === false) {
+    fwrite(STDERR, "request failed: $error\n");
+    exit(1);
+  }
 
-  return $response->body;
+  return json_decode($body);
 }
 
 $arguments = array(
   'name'        => 'myTiff',
-  'description' => 'nothing special',
-  'file_name'   => '@/home/data/Desktop/ict-innovations/all_test-data/fax.pdf'
+  'description' => 'nothing special'
 );
 
 $files = array(

@@ -17,10 +17,13 @@ use Firebase\JWT\JWT;
 use ICT\Core\Corelog;
 use ICT\Core\CoreException;
 use Firebase\JWT\ExpiredException;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_SendmailTransport;
-use Swift_SmtpTransport;
+use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use ICT\Core\Conf;
 use ICT\Core\Gateway\Sendmail;
 
@@ -71,24 +74,27 @@ class Forgot_password
         $body = str_replace(['[link]'], $link, $templateBody);
         $body = str_replace('[first_name]', $aValue['first_name'], $body);
         $route = Sendmail::default_route();
-        $transport = (new Swift_SmtpTransport($route->host, $route->port))
+        $transport = (new EsmtpTransport($route->host, (int) $route->port))
           ->setUsername($route->username)
           ->setPassword($route->password);
         // Create the Mailer using created Transport
-        $mailer = new Swift_Mailer($transport);
+        $mailer = new Mailer($transport);
         // Create a message
-        $message = (new Swift_Message('Forgot Password Request'))
-          ->setFrom(['kashif@ictinnovations.com' => 'ICT Fax'])
-          ->setTo($email)
-          ->setBody($body, 'text/html');
-        // return $message;
-        $result = $mailer->send($message);
-        if ($result) {
-          return true;
-          Corelog::log('email ' . print_r($result, true), Corelog::INFO);
-        } else {
+        $message = (new Email())
+          ->subject('Forgot Password Request')
+          ->from(new Address('kashif@ictinnovations.com', 'ICT Fax'))
+          ->to($email)
+          ->html($body);
+        // Symfony's send() returns void and signals failure by throwing, unlike
+        // Swift which returned a recipient count. Testing the return value here
+        // would report every successful send as a failure.
+        try {
+          $mailer->send($message);
+        } catch (TransportExceptionInterface $send_error) {
+          Corelog::log('email send failed: ' . $send_error->getMessage(), Corelog::ERROR);
           throw new CoreException(500, 'Error while sending mail');
         }
+        return true;
       } else {
         throw new CoreException(401, 'The provided email is not registered in our system. Please enter a valid email address.');
       }
@@ -153,7 +159,7 @@ class Forgot_password
       $key_file = Conf::get('security:public_key', '/usr/ictcore/etc/ssh/ib_node.pub');
       $hash_type = Conf::get('security:hash_type', 'RS256');
       $public_key = file_get_contents($key_file);
-      return JWT::decode($token, $public_key, array($hash_type));   
+      return JWT::decode($token, new Key($public_key, $hash_type));
     } catch (ExpiredException $e) {
       // Handle token expiration
       return false;

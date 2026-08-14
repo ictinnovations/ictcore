@@ -18,15 +18,11 @@ use ICT\Core\Provider;
 use ICT\Core\Provider\Smtp;
 use ICT\Core\Provider\Emailcmd;
 use ICT\Core\Request;
-use Swift_Attachment;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_SendmailTransport;
-use Swift_SmtpTransport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\SendmailTransport;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mime\Email;
 use ICT\Core\Account\EAddress;
-
-global $path_root;
-require_once $path_root . '/vendor/swiftmailer/swiftmailer/lib/swift_required.php';
 
 class Sendmail extends Gateway
 {
@@ -78,10 +74,15 @@ class Sendmail extends Gateway
     switch ($this->oProvider->type) {
       case 'smtp':
         try {
-          $this->conn = Swift_SmtpTransport::newInstance($this->oProvider->host, $this->oProvider->port);
-          if (!empty($this->oProvider->encryption)) {
-            $this->conn->setEncryption($this->oProvider->encryption);
+          // Swift took the encryption name as a string after construction.
+          // Symfony decides it up front: true means implicit TLS on connect
+          // (smtps, usually 465), null means plain connect then STARTTLS if the
+          // server advertises it, which is what 'tls' meant to Swift.
+          $tls = null;
+          if (strtolower((string) $this->oProvider->encryption) === 'ssl') {
+            $tls = true;
           }
+          $this->conn = new EsmtpTransport($this->oProvider->host, (int) $this->oProvider->port, $tls);
           $this->conn->setUsername($this->oProvider->username);
           $this->conn->setPassword($this->oProvider->password);
         } catch (Exception $conn_error) {
@@ -91,7 +92,7 @@ class Sendmail extends Gateway
       case 'sendmail':
       default:
         try {
-          $this->conn = Swift_SendmailTransport::newInstance($this->oProvider->cli);
+          $this->conn = new SendmailTransport($this->oProvider->cli);
         } catch (Exception $conn_error) {
           throw new CoreException("500", "sendmail connection error", $conn_error);
         }
@@ -103,7 +104,12 @@ class Sendmail extends Gateway
   protected function dissconnect()
   {
     Corelog::log("Sendmail disconnect requested", Corelog::CRUD);
-    return $this->conn->stop();
+    // Only the SMTP transport holds a socket open. SendmailTransport pipes to a
+    // process per message and has no stop().
+    if ($this->conn && method_exists($this->conn, 'stop')) {
+      return $this->conn->stop();
+    }
+    return TRUE;
   }
 
   public function get()
@@ -122,27 +128,25 @@ class Sendmail extends Gateway
     // Convert json into data array
     $data = json_decode($command, TRUE);
 
-    $mailMsg = Swift_Message::newInstance();
+    $mailMsg = new Email();
 
     // TODO, make it functional $headers = $mailMsg->getHeaders();
     // $headers->addIdHeader('spool_id', $data['spool_id']);
 
     try {
-      $mailMsg->setTo($this->validate_email($data['to']));
-      $mailMsg->setFrom($this->validate_email($data['from']));
-      $mailMsg->setSubject($data['subject']);
-      $mailMsg->setBody($data['body'], 'text/html');
+      $mailMsg->to($this->validate_email($data['to']));
+      $mailMsg->from($this->validate_email($data['from']));
+      $mailMsg->subject($data['subject']);
+      $mailMsg->html($data['body']);
       if (!empty($data['body_alt'])) {
-        $mailMsg->addPart($data['body_alt'], 'text/plain');
+        $mailMsg->text($data['body_alt']);
       }
       // Optionally add attachments
       if (!empty($data['attachment'])) {
         $aAttachment = \ICT\Core\path_string_to_array($data['attachment']);
         foreach($aAttachment as $attachment) {
           if (is_file($attachment)) {
-            $oAttachment = Swift_Attachment::fromPath($attachment);
-            // $oAttachment->setFilename($data['file_title']);
-            $mailMsg->attach($oAttachment);
+            $mailMsg->attachFromPath($attachment);
           }
         }
       }
@@ -155,7 +159,7 @@ class Sendmail extends Gateway
     $this->connect();
     if ($this->conn) {
       try {
-        $oMailer = Swift_Mailer::newInstance($this->conn);
+        $oMailer = new Mailer($this->conn);
         $oMailer->send($mailMsg);
       } catch (Exception $send_error) {
         throw new CoreException("500", "error while sending email", $send_error);
