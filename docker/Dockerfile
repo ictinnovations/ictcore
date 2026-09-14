@@ -1,9 +1,10 @@
 FROM rockylinux:8
 
-# PHP 7.4 matches the versions pinned in composer.lock (twig 1.35, swiftmailer
-# 5.4). Both are pre-PHP-8 and will fatal on 8.x. Bump this once the vendor
-# dependencies are modernised.
-ARG PHP_STREAM=remi-7.4
+# 8.3 matches the dependency set this branch moves to. symfony/mailer 6.4 and
+# thecodingmachine/safe 3.4 both require PHP 8.1 or newer, and safe uses union
+# types, so on 7.4 every request dies with a parse error before it reaches any
+# ICTCore code. This line was the one the branch missed.
+ARG PHP_STREAM=remi-8.3
 ARG FREESWITCH_VERSION=1.10.12
 
 LABEL org.opencontainers.image.title="ictcore" \

@@ -20,11 +20,6 @@ use ICT\Core\CoreException;
 use Firebase\JWT\ExpiredException;
 use ICT\Core\Provider\Smtp;
 use ICT\Core\Request;
-use Swift_Attachment;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_SendmailTransport;
-use Swift_SmtpTransport;
 
 #[\AllowDynamicProperties]
 class ForgotpasswordApi extends Api
