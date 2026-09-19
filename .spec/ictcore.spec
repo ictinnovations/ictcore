@@ -434,10 +434,15 @@ grep 'event-scheduler=ON' /etc/my.cnf || sed -i "s/\[mysqld\]/[mysqld]\nevent-sc
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT   # ssl web
 /etc/init.d/iptables save
 %else
+if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
 /bin/firewall-cmd --zone=public --add-port=80/tcp --permanent    # web
 /bin/firewall-cmd --zone=public --add-port=443/tcp --permanent   # ssl web
 /bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
+else
+echo "ictcore: firewalld is not installed or not running, so no firewall rules were added."
+echo "ictcore: open 80/tcp and 443/tcp yourself if this host filters traffic."
+fi
 %endif
 # Remove URL Cache
 %{__rm} -rf /usr/ictcore/cache/urlMap.cache
@@ -501,6 +506,7 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /sbin/iptables -I INPUT -p udp --dport 10000:20000 -j ACCEPT     # rtp
 /etc/init.d/iptables save
 %else
+if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
 # sip internal profile
 /bin/firewall-cmd --zone=public --add-port=5060/udp --permanent  # udp
 /bin/firewall-cmd --zone=public --add-port=5060/tcp --permanent  # tcp
@@ -522,6 +528,10 @@ sed -i 's/<!-- <load module="mod_curl"\/> -->/<load module="mod_curl"\/>/g' \
 /bin/firewall-cmd --zone=public --add-port=10000-20000/udp --permanent # rtp
 /bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
+else
+echo "ictcore: firewalld is not installed or not running, so no firewall rules were added."
+echo "ictcore: open SIP 5060/5061, 5070/5071, 5080/5081, WSS 7443 and RTP 10000-20000/udp yourself if this host filters traffic."
+fi
 %endif
 
 %post kannel
@@ -538,9 +548,14 @@ fi
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 2775 -j ACCEPT    # smpp
 /etc/init.d/iptables save
 %else
+if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
 /bin/firewall-cmd --zone=public --add-port=2775/tcp --permanent  # smpp
 /bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
+else
+echo "ictcore: firewalld is not installed or not running, so no firewall rules were added."
+echo "ictcore: open 2775/tcp for SMPP yourself if this host filters traffic."
+fi
 %endif
 %if %{rhel} < 7
 /sbin/chkconfig kannel on
@@ -575,9 +590,14 @@ echo "apache" >> /etc/mail/trusted-users
 /sbin/iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 25 -j ACCEPT    # smtp
 /etc/init.d/iptables save
 %else
+if command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1; then
 /bin/firewall-cmd --zone=public --add-port=25/tcp --permanent  # smtp
 /bin/firewall-cmd --runtime-to-permanent
 /bin/firewall-cmd --reload
+else
+echo "ictcore: firewalld is not installed or not running, so no firewall rules were added."
+echo "ictcore: open 25/tcp for SMTP yourself if this host filters traffic."
+fi
 %endif
 
 %changelog
