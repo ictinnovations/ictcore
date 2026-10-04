@@ -100,7 +100,7 @@ class Receivefax extends Program
   public function scheme()
   {
     $inboundCall = new Inbound();
-    $inboundCall->source = $this->aResource['account']->phone;
+    $inboundCall->destination = $this->aResource['account']->phone;
     $inboundCall->filter_flag = Dialplan::FILTER_COMMON;
 
     $answerCall = new Connect();
