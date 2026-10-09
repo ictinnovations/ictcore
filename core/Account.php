@@ -371,6 +371,11 @@ class Account
       // add new
       $result = DB::update(self::$table, $data, false);
       $this->account_id = $data['account_id'];
+      if (empty($this->user_id)) {
+        // DB::update stamps created_by with the session user. Keep the object in step, so a
+        // subclass save() (Extension writes its SIP user) sees the owner on the first save.
+        $this->user_id = Session::get_instance()->user->user_id;
+      }
       Corelog::log("New account created: $this->account_id", Corelog::CRUD);
     }
     return $result;
