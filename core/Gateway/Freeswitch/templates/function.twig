@@ -1,19 +1,24 @@
-{% macro set_prefix(in_phone, in_prefix) %}
-{% spaceless %}
-  {% set phone = in_phone %}
-  {% set listPrefix = in_prefix|split(',') %}
-  {% set prefix_matched = false %}
-  {% for prefix in listPrefix if not prefix_matched %}
-    {% set prefix_remove = prefix|split('|', 2)[0] %}
-    {% set prefix_add = prefix|split('|', 2)[1] %}
-    {% set phone = '^' ~ in_phone %}
-    {% set prefix_remove = '^' ~ prefix_remove %}
-    {% set phone = phone|replace({(prefix_remove): (prefix_add)}) %}
-    {% set phone = phone|replace({'^': ''}) %}
-    {% if in_phone is not same as(phone) %}
-      {% set prefix_matched = true %}
-    {% endif %}
-  {% endfor %}
-  {{ phone }}
-{% endspaceless %}
-{% endmacro %}
+{#
+  set_prefix(phone, prefix_rules): apply the first matching provider prefix rule to a number.
+  prefix_rules is a comma separated list of "remove|add" pairs, e.g. "00|,0|92": a leading 00 is
+  dropped, else a leading 0 becomes 92. The first rule that changes the number wins; with no match
+  the number is returned unchanged.
+  Twig 3: no {% spaceless %} and no "for ... if", so whitespace control and an explicit flag instead.
+#}
+{% macro set_prefix(in_phone, in_prefix) -%}
+  {%- set phone = in_phone -%}
+  {%- set prefix_matched = false -%}
+  {%- for prefix in (in_prefix ?? '')|split(',') -%}
+    {%- if not prefix_matched -%}
+      {%- set parts = prefix|split('|', 2) -%}
+      {%- set prefix_remove = '^' ~ parts[0] -%}
+      {%- set prefix_add = parts[1] ?? '' -%}
+      {%- set candidate = ('^' ~ in_phone)|replace({(prefix_remove): (prefix_add)})|replace({'^': ''}) -%}
+      {%- if candidate is not same as(in_phone ~ '') -%}
+        {%- set phone = candidate -%}
+        {%- set prefix_matched = true -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {{- phone -}}
+{%- endmacro %}
