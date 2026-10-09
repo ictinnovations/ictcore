@@ -9,8 +9,9 @@ namespace ICT\Core;
  * Mail : nasir@ictinnovations.com                                 *
  * **************************************************************** */
 
-use Twig_Environment;
-use Twig_Loader_Filesystem;
+use Twig\Environment;
+use Twig\Extension\EscaperExtension;
+use Twig\Loader\FilesystemLoader;
 
 class Token
 {
@@ -114,13 +115,18 @@ class Token
     $this->default_value = $default_value;
 
     /* ---------------------------------------------- PREPARE TEMPLATE ENGINE */
-    $loader = new Twig_Loader_Filesystem($template_dir); // template home dir
-    $twig = new Twig_Environment($loader, array(
+    $loader = new FilesystemLoader($template_dir); // template home dir
+    $twig = new Environment($loader, array(
         'autoescape' => false,
             // uncomment following line to enable cache
             // 'cache' => $path_cache,
     ));
-    $twig->getExtension('Twig_Extension_Core')->setEscaper('json', function($twigEnv, $string, $charset) {
+    // No template in this tree asks for the json strategy, but ICTCore is a
+    // library and the products built on it ship their own templates, so the
+    // strategy is kept rather than dropped. Twig 3 moved setEscaper off the core
+    // extension onto EscaperExtension; it still passes the environment as the
+    // first argument, so the callable keeps its original three parameters.
+    $twig->getExtension(EscaperExtension::class)->setEscaper('json', function($twigEnv, $string, $charset) {
         return addcslashes(str_replace("\r", '', $string), "\"\n\r");
     });
 

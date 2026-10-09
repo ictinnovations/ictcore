@@ -14,26 +14,15 @@
     {
       "type": "vcs",
       "url": "https://github.com/ictinnovations/RestServer"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/ictinnovations/ProcessManager"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/ictinnovations/office-converter"
     }
   ],
   "require": {
-    "swiftmailer/swiftmailer": "^5.4.8",
-    "nategood/httpful": "^0.2.20",
-    "aza/thread": "^1.1",
-    "twig/twig": "^1.35",
+    "php": ">=8.1",
+    "symfony/mailer": "^6.4",
+    "twig/twig": "^3.0",
     "jacwright/restserver": "dev-master",
-    "firebase/php-jwt": "^5.0",
-    "firehed/processmanager": "dev-master",
-    "ncjoes/office-converter": "dev-master",
-    "dompdf/dompdf": "^0.8.3"
+    "firebase/php-jwt": "^7.0",
+    "dompdf/dompdf": "^3.0"
   },
   "autoload": {
     "psr-4": {
