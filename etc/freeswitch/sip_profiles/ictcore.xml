@@ -57,16 +57,11 @@
         DO NOT USE HOSTNAMES, ONLY IP ADDRESSES IN THESE SETTINGS!
 
         default configuration
+    -->
     <param name="rtp-ip" value="$${local_ip_v4}"/>
     <param name="sip-ip" value="$${local_ip_v4}"/>
     <param name="ext-rtp-ip" value="auto-nat"/>
     <param name="ext-sip-ip" value="auto-nat"/>
-    -->
-
-    <param name="rtp-ip" value="10.20.20.122"/>
-    <param name="sip-ip" value="10.20.20.122"/>
-    <param name="ext-rtp-ip" value="10.20.20.122"/>
-    <param name="ext-sip-ip" value="10.20.20.122"/>
     <param name="rtp-timeout-sec" value="300"/>
     <param name="rtp-hold-timeout-sec" value="1800"/>
     <!--<param name="enable-3pcc" value="true"/>-->
