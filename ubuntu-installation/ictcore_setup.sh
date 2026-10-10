@@ -26,7 +26,10 @@ echo "Ownership updated."
 echo "Linking FreeSWITCH configuration files..."
 ln -sf /usr/ictcore/etc/freeswitch/dialplan/ictcore.xml /etc/freeswitch/dialplan/ictcore.xml
 ln -sf /usr/ictcore/etc/freeswitch/sip_profiles/ictcore.xml /etc/freeswitch/sip_profiles/ictcore.xml
-ln -sf /usr/ictcore/etc/freeswitch/directory/ictcore.xml /etc/freeswitch/directory/ictcore.xml
+# extension accounts must sit inside the default domain, and the vanilla demo users (password 1234) go
+mkdir -p /etc/freeswitch/directory/default
+ln -sf /usr/ictcore/etc/freeswitch/directory/ictcore.xml /etc/freeswitch/directory/default/ictcore.xml
+rm -f /etc/freeswitch/directory/default/1[0-9][0-9][0-9].xml /etc/freeswitch/directory/default/brian.xml /etc/freeswitch/directory/default/example.com.xml /etc/freeswitch/directory/default/skinny-example.xml
 echo "Symbolic links created."
 
 # 5. Run ICTCore keygen script

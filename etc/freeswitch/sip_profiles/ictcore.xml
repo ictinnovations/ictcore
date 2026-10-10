@@ -44,8 +44,10 @@
 
     <!--<param name="dbname" value="share_presence"/>-->
     <!--<param name="presence-hosts" value="$${domain}"/>-->
-    <!--<param name="force-register-domain" value="$${domain}"/>-->
-    <!--<param name="force-register-db-domain" value="$${domain}"/>-->
+    <!-- Devices register with whatever domain they were given (public IP, hostname).
+         Map them all onto the one ICTCore domain, or ATAs get 403 behind NAT. -->
+    <param name="force-register-domain" value="$${domain}"/>
+    <param name="force-register-db-domain" value="$${domain}"/>
     <!--<param name="aggressive-nat-detection" value="true"/>-->
     <param name="inbound-codec-negotiation" value="generous"/>
     <param name="nonce-ttl" value="60"/>
