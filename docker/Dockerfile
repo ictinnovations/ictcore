@@ -158,6 +158,20 @@ RUN for d in dialplan sip_profiles; do \
  && grep -q 'rtp-end-port" value="16484"' /etc/freeswitch/autoload_configs/switch.conf.xml \
  && ! ls /etc/freeswitch/directory/default/1000.xml 2>/dev/null
 
+# CVE-2026-116779 (GHSA-mg63-h38w-8p9p): an inbound SIP MESSAGE can select the
+# "api" chat proto and run FreeSWITCH API commands. The fix is in 1.11.3 and the
+# Copr only builds 1.10.12, so chat is switched off on every profile that loads,
+# and the vanilla "default" directory user, which has no password, goes. The
+# build fails if any loaded profile is left with chat on.
+RUN for f in /etc/freeswitch/sip_profiles/*.xml; do \
+      grep -q 'name="enable-chat"' "$f" \
+        || sed -i --follow-symlinks '0,/<settings>/s||<settings>\n    <param name="enable-chat" value="false"/>|' "$f"; \
+    done \
+ && rm -f /etc/freeswitch/directory/default/default.xml \
+ && for f in /etc/freeswitch/sip_profiles/*.xml; do \
+      grep -q 'name="enable-chat" value="false"' "$f" || { echo "chat still on in $f"; exit 1; }; \
+    done
+
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/mariadb.ini      /etc/supervisord.d/mariadb.ini
 COPY docker/entrypoint.sh    /usr/local/bin/entrypoint.sh

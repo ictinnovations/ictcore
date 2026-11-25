@@ -57,6 +57,19 @@ sudo make install
 sudo make cd-sounds-install
 sudo make cd-moh-install
 
+# CVE-2026-116779: an inbound SIP MESSAGE can select the "api" chat proto and run
+# FreeSWITCH API commands. Switch chat off on every profile, and drop the vanilla
+# directory users that have no password (default, skinny-example) or the published
+# one (1000-1019, password 1234).
+echo "Hardening SIP profiles and the user directory..."
+for f in /usr/local/freeswitch/conf/sip_profiles/*.xml; do
+  sudo grep -q 'name="enable-chat"' "$f" \
+    || sudo sed -i '0,/<settings>/s||<settings>\n    <param name="enable-chat" value="false"/>|' "$f"
+done
+sudo rm -f /usr/local/freeswitch/conf/directory/default/default.xml \
+           /usr/local/freeswitch/conf/directory/default/skinny-example.xml \
+           /usr/local/freeswitch/conf/directory/default/1[0-9][0-9][0-9].xml
+
 # Post-install setup
 echo "Creating symlinks..."
 sudo ln -s /usr/local/freeswitch/conf /etc/freeswitch 

@@ -17,6 +17,10 @@
     <param name="tls-sip-port" value="5061"/>
     <param name="context" value="ictcore"/>
 
+    <!-- No inbound SIP MESSAGE chat. With chat on, a MESSAGE can select the "api"
+         chat proto and run FreeSWITCH API commands (CVE-2026-116779). -->
+    <param name="enable-chat" value="false"/>
+
     <!-- which transport to use for register -->
     <param name="bind-params" value="transport=udp,tcp"/>
     <param name="register-transport" value="tcp"/>
